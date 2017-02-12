@@ -1,6 +1,6 @@
 - Feature Name: import-from-derivations
-- Start Date: (fill me in with today's date, YYYY-MM-DD)
-- Authors: (need two names: yours and another buddy later)
+- Start Date: 2017-02-12
+- Authors: peti, zimbatm
 - RFC PR: (leave this empty)
 - Related Issue: (link to related github issues)
 
