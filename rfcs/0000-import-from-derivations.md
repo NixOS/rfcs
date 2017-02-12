@@ -1,4 +1,4 @@
-- Feature Name: (fill me in with a unique ident, my_awesome_feature)
+- Feature Name: import-from-derivations
 - Start Date: (fill me in with today's date, YYYY-MM-DD)
 - Authors: (need two names: yours and another buddy later)
 - RFC PR: (leave this empty)
