@@ -1,5 +1,6 @@
 - Feature Name: rfc-process
 - Start Date: 2017-02-12
+- Authors: zimbatm, ???
 - RFC PR:
 - Related Issue:
 
@@ -14,16 +15,10 @@ ecosystem is evolving in.
 # Motivation
 [motivation]: #motivation
 
-There are a number of GitHub issues, PRs and mailing-list discussions where
-significant contribution was put in but then grind to a halt. Usually because
-there is either not a clear desirable outcome, the direction taken is not
-desired (PR) or the stakeholder doesn't have enough brain space available to
-think about the issue.
-
-The motiviation for introducing this process is to avoid losing all that work.
-By putting contributors through the RFC process for significant changes, it
-should help clarify the path for contribution when the other routes aren't
-suitable.
+There are a number of changes that are significant enough that they could
+benefit from wider community consensus before being implemented. Either
+because they introduce new concepts, big changes or are controversial enough
+that not everybody will agree on the direction to take.
 
 # Detailed design
 [design]: #detailed-design
@@ -50,6 +45,7 @@ on community norms, but may include the following.
   - Removing language features
   - Big restructuring of nixpkgs
   - Introduction of new interfaces or functions
+  - A controversial change
 
 Some changes do not require an RFC:
 
@@ -63,10 +59,9 @@ submit an RFC first.
 
 ## What the process is
 
-In short, to get a major feature added to the Nix ecosystem, one must first
-get the RFC merged into the RFC repo as a markdown file. At that point the RFC
-is 'active' and may be implemented with the goal of eventual inclusion into
-the Nix ecosystem.
+In short, to get a major feature added to the Nix ecosystem, one should first
+go throught the RFC process in order to improve the likelyhood of inclusion.
+Here are roughly the steps that one would take:
 
 * Fork the RFC repo https://github.com/NixOS/rfcs
 * Copy `0000-template.md` to `rfcs/0000-my-feature.md` (where
@@ -78,9 +73,9 @@ the design from the larger community.
 are much more likely to make progress than those that don't receive any
 comments.
 
-Eventually, somebody on the [core team] will either accept the RFC by
-merging the pull request, at which point the RFC is 'active', or
-reject it by closing the pull request.
+At this point, the person submitting the RFC should find at least one "buddy"
+that will help him bring the RFC to reality. The goal is to improve the
+chances that the RFC is both desired and lilely to be implemented.
 
 Whomever merges the RFC should do the following:
 
