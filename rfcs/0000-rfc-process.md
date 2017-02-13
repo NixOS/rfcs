@@ -75,7 +75,7 @@ comments.
 
 At this point, the person submitting the RFC should find at least one "buddy"
 that will help him bring the RFC to reality. The goal is to improve the
-chances that the RFC is both desired and lilely to be implemented.
+chances that the RFC is both desired and likely to be implemented.
 
 Whomever merges the RFC should do the following:
 
