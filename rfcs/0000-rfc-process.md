@@ -97,8 +97,8 @@ stakeholders have agreed to the feature and are amenable to merging it.
 ### Role of the "buddy"
 
 To goal for assigning a "buddy" to the RFC is multifold. The main
-responsability is to make himself available for to the author to move the RFC
-along. It means keep a closer connection with him, talk and help resolve
+responsability is to make themselves available for to the author to move the RFC
+along. It means keep a closer connection with them, talk and help resolve
 ongoing issues and add credence to the proposal. The buddy doesn't necessarily
 have to agree with all the points of the RFC but should generally be satisfied
 that the proposed additions are a good thing for the community.
