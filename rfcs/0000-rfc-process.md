@@ -44,6 +44,7 @@ on community norms, but may include the following.
   - Any semantic or syntactic change to the language that is not a bugfix.
   - Removing language features
   - Big restructuring of nixpkgs
+  - Expansions to the scope of nixpkgs (new arch, major subprojects, ...)
   - Introduction of new interfaces or functions
   - A controversial change
 
