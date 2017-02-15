@@ -51,8 +51,7 @@ on community norms, but may include the following.
 Some changes do not require an RFC:
 
   - Adding, updating and removing packages in nixpkgs
-  - Additions only likely to be _noticed by_ other developers-of-nix,
-    invisible to users-of-nix.
+  - Fixing security updates and bugs that don't break interfaces
 
 If you submit a pull request to implement a new feature without going
 through the RFC process, it may be closed with a polite request to
