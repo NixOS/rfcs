@@ -74,7 +74,7 @@ are much more likely to make progress than those that don't receive any
 comments.
 
 At this point, the person submitting the RFC should find at least one "buddy"
-that will help him bring the RFC to reality. The goal is to improve the
+that will help them bring the RFC to reality. The goal is to improve the
 chances that the RFC is both desired and likely to be implemented.
 
 Whomever merges the RFC should do the following:
