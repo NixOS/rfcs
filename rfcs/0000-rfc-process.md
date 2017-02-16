@@ -27,8 +27,7 @@ Many changes, including bug fixes and documentation improvements can be
 implemented and reviewed via the normal GitHub pull request workflow.
 
 Some changes though are "substantial", and we ask that these be put through a
-bit of a design process and produce a consensus among the Nix community and
-the core team.
+bit of a design process and produce a consensus among the Nix community.
 
 This is the bulk of the RFC. Explain the design in enough detail for somebody
 familiar with the ecosystem to understand, and implement.  This should get
