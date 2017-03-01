@@ -1,8 +1,8 @@
-- Feature Name: rfc-process
-- Start Date: 2017-02-12
-- Authors: zimbatm, ???
-- RFC PR:
-- Related Issue:
+* Feature Name: rfc-process
+* Start Date: 2017-02-12
+* Authors: zimbatm, ???
+* RFC PR:
+* Related Issue:
 
 # Summary
 [summary]: #summary
@@ -40,17 +40,17 @@ You need to follow this process if you intend to make "substantial" changes to
 the Nix ecosystem. What constitutes a "substantial" change is evolving based
 on community norms, but may include the following.
 
-  - Any semantic or syntactic change to the language that is not a bugfix.
-  - Removing language features
-  - Big restructuring of nixpkgs
-  - Expansions to the scope of nixpkgs (new arch, major subprojects, ...)
-  - Introduction of new interfaces or functions
-  - A controversial change
+* Any semantic or syntactic change to the language that is not a bugfix
+* Removing language features
+* Big restructuring of nixpkgs
+* Expansions to the scope of nixpkgs (new arch, major subprojects, ...)
+* Introduction of new interfaces or functions
+* A controversial change
 
 Some changes do not require an RFC:
 
-  - Adding, updating and removing packages in nixpkgs
-  - Fixing security updates and bugs that don't break interfaces
+* Adding, updating and removing packages in nixpkgs
+* Fixing security updates and bugs that don't break interfaces
 
 If you submit a pull request to implement a new feature without going
 through the RFC process, it may be closed with a polite request to
