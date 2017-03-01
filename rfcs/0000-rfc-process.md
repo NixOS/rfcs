@@ -72,8 +72,8 @@ the design from the larger community.
 are much more likely to make progress than those that don't receive any
 comments.
 
-At this point, the person submitting the RFC should find at least one "buddy"
-that will help them bring the RFC to reality. The goal is to improve the
+At this point, the person submitting the RFC should find at least one "co-author"
+that will help them bring the RFC to completion. The goal is to improve the
 chances that the RFC is both desired and likely to be implemented.
 
 Whomever merges the RFC should do the following:
@@ -93,12 +93,12 @@ rubber stamp, and in particular still does not mean the feature will
 ultimately be merged; it does mean that in principle all the major
 stakeholders have agreed to the feature and are amenable to merging it.
 
-### Role of the "buddy"
+### Role of the "co-author"
 
-To goal for assigning a "buddy" to the RFC is multifold. The main
+To goal for assigning a "co-author" to the RFC is multifold. The main
 responsability is to make themselves available for to the author to move the RFC
 along. It means keep a closer connection with them, talk and help resolve
-ongoing issues and add credence to the proposal. The buddy doesn't necessarily
+ongoing issues and add credence to the proposal. The co-author doesn't necessarily
 have to agree with all the points of the RFC but should generally be satisfied
 that the proposed additions are a good thing for the community.
 
