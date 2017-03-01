@@ -63,14 +63,12 @@ go throught the RFC process in order to improve the likelyhood of inclusion.
 Here are roughly the steps that one would take:
 
 * Fork the RFC repo https://github.com/NixOS/rfcs
-* Copy `0000-template.md` to `rfcs/0000-my-feature.md` (where
-'my-feature' is descriptive. don't assign an RFC number yet).
+* Copy `0000-template.md` to `rfcs/0000-my-feature.md` (where 'my-feature' is
+  descriptive. don't assign an RFC number yet).
 * Fill in the RFC
-* Submit a pull request. The pull request is the time to get review of
-the design from the larger community.
-* Build consensus and integrate feedback. RFCs that have broad support
-are much more likely to make progress than those that don't receive any
-comments.
+* Submit a pull request. Rename the rfcs with the PR number. (eg: PR #123 would
+  be `rfcs/0123-my-feature.md`)
+* Get initial feedback on the PR.
 
 At this point, the person submitting the RFC should find at least one "co-author"
 that will help them bring the RFC to completion. The goal is to improve the
@@ -78,13 +76,10 @@ chances that the RFC is both desired and likely to be implemented.
 
 Whomever merges the RFC should do the following:
 
-* Assign an id, using the PR number of the RFC pull request. (If the RFC
-  has multiple pull requests associated with it, choose one PR number,
-  preferably the minimal one.)
-* Add the file in the `rfcs/` directory.
-* Create a corresponding issue on the appropriate repo (NixOS/nix, NixOS/nixpkgs, ...).
-* Fill in the remaining metadata in the RFC header, including links for
-  the original pull request(s) and the newly created issue.
+* Create a corresponding issue on the appropriate repo (NixOS/nix,
+  NixOS/nixpkgs, ...).
+* Fill in the remaining metadata in the RFC header, including links for the
+  original pull request(s) and the newly created issue.
 * Commit everything.
 
 Once an RFC becomes active then authors may implement it and submit the
