@@ -14,3 +14,8 @@ ecosystem is evolving in.
 ## TODO
 
 The first RFC will define the process around RFCs.
+
+## License
+
+All contributions are licensed by their respective authors under the
+[CC-BY-SA 4.0 License](https://creativecommons.org/licenses/by-sa/4.0/legalcode).
