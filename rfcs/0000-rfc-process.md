@@ -1,6 +1,6 @@
 * Feature Name: rfc-process
 * Start Date: 2017-02-12
-* Authors: zimbatm, ???
+* Authors: zimbatm, teh
 * RFC PR:
 * Related Issue:
 
