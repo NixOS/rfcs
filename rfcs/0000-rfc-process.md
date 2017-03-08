@@ -15,8 +15,8 @@ and controlled path for new features to enter the nix language, packages and
 OS, so that all stakeholders can be confident about the direction the
 ecosystem is evolving in.
 
-This RFC is used as a bootstrap to the process. Further RFCs can be used to
-refine the process.
+This RFC is used to bootstrap the process. Further RFCs can be used to refine
+the process.
 
 # Motivation
 [motivation]: #motivation
