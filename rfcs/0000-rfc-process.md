@@ -95,7 +95,7 @@ Whomever merges the RFC should do the following:
 * Commit everything.
 
 Once an RFC becomes active then authors may implement it and submit the
-feature as a pull request to the nix or nixpkgs repo. An 'active' is not a
+feature as a pull request to the nix or nixpkgs repo. An 'active' RFC is not a
 rubber stamp, and in particular still does not mean the feature will
 ultimately be merged; it does mean that in principle all the major
 stakeholders have agreed to the feature and are amenable to merging it.
