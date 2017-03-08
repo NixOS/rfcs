@@ -139,6 +139,8 @@ inspiration.
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
+To be solved in the future:
+
 1. Does this RFC strike a favorable balance between formality and agility?
 2. Does this RFC successfully address the aforementioned issues with the current
    informal RFC process?
