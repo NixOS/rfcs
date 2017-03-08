@@ -1,9 +1,11 @@
-* Feature Name: rfc-process
-* Start Date: 2017-02-12
-* Author: zimbatm
-* Co-Authors: teh, MoreTea
-* RFC PR:
-* Related Issue:
+----
+Feature Name: rfc-process
+Start Date: 2017-02-12
+Author: zimbatm
+Co-Authors: teh, MoreTea
+RFC PR:
+Related Issue:
+----
 
 # Summary
 [summary]: #summary
