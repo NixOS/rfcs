@@ -3,8 +3,7 @@ feature: rfc-process
 start-date: 2017-02-12
 author: zimbatm
 co-authors: teh, MoreTea
-rfc-pr:
-related-issues:
+related-issues: https://github.com/zimbatm/rfcs/pull/2
 ---
 
 # Summary
