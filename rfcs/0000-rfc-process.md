@@ -80,6 +80,12 @@ At this point, the person submitting the RFC should find at least one "co-author
 that will help them bring the RFC to completion. The goal is to improve the
 chances that the RFC is both desired and likely to be implemented.
 
+Once the author is happy with the state of the RFC, he tells it's ready for
+wider community review. And the review process happens.
+
+After the review process has settled a decision is taken by community vote,
+with @edolstra as a BDFL that can override any decision.
+
 Whomever merges the RFC should do the following:
 
 * Create a corresponding issue on the appropriate repo (NixOS/nix,
