@@ -78,11 +78,14 @@ At this point, the person submitting the RFC should find at least one "co-author
 that will help them bring the RFC to completion. The goal is to improve the
 chances that the RFC is both desired and likely to be implemented.
 
-Once the author is happy with the state of the RFC, he tells it's ready for
-wider community review. And the review process happens.
+Once the author is happy with the state of the RFC, she/he should seek for
+wider community review by stating the readyness of the work. Advertisement on
+the mailing-list and IRC is an acceptable way of doing that.
 
-After the review process has settled a decision is taken by community vote,
-with @edolstra as a BDFL that can override any decision.
+After a number of rounds of review the discussion should settle and a general
+consensus should emerge. This bit is left intentionnaly vague and should be
+refined in the future. We don't have a technical commitee so controversial
+changes will be rejected by default.
 
 Whoever merges the RFC should do the following:
 
@@ -93,8 +96,8 @@ Whoever merges the RFC should do the following:
 * Commit everything.
 
 Once an RFC becomes active then authors may implement it and submit the
-feature as a pull request to the Nix or nixpkgs repo. An 'active' RFC is not a
-rubber stamp, and in particular still does not mean the feature will
+feature as a pull request to the Nix or nixpkgs repo. An 'accepted' RFC is not
+a rubber stamp, and in particular still does not mean the feature will
 ultimately be merged; it does mean that in principle all the major
 stakeholders have agreed to the feature and are amenable to merging it.
 
