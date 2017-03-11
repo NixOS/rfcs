@@ -42,11 +42,11 @@ familiar with the ecosystem to understand, and implement.  This should get
 into specifics and corner-cases, and include examples of how the feature is
 used.
 
-## When you need to follow this process
+## When this process is followed
 
-You need to follow this process if you intend to make "substantial" changes to
-the Nix ecosystem. What constitutes a "substantial" change is evolving based
-on community norms, but may include the following.
+This process is followed when one intends to make "substantial" changes to the
+Nix ecosystem. What constitutes a "substantial" change is evolving based on
+community norms, but may include the following.
 
 * Any semantic or syntactic change to the language that is not a bugfix
 * Removing language features
