@@ -54,7 +54,7 @@ community norms, but may include the following.
 * Expansions to the scope of nixpkgs (new arch, major subprojects, ...)
 * Introduction of new interfaces or functions
 
-Some changes do not require an RFC:
+Certain changes do not require an RFC:
 
 * Adding, updating and removing packages in nixpkgs
 * Fixing security updates and bugs that don't break interfaces
