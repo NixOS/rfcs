@@ -115,7 +115,7 @@ for the community.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-There is a danger that the additional process will hinder contribution more
+There is a risk that the additional process will hinder contribution more
 than it would help. We should stay alert that the process is only a way to
 help contribution, not an end in itself.
 
