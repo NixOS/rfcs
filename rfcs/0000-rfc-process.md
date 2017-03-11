@@ -73,7 +73,6 @@ Here are roughly the steps that one would take:
 * Fill in the RFC
 * Submit a pull request. Rename the rfcs with the PR number. (eg: PR #123 would
   be `rfcs/0123-my-feature.md`)
-* Get initial feedback on the PR.
 
 At this point, the person submitting the RFC should find at least one "co-author"
 that will help them bring the RFC to completion. The goal is to improve the
