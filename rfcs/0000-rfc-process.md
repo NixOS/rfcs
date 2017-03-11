@@ -61,7 +61,7 @@ Certain changes do not require an RFC:
 
 Pull requests that contain any of the afore mentioned 'substantial' changes may be closed if there is no RFC connected to the proposed changes.
 
-## What the process is
+## Description of the process
 
 In short, to get a major feature added to the Nix ecosystem, one should first
 go throught the RFC process in order to improve the likelyhood of inclusion.
