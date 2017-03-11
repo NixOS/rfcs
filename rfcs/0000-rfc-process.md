@@ -53,7 +53,6 @@ community norms, but may include the following.
 * Big restructuring of nixpkgs
 * Expansions to the scope of nixpkgs (new arch, major subprojects, ...)
 * Introduction of new interfaces or functions
-* A controversial change
 
 Some changes do not require an RFC:
 
