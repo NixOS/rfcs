@@ -87,19 +87,24 @@ consensus should emerge. This bit is left intentionnaly vague and should be
 refined in the future. We don't have a technical commitee so controversial
 changes will be rejected by default.
 
+If a RFC is accepted then authors may implement it and submit the feature as a
+pull request to the Nix or nixpkgs repo. An 'accepted' RFC is not a rubber
+stamp, and in particular still does not mean the feature will ultimately be
+merged; it does mean that in principle all the major stakeholders have agreed
+to the feature and are amenable to merging it.
+
 Whoever merges the RFC should do the following:
 
-* Create a corresponding issue on the appropriate repo (NixOS/Nix,
-  NixOS/nixpkgs, ...).
 * Fill in the remaining metadata in the RFC header, including links for the
   original pull request(s) and the newly created issue.
 * Commit everything.
 
-Once an RFC becomes active then authors may implement it and submit the
-feature as a pull request to the Nix or nixpkgs repo. An 'accepted' RFC is not
-a rubber stamp, and in particular still does not mean the feature will
-ultimately be merged; it does mean that in principle all the major
-stakeholders have agreed to the feature and are amenable to merging it.
+If a RFC is rejected, whoever merges the RFC should do the following:
+* Move the rfc to the rejected folder
+* Fill in the remaining metadata in the RFC header, including links for the
+  original pull request(s) and the newly created issue.
+* Include a summary reason for the rejection
+* Commit everything
 
 ## Role of the "co-author"
 
@@ -145,6 +150,5 @@ To be solved in the future:
 1. Does this RFC strike a favorable balance between formality and agility?
 2. Does this RFC successfully address the aforementioned issues with the current
    informal RFC process?
-3. Should we retain rejected RFCs in the archive?
 
 [PEP]: http://legacy.python.org/dev/peps/pep-0001/
