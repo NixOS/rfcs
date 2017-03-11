@@ -14,9 +14,6 @@ and controlled path for new features to enter the Nix language, packages and
 OS, so that all stakeholders can be confident about the direction the
 ecosystem is evolving in.
 
-This RFC is used to bootstrap the process. Further RFCs can be used to refine
-the process.
-
 # Motivation
 [motivation]: #motivation
 
@@ -24,6 +21,12 @@ There are a number of changes that are significant enough that they could
 benefit from wider community consensus before being implemented. Either
 because they introduce new concepts, big changes or are controversial enough
 that not everybody will agree on the direction to take.
+
+Therefore, the purpose of this RFC is to introduce a process that allows to
+bring the discussion upfront and avoid unnecesary implementations. It forces
+developers to formulate their ideas without getting bogged down into
+implementation details. This RFC is used to bootstrap the process and further
+RFCs can be used to refine the process.
 
 # Detailed design
 [design]: #detailed-design
