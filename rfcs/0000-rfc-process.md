@@ -10,7 +10,7 @@ related-issues: https://github.com/zimbatm/rfcs/pull/2
 [summary]: #summary
 
 The "RFC" (request for comments) process is intended to provide a consistent
-and controlled path for new features to enter the nix language, packages and
+and controlled path for new features to enter the Nix language, packages and
 OS, so that all stakeholders can be confident about the direction the
 ecosystem is evolving in.
 
@@ -87,14 +87,14 @@ with @edolstra as a BDFL that can override any decision.
 
 Whomever merges the RFC should do the following:
 
-* Create a corresponding issue on the appropriate repo (NixOS/nix,
+* Create a corresponding issue on the appropriate repo (NixOS/Nix,
   NixOS/nixpkgs, ...).
 * Fill in the remaining metadata in the RFC header, including links for the
   original pull request(s) and the newly created issue.
 * Commit everything.
 
 Once an RFC becomes active then authors may implement it and submit the
-feature as a pull request to the nix or nixpkgs repo. An 'active' RFC is not a
+feature as a pull request to the Nix or nixpkgs repo. An 'active' RFC is not a
 rubber stamp, and in particular still does not mean the feature will
 ultimately be merged; it does mean that in principle all the major
 stakeholders have agreed to the feature and are amenable to merging it.
