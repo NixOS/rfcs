@@ -59,9 +59,7 @@ Certain changes do not require an RFC:
 * Adding, updating and removing packages in nixpkgs
 * Fixing security updates and bugs that don't break interfaces
 
-If you submit a pull request to implement a new feature without going
-through the RFC process, it may be closed with a polite request to
-submit an RFC first.
+Pull requests that contain any of the afore mentioned 'substantial' changes may be closed if there is no RFC connected to the proposed changes.
 
 ## What the process is
 
