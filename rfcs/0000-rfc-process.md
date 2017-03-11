@@ -64,7 +64,7 @@ Pull requests that contain any of the afore mentioned 'substantial' changes may 
 ## Description of the process
 
 In short, to get a major feature added to the Nix ecosystem, one should first
-go throught the RFC process in order to improve the likelyhood of inclusion.
+go through the RFC process in order to improve the likelyhood of inclusion.
 Here are roughly the steps that one would take:
 
 * Fork the RFC repo https://github.com/NixOS/rfcs
