@@ -78,12 +78,12 @@ At this point, the person submitting the RFC should find at least one "co-author
 that will help them bring the RFC to completion. The goal is to improve the
 chances that the RFC is both desired and likely to be implemented.
 
-Once the author is happy with the state of the RFC, she/he should seek for
+Once the author is happy with the state of the RFC, they should seek for
 wider community review by stating the readyness of the work. Advertisement on
 the mailing-list and IRC is an acceptable way of doing that.
 
 After a number of rounds of review the discussion should settle and a general
-consensus should emerge. This bit is left intentionnaly vague and should be
+consensus should emerge. This bit is left intentionally vague and should be
 refined in the future. We don't have a technical commitee so controversial
 changes will be rejected by default.
 
@@ -108,7 +108,7 @@ If a RFC is rejected, whoever merges the RFC should do the following:
 
 ## Role of the "co-author"
 
-To goal for assigning a "co-author" is to help move the RFC along.
+The goal for assigning a "co-author" is to help move the RFC along.
 
 The co-author should:
 * be available for discussion with the main author
