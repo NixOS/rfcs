@@ -112,24 +112,30 @@ The assumption is that `<nixos-store-key>` resolves to something like
   we can add an option to allow modules to declare files that need
   decryption:
 
+    ```
     security.encryptedFiles = [ wpaSupplicantConf ];
+    ```
 
   which would be decrypted by the activation script to a well-known
   location such as `/var/secrets/<storepath>`. This way, services can
   refer to the decrypted path easily:
 
+    ```
     systemd.services.wpa_supplicant.serviceConfig.Exec =
       "wpa_supplicant -c /var/secrets/${wpaSupplicantConf}";
       # i.e. ... -c /var/secrets/nix/store/.../wpa_supplicant.conf
+    ```
 
   The above can also be extended to support access by non-root users,
   e.g.
 
+    ```
     security.encryptedFiles = [
       { file = httpdConf;
         owner = "httpd";
       }
     ];
+    ```
 
   An alternative is to write a little FUSE filesystem that
   transparently decrypts files on the underlying filesystem. For
