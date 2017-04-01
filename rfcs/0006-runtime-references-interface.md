@@ -29,6 +29,11 @@ more complex reference checking story. Having an interface to
 explicitly specify runtime references would improve all of these
 issues.
 
+Nix will need to provide the build time references to the build to
+enable us to move reference scanning to stdenv and to allow for setups
+that use the reference scan results as a base and then modify that set
+accordingly.
+
 # Detailed design
 [design]: #detailed-design
 
