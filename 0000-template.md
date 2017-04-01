@@ -39,3 +39,9 @@ What other designs have been considered? What is the impact of not doing this?
 [unresolved]: #unresolved-questions
 
 What parts of the design are still TBD or unknowns?
+
+# Future work
+[future]: #future-work
+
+What future work, if any, would be implied or impacted by this feature
+without being directly part of the work?
