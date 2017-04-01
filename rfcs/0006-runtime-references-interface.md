@@ -67,3 +67,11 @@ in the recursive nix regime
 
 The exact specifics of the interface (see "Alternatively" in the
 [detailed design](#detailed-design)).
+
+# Future work
+[future]: #future-work
+
+If this feature is added, we will likely want to implement hash
+scanning in stdenv and add hooks to disable it or do something
+afterward, and use that infrastructure to replace nukeReferences usage
+etc.
