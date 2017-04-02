@@ -12,9 +12,9 @@ related-issues: https://github.com/NixOS/rfcs/pull/6
 Currently, nix itself scans derivation outputs for the hashes of the
 (transitive closure of) the inputs of the build and registers those it
 finds as references. This feature would provide an optional interface
-for builds to specify their own runtime references, and possibly for
-nix to tell the build what its build time inputs are, bypassing nix's
-own hash scanning.
+for builds to specify their own runtime references and for nix to tell
+the build what its build time inputs are, bypassing nix's own hash
+scanning.
 
 # Motivation
 [motivation]: #motivation
@@ -29,7 +29,7 @@ more complex reference checking story. Having an interface to
 explicitly specify runtime references would improve all of these
 issues.
 
-Nix will need to provide the build time references to the build to
+Nix will need to provide the build time requisites to the build to
 enable us to move reference scanning to stdenv and to allow for setups
 that use the reference scan results as a base and then modify that set
 accordingly.
@@ -37,17 +37,12 @@ accordingly.
 # Detailed design
 [design]: #detailed-design
 
-Nix will put all the build time references (or requisites?) into
-`$NIX_BUILD_TOP/build-time-references`. After the build completes, nix
+Nix will put all the build time requisites into
+`$NIX_BUILD_TOP/build-time-requisites`. After the build completes, nix
 will check `$NIX_BUILD_TOP/runtime-references` and, if it exists, skip
 its builtin hash scanning and just use the file. Both files are
 newline-separated lists of store paths. Parse errors in the
 `runtime-references` file, or non-existent store paths, fail the build.
-
-Alternatively, since recursive nix will require a more complex
-interface with the host nix process anyway, we can just expose a unix
-domain socket (possibly just a socketpair) to the build to query the
-build time references and set the run time references.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -65,8 +60,7 @@ in the recursive nix regime
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-The exact specifics of the interface (see "Alternatively" in the
-[detailed design](#detailed-design)).
+None I'm aware of.
 
 # Future work
 [future]: #future-work
@@ -75,3 +69,6 @@ If this feature is added, we will likely want to implement hash
 scanning in stdenv and add hooks to disable it or do something
 afterward, and use that infrastructure to replace nukeReferences usage
 etc.
+
+Once we have recursive nix, we may be able to get away with removing
+or reducing the `build-time-requisites` file.
