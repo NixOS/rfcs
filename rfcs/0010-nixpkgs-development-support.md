@@ -28,7 +28,7 @@ kinds of tools.
 # Detailed design
 [design]: #detailed-design
 
-Add `pkgs/development-support`, add `pkgs.development-support` calling
+Add `pkgs/development-support`, add `pkgs.developmentSupport` calling
 the functions defined in `pkgs/development-support`.
 
 Any tool relying on `builtins.exec` will take that function as an
