@@ -25,9 +25,9 @@ more considerate of what we consider merge-ready.
 # Detailed design
 [design]: #detailed-design
 
-1. Get nix 1.12 out ASAP. Identify the bugs that need fixing and
+1. Get a new nix out ASAP. Identify the bugs that need fixing and
    optionally features that absolutely need finishing (or possibly
-   temporary reverting), get people to test, and release it.
+   temporary reverting), get people to test, and release it as `2.0.0`.
 2. Do new non-trivial work in feature branches
 3. If a feature branch may introduce regressions, including
    performance regressions, ensure they are tested by relevant parties
