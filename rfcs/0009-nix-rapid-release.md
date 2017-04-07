@@ -33,11 +33,8 @@ more considerate of what we consider merge-ready.
    performance regressions, ensure they are tested by relevant parties
    before merge
 4. Switch to semver
-5. Release master frequently. Personally I'm in favor of every new
-   successful hydra build being a release (and, once we get proper PR
-   integration, we shouldn't have merges before hydra is green), but
-   probably a more realisitic step would be that people can make a
-   request for a new release and it's almost always granted.
+5. Release master frequently. Community members can make a request for
+   a new release and it's almost always granted.
 6. If need arises, start maintenance branches that *only* do bug fixes.
 
 # Drawbacks
