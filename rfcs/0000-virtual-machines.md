@@ -47,6 +47,16 @@ configuration.
 # Detailed design
 [design]: #detailed-design
 
+The VM module is architectured in the following way:
+ * The root filesystem is written on a qcow2 image
+ * The store is stored on the host, for easy upgrade handling (see [Disk
+   management](#disk-management))
+ * `qemu` fetches the kernel and initrd directly from the guests' store
+ * Networking is done with all the VMs in a bridge internal to the server (see
+   [Networking](#networking))
+
+Details follow.
+
 ## Basic configuration
 
 The user should be able to configure various aspects of the VMs running,
@@ -74,6 +84,7 @@ The following options are proposed:
 ```
 
 ## Disk management
+[disk-management]: #disk-management
 
 The VM must have its own disk image, yet must also have shared access to folders
 on the host, if the configuration dictates it so.
@@ -107,6 +118,7 @@ The following options are proposed:
 ```
 
 ## Networking
+[networking]: #networking
 
 The networking system should be as simple to configure as possible, while
 staying complete featurewise.
