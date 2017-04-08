@@ -31,6 +31,12 @@ the guest is still able to get the host's configuration by reading it from the
 store. This information leak is precious to an attacker trying to attack the
 host system.
 
+In addition, containers have seen many high-importance issues and there are ways
+to escape them (see CVE-2016-5195 or CVE-2017-6074 for recent ones in the linux
+kernel, unfortunately systemd seems not to keep a record of what CVEs were fixed
+in their NEWS file). This is normal, as the attack surface of a container is
+much larger than the one of an emulator, even when considering virtio drivers.
+
 ## Use case
 
 The use case this RFC puts forward is the one of someone for whom security is
@@ -73,7 +79,8 @@ The following options are proposed:
   vms = {
     path = "/path/to/dir"; # Path into which to store persistent data (disk
                            # images and per-vm store)
-    rpath = "/runtime/dir"; # Path for temporary non-user-facing low-size data
+    rpath = "/runtime/dir"; # Path for temporary non-user-facing low-size data,
+                            # like IPC sockets
 
     machines.${name} = {
       diskSize = 10240; # Size (in MiB) of the disk image excluding shared paths
@@ -100,7 +107,9 @@ execute them.
 The aim is to be able to trigger an update without rebooting the guest, by
 having the host write the additional packages to the guest's nix store and call
 the `switch-to-configuration` script on the guest in some way. However, this is
-not included in the current RFC, for the sake of simplicity.
+not included in the current RFC, for the sake of simplicity: for now, upgrading
+is done by pointing qemu at the new configuration (by writing the new systemd
+service), and rebooting the VM (by restarting the systemd service).
 
 In order to do this, a possible way to do so is to mount:
  * `/` as a filesystem on a qcow2 image
