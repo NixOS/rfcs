@@ -39,16 +39,13 @@ want the same ease of use as with containers.
 
 ## Expected outcome
 
-TODO: What does this exactly encompass? How to make this not overlap with
-[detailed design](#detailed-design)?
-
-# Detailed design
-[design]: #detailed-design
-
 This RFC describes a prospective NixOS module for running VMs. Thus, the main
 design point is that a `vms.` module should be made available to NixOS users.
 It should allow to declaratively define virtual machines, including their
 configuration.
+
+# Detailed design
+[design]: #detailed-design
 
 ## Basic configuration
 
@@ -224,3 +221,4 @@ consideration that the host is a NixOS) nixops tool.
    is following? If so, should all the packages from the VM be installed based
    on this channel? How to do this, given the configuration is evaluated inside
    the host and not inside the guest?
+ * Is VM IP auto-assignment too much for this first RFC, should it be removed?
