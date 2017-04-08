@@ -44,10 +44,144 @@ TODO: What does this exactly encompass? How to make this not overlap with
 # Detailed design
 [design]: #detailed-design
 
-This is the bulk of the RFC. Explain the design in enough detail for somebody
-familiar with the ecosystem to understand, and implement.  This should get
-into specifics and corner-cases, and include examples of how the feature is
-used.
+This RFC describes a prospective NixOS module for running VMs. Thus, the main
+design point is that a `vms.` module should be made available to NixOS users.
+It should allow to declaratively define virtual machines, including their
+configuration.
+
+## Basic configuration
+
+The user should be able to configure various aspects of the VMs running,
+especially disk, memory and vcpu usages.
+
+### Proposed option set
+
+The following options are proposed:
+
+```nix
+{
+  vms = {
+    path = "/path/to/dir"; # Path into which to store persistent data (disk
+                           # images and per-vm store)
+    rpath = "/runtime/dir"; # Path for temporary non-user-facing low-size data
+
+    machines.${name} = {
+      diskSize = 10240; # Size (in MiB) of the disk image excluding shared paths
+                        # and store
+      memorySize = 1024; # Size (in MiB) of the RAM allocated to the VM
+      vcpus = 1; # Number of virtual CPUs the VM will see
+    };
+  };
+}
+```
+
+## Disk management
+
+The VM must have its own disk image, yet must also have shared access to folders
+on the host, if the configuration dictates it so.
+
+In order to do this, a possible way to do so is to mount:
+ * `/` as a filesystem on a qcow2 image
+ * `/nix/store` as a (writable, see [nix support](#nix-support)) virtfs onto a
+   directory on the host, in order to easily handle setup and upgrades from the
+   host
+ * Shared folders as virtfs' between the host and the guest
+
+### Proposed option set
+
+The following options are proposed:
+
+```nix
+{
+  vms.machines.${name}.shared = { "/guest/directory" = "/host/directory"; };
+  # Pairs of directories from the host to make available to the guest
+}
+```
+
+## Networking
+
+The networking system should be as simple to configure as possible, while
+staying complete featurewise.
+
+A solution to do so is to put all the guests and the host on the same bridge,
+and to enforce IP source addresses using `ebtables`. Then, firewalling can be
+done in `INPUT` on each individual VM, and they can both talk to each other (if
+the configuration of their firewall allows it) and be isolated if need be.
+
+While not perfect securitywise, it has the advantage of being convenient to use
+as well as intuitive, and should be enough even for most paranoid users.
+
+For reproducibility, the IP addresses assigned to each VM should be static. For
+convenience, the user should not have to actually configure them by hand, and
+have an easy way to access it in nix for eg. other VMs' configuration.
+
+Finally, the user should have a domain name for each VM as well as the host, so
+that easy communication can be performed between VMs.
+
+Also, see the [unresolved questions](#unresolved-questions) for additional
+potential networking-related configuration, like port or ip forwarding.
+
+### Proposed option set
+
+The following options are proposed:
+
+```nix
+{
+  vms = {
+    bridge = "br-vm"; # Name of the VM bridge
+    ip4 = {
+      address = "172.16.0.1"; # Start address of the IPv4 subnet in the bridge
+      prefixLength = 12; # Prefix length
+    };
+    ip6 = { /* Same here */ };
+
+    addHostNames = true; # Whether to add the VMs in /etc/hosts of each other,
+                         # under the vm-${name}.localhost name and
+                         # host.localhost
+
+    machines.${name} = {
+      ip4 = "172.16.0.2"; # IPv4 address of the VM, should be auto-filled with
+                          # an IP not used anywhere else in the subnet defined
+                          # on the host if not set, so that user code can use
+                          # vms.machines.${name}.ip4 in the firewall
+      ip6 = "..."; # Same here
+      mac = "..."; # Should be auto-filled with no collision
+    };
+  };
+}
+```
+
+## Security
+
+For security reasons, the qemu daemons should not be run as root. As a
+consequence, issues may arise with shared paths that may be owned by root on the
+host.
+
+In order to make things work more smoothly, qemu's virtfs should be put in
+`proxy` mode, which allows a tiny priviledge broker to run and give access to
+the shared directories to the unpriviledged qemu process.
+
+## Nix support
+[nix-support]: #nix-support
+
+Nix should be supported inside the VMs. In order to do so, the store should be
+writable, and internet access should be possible from the VMs, by using the host
+as a relay. Also see the [unresolved questions](#unresolved-questions).
+
+### Proposed option set
+
+The following options are proposed:
+
+```nix
+{
+  vms.machines.${name}.channels = {
+    nixos = "https://nixos.org/channels/nixos-unstable";
+  };
+  # Allows to define channels the VM's nix should follow. See unresolved
+  # questions for discussion on whether something similar should condition the
+  # VM's overall configuration.
+}
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -62,4 +196,21 @@ What other designs have been considered? What is the impact of not doing this?
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-What parts of the design are still TBD or unknowns?
+ * Should we add options like `containers`' `forwardPorts`, or `allowInternet`
+   (that would do the NATing part, as well as forwarding resolv.conf from host
+   to guest)? Or allow to filter internet only to some ports? (eg. a mail vm
+   only allowed to open connections to the outside on tcp/25 and the nix cache)
+ * If so, should we add a `forwardAddress` to forward a complete IP to a VM?
+   Should we handle multiple IPs on the host cleanly?
+ * How to handle the case of adding a new VM that takes the IP of a previous
+   already-running VM? (VM IP assignment has to be written in nix, as nix code
+   like other VMs' firewall has to access it) Using a hash of the VM name to
+   define the IP for each VM, so that IPs don't change? (that implies writing
+   the hashing function in nix, so...)
+ * Should [nix support](#nix-support) be triggered based on a per-VM option? If
+   so, should it automatically set up some kind of NATing restricted to the nix
+   cache?
+ * Should the host be able to set a channel for a VM different from the one it
+   is following? If so, should all the packages from the VM be installed based
+   on this channel? How to do this, given the configuration is evaluated inside
+   the host and not inside the guest?
