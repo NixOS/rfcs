@@ -16,6 +16,7 @@ machines, in a way similar to the current `containers` module.
 [motivation]: #motivation
 
 ## Issues with containers
+[issues-with-containers]: #issues-with-containers
 
 The `containers` module is useful, but is only namespace-level virtualisation.
 As a natural consequence, it blocks kernel-level virtualisation, thus limiting
@@ -186,12 +187,21 @@ The following options are proposed:
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this?
+This adds quite a bit of complexity, even though it is contained inside a single
+module. It would also add a few nix functions to nixpkgs' library, as
+auto-generation of IPs is something pretty generic and reusable.
+
+This proposal would mostly require being maintained over time, even though
+qemu's interface is pretty stable.
 
 # Alternatives
 [alternatives]: #alternatives
 
-What other designs have been considered? What is the impact of not doing this?
+The only current alternative is to use containers, which are [not a tool for the
+same job](#issues-with-containers). The impact for not doing this would be that
+VMs cannot be spawned as easily as they could, and people will most likely just
+not use VMs, or use the (unfit for this task, as there is the additional
+consideration that the host is a NixOS) nixops tool.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
