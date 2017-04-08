@@ -51,6 +51,8 @@ The VM module is architectured in the following way:
  * The root filesystem is written on a qcow2 image
  * The store is stored on the host, for easy upgrade handling (see [Disk
    management](#disk-management))
+ * Each VM is run as a (set of) systemd service, and can be rebooted using
+   `systemctl restart vm-${name}.service`
  * `qemu` fetches the kernel and initrd directly from the guests' store
  * Networking is done with all the VMs in a bridge internal to the server (see
    [Networking](#networking))
