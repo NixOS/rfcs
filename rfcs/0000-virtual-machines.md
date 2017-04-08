@@ -162,24 +162,13 @@ the shared directories to the unpriviledged qemu process.
 ## Nix support
 [nix-support]: #nix-support
 
-Nix should be supported inside the VMs. In order to do so, the store should be
-writable, and internet access should be possible from the VMs, by using the host
-as a relay. Also see the [unresolved questions](#unresolved-questions).
-
-### Proposed option set
-
-The following options are proposed:
-
-```nix
-{
-  vms.machines.${name}.channels = {
-    nixos = "https://nixos.org/channels/nixos-unstable";
-  };
-  # Allows to define channels the VM's nix should follow. See unresolved
-  # questions for discussion on whether something similar should condition the
-  # VM's overall configuration.
-}
-```
+Nix doesn't have to be supported inside the VMs: the guests' configuration is
+managed by the host anyway. As a consequence, nix support would be limited to
+handling things like `nix-shell` usage. While (very) useful, this adds
+significant complexity in the setup. It is possible to do so, but it requires
+quite a number of other automatic things we don't necessarily want (like
+`allowInternet`). As a consequence, it is not included in this RFC, and may come
+in a later RFC.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -214,9 +203,9 @@ consideration that the host is a NixOS) nixops tool.
    like other VMs' firewall has to access it) Using a hash of the VM name to
    define the IP for each VM, so that IPs don't change? (that implies writing
    the hashing function in nix, so...)
- * Should [nix support](#nix-support) be triggered based on a per-VM option? If
-   so, should it automatically set up some kind of NATing restricted to the nix
-   cache?
+ * Should [nix support](#nix-support) be supported and triggered based on a
+   per-VM option? If so, should it automatically set up some kind of NATing
+   restricted to the nix cache?
  * Should the host be able to set a channel for a VM different from the one it
    is following? If so, should all the packages from the VM be installed based
    on this channel? How to do this, given the configuration is evaluated inside
