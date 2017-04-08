@@ -78,11 +78,21 @@ The following options are proposed:
 The VM must have its own disk image, yet must also have shared access to folders
 on the host, if the configuration dictates it so.
 
+The store is a special case, as it has to be written by the host, in order to
+handle both initial VM creation and upgrades, and read by the guest. As a
+consequence, the easy way of doing it is to bind it as a virtfs between the host
+and the guest. The host writes new packages on it, and the guest is able to
+execute them.
+
+The aim is to be able to trigger an update without rebooting the guest, by
+having the host write the additional packages to the guest's nix store and call
+the `switch-to-configuration` script on the guest in some way. However, this is
+not included in the current RFC, for the sake of simplicity.
+
 In order to do this, a possible way to do so is to mount:
  * `/` as a filesystem on a qcow2 image
- * `/nix/store` as a (writable, see [nix support](#nix-support)) virtfs onto a
-   directory on the host, in order to easily handle setup and upgrades from the
-   host
+ * `/nix/store` as a virtfs onto a directory on the host, in order to easily
+   handle setup and upgrades from the host
  * Shared folders as virtfs' between the host and the guest
 
 ### Proposed option set
