@@ -1,5 +1,5 @@
 ---
-feature: virtual-machines
+feature: declarative-virtual-machines
 start-date: 2017-04-02
 author: Ekleog
 co-authors: Nadrieril
