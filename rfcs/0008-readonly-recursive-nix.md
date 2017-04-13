@@ -24,63 +24,47 @@ feature and make it more general.
 # Detailed design
 [design]: #detailed-design
 
-There are a number of components to this work:
-
-## StoreViewStore
-[store-view-store]: #StoreViewStore
-
-A `nix::Store` implementation that forwards readonly requests to an
-underlying `Store` implementation, filtering both requests and
-responses to ensure that only paths that should be accessible to the
-build are returned (so e.g. `queryAllValidPaths` will only return the
-build time requisites of the build, not the full host store).
-
-Alternatively, this can just be a special mode of the nix daemon
-rather than a proper store api implementation.
-
-## FdDaemonStore
-[fd-daemon-store]: #FdDaemonStore
-
-A `nix::RemoteStore` implementation that opens new connections by
-making a request to a datagram-oriented unix domain socket passed into
-it as a parameter.
-
-## Build setup
-[build-setup]: #build-setup
-
-### Daemon availability
-
-The nix build code must ensure there is some daemon running. If the
-current build is a child of a nix-daemon process, it can just reuse
-the parent, otherwise it must spawn its own private nix-daemon process.
-This can be shared by all builds.
-
-### Connection setup
-
-For each build, the build code should create a socketpair, passing one
-socket to the build via `NIX_REMOTE` as appropriate for the
-[FdDaemonStore][fd-daemon-store], and reading packets from the other.
-When connection requests are received, the build loop should create a
-new connection with the daemon, tell the daemon what it needs to know
-to set up a [StoreViewStore][store-view-store], and then pass the
-client socket through to the build.
-
-Multiple processes in the build may be trying to open connections in
-parallel, but as long as each only consumes one response it doesn't
-matter if the response is the exact one corresponding to the specific
-request made.
+1. Break out daemon code into `Daemon` class that can be instantiated
+   by `DerivationGoal`, with a separate thread to handle incoming
+   connections.
+2. Add a readonly mode to the `Daemon`.
+3. Add a parameter to the `Daemon` code to restrict the view exposed
+   by its underlying `Store` to just those paths that are inputs to
+   the build.
+4. Add an environment variable to specify the daemon socket path.
+5. Create a daemon socket in the build directory.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Increased complexity.
+Increased complexity, increased attack surface for builds (which now
+have a new communication channel with a root process). The daemon is
+already intended to be safe to have arbitrary users connect to it, and
+if need be we can put this behind an option.
 
 # Alternatives
 [alternatives]: #alternatives
 
 The main alternative to full recursive nix is import from derivation,
 which currently works but has some significant issues. It is also less
-expressive than full recursive nix.
+expressive than full recursive nix:
+
+* Import-from-derivation breaks dry-run evaluation and separation of
+  evaluation-time from build-time.
+* Import-from-derivation won't work if your expression-producing build
+  needs to run on a different machine than your evaluating machine,
+  unless you have distributed builds set up at evaluation time
+* Import-from-derivation doesn't keep a connection between the build
+  rule and its dependencies: the expressions imported-from-derivation
+  are not discoverable from the final drv
+* Import-from-derivation requires you to know up front all of the
+  possible branches that involve recursive evaluation, whereas
+  recursive nix can branch based on information derived during the
+  build itself.
+* Certain far-future goals, such as a gcc frontend that does all
+  compilations as nested derivations to get free distcc and ccache,
+  would be very impractical to shoehorn into an import-from-derivaiton
+  regime.
 
 The alternative to readonly recursive nix is just to continue to used
 the existing `exportReferencesGraph` mechanism. But not doing this
@@ -90,7 +74,6 @@ of valuable use cases, including using nix as a make replacement.
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-Whether the [StoreViewStore][store-view-store] should be a proper
-store API implementation or just a mode for the nix daemon.
+None as far as I know
 
 [nix-issue-13]: https://github.com/NixOS/nix/issues/13
