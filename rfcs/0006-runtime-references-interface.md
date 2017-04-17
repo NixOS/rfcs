@@ -45,10 +45,17 @@ its builtin hash scanning and just use the file. Both files are
 newline-separated lists of store paths. Parse errors in the
 `runtime-references` file, or non-existent store paths, fail the build.
 
-To avoid duplicating the default reference scanning behavior in Nix,
-we could also make a tiny tool part of Nix itself that wraps the
-`scanForReferences` API, and then expose that in the `<nix>` namespace
-so tooling can get the full path to that tool.
+Optionally, to avoid duplicating the default reference scanning behavior
+in Nix, we will also expose a tiny wrapper around the Nix
+`scanForReferences` API, which consumers can use by using
+`<nix/scan-for-references.nix>`. This will be usable inside a build as
+follows:
+
+```nix
+${import <nix/scan-for-references.nix>} \
+  $NIX_BUILD_TOP/build-time-requisites | grep -v [evil-reference] > \
+  $NIX_BUILD_TOP/runtime-references
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
