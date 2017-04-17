@@ -23,7 +23,8 @@ The existing hash scanning works very well for most use cases. There
 are times, however, where we have to hack around the constraints it
 imposes (e.g. `nukeReferences`, not storing the configure flags used
 to build gcc, storing the path of a file in a comment to ensure the
-build depends on it, etc.). Moreover, every time we need to tweak the
+build depends on it, building disk images that don't retain references
+to their contents, etc.). Moreover, every time we need to tweak the
 logic we need a new nix release. Finally, recursive nix will involve a
 more complex reference checking story. Having an interface to
 explicitly specify runtime references would improve all of these
@@ -44,6 +45,11 @@ its builtin hash scanning and just use the file. Both files are
 newline-separated lists of store paths. Parse errors in the
 `runtime-references` file, or non-existent store paths, fail the build.
 
+To avoid duplicating the default reference scanning behavior in Nix,
+we could also make a tiny tool part of Nix itself that wraps the
+`scanForReferences` API, and then expose that in the `<nix>` namespace
+so tooling can get the full path to that tool.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -55,7 +61,11 @@ more moving complexity to a more appropriate place.
 
 The main alternative is just sticking with the status quo and hacks,
 which mostly works and can be accomodated (though not super cleanly)
-in the recursive nix regime
+in the recursive nix regime. Tools like `nukeReferences` and similar
+can approximate the mechanism we propose in this RFC in many cases,
+but with disk images in particular they fall short, because the paths
+are valid _inside_ the image, but we don't want to retain references
+in the store that built it.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
