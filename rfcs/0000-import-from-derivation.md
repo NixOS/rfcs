@@ -2,7 +2,7 @@
 feature: import-from-derivation
 start-date: 2017-05-19
 author: John Ericson (@Ericson2314)
-co-authors: (find a buddy later to help our with the RFC)
+co-authors: Joe Hermaszewski (@expipiplus1)
 related-issues: (will contain links to implementation PRs)
 ---
 
