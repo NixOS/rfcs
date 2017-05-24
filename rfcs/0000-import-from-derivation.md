@@ -9,7 +9,8 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Fix some issues with import-from-derivation so it is nice to use and suitable for use in nixpkgs.
+Fix some issues with importing from derivations so it is nicer to use both manually and with CI.
+Once this RFC is implemented, hydra.nixos.org should allow importing from derivations.
 
 # Motivation
 [motivation]: #motivation
