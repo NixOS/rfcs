@@ -244,3 +244,5 @@ consideration that the host is a NixOS) nixops tool.
    on this channel? How to do this, given the configuration is evaluated inside
    the host and not inside the guest?
  * Is VM IP auto-assignment too much for this first RFC, should it be removed?
+ * Should we handle VMs having multiple disks attached? If so, with what
+   options?
