@@ -36,6 +36,9 @@ Currently there are some issues with import-from-derivation, however. Per @shlev
   By not building during evaluation, we can use remote build machines just as usual.
 
 This RFC details the fixes to those problems.
+With these fixes made, hydra.nixos.org should change policy to allow importing from derivations.
+In turn, Nixpkgs can stop including auto-generated code, such as the dumps of Hackage.
+This will vastly decrease churn, decreasing growth of that repository.
 
 # Detailed design
 [design]: #detailed-design
