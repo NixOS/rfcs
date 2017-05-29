@@ -28,6 +28,8 @@ Currently there are some issues with import-from-derivation, however. Per @shlev
 
   This is solved by simply making dry-run not build imported derivations.
   Those imports instead become stuck terms, and the derivations blocking them are enqueued.
+  Moreover, the conceptual layering of the nix language and the derivation builder is preserved:
+  While yes, in non-dry-run mode the evaluator will still need to invoke the builder, the builder need not know anything about evaluation.
 
 - *Import-from-derivation won't work if your expression-producing build needs to run on a different machine than your evaluating machine, unless you have distributed builds set up at evaluation time*
 
