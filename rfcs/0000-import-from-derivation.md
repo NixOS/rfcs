@@ -85,7 +85,7 @@ Overlap with recursive Nix.
 # Alternatives
 [alternatives]: #alternatives
 
-Just do recursive Nix alone. @shelvy raised some other downsides of import-from-derivation, not solved by this RFC, which I'll address below:
+Just do recursive Nix alone. @shlevy raised some other downsides of import-from-derivation, not solved by this RFC, which I'll address below:
 
 - *Import-from-derivation doesn't keep a connection between the build rule and its dependencies: the expressions imported-from-derivation are not discoverable from the final drv.*
 
