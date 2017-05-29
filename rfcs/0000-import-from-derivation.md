@@ -19,7 +19,7 @@ Sometimes the entire dependent graph cannot be known statically (before any buil
 Examples of this would be a package with its own nix-based build system—the dependency must be downloaded first,
 or leveraging a language specific build tool (Cabal, Cargo, etc) to generate a build plan.
 
-Import-from-derivation and recursive Nix are two ways to achieve this dynamism—the interleaving of planning the graph and building it.
+Import-from-derivation and recursive Nix are two ways to achieve this dynamism—the interleaving of planning the build graph and executing it.
 Implementation-wise, however, they are completely orthogonal so there's no reason not work on both.
 
 Currently there are some issues with import-from-derivation, however. Per @shlevy's read-only recursive nix RFC:
