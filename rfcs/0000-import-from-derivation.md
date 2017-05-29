@@ -16,19 +16,19 @@ Once this RFC is implemented, hydra.nixos.org should allow importing from deriva
 [motivation]: #motivation
 
 Sometimes the entire dependent graph cannot be known statically (before any building).
-Examples of this would be a package with its own nix-based build system—the dependency must be downloaded first,
+Examples of this would be a package with its own Nix-based build system—the dependency must be downloaded first,
 or leveraging a language specific build tool (Cabal, Cargo, etc) to generate a build plan.
 
 Import-from-derivation and recursive Nix are two ways to achieve this dynamism—the interleaving of planning the build graph and executing it.
-Implementation-wise, however, they are completely orthogonal so there's no reason not work on both.
+Implementation-wise, however, they are completely orthogonal so there's no reason not to work on both.
 
-Currently there are some issues with import-from-derivation, however. Per @shlevy's read-only recursive nix RFC:
+Currently there are some issues with import-from-derivation, however. Per @shlevy's read-only recursive Nix RFC:
 
 - *Import-from-derivation breaks dry-run evaluation and separation of evaluation-time from build-time.*
 
   This is solved by simply making dry-run not build imported derivations.
   Those imports instead become stuck terms, and the derivations blocking them are enqueued.
-  Moreover, the conceptual layering of the nix language and the derivation builder is preserved:
+  Moreover, the conceptual layering of the Nix language and the derivation builder is preserved:
   While yes, in non-dry-run mode the evaluator will still need to invoke the builder, the builder need not know anything about evaluation.
 
 - *Import-from-derivation won't work if your expression-producing build needs to run on a different machine than your evaluating machine, unless you have distributed builds set up at evaluation time*
@@ -48,14 +48,14 @@ This is probably easier to explain in terms of the implementation steps needed.
 
 ## Black-hole unwinding
 
-There's currently a bug with nix-repl where if computation is interrupted (say with `SIGINT`), and the same computation is begun again, one will get an infinite recursion error despite there being no infinite recursion.
+There's currently a bug with `nix-repl` where if computation is interrupted (say with `SIGINT`), and the same computation is begun again, one will get an infinite recursion error despite there being no infinite recursion.
 This is because the thunks stay black-holed—the indication that they are currently evaluated—despite the computation being aborted.
 To fix this, we want aborted computations to instead unwind their stack, un-black-holing any thunks back the way they were before.
 Mathematically, black-hole unwinding ensures that evaluation is idempotent.
 
 ## Partial evaluation
 
-The next step is to extend the nix evaluator to support partial evaluation—i.e. evaluation in the presence of *stuck terms* which cannot be normalized.
+The next step is to extend the Nix evaluator to support partial evaluation—i.e. evaluation in the presence of *stuck terms* which cannot be normalized.
 The partial evaluator, on encountering a stuck term, will unwind (while unblack-holing thunks) until it finds another thunk to force—forcing binary primops for example force both subterms.
 Eventually nothing is left to evaluate, and the evaluator returns.
 [This is all completely standard for partial evaluation.]
@@ -80,12 +80,12 @@ That includes taking advantage of build remotes, which avoids the problem of imp
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Overlap with recursive nix.
+Overlap with recursive Nix.
 
 # Alternatives
 [alternatives]: #alternatives
 
-Recursive nix alone. @shelvy raised some other downsides of import-from-derivation, not solved by this RFC, which I'll address below:
+Just do recursive Nix alone. @shelvy raised some other downsides of import-from-derivation, not solved by this RFC, which I'll address below:
 
 - *Import-from-derivation doesn't keep a connection between the build rule and its dependencies: the expressions imported-from-derivation are not discoverable from the final drv.*
 
@@ -94,7 +94,7 @@ Recursive nix alone. @shelvy raised some other downsides of import-from-derivati
 - *Import-from-derivation requires you to know up front all of the possible branches that involve recursive evaluation, whereas recursive nix can branch based on information derived during the build itself.*
 
   This is fair. There's a CPS-like encoding where one always imports a derivation, but it's something one would want to write.
-  But, more importantly, we do not need to choose between improved import-from-derivation and recursive nix.
+  But, more importantly, we do not need to choose between improved import-from-derivation and recursive Nix.
 
 - *Certain far-future goals, such as a gcc frontend that does all compilations as nested derivations to get free distcc and ccache, would be very impractical to shoehorn into an import-from-derivation regime.*
 
@@ -111,7 +111,7 @@ None.
 
 This unlocks lots of future work in Nixpkgs:
 
- - Leveraging language-specific tools to generate plans nix builds, rather than reimplementing much of those tools.
+ - Leveraging language-specific tools to generate plans Nix builds, rather than reimplementing much of those tools.
 
  - Simply fetching and importing packages which use Nix for their build system, like Nix itself and hydra, rather than vendoring that build system in.
 
