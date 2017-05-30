@@ -68,7 +68,7 @@ The partial evaluator, on encountering stuck terms, will log the unbuilt derivat
 
 ## CLI
 
-This is taken from issue XXX.
+This is taken from issue https://github.com/NixOS/nix/issues/666.
 `nix-build --dry-run` will do a single round of partial evaluation, and print out the set of unbuilt imported derivations just as it would the build plan in the case that evaluation doesn't complete.
 `nix-build --dry-run=n` will perform `n` rounds of evaluation, and then building unbuilt derivations, and then print the build plan or unbuilt imported derivations.
 `nix-build --dry-run` is thus a synonym of `nix-build --dry-run=0`.
