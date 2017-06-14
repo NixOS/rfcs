@@ -25,17 +25,13 @@ more considerate of what we consider merge-ready.
 # Detailed design
 [design]: #detailed-design
 
-1. Get a new nix out ASAP. Identify the bugs that need fixing and
-   optionally features that absolutely need finishing (or possibly
-   temporary reverting), get people to test, and release it as `2.0.0`.
-2. Do new non-trivial work in feature branches
-3. If a feature branch may introduce regressions, including
+1. Do new non-trivial work in feature branches
+2. If a feature branch may introduce regressions, including
    performance regressions, ensure they are tested by relevant parties
    before merge
-4. Switch to semver
-5. Release master frequently. Community members can make a request for
+3. Release master frequently. Community members can make a request for
    a new release and it's almost always granted.
-6. If need arises, start maintenance branches that *only* do bug fixes.
+4. If need arises, start maintenance branches that *only* do bug fixes.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -54,3 +50,11 @@ releases, or merge windows, or time-based releases.
 [unresolved]: #unresolved-questions
 
 The steps needed to get 1.12 out.
+
+# Future work
+[future]: #future-work
+
+1. Get a new nix out ASAP. Identify the bugs that need fixing and
+   optionally features that absolutely need finishing (or possibly
+   temporary reverting), get people to test, and release it as `2.0.0`.
+2. Switch to semver
