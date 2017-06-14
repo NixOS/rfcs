@@ -2,7 +2,7 @@
 feature: nix-rapid-release
 start-date: 2017-04-04
 author: Shea Levy
-co-authors: (find a buddy later to help our with the RFC)
+co-authors: John Ericson (@Ericson2314)
 related-issues: (will contain links to implementation PRs)
 ---
 
