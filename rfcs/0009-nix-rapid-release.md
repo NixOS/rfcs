@@ -14,9 +14,9 @@ Nix master is always release-ready and new releases are cut often.
 # Motivation
 [motivation]: #motivation
 
-Currently, nix releases are unpredictable and new features (and, less often, bug fixes) sit on master for a long time before people can rely on them.
-nix 1.12 in particular has a large number of changes that are not generally available yet.
-A rapid release policy would allow more users to benefit from the latest greatness while also forcing us to make our improvements to nix more incremental and unitary and to be more considerate of what we consider merge-ready.
+Currently, Nix releases are unpredictable and new features (and, less often, bug fixes) sit on master for a long time before people can rely on them.
+Nix 1.12 in particular has a large number of changes that are not generally available yet.
+A rapid release policy would allow more users to benefit from the latest greatness while also forcing us to make our improvements to Nix more incremental and unitary and to be more considerate of what we consider merge-ready.
 
 # Detailed design
 [design]: #detailed-design
@@ -50,6 +50,6 @@ The steps needed to get 1.12 out.
 # Future work
 [future]: #future-work
 
-1. Get a new nix out ASAP.
+1. Get a new Nix out ASAP.
    Identify the bugs that need fixing and optionally features that absolutely need finishing (or possibly temporary reverting), get people to test, and release it as `2.0.0`.
 2. Switch to semver.
