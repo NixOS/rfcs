@@ -13,118 +13,170 @@ require the evaluation of a function.
 # Motivation
 [motivation]: #motivation
 
-Making Nix packages more declarative, and without the usual `stdenv.mkDerivation`, nor
-`callPackage` functions provide multiple benefits such as:
+Making Nix packages more declarative, i-e as a simple attribute set, without the *wrapping* of `stdenv.mkDerivation` and
+`callPackage`. Using such declarative approach has multiple benefits such as:
 
- - Replace the `override` and `overrideDerivation` functions by the update (`//`) operator.
- - Make faster lookup for packages names, as done by the `nix-env` tool.
- - Remove the unused memory held by `stdend.mkDerivation` and `callPackage` to be garbage collected by the Nix interpreter.
- - Normalize inputs of packages, to be used for future grafting techniques.
+- Replace the `override` and `overrideDerivation` functions by the update (`//`) operator.
+- Make faster lookup for packages names, as done by the `nix-env` tool.
+- Remove reflexivity hacks added by `stdend.mkDerivation` and `callPackage`.
+  Do not keep the inputs alive after their evaluations.
+- Normalize inputs of packages, to be used for future grafting techniques.
 
 # Detailed design
 [design]: #detailed-design
 
-To install a package, we want to resolve a package attribute path to a derivation.  To list all
-available packages, we want to resolve a package attribute path to a name.  To list all licences we
-want to list all the meta-data of packages.
+This work add the notion of *view*.  A view is a way to evaluate a set of packages.
+ - name view: extract the names of all the packages.
+ - licenses view: extract the `meta.license` information, and do the same for dependencies.
+ - package view: evaluate the derivation, and register them to the Nix daemon.
 
-In all cases, we have the same input, but a different way to *view* the data provided by the
-packages.  In one case we are interested in viewing the packages as a derivation, which generates
-the derivation files, in an other case we are looking for the `name`, or `meta.license` attributes,
-and we might even want to follow the dependencies as well.
+In all cases, we have the same inputs, but different ways to *view* the data.
 
-Packages should be written as:
+This RFC first introduces:
+1. The new way to write packages.
+2. How to override such packages.
+3. A Recursive Update operator, to remove hierachies of update operators.
+
+## Packages
+
+With this proposal all packages should be written in standalone files, or in the same file as done for python packages.
 
 ```nix
-super: self: # [0]
+self: super: # [0]
 
 { name = "forty-two-1.0";
   src = super.fetchurl { … };
   drvBuilder = self.stdenv.mkDerivation; # [1]
   buildDeps = { inherit (self) foo bar; }; # [2]
-  buildInputs = @: [ foo ]; # [3]
-  buildPhase = @: ''
-    command ${bar /* [4] */ }
+  buildInputs = with :; [ foo ]; # [3]
+  buildPhase = with :; /* [4] */ ''
+    command ${bar /* [5] */ }
   '';
 }
 ```
 
-The usual list of arguments is replaced by the default `super: self:` arguments [0], which includes
-all packages.  This makes the call convention simple which provides the same set of arguments to all
-packages, which avoid the creation of thousands of small attribute sets which have to be held alive
-in order to be overriden.
+The usual list of arguments is replaced by the default `self: super:` arguments [0], which includes
+all packages.  The benefit of this approach is that this avoid redundant information, and avoid the
+creation of thousands of small attribtue set when looking for names of packages.
 
-The list of dependencies can still be overriden by using the `//` operator on the `buildDeps` [2]
-attribute of the package.  Thus replacing a dependency by a different version follow the following
-logic:
+The set of dependencies, instead of being given as arguments, are listed in the `buildDeps` attribute
+set[2].  This is equivalent to the set generated currently by the `callPackage` function, as an
+intersection of the names expected by the functions, and the packages available in `self`.
+
+The new syntax `with :;` [3][4] is detailed below, while describing how to override such attribute set.
+
+## Overrides
+
+Today, `callPackage` add the ability to `.override` the arguments of the function.  This override
+ability is provided by keeping the original function instance.  With this new approach, there is
+no need to keep the original function, but only its attribute set result.  As any other attribute set,
+we can use the update (`//`) operator on the `buildDeps` attribute [2].
+
+With this new design, an overlay which would replace a dependency by a different version would look like:
 
 ```nix
-super: self:
+self: super:
 
 {
   fortytwo_1_0 = super.fortytwo_1_0 // {
     buildDeps = super.fortytwo_1_0.buildDeps // {
-      foo = self.foo_1_21;
+      foo = self.foo_1_21; # [9]
     };
   };
 }
 ```
 
+This approach being quite verbose, would need some additional syntax to express recursive updates of
+attribute sets.  A suggestion is described below, on a new syntax to support recursive updates of
+attribute sets.
+
 The list of build dependencies [2] is processed by the `drvBuilder` function [1], which is called on
-the attribute set which contains it.  To make all top-level packages of Nixpkgs be evaluated as a
-derivation, we would have to use the following Nix expression:
+the attribute set which contains it.
 
 ```nix
-let pkgs = (import <nixpkgs> {});
-    asDerivation = deps: attrsMap (pkg: pkg.drvBuilder pkg) deps;
-in asDerivation pkgs;
+pkg: pkg.drvBuilder pkg
 ```
 
-The `drvBuilder` function [1] is responsible for recursively applying the `asDerivation` function on
-the list of build dependencies [2], before giving the evaluated set to a few specialized attributes
-expected by the `drvBuidler` function, such as `buildInputs` and `buildPhase`.
+The `drvBuilder` function [1] is responsible for applying the `drvBuilder` function on
+the list of build dependencies [2]. Once this set computed, it is given as argument to other attributes
+which are starting with `with :;`, such as `buildInputs` [3] and `buildPhase`.
 
-Attributes such as `buildInputs`[3] are defined with the `@: …` syntax.  This Nix language syntax is
-used to force all names on the right-hand-side to be strictly dynamically scoped.  This is
-equivalent to have a new file with the expression `args: with args; …`, where the `args` binding is
-hidden.  Using a strictly dynamically scoped names will prevent any of the attribute names to refer
-to names which are not explicitly listed as part of the dependencies.  Ideally the `drvBuilder`
-function should check that attributes such as `buildInputs` are asserted to be valid under the
-`isDynamicScopedFunction` predicate that should be added to the builtins.
+Attributes such as `buildInputs`[3] are starting with the `with:; …` syntax.  This is a new Nix
+language syntax is used to force all names on the right-hand-side to be *strictly* dynamically scoped.
+This is equivalent to have a *new file* with the expression `args: with args; …`, where the `args`
+binding is hidden.
 
-In order to simplify the override of the recipe we should have the evaluation of dynamic scoped
-functions be dependent on the evaluation environment.  If a dynamic scoped function is not apply to
-any attribute set argument and it is being evaluated, then it should called with the same argument
-of the last dynamic scoped function call.  Such rule is needed in order to avoid boiler plate code
-when overriding values such as `buildPhase`.
+Using a strictly dynamically scoped names will prevent any of the attribute names to refer
+to names which are not explicitly listed as part of the build dependencies (`buildDeps`).  Thus,
+if a variable is not bound the writer of the Nix expression would be notified to add it in the
+`buildDeps` attribute set.
+
+Ideally the `drvBuilder` function should check that attributes such as `buildInputs` are asserted
+to be valid under the `isDynamicScopedFunction` predicate that should be added to the builtins.
+
+To override and extend the `buildPhase` attribute, we need additional semantic to the dynamically
+scoped functions, i-e that the hidden attribute set should be added as part of the evaluation
+environment, and be used by other dynamicaly scoped function which are wrapped under the evaluation.
+
+Also, as the dynamically scoped function are stricly removing every binding from the out-side, we
+have to explicitly inherit it, as the following example show:
 
 ```nix
-super /* [5] */: self:
+self: super:
 
 {
   fortytwo_1_0 = super.fortytwo_1_0 // {
-    buildDeps = super.fortytwo_1_0.buildDeps // {
-      inherit (self) bad;
-    };
-    buildPhase /* [6] */ = @{ inherit (super.fortytwo_1_0) buildPhase /* [7] */; }: ''
+    buildPhase /* [6] */ = with : // { inherit (super.fortytwo_1_0) buildPhase /* [7] */; }; ''
       ${buildPhase /* [8] */}
-      other_command ${bad}
+      other_command ${foo}
     '';
   };
 }
 ```
 
-Thus, with the previous rule, `buildPhase` [6] which evaluates to a string, is called with the
-attribute set which contains the derivations of `foo`, `bar` and `bad`.  This attribute set is then
-pass down to the dynamically scoped function call [8] which corresponds to the previous `buildPhase`
-[4], as `buildPhase` [7] is explicitly bound to the outer scope through the `super` [5] argument.
+This overriden package will evaluate the `buildPhase` [6] as to a string.  This string interpolates
+the evaluation of the `buildPhase` [8], which is inherited [7] from the out-side and corresponds to
+the evaluation of the previous `buildPhase`[4].
 
-At this stage, overriding the dependencies or the recipe of a package is performed with the update
-`//` operator.  Unfortunately the update operator is quite verbose, as we have to repeat all the
+The dynamic scope given to the `buildPhase` [6], and provided by the evaluation of the `buildDeps` [2]
+by the `drvBuilder` [1], is forwarded seamlessly to any dynamically scoped function under it, such as
+the `buildPhase` [8] evaluation, inherited from the overriden attribute set.
+
+Thus, the interpolation of `foo` and `bar` [5], correspond to the `outPath` of the derivation provided
+by the `drvBuilder` as the dynamic scope.
+
+At this stage, overriding the dependencies [2] or the recipe of a package [4] is performed with the update
+`//` operator.  This respectly replaces the need for the `override` and `overrideDerivation` functions, and
+by such any need for reflexivity.
+
+## Recursive Update
+
+Unfortunately the update operator is quite verbose, as we have to repeat all the
 names at each level of the attribute set.  To makes this easier to manipulate we would have to
-promote the `recursiveUpdate` function to give it some syntax as well.  Also, we would need to stop
-the recursiveUpdate to avoid recursive updates of `foo` in the `buildDeps` attribute.
+promote the `recursiveUpdate` function to give it some syntax as well.  Also, we need a way to stop
+the recursiveUpdate to avoid recursive updates in the attribute `foo` [9] of the `buildDeps` attribute.
 
+The update operator `//`, is only updating the top-level attribute set.  A recursive update operator
+need a way to *start zipping* (`/</`) attribute sets, and to *stop zipping* (`/>/:`) them to default to
+the update logic.
+
+Also, we need a way to refer to the original attribute set, such that we can alias the `buildPhase` [7],
+without repeating the package name.  In the following example, this is achieved with the stop operator,
+which alias the left-hand-side value of the update operator (`/>/@lhs:`).
+
+```nix
+self: super:
+
+{
+  fortytwo_1_0 = super.fortytwo_1_0 /</ {
+    buildDeps.foo = />/: self.foo_1_21; # [9]
+    buildPhase = />/@buildPhase: with : // { inherit buildPhase; }; ''
+      ${buildPhase}
+      other_command ${foo}
+    '';
+  };
+}
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -135,8 +187,7 @@ migrate most of the packages to the new scheme by using the `callPackage` and `s
 functions to convert existing expressions to the new scheme.
 
 This feature require the addition of extra Nix syntax, which might have not easy semantics, as it
-would depend on the evaluation environ, in a similar way as error messages are produced with
-`addErrorContext`.
+would depend on the evaluation environment.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -189,4 +240,4 @@ fucntion, and a second time to evaluate it.  Fortunately, this limitation is rem
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
- - Find a syntax for a `recursiveUpdate` operator
+ - Should we evaluate all derivations as part of `self`, or as part of the `drvBuilder` function?
