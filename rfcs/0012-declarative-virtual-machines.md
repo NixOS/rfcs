@@ -39,8 +39,9 @@ much larger than the one of an emulator, even when considering virtio drivers.
 
 ## Use case
 
-The use case this RFC puts forward is the one of someone for whom security is
-more important than speed (pushing for VMs instead of containerization), but who
+The use case this RFC puts forward is the the same as the one of the current
+`containers.` module, but adapted for the needs of someone for whom security is
+more important than speed (pushing for VMs instead of containerization), yet who
 want the same ease of use as with containers.
 
 ## Expected outcome
