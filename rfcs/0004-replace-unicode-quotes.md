@@ -40,7 +40,7 @@ There are three main reasons for this change.
 
    Also, such quotes should be removed from code snippets in the documentation.
    Otherwise, they cannot be used as is. See
-   http://lists.science.uu.nl/pipermail/nix-dev/2010-April/004286.html
+   https://nixos.org/nix-dev/2010-April/004286.html
 
 2. _Compatibility_: Most terminal emulators do not recognise unicode quotes as
    string delimiters. This makes string copy/paste from the terminal clumsy.
