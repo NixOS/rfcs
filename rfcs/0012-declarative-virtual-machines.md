@@ -60,7 +60,7 @@ The VM module is architectured in the following way:
    management](#disk-management))
  * Each VM is run as a (set of) systemd service, and can be rebooted using
    `systemctl restart vm-${name}.service`
- * `qemu` fetches the kernel and initrd directly from the guests' store
+ * `qemu` fetches the kernel and initrd directly from the host's store
  * Networking is done with all the VMs in a bridge internal to the server (see
    [Networking](#networking))
 
@@ -73,15 +73,15 @@ especially disk, memory and vcpu usages.
 
 ### Proposed option set
 
-The following options are proposed:
+The following options are proposed, with default values shown as an example:
 
 ```nix
 {
   vms = {
-    path = "/path/to/dir"; # Path into which to store persistent data (disk
-                           # images and per-vm store)
-    rpath = "/runtime/dir"; # Path for temporary non-user-facing low-size data,
-                            # like IPC sockets
+    stateDir = "/var/lib/vm"; # Path into which to store persistent data (disk
+                              # images and per-vm store).
+    socketDir = "/run/vm"; # Path for temporary non-user-facing low-size data,
+                           # like IPC sockets
 
     machines.${name} = {
       diskSize = 10240; # Size (in MiB) of the disk image excluding shared paths
@@ -90,6 +90,30 @@ The following options are proposed:
       vcpus = 1; # Number of virtual CPUs the VM will see
     };
   };
+}
+```
+
+## VM internal configuration
+
+The VM must be configurable by the user from his NixOS host configuration, so
+that VM usage can be as transparent as possible.
+
+However, there is also a need for potentially handling non-NixOS VMs.
+In order for this handling to not require additional tools, the user must be
+able to set the VM root image.
+
+In this case, the NixOS configuration can not be applied, hence these two
+settings are mutually exclusive.
+
+### Proposed option set
+
+The following mutually exclusive options are proposed, with no default value:
+
+```nix
+{
+  vms.machines.${name}.config = {}; # Same type as `import /etc/nixos/configuration.nix`
+  # OR
+  vms.machines.${name}.root = "/var/lib/vm/my_vm.qcow2";
 }
 ```
 
@@ -114,13 +138,15 @@ service), and rebooting the VM (by restarting the systemd service).
 
 In order to do this, a possible way to do so is to mount:
  * `/` as a filesystem on a qcow2 image
- * `/nix/store` as a virtfs onto a directory on the host, in order to easily
-   handle setup and upgrades from the host
+ * `/nix/store` as a virtfs onto a directory on the host (different from his
+   `/nix/store`, but containing a copy of exactly the packages required for this
+   VM to properly run), in order to easily handle setup and upgrades from the
+   host
  * Shared folders as virtfs' between the host and the guest
 
 ### Proposed option set
 
-The following options are proposed:
+The following options are proposed, with no default values:
 
 ```nix
 {
@@ -155,21 +181,28 @@ potential networking-related configuration, like port or ip forwarding.
 
 ### Proposed option set
 
-The following options are proposed:
+The following options are proposed, with default values shown where applicable:
 
 ```nix
 {
   vms = {
-    bridge = "br-vm"; # Name of the VM bridge
-    ip4 = {
-      address = "172.16.0.1"; # Start address of the IPv4 subnet in the bridge
-      prefixLength = 12; # Prefix length
-    };
-    ip6 = { /* Same here */ };
+    networking = {
+      bridge = "br-vm"; # Name of the VM bridge
 
-    addHostNames = true; # Whether to add the VMs in /etc/hosts of each other,
-                         # under the vm-${name}.localhost name and
-                         # host.localhost
+      ip4 = {
+        address = "172.16.0.1"; # Start address of the IPv4 subnet in the bridge
+        prefixLength = 12; # Prefix length
+      };
+
+      ip6 = {
+        address = "fd1d:fbcd:2a87:1::"; # You should draw another random subnet
+        prefixLength = 48;
+      };
+
+      addHostNames = true; # Whether to add the VMs in /etc/hosts of each other,
+                           # under the vm-${name}.localhost name and
+                           # host.localhost
+    };
 
     machines.${name} = {
       ip4 = "172.16.0.2"; # IPv4 address of the VM, should be auto-filled with
