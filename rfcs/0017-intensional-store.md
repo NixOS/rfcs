@@ -25,7 +25,7 @@ One paragraph explanation of the feature.
 Terms used:
 * derivation: a `nix-build` output product depending on some inputs and resulting in a file or directory under `/nix/store`
 * dependent derivation: a derivation built using the currently considered derivation
-* `$out`: name of the location where a derivation is built, e.g., `zyb6qaasr5yhh2r4484x01cy87xzddn7-unit-script-1.12`
+* `$out`: name of the location where a derivation is installed first, e.g., `zyb6qaasr5yhh2r4484x01cy87xzddn7-unit-script-1.12`
   * calculated based on the hashes of all the inputs, including build tools
 * `$cas`: output hash, the total hash of all the files under $out, with the derivation name appended, e.g., `qqzyb6bsr5yhh2r5624x01cy87xzn7aa-unit-script-1.12`
 
@@ -37,7 +37,7 @@ After building a derivation, `$cas` is calculated, and `$out` is renamed to `$ca
 
 This means that if 2 different derivations of the same input have a different `$out` but the same `$cas`, any dependent builds will not need to rebuild due to the inputs being different. For example, the 12MB input `poppler-data` is often the same across multiple different input derivations, so many `$out`s for `poppler-data` all result in the same `$cas`. Similarly, a compiler flag change might leave most derivations unchanged.
 
-In order to know which `$out`s refer to a particular `$cas`, symlinks can be used (`$out` pointing to `$cas`), or that data can be stored in the store database. The database can help with doing reverse lookups from `$cas` to all the `$out`s.
+In order to know which `$out`s refer to a particular `$cas`, symlinks can be used (`$out` pointing to `$cas`), or that data can be stored in the store database. The database can help with doing reverse lookups from `$cas` to all the `$out`s. Using symlinks will have a benefit of handling the case when self-references that are not discoverable via grep (e.g. filtered by ```xxd(1)```).
 
 ## Calculating `$cas`
 
