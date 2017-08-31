@@ -10,7 +10,7 @@ related-issues: https://github.com/NixOS/nix/issues/8, https://github.com/NixOS/
 [summary]: #summary
 
 We currently lack a way to store secret information in the Nix
-store. The proposal is to add add a builtin function to Nix to allow
+store. The proposal is to add a builtin function to Nix to allow
 secrets to be encrypted at evaluation time with a key. At runtime,
 files containing encrypted data can be decrypted using the same key.
 
