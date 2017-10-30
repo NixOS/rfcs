@@ -2,7 +2,7 @@
 feature: security-on-call
 start-date: 2017-10-30
 author: Graham Christensen
-co-authors:
+co-authors: Franz Pletz
 related-issues:
 ---
 
