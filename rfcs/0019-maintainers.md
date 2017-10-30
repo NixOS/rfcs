@@ -2,7 +2,7 @@
 feature: maintainers-file
 start-date: 2017-10-28
 author: Maarten Hoogendoorn (@moretea)
-co-authors: (find a buddy later to help our with the RFC)
+co-authors: @zimbatm
 related-issues: (will contain links to implementation PRs)
 ---
 
