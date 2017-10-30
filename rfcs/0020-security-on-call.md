@@ -115,10 +115,11 @@ However, an initial starting list to consider:
 2. full-disclosure
 3. an assortment of distro advisory announcements:
 
- - debian
- - redhat
- - suse
- - gentoo
+ - Arch
+ - Debian
+ - Gentoo
+ - Red Hat
+ - SUSE
 
 ## Ensuring Complete Mailing List Coverage
 
