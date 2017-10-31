@@ -9,37 +9,47 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Currently, nixpkgs does not have explicit maintainers for anything besides
-the packages themselves. Introducing a maintainers file enables us to mark
-maintainers for the remaining parts.
+In the long term we want to move to a more controlled way of can merge what, and have explicit
+reviewers in place for all files.
+This RFC is part of a larger body of work that is necessary to archieve this goal.
+To enable this, we must be able to map all nixpkgs files to maintainers.
+
 
 # Motivation
 [motivation]: #motivation
-
 <!--  Why are we doing this? -->
-There is no explicit (machine-readable) description of who maintains what.
+Currently we have two mechanism in place that explictly describes who the owner is.
+It either is defined in the `metadata.maintainers` in a `stdenv.mkDerivation`, or when it matches a
+pattern in `CODEOWNERS` file.
 
-Currently, a bot is used to ping people based on the heuristic of who authored
-a git commit that that have touched a file at least once.  
-This does not accurately track the current maintainers.
-For example, if someone took over maintenance of the NixOS module system, nbp 
-will still get pinged all the time, because he has created most of the files
-in there.
+The metadata.maintainers only covers the packages, and does not used to determine reviewers
+for packages on GitHub.
 
-Furthermore, there is only the rather black-and-white distinction between
-people who have commit access, and those that do not. A maintainers file
-might open further automation to delegate merge access.
+The [`CODEOWNERS`](https://help.github.com/articles/about-codeowners/)
+is only used to help GitHub select a reviewer and is centrally managed in a single file.
+One of the problems is that this loses the data locality, unlike the `.gitignore` files, on which
+the format is heavily inspired.
+This makes further delegation of maintainer responsibilities harder.
 
-<!-- What use cases does it support? -->
-With a maintainers file, we can ping the correct maintainer(s) on a PR.
-By having this file, we can also enable delegation of maintenance of sub-parts
-of the code tree without giving full commit access.
+These two systems do not integrate together.
+The meta data in` pokgs/*` is used by Hydra packages break, and the CODEOWNERS is only used by
+GitHub for reviews.
 
-<!-- What is the expected outcome? -->
+The `CODEOWNERS` format is not extensible at all; there is no way to specify e.g. that some parts
+require one positive review of the maintainers and others might require more than one.
+
+Furthermore, GitHub is not suitable to handle the permission that the Nix community needs;
+currently people either have full commit access, or none at all.
+
+Therefore, we should implement a format and automation to handle both the data from the
+`metadata.maintainers` and some maintainers file.
+
 The output of this RFC is:
 - An agreed format for the maintainer file format.
 - A simple tool (with machine parseable output) to answer who is the maintainer
   of a file or git diff.
+- Have a check to ensure that every file in nixpkgs has a maintainer.
+
 
 # Detailed design
 [design]: #detailed-design
@@ -49,14 +59,30 @@ familiar with the ecosystem to understand, and implement.  This should get
 into specifics and corner-cases, and include examples of how the feature is
 used. -->
 
+## Requirements
+The input to the maintainers script is a list of files the output will be a machine readable list
+of maintainers. It will support a `--why` option to print out which decisions points were
+encountered, in order to debug why someone is a maintainer of a file.
+
+This script will read in a MAINTAINERS files, with support for nested delegation like how the
+`.gitignore` files work.
+
+For files in `pkg/`, the script will try to use the metadata in the packages to find the maintainer.
+If this information cannot be retrieved, it falls back to the rules in the MAINTAINERS file.
+
+
+## Maintainers file format
+
+TBD.
+
 There are two high level options to take:
-- Data format, such as toml, yaml, or the 
-  [Linux kernel's maintainer file](https://github.com/torvalds/linux/blob/master/MAINTAINERS)
+- Data format, such as toml, yaml, or the
+  [Linux kernel's maintainer file format](https://github.com/torvalds/linux/blob/master/MAINTAINERS)
 - Use Nix file + script to invoke this.
 
-The maintainers file will be a Nix script, which will enable implementing some
-more complex logic, and use the maintainers declared in 
-`pkg.$name.metadata.maintainers`
+## Implementation
+In order to facilitate integration in the GitHub PR + Hydra work by @globin and @gchristensen,
+the implementation will consist of a python library and script.
 
 
 # Drawbacks
@@ -64,7 +90,8 @@ more complex logic, and use the maintainers declared in
 
 <!-- Why should we *not* do this? -->
 
-Potential drawbacks include that this will introduce more formal maintainers.
+A drawback is that this will introduce more formal maintainers and processes.
+
 
 # Alternatives
 [alternatives]: #alternatives
@@ -72,14 +99,21 @@ Potential drawbacks include that this will introduce more formal maintainers.
 <!-- What other designs have been considered? What is the impact of not doing this?
 -->
 
-The alternative is to keep the status quo (to not have explicit maintainers).
+## Codeowners
+Using the existing Codeowners file. This will not include the data from the metadata in packages.
+
+## Mentionbot
+Mentionbot is a heuristic to find ownership.
+It does not work properly with accidental contributors, or when ownership has been tranferred to a new maintainer.
+
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
 <!-- What parts of the design are still TBD or unknowns? -->
 
--
+- The exact file format
+
 
 # Future work
 [future]: #future-work
@@ -90,6 +124,3 @@ enable more granular permissions than getting full commit access.
 
 Furthermore, we could automate getting a quorum / minimal number of reviews
 for complex or critical sub systems, such as the stdenv.
-
-
-
