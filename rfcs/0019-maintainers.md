@@ -68,7 +68,7 @@ encountered, in order to debug why someone is a maintainer of a file.
 This script will read in a MAINTAINERS files, with support for nested delegation like how the
 `.gitignore` files work.
 
-For files in `pkgs/`, the script will try to use the metadata in the packages to find the maintainer.
+For packages in `pkgs/`, modules in `nixos/modules` and tests in `nixos/tests/`, the script will try to use the metadata in the packages to find the maintainer.
 If this information cannot be retrieved, it falls back to the rules in the MAINTAINERS file.
 
 
