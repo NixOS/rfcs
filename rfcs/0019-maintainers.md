@@ -3,7 +3,8 @@ feature: maintainers-file
 start-date: 2017-10-28
 author: Maarten Hoogendoorn (@moretea)
 co-authors: @zimbatm
-related-issues: (will contain links to implementation PRs)
+related-issues: 
+(will contain links to implementation PRs)
 ---
 
 # Summary
@@ -81,8 +82,10 @@ There are two high level options to take:
 - Use Nix file + script to invoke this.
 
 ## Implementation
-In order to facilitate integration in the GitHub PR + Hydra work by @globin and @gchristensen,
+In order to [facilitate integration](https://github.com/mayflower/nixbot/issues/9)
+in the GitHub PR + Hydra work by @globin and @gchristensen,
 the implementation will consist of a python library and script.
+
 
 
 # Drawbacks
