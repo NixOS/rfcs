@@ -32,7 +32,7 @@ the format is heavily inspired.
 This makes further delegation of maintainer responsibilities harder.
 
 These two systems do not integrate together.
-The meta data in` pokgs/*` is used by Hydra packages break, and the CODEOWNERS is only used by
+The meta data in `pkgs/*` is used by Hydra packages break, and the CODEOWNERS is only used by
 GitHub for reviews.
 
 The `CODEOWNERS` format is not extensible at all; there is no way to specify e.g. that some parts
