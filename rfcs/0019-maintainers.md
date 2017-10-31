@@ -19,10 +19,10 @@ To enable this, we must be able to map all nixpkgs files to maintainers.
 [motivation]: #motivation
 <!--  Why are we doing this? -->
 Currently we have two mechanism in place that explictly describes who the owner is.
-It either is defined in the `metadata.maintainers` in a `stdenv.mkDerivation`, or when it matches a
+It either is defined in the `meta.maintainers` in a `stdenv.mkDerivation`, or when it matches a
 pattern in `CODEOWNERS` file.
 
-The metadata.maintainers only covers the packages, and does not used to determine reviewers
+The `meta.maintainers` only covers the packages, and does not used to determine reviewers
 for packages on GitHub.
 
 The [`CODEOWNERS`](https://help.github.com/articles/about-codeowners/)
@@ -42,7 +42,7 @@ Furthermore, GitHub is not suitable to handle the permission that the Nix commun
 currently people either have full commit access, or none at all.
 
 Therefore, we should implement a format and automation to handle both the data from the
-`metadata.maintainers` and some maintainers file.
+`meta.maintainers` and some maintainers file.
 
 The output of this RFC is:
 - An agreed format for the maintainer file format.
