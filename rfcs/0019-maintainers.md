@@ -11,14 +11,14 @@ related-issues: "-"
 
 In the long term we want to move to a more controlled way of can merge what, and have explicit
 reviewers in place for all files.
-This RFC is part of a larger body of work that is necessary to archieve this goal.
+This RFC is part of a larger body of work that is necessary to achieve this goal.
 To enable this, we must be able to map all nixpkgs files to maintainers.
 
 
 # Motivation
 [motivation]: #motivation
 <!--  Why are we doing this? -->
-Currently we have two mechanism in place that explictly describes who the owner is.
+Currently we have two mechanism in place that explicitly describes who the owner is.
 It either is defined in the `meta.maintainers` in a `stdenv.mkDerivation`, or when it matches a
 pattern in `CODEOWNERS` file.
 
@@ -32,7 +32,7 @@ the format is heavily inspired.
 This makes further delegation of maintainer responsibilities harder.
 
 These two systems do not integrate together.
-The meta data in `pkgs/*` is used by Hydra packages break, and the CODEOWNERS is only used by
+The meta data in `pkgs/*` is used by Hydra packages break, and the `CODEOWNERS` is only used by
 GitHub for reviews.
 
 The `CODEOWNERS` format is not extensible at all; there is no way to specify e.g. that some parts
@@ -64,17 +64,17 @@ The input to the maintainers script is a list of files the output will be a mach
 of maintainers. It will support a `--why` option to print out which decisions points were
 encountered, in order to debug why someone is a maintainer of a file.
 
-This script will read in a MAINTAINERS files, with support for nested delegation like how the
-`.gitignore` files work.
+This script will read in a maintainers files, with support for nested delegation like what is
+possible with `.gitignore` files.
 
-For packages in `pkgs/`, modules in `nixos/modules` and tests in `nixos/tests/`, the script will try to use the metadata in the packages to find the maintainer.
+For packages in `pkgs/`, modules in `nixos/modules` and tests in `nixos/tests/`,
+the script will try to use the metadata in the packages to find the maintainer.
 If this information cannot be retrieved, it falls back to the rules in the MAINTAINERS file.
-
 
 ## Maintainers file format
 The maintainers file format will be a Nix expression.
 This allows easy integration and sharing of the data in `lib/maintainers.nix`,
-which will be come the authoritive source for meta data about maintainers.
+which will become the authoritative source for meta data about maintainers.
 
 This file is only supposed to be a data structure.
 The external script will interpret the rules defined in `maintainers.nix`.
@@ -115,7 +115,7 @@ with maintainers;
 
 ```nix
 # located at <nixpkgs/pkgs/development/ruby-modules/maintainers.nix>
-# This file can be maintained by zimbatm without
+# This file can be maintained by zimbatm without involving Eelco.
 maintainers: with maintainers;
 [
   {
@@ -126,20 +126,20 @@ maintainers: with maintainers;
 ```
 
 ## Evaluation of rules
-The first rule that matches is accepted.
+The first rule int the list that matches is accepted.
 If a rule has a `delegate` attribute, it will (recursively) apply the same algorithm until the
 most specific, topmost entry has been selected.
 
-Note that this implies in the example that zimbatm is the "failback" maintainer for all non-bundix
+Note that this implies in the example that zimbatm is the "fallback" maintainer for all non-bundix
 related files in `pkgs/development/ruby-modules`.
 
 ## Extending `lib/maintainers.nix`
-To facilitate future work on pinging people via IRC or GitHub issues, the values of the top level
+To facilitate future work on pinging people via IRC or GitHub PR's, the values of the top level
 attribute set should be converted from simple strings to attribute sets.
 
 Valid fields will be `fullName`, `email`, `GitHub` and `IRC`.
 
-If the GitHub attribute is ommited, it defaults to the name of the key in the top level attribute set.
+If the GitHub attribute is omitted, it defaults to the name of the key in the top level attribute set.
 
 ```
 # <nixpkgs/lib/maintainers.nix>
@@ -152,7 +152,7 @@ If the GitHub attribute is ommited, it defaults to the name of the key in the to
 ## Implementation of the script
 In order to [facilitate integration](https://github.com/mayflower/nixbot/issues/9)
 in the GitHub PR + Hydra work by @globin and @gchristensen,
-the implementation will consist of a python library and script.
+the implementation will consist of a Python library and script.
 
 
 
@@ -175,7 +175,7 @@ Using the existing Codeowners file. This will not include the data from the meta
 
 ## Mentionbot
 Mentionbot is a heuristic to find ownership.
-It does not work properly with accidental contributors, or when ownership has been tranferred to a new maintainer.
+It does not work properly with accidental contributors, or when ownership has been transferred to a new maintainer.
 
 
 # Unresolved questions
