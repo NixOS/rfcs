@@ -1,10 +1,9 @@
 ---
 feature: maintainers-file
 start-date: 2017-10-28
-author: Maarten Hoogendoorn (@moretea)
-co-authors: @zimbatm
-related-issues: 
-(will contain links to implementation PRs)
+author: "Maarten Hoogendoorn (@moretea)"
+co-authors: "@zimbatm"
+related-issues: "-"
 ---
 
 # Summary
