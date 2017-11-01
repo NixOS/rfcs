@@ -22,8 +22,8 @@ Currently we have two mechanism in place that explictly describes who the owner 
 It either is defined in the `meta.maintainers` in a `stdenv.mkDerivation`, or when it matches a
 pattern in `CODEOWNERS` file.
 
-The `meta.maintainers` only covers the packages, and is not used to determine reviewers
-for packages on GitHub.
+The `meta.maintainers` only covers the packages, and some NixOS modules and NixOS tests.
+It is not used to determine reviewers on GitHub.
 
 The [`CODEOWNERS`](https://help.github.com/articles/about-codeowners/)
 is only used to help GitHub select a reviewer and is centrally managed in a single file.
