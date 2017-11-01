@@ -73,15 +73,84 @@ If this information cannot be retrieved, it falls back to the rules in the MAINT
 
 
 ## Maintainers file format
+The maintainers file format will be a Nix expression.
+This allows easy integration and sharing of the data in `lib/maintainers.nix`,
+which will be come the authoritive source for meta data about maintainers.
 
-TBD.
+This file is only supposed to be a data structure.
+The external script will interpret the rules defined in `maintainers.nix`.
 
-There are two high level options to take:
-- Data format, such as toml, yaml, or the
-  [Linux kernel's maintainer file format](https://github.com/torvalds/linux/blob/master/MAINTAINERS)
-- Use Nix file + script to invoke this.
+Splitting up this file by importing other maintainer files is supported and encouraged to
+delegate management of maintainers of sub-parts to maintainers.
 
-## Implementation
+### Structure
+The file is an ordered list of rules.
+Each rule must have a `description`, `paths` and `maintainers` attribute.
+The `delegate` field is optional.
+
+```nix
+# located at <nixpkgs/maintainers.nix>
+
+let maintainers = (import lib/maintainers.nix {}); in
+with maintainers;
+[
+  {
+    description = "Maintainers";
+    paths = [ "maintainers.nix" ];
+    maintainers = [ eelco ];
+  }
+
+  {
+    description = "Standard environment";
+    paths = [ "pkgs/stdenv/**/*" ];
+    maintainers = [ eelco ];
+  }
+
+  {
+    paths = [ "pkgs/development/ruby-modules/**/*" ];
+    delegate = (import pkgs/development/ruby-modules/maintainers.nix) maintainers;
+    maintainers = [ zimbatm ];
+  }
+]
+```
+
+```nix
+# located at <nixpkgs/pkgs/development/ruby-modules/maintainers.nix>
+# This file can be maintained by zimbatm without
+maintainers: with maintainers;
+[
+  {
+    paths = [ "pkgs/develpoment/ruby-modules/bundix/**/*" ];
+    maintainers = [ zimbatm manveru ];
+  }
+]
+```
+
+## Evaluation of rules
+The first rule that matches is accepted.
+If a rule has a `delegate` attribute, it will (recursively) apply the same algorithm until the
+most specific, topmost entry has been selected.
+
+Note that this implies in the example that zimbatm is the "failback" maintainer for all non-bundix
+related files in `pkgs/development/ruby-modules`.
+
+## Extending `lib/maintainers.nix`
+To facilitate future work on pinging people via IRC or GitHub issues, the values of the top level
+attribute set should be converted from simple strings to attribute sets.
+
+Valid fields will be `fullName`, `email`, `GitHub` and `IRC`.
+
+If the GitHub attribute is ommited, it defaults to the name of the key in the top level attribute set.
+
+```
+# <nixpkgs/lib/maintainers.nix>
+{
+  moretea = { fullName = "Maarten Hoogendoorn"; email = "maarten@moretea.nl"; GitHub = "moretea"; IRC = "MoreTea"; };
+}
+
+```
+
+## Implementation of the script
 In order to [facilitate integration](https://github.com/mayflower/nixbot/issues/9)
 in the GitHub PR + Hydra work by @globin and @gchristensen,
 the implementation will consist of a python library and script.
