@@ -69,7 +69,7 @@ arise during their shift, where "handling an issue" means:
    a coordinated manner.
 
  - Determine whether Nixpkgs and/or NixOS is vulnerable to the given
-   vulneravbility and record your findings in the appropriate ticket.
+   vulnerability and record your findings in the appropriate ticket.
    
  - If Nix *is* vulnerable, then
  
