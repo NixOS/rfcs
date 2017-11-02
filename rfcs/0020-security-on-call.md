@@ -18,15 +18,17 @@ disclosures, through the use of a community-based team and rotating
 
 ## 1. Security Posture, Prompt Patching, and Documented Process
 
-Our process for security issues is currently fairly well executed, but
+Our process for handling security issues is currently fairly well executed, but
 porly defined. How to participate and how to do the job is very
 nebulous and boils down to:
 
 1. Everybody pays attention
 2. Everybody patches
 
-This system means there is no division of labor, and no documented way
-to ensure patches are patched the same way, every time.
+This system means there is no division of labor and no mechanisms
+to ensure that no issues will be lost. Furthermore, there is no
+documentation about the procedures individuals should follow in
+order to achieve predictable, high-quality results.
 
 ## 2. Community and Commitment Sensitivity
 
@@ -58,12 +60,31 @@ experienced community members for help.
 # Detailed design
 [design]: #detailed-design
 
-I propose we create an on-call rotation for publicly disclosed
-security issues. Each member of the team will be on call for 24 hours,
-and expected to handle every new issue which is created within their
-on-call period.
+I propose we create a 24 hour on-call rotation of volunteers who will be
+responsible for handling any publicly disclosed security issues that
+arise during their shift, where "handling an issue" means:
 
-The patching team will not handle issues under embargo.
+ - Create a ticket for the given issue to ensure that others can
+   see, follow, and contribute to the current state of affairs in
+   a coordinated manner.
+
+ - Determine whether Nixpkgs and/or NixOS is vulnerable to the given
+   vulneravbility and record your findings in the appropriate ticket.
+   
+ - If Nix *is* vulnerable, then
+ 
+    (a) fix the issue by applying the appropriate patches or version
+        updates or
+        
+    (b) ping the package's maintainers and ask them to apply the
+        necessary fixes.
+
+Furthermore, it is good practice for the volunteers to track issues
+they are responsible for beyond their respective shifts and to keep an
+eye on the progress, possible "nudging" others to complete the necessary
+steps. 
+
+This team will generally not handle issues under embargo.
 
 ## Patching Team
 
