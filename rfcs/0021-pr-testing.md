@@ -2,7 +2,7 @@
 feature: pr-testing
 start-date: 2017-11-06
 author: @globin
-co-authors: (find a buddy later to help out with the RFC)
+co-authors: @grahamc
 related-issues: https://github.com/NixOS/hydra/pull/516 https://github.com/mayflower/nixborg
 ---
 
@@ -50,7 +50,8 @@ The current implementation consists of three seperate services:
 
 Some small remarks on the architecture:
  - the rebasing is done in order to:
-   - make sure Hydra builds a commit that has been reviewed by a maintainer
+   - make sure Hydra builds a commit that has been reviewed by a maintainer (currently contributer with commit access, GitHub terminology: "member")
+   - checks for race conditions of maintainer confirming the build vs last push
    - ensure an older PR is tested based on the current state of the base branch
  - `nixbot-receiver` is implemented as a stdlib-dependency-only python script not doing any logic to have a stable interface to Hydra that doesn't need to be updated
     often, when iterating on nixborg and to not have a large footprint (cpu, memory, disk space)
