@@ -39,11 +39,11 @@ most modules are not needed for a particular configuration.
 The proposal is to require most modules to be included explicitly in a
 system configuration. That is, rather than writing e.g.
 
-   hardware.pulseaudio.enable = true;
+    hardware.pulseaudio.enable = true;
 
 you write
 
-   imports = [ <nixpkgs/nixos/modules/config/pulseaudio.nix> ];
+    imports = [ <nixpkgs/nixos/modules/config/pulseaudio.nix> ];
 
 For example, here is the time and memory consumption for evaluating a
 50-machine NixOps network:
@@ -54,15 +54,15 @@ For example, here is the time and memory consumption for evaluating a
 | 17.09 minimal               | 19.5     | 2577      |
 | 17.09 minimal + memoisation | 12.5     | 1532      |
 
-The "minimal" configuration replaces `module-list.nix` with the list
-shown at https://pastebin.com/GSHS8q67. (This list can be reduced a
-bit further by eliminating some unnecessary module dependencies,
+The "minimal" configuration replaces `module-list.nix` with a [smaller
+list](https://pastebin.com/GSHS8q67). (This list can be reduced a bit
+further by eliminating some unnecessary module dependencies,
 e.g.`hardware/opengl.nix` and `services/networking/dnsmasq.nix` are
 unnecessary. On the other hand, some modules that are not needed to
 evaluate the configuration but that are needed to get a workable
 system are probably missing.)  "Memoisation" refers to using the
-memoisation primop
-(https://github.com/NixOS/nix/commit/0395b9b94af56bb814810a32d680c606614b29e0)
+[memoisation
+primop](https://github.com/NixOS/nix/commit/0395b9b94af56bb814810a32d680c606614b29e0)
 to eliminate repeated evaluations of Nixpkgs; it does not prevent
 repeated evaluations of the NixOS module system.
 
@@ -127,15 +127,15 @@ path consisting of all modules available in the search path. This
 would make configurations agnostic as to the location of a module. For
 instance, instead of
 
-   imports = [ (builtins.fetchgit https://github.com/edolstra/dwarffs + "/modules/dwarffs.nix") ];
+    imports = [ (builtins.fetchgit https://github.com/edolstra/dwarffs + "/modules/dwarffs.nix") ];
 
 you would write
 
-   imports = [ <modules/dwarffs.nix> ];
+    imports = [ <modules/dwarffs.nix> ];
 
 where Nix would be invokes as
 
-  nix-build ... -I https://github.com/edolstra/dwarffs
+    nix-build ... -I https://github.com/edolstra/dwarffs
 
 # Future work
 [future]: #future-work
