@@ -3,8 +3,10 @@ feature: musl-libc
 start-date: 2018-02-19
 author: Will Dietz
 co-authors: (find a buddy later to help our with the RFC)
-related-issues: [big musl PR](https://github.com/NixOS/nixpkgs/pull/34645), [issues matching "musl", newest first](https://github.com/NixOS/nixpkgs/search?o=desc&q=musl&s=created&type=Issues&utf8=%E2%9C%93), [2015 libc discussion](https://github.com/NixOS/nixpkgs/issues/6221#issuecomment-116754223)
+related-issues: 34645, 6221, ...
 ---
+
+
 
 # Summary
 [summary]: #summary
@@ -102,6 +104,11 @@ do folks believe the costs are too high?
 * [projects using musl](https://wiki.musl-libc.org/projects-using-musl.html)
 * [Slides from a talk discussing various libcs, 2014](http://events17.linuxfoundation.org/sites/events/files/slides/libc-talk.pdf)
 
+## Related Isssues
+
+* [big musl PR](https://github.com/NixOS/nixpkgs/pull/34645)
+* [issues matching "musl", newest first](https://github.com/NixOS/nixpkgs/search?o=desc&q=musl&s=created&type=Issues&utf8=%E2%9C%93)
+* [2015 libc discussion](https://github.com/NixOS/nixpkgs/issues/6221#issuecomment-116754223)
 
 # Detailed design
 [design]: #detailed-design
