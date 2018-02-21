@@ -1,8 +1,8 @@
 ---
 feature: musl-libc
 start-date: 2018-02-19
-author: Will Dietz
-co-authors: (find a buddy later to help our with the RFC)
+author: Will Dietz (@dtzWill)
+co-authors: Shea Levy (@shlevy)
 related-issues: 34645, 6221, ...
 ---
 
