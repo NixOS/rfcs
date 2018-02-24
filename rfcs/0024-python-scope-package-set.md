@@ -69,12 +69,21 @@ implementations.
 
 That in effect means only one version of a package is permitted as having
 multiple versions in the set may lead to collisions. Exceptions can be made,
-like in the case of build or test-time dependencies like the `pytest` test runner.
+like in the case of build or test-time dependencies such as the `pytest` test runner.
 
 The definitions from the previous section shall be used to decide whether an
-expression should be part of the Python package set or not.
+expression should be part of the Python package set or not. The following
+special cases exist.
 
-## Application-specific dependencies
+### Package that is used as a both an application and a library
+In certain cases a package is used as both an application and a library. The
+predominant use case determines whether the expression is considered an
+application or a library. If both use cases are considered common, then the
+expression shall be part of the package set and a special alias shall we added
+to the top-level attribute set. This special attribute will mark the package as an
+application and shall be documented in the Nixpkgs manual.
+
+### Application-specific dependencies
 A special case to consider are application-specific dependencies. These are
 dependencies that have been factored out into separate packages but are only
 intended to be used by the parent application. Examples of such packages are
