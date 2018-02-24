@@ -71,6 +71,17 @@ That in effect means only one version of a package is permitted as having
 multiple versions in the set may lead to collisions. Exceptions can be made,
 like in the case of build or test-time dependencies like the `pytest` test runner.
 
+The definitions from the previous section shall be used to decide whether an
+expression should be part of the Python package set or not.
+
+## Application-specific dependencies
+A special case to consider are application-specific dependencies. These are
+dependencies that have been factored out into separate packages but are only
+intended to be used by the parent application. Examples of such packages are
+`buildbot` plugins or the `sabyenc` module for `sabnzbd`. As such packages are
+of no use in a development environment, they should be bundled with the
+expression of the parent application.
+
 ## Contributing and maintaining expressions
 
 Maintenance of the expressions takes effort. All expressions shall therefore
