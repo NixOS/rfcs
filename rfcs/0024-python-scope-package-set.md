@@ -79,9 +79,11 @@ special cases exist.
 In certain cases a package is used as both an application and a library. The
 predominant use case determines whether the expression is considered an
 application or a library. If both use cases are considered common, then the
-expression shall be part of the package set and a special alias shall we added
-to the top-level attribute set. This special attribute will mark the package as an
-application and shall be documented in the Nixpkgs manual.
+expression shall be part of the package set as a library, and a special alias
+shall we added to the top-level attribute set. This alias shall apply a function
+to the library that performs additional steps to convert it from library to
+application, clearly marking it as an application. This function shall be
+documented in the Nixpkgs manual.
 
 ### Application-specific dependencies
 A special case to consider are application-specific dependencies. These are
