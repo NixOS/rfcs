@@ -217,6 +217,7 @@ Unfortunately this is unrealistic due to capacity constraints and other reasons.
 * @dtzWill
 * @shlevy
 * @domenkozar
+* @rasendubi
 
 A team handle will be created to track this
 and to ping the team on musl-related discussion or issues.
