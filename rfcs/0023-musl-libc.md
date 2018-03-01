@@ -212,7 +212,14 @@ Unfortunately this is unrealistic due to capacity constraints and other reasons.
 
 ### Responsibility
 
-"musl team" is reponsible, to be formed.
+"musl team" is reponsible, initially consisting of
+
+* @dtzWill
+* @shlevy
+* @domenkozar
+
+A team handle will be created to track this
+and to ping the team on musl-related discussion or issues.
 
 ### Infrastructure
 
@@ -264,6 +271,9 @@ We need to work on defining:
 * What "Support" entails
 * Responsibility
 * Blame?
+
+For now we leave it as an informal understanding
+which we can improve on in the future.
 
 ## Impact
 
