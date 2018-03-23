@@ -9,7 +9,7 @@ related-issues: https://github.com/matthewbauer/rfcs/pull/27
 # Summary
 [summary]: #summary
 
-Create a "trusted bot" team to manage GitHub bots.
+Create a "trusted bot" process to manage GitHub bots. Bot maintainers can apply to make their bot "trusted", adding it to the bot team.
 
 # Motivation
 [motivation]: #motivation
