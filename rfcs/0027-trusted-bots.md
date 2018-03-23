@@ -27,7 +27,7 @@ Past bots:
 - Travis CI bot
 - [mention-bot](https://github.com/facebook/mention-bot)
 
-Right now we have kind of a wild west of bots where anyone can create and manage their own bots. This is great for iterating on new ideas, but has certain dangers. The biggest danger is that these maintainers get hit by a bus and are unable to continue managing the bot. In the long-term, My goal is to have these bots managed by the NixOS organization. The trusted bots program is the first step in that direction
+Right now we have kind of a wild west of bots where anyone can create and manage their own bots. This is great for iterating on new ideas, but has certain dangers. The biggest danger is that these maintainers get hit by a bus and are unable to continue managing the bot. In the long-term, my goal is to have these bots managed by the NixOS organization. The trusted bots program is the first step in that direction.
 
 # Detailed design
 [design]: #detailed-design
