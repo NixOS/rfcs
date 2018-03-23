@@ -68,6 +68,6 @@ This process could formalize things too much. We want to allow people to iterate
 # Future work
 [future]: #future-work
 
-In the future, we want to move the bots onto the NixOS org on GitHub and through hardware. This will help decrease the "bus factor" of Nixpkgs.
+In the future, we want to move the bots onto the NixOS org on GitHub and also run the bots on shared hardware. This will help decrease the "bus factor" of Nixpkgs.
 
 Interested in co-authors and also any suggestions, comments or concerns.
