@@ -51,15 +51,14 @@ corruption).
    of all other releases at the time it is made.
 4. Changes aimed at getting the release ready (fixing bugs, improving
    docs, etc.) should target the `#-maintenance` branch and then
-   be merged forward into `master`. No commit should exist on the
-   `#-maintenance` branch during the stabilization phase without very
-   soon thereafter being merged into `master` except under rare
-   circumstances. This implies that especially large changes ready
-   around a release should either be included before branch-off (with
-   extra time to stabilize the new feature) or should, if possible,
-   wait to be merged to `master` until after the release. Which path
-   is taken should be a collaboration between the release manager and
-   the developers of the change in question.
+   be merged forward into `master`. Normally, during the stabilization 
+   phase the '#-maintenance' branch should be merged into `master` 
+   soon after each set of commits. This implies that especially large 
+   changes ready around a release should either be included before
+   branch-off (with extra time to stabilize the new feature) or 
+   should, if possible, wait to be merged to `master` until after the
+   release. Which path is taken should be a collaboration between the
+   release manager and the developers of the change in question.
 5. New development unrelated to the new release can go directly into
    `master` in parallel with a release stabilization.
 6. During stabilization, the release manager should update
