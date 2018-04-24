@@ -92,7 +92,9 @@ corruption).
 12. A maintenance release can be tagged off of the `#-maintenance`
     branch at any time *after* there is a mainline release that
     contains all of the fixes included in the desired maintenance
-    release, at the discretion of the Nix core team. This implies that
+    release, at the discretion of the Nix core team. If for there is
+    also a newer `#-maintenance branch`, it should also be released 
+    before (or simultaneously with) the older one. This implies that
     maintenance releases may be tagged off of commits behind the tip
     of the maintenance branch, if the latest commits haven't been
     included in a mainline release.
