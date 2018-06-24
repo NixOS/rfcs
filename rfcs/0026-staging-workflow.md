@@ -87,6 +87,9 @@ Reducing the size of the Hydra jobset would mean the iteration pace could be
 higher, but has the downside of testing fewer packages, and having fewer binary
 substitutes available.
 
+The part about fewer binary substitutes could be partially mitigated by adding
+another slower larger jobset that wouldn't block the channel.
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
