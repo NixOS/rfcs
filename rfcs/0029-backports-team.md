@@ -115,9 +115,9 @@ Definitions
 
 Taking fixes and features from a newer version and applying them to an older
 maintained version to provide the equivalent fix or feature.<sup>
-[[1]][1]
-[[2]][2]
-[[3]][3]
+[1][1]
+[2][2]
+[3][3]
 </sup>
 
 ### Current-stable
