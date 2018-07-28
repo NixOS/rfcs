@@ -38,6 +38,9 @@ be the release manager's, as per [RFC 0015][rfc0015]. Through [dubious
 stats][stats_release], it seems that for the 18.03 release their work has
 been minimal, and instead filled-in by ad-hoc work by other members.
 
+Additionally, the formalized process will be built upon the [general
+guidelines][grahamc_backport] previously written.
+
 
 Detailed design
 ===============
@@ -98,6 +101,8 @@ Unresolved questions
 
  * Actual team organization (if any).
  * Specifying processes for all software updates and fixes.
+ * Keeping patch-releases up-to-date when a major is out at upstream.
+ * Finding sources for patches (e.g. debian) when
 
 
 Future work
@@ -130,3 +135,4 @@ A version-agnostic way to specify the current stable branch of NixOS.
 [3]: https://access.redhat.com/security/updates/backporting
 [rfc0015]: https://github.com/NixOS/rfcs/blob/master/rfcs/0015-release-manager.md
 [stats_release]: https://gist.github.com/samueldr/7ec402f71d3bb2ac2e059f33d29d95bb
+[grahamc_backport]: https://gist.github.com/grahamc/c60578c6e6928043d29a427361634df6#what-to-backport
