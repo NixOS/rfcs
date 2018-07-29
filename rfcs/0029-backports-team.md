@@ -44,8 +44,6 @@ Detailed design
 ===============
 [design]: #detailed-design
 
-> *Currently being worked on from misc. notes.*
-
 Backports process
 -----------------
 
