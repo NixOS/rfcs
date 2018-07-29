@@ -129,8 +129,61 @@ The processes and tooling is expected to:
  * Reduce the amount of busywork.
  * Standardize to expedite shipping and reviewing backports.
 
-> * `TODO` *Flesh-out more details about the expected tooling.*
-> * `TODO` *Present MVP command line tool.*
+### Collaboration
+
+> (This is a high-level non-bikesheddable overview of the functionalities)
+
+Through a networked-service, with high probability of it being a web-based
+service, team members will be able to file merged PRs as either on-topic of
+off-topic for the backports team. The system is expected to fetch the newly
+merged PRs from github and provide them for the "figuring out" task previously
+described. The PRs would be presented from oldest to newest.
+
+Once filed, the collaboration system will allow members to assign themselves
+to do the backports. It is expected that team members will go from oldest to
+newest, but not enforced. Working on implementing a backport would first have
+the team member "take" the task, allowing parallel work to not conflict.
+
+A task will be worked on by making use of a command line tooling, allowing
+most tediousness to be automated away.
+
+### Making the backport
+
+As previously said, the team member will use a command line tooling.
+
+The team member will be presented with the commands in the interface, allowing
+less thoughts to be given to the task.
+
+When using the tooling, pretty much all tasks will be as automated as possible.
+
+ * Fetching
+ * (Checking out current-stable)
+ * Creating the branch
+ * Cherry-picking
+     * If it fails to auto-apply, this is where work starts; applying.
+     * After applying, resuming automation will be possible.
+ * Build of affected attributes (*may be limited somewhat*)
+
+One part that is **not** automated is testing. It is expected that the team
+member will at least try to launch affected software `result/bin/*`. Only a
+general glance would be required.
+
+For patches affecting libraries, affected attributes will be listed, allowing
+some general testing to be done.
+
+Once some general testing has been done and conclusive, the team member will
+use the tooling to automate pushing and creating the PR.
+
+ * Push to team member's repository.
+ * Create the PR targeting current-stable.
+     * The text will be auto-filled with data according to the build.
+     * Some machine-usable data may be provided for the tooling.
+ * Automatically mark the task as done and add with the newly opened PR number to it.
+
+The standardized PRs created by the tooling are expected to be easier to be
+approve by members of NixOS. The reduced number of manual steps is expected
+to make it easy for non-maintainers, even only enthusiasts to take part in
+the effort.
 
 
 Drawbacks
@@ -166,6 +219,8 @@ Unresolved questions
  * Actual team organization (if any).
  * Specifying processes for all software updates and fixes.
  * Keeping patch-releases up-to-date when a major is out at upstream.
+ * How to work with non-PR commits with fixes or updates needing backport.
+ * Conflict with non-team members' own backports.
 
 
 Future work
