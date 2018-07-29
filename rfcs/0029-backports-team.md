@@ -63,11 +63,6 @@ Expected to be backported to current-stable are the following:
 An example of broken software needing a major update to be backported is
 Spotify, which regularly breaks with old versions.
 
-Don't backport if the patch is just for Darwin, they use nixpkgs-unstable not a
-stable branch.
-
-> `FIXME` Is this true?? I see nixpkgs-18.03-darwin in the channels list.
-
 Backports team
 --------------
 
