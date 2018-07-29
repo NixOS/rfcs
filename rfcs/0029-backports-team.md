@@ -21,7 +21,8 @@ Motivation
 The way it is currently handled makes it so too often fixes for lesser-used
 software are not backported to the *current-stable* revision of NixOS.
 Furthermore, even some more-often used software sometimes lag behind since the
-updates were simply not cherry-picked.
+updates were simply not cherry-picked. While there are [general
+guidelines][grahamc_backport] written up, no canonical process is documented.
 
 Backports is not only a security feature, but also a user-experience feature.
 Upstream software is getting updated; it would be best if current-stable does
@@ -38,9 +39,6 @@ be the release manager's, as per [RFC 0015][rfc0015]. Through [dubious
 stats][stats_release], it seems that for the 18.03 release their work has
 been minimal, and instead filled-in by ad-hoc work by other members.
 
-Additionally, the formalized process will be built upon the [general
-guidelines][grahamc_backport] previously written.
-
 
 Detailed design
 ===============
@@ -48,25 +46,93 @@ Detailed design
 
 > *Currently being worked on from misc. notes.*
 
-<!--
+Backports process
+-----------------
 
-TODO!
+Expected to be backported to current-stable are the following:
+<sup>[1][grahamc_backport]</sup>
 
-Main points:
+ * Patch-level and minor-level updates.
+ * Security patches from downstream projects (other distributions) when
+   no patch-level or minor-level update is made available.
+ * Any update when the current stable version is completely broken.
+ * Extremely security-sensitive software, in particular web browsers,
+   mail user-agents and the kernel, can and should be updated to the version
+   expected by upstream to be secure.
 
-## Team
+### Examples
 
- * Building a team with multiple people
- * Prevent burnouts by distributing across people
+An example of broken software needing a major update to be backported is
+Spotify, which regularly breaks with old versions.
 
-## Process / Tooling
+Don't backport if the patch is just for Darwin, they use nixpkgs-unstable not a
+stable branch.
 
- * Make the effort distributed
- * Make the process bite-sized
- * Brain activity not required for most parts
- * Standardize to expedite backports
+> `FIXME` Is this true?? I see nixpkgs-18.03-darwin in the channels list.
 
--->
+Backports team
+--------------
+
+The idea behind the team is more to rally people behind a common mindset and
+banner than forcibly organizing and assigning roles to people. There is also
+the advantage of creating an explicit communication channel reducing the risks
+of overlaps in the backport efforts. Since the members of the team are working
+towards the same goal, better coordination with tooling and documentation can
+hopefully happen.
+
+Being on the backports team is not expected to be too much of an investment,
+as long as there are multiple members on the team. Members will not be expected
+to do anything particular, only to sometimes help out in the duties. At first,
+no rotated duties are expected to be given.
+
+While reading the following sections, keep in mind that there is expectation
+that there will be tooling developer along the way to automate and expedite
+part of the process of backporting.
+
+### Duties
+
+The duties of the backport team members are as follow
+
+ * Identify pull requests and commits subject to backport.
+ * Prepare contained change sets with backports.
+
+Identifying pull requests subject to backport is expected to be done through
+figuring out, from the set of recently closed pull requests, which ones are
+to be backported. Nothing more, preparing the change sets is a separate task.
+
+Identifying the commits subject to backport is a similar task, but may not be
+done depending on the difficulty. It is expected that changes and fixes needing
+to be backported will be applied through PRs.
+
+Preparing the change sets will generally consist of taking the commit(s) and
+using `git cherry-pick -x` on the current-stable branch. Then, creating a PR
+with a generally standardized layout.
+
+As for "*who merges?*", this is something that may be handed by any NixOS
+member having the commit bit, in the backports team or not. It is not expected
+to be in the duties of the backports team until there is a critical mass of
+members, especially members having commit access. It is hoped that the
+standardized work from the backports team will make merging their pull requests
+an easy task.
+
+
+Backports tooling
+-----------------
+
+While having a team working together is great, collaborating still is an issue
+without both conventions and tooling. Initially the author's (@samueldr) duty,
+figuring out both a workflow and tools to help the team collaborate efficiently
+is required. 
+
+The processes and tooling is expected to:
+
+ * Distribute the effort as much as possible while reducing overlap.
+ * Minimize the size of individual efforts.
+ * Reduce the amount of busywork.
+ * Standardize to expedite shipping and reviewing backports.
+
+> * `TODO` *Flesh-out more details about the expected tooling.*
+> * `TODO` *Present MVP command line tool.*
 
 
 Drawbacks
@@ -102,7 +168,6 @@ Unresolved questions
  * Actual team organization (if any).
  * Specifying processes for all software updates and fixes.
  * Keeping patch-releases up-to-date when a major is out at upstream.
- * Finding sources for patches (e.g. debian) when
 
 
 Future work
