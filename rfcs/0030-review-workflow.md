@@ -36,6 +36,8 @@ through recent PRs regularly and review them. That has various drawbacks:
 # Detailed design
 [design]: #detailed-design
 
+## PR states
+
 Inspired by the [sage trac](https://trac.sagemath.org/query?desc=1&order=id&group=status&status=!closed&summary=~upgrad&or&status=!closed&summary=~updat),
 I propose that we introduce a set of states a PR might be in. Every PR has to
 be assigned to exactly one of these states and might change between these states
@@ -50,9 +52,22 @@ introduce an additional state like `needs:merge`. Reviewing and merging those
 PRs should then take little time for the committers and could double as a sort
 of training program for potential new committers.
 
+## Tooling
+
 This workflow is not currently possible due to GitHub's restrictions. Namely
 only people with commit access can set tags on a PR. This can be resolved
 through tooling. Work on this is [in progress](https://github.com/NixOS/ofborg/pull/216).
+
+The tooling should then initialize the PR status on new PRs. In general this
+is going to be `needs:review`. One exception of this are PRs that are work in
+progress (indicated by a `WIP` tag in the title). Those should start at
+`needs:work`. Other exceptions may include RFC type PRs, which may warrant their
+own state (`needs:opinions`?).
+
+To reduce friction for new contributors, the tooling could later be expaned
+to explain this process to first time contributors.
+
+## Advantages
 
 All the above issues should be resolved by this:
 
