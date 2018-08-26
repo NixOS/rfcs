@@ -31,7 +31,7 @@ used.
 
 ## Backwards Compatibility and its Scope
 
-The main point of deprecation is to provide a limited amount of backwards compatibility for external code using our codebase when we remove some functionality. An important part to consider is the scope of backwards compatibility, because in theory full backwards compatibilty in every way can only be achieved by not ever changing anything: What if Bob built his code on the assumption that `stringLength (readFile <nixpkgs/default.nix>)` would always return 732? Of course nobody will actually do this and we don't need to nor want to keep file lengths constant. Compatibility is therefore always in regards to *how the codebase gets used* in external code. We look at how nixpkgs gets used externally:
+The main point of deprecation is to provide a limited amount of backwards compatibility for external code using our codebase when we remove or change some functionality. An important part to consider is the scope of backwards compatibility, because in theory full backwards compatibilty in every way can only be achieved by not ever changing anything: What if Bob built his code on the assumption that `stringLength (readFile <nixpkgs/default.nix>)` would always return 732? Of course nobody will actually do this and we don't need to nor want to keep file lengths constant. Compatibility is therefore always in regards to *how the codebase gets used* in external code. We look at how nixpkgs gets used externally:
 
 1. Anything accessible through the top-level attribute set `pkgs = import <nixpkgs> {}`
   a. Packages (`pkgs.hello`, `pkgs.gcc`, ...) including their resulting attribute sets
@@ -43,7 +43,7 @@ The main point of deprecation is to provide a limited amount of backwards compat
   a. All NixOS options from modules in `<nixpkgs/nixos/modules/module-list.nix>`
   b. NixOS profiles in `<nixpkgs/nixos/modules/profiles>` (TODO: Couldn't these be implemented as a NixOS option?)
 
-Point 3a is already dealt with through `mkRemovedOptionModule`, `mkRenamedOptionModule`, etc. and is therefore not in scope for this RFC (TODO: These however don't work in submodules -> options in submodules can't use them). Point 3b is very low-traffic and therefore neither in scope. Point 2 is pretty much the same as 1b. We'll also not distinguish between standard library functions and other functions in `pkgs`.
+Point 3a is already dealt with through `mkRemovedOptionModule`, `mkRenamedOptionModule`, etc. and is therefore not in scope for this RFC (TODO: These however don't work in submodules -> options in submodules can't use them). Point 3b is very low-traffic and therefore neither in scope. Point 2 is pretty much the same as 1b. We'll also not distinguish between standard library functions and other functions in `pkgs`. We also won't be trying to keep expressions backwards compatible in regards to e.g. what elements a list contains.
 
 We end up with 2 categories and their compatibility properties:
 
@@ -58,16 +58,116 @@ Examples:
 - `pkgs.haskellPackages.xmonad.env` continues existing
 - A potential exception: `pkgs.fzf.bin` may stop existing in the future and you should rely on `pkgs.lib.getBin` for getting the binary output instead.
 
-## Cases
+## Implementation 
 
-Soft deprecate: Warn first, then throw, then remove. Needs compatible expression.
-Hard deprecate: Throw, then remove. Doesn't need compatible expression.
-Insta deprecate: Remove immediately. Only use in special occasions.
+### Types of deprecation
+
+Desired deprecation properties
+
+- User knows deprecation reason
+- Old code can be removed
+- External code continues to work
+- The change can be undone/changed without any UX inconsistencies "predeprecation". Users shouldn't get a warning about deprecation when later a compatibility package will be added to make it work again.
+
+Types of deprecation
+
+- Soft: Don't warn at first, then warn, then throw. "We don't know if we really want to deprecate it as of now"
+- Firm: First warn, then throw. "We're sure to deprecate it"
+- Hard: Throw. "It is deprecated and not supported anymore"
+- Instant: Remove code instantly. "It has been deprecated and we want to get the warning out of our codebase"
+
+Which types have which properties
+
+| Property                                                     | Instant | Hard | Firm | Soft |
+| User knows deprecation reason                                | No      | Yes  | Yes  | Yes  |
+| Old code can be instantly removed                            | Yes     | Yes  | No   | No   |
+| Users expressions continue to evaluate                       | No      | No   | Yes  | Yes  |
+| The change can be undone/replaced without UX inconsistencies | No      | No   | No   | Yes  |
+
+## When to deprecate
+
+- Unsupported (version of a) package
+
+## Deprecation Timeline
+
+Because nixpkgs gets a new release every 6 months, it also makes sense to change deprecation behaviour on these boundaries. To implement this, the already existing `<nixpkgs/.version>` file can be used.
+
+## Presets
+
+A: Deprecate with warning now, throw error in next release, remove in distant future
+B: Throw error now, remove in distant future
+C: Low priority deprecation: Silent warning now, 
+
+
+## Allowed State transitions
+
+firm d val  "Been deprecated since d, but your code using it will still work up to including release r(d), but not after that. Do the other thing instead" will change to the hard message when current release > r(d)
+hard d "Been deprecated since d, do the other thing instead"
+
+
+Current time is t :: month, next release for a month is r :: month -> release, deprecation time is d :: month
+
+val -> firm d val, if
+  - d >= t, can't deprecate in the past
+val -> hard d, if
+  - d == t, can't deprecate in past nor future, because we won't have the value anymore
+firm d val -> hard d, if
+  - r(t) > r(d), we have to wait for the next release to promote a firm to a hard deprecation
+firm d val -> removed, if
+  - d + 24 >= t, a long time has passed
+firm d val -> val, if
+  - d > t, no warnings have been issued before
+hard d val -> removed, if
+  - d + 24 >= t, a long time has passed
+
+
+## Deprecation messages
+
+Should include
+- Date of deprecation
+- (optional) Date of expected removal
+- Reason
+- (optional) Remedy
+
+## Cases
 
 An attribute or function argument gets renamed -> Add alias and soft or hard deprecate
 An attribute or function argument gets changed in functionality -> Rename it, if possible add functional equivalent alias and soft deprecate, otherwise hard deprecate
 An attribute or function argument gets removed -> Soft or hard deprecate
 
+nixpkgsVersion -> version. Don't warn by default (but do when user turned on more warnings).
+
+## Implementation
+
+Attributes containing the current release year and month, parsed from `<nixpkgs/.version>`. Deprecation is done like this:
+```nix
+nix-repl = deprecate.hard 2018 8 "foo has been deprecated in favor of bar";
+nix-repl = deprecate.firm 2018 8 "foo has been deprecated in favor of bar" "foo";
+nix-repl = deprecate.soft 2018 8 "foo has been deprecated in favor of bar" "foo";
+```
+
+```nix
+fetchGit = { url, sha256 }: "foo";
+fetchGit = { url, sha256 ? null }: "foo";
+
+```
+
+
+## PRs
+
+https://github.com/NixOS/nixpkgs/pull/32776#pullrequestreview-84012820
+
+soft can be the same as firm with an increased deprecation date
+
+## Todo
+
+- Option to silence warnings, option to show warnings
+
+## Examples
+
+Can be used for deprecating versions when they're not supported anymore by upstream at the exact day.
+
+Single file with all deprecations as an overlay? Can't implement everything, what about deprecated function args? What about stuff you can't overlay?
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -85,6 +185,7 @@ What other designs have been considered? What is the impact of not doing this?
 What parts of the design are still TBD or unknowns?
 
 What about errors in library functions? Correct or keep backwards compatible. #41604
+What about function arguments?
 
 # Future work
 [future]: #future-work
