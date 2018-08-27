@@ -157,6 +157,10 @@ fetchGit = { url, sha256 ? null }: "foo";
 
 https://github.com/NixOS/nixpkgs/pull/32776#pullrequestreview-84012820
 
+https://github.com/NixOS/nixpkgs/issues/18763#issuecomment-406812366
+
+https://github.com/NixOS/nixpkgs/issues/22401#issuecomment-277660080
+
 soft can be the same as firm with an increased deprecation date
 
 ## Todo
