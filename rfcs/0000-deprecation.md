@@ -96,14 +96,19 @@ Current time is t :: month, next release for a month is r :: month -> release, d
 
 val -> soft d val, if
   - d >= t, can't deprecate in the past
+  
 val -> hard d, if
   - d == t, can't deprecate in past nor future, because we won't have the value anymore
+  
 soft d val -> hard d, if
   - r(t) > r(d), we have to wait for the next release to promote a soft to a hard deprecation
+  
 soft d val -> removed, if
   - d + 24 >= t, a long time has passed
+  
 soft d val -> val, if
   - d > t, no warnings have been issued before
+  
 hard d val -> removed, if
   - d + 24 >= t, a long time has passed
 
