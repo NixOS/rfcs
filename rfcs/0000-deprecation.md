@@ -179,6 +179,8 @@ https://github.com/NixOS/nixpkgs/issues/22401#issuecomment-277660080
 
 https://github.com/NixOS/nixpkgs/pull/45717
 
+https://github.com/NixOS/nixpkgs/pull/19315
+
 ## Todo
 
 - Option to silence warnings, option to show warnings
