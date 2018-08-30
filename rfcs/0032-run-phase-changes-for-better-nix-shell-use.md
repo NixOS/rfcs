@@ -17,21 +17,27 @@ Making some minor tweaks to how phases are run in the stdenv to improve the UX o
 The primary goal of this RFC is to make it easier to run build phases manually inside a nix-shell.
 Currently, it's a bit annoying because to run say, `buildPhase` the only invocation that works correctly in all cases is:
 
-````
+````sh
 eval "${buildPhase:-buildPhase}"
 ````
 
 The goal is to be able to replace the above with the obvious:
-````
+````sh
 buildPhase
 ````
 
 The secondary goal is to change how hooks (like `preBuild`, `postBuild` etc.) interact with overridden phases.
 For example a derivation `foo-package` doing,
-````
+````nix
+stdenv.mkDerivation {
+    # ...
+    
     buildPhase = ''
         ./my-funky-build-script.sh
     '';
+    
+    # ...
+}
 ````
 causes `preBuild` and `postBuild` not to be called anymore.
 In 99% of the cases this isn't a problem, but it can cause hidden annoyances when using `.overrideAttrs`, for instance:
@@ -50,7 +56,7 @@ Thus, to counter this inconsistency, this RFC proposes that those hooks will be 
 [design]: #detailed-design
 
 All the 'phase' functions in Nixpkgs need to be reworked a bit. Conceptually, the following diff will be applied to each of them:
-````
+````diff
 -buildPhase() {
 +defaultBuildPhase() {
 -    runHook preBuild
@@ -84,7 +90,7 @@ and the function responsible for the default implementation is now renamed to `d
 Then, the `runHook` calls are pulled up from the default phase implementation to the new `buildPhase` function itself.
 
 The actual logic is abstracted to helper function I've named `commonPhaseImpl` (bikeshedding on the name welcome). Thus the implementation of `buildPhase` presented above will be this one-liner:
-````
+````sh
 buildPhase() {
     commonPhaseImpl buildPhase --default defaultBuildPhase --pre-hook preBuild --post-hook postBuild
 }
@@ -113,11 +119,17 @@ An alternative would be to have a associative array where the phases could decla
 
 For 3., the specific problem is that some (very few) packages do something like this:
 ````
+stdenv.mkDerivation {
+    # ...
+    
     buildPhase = ''
         buildPhase
         (cd foo; buildPhase)
         (cd bar; buildPhase)
     '';
+    
+    # ...
+}
 ````
 Which will now call the overridden `buildPhase` and recurse infinitely until Bash crashes with a segfault.
 To counter this, `commonPhaseImpl` will detect recursion from a phase to itself and fail the build with an error message,
@@ -137,7 +149,7 @@ Nixpkgs developers will have to learn this new way of implementing phases.
 [alternatives]: #alternatives
 
 An alternative which has been discussed at some point is to have a function like:
-````
+````sh
 runPhase() {
     local phase="$1"
     eval "${!phase:-$phase}"
