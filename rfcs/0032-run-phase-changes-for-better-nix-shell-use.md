@@ -9,7 +9,9 @@ related-issues: https://github.com/dezgeg/nixpkgs/tree/better-run-phases
 # Summary
 [summary]: #summary
 
-Making some minor tweaks to how phases are run in the stdenv to improve the UX of nix-shell.
+The intent of this proposal is to tweak a bit how the stdenv runs phases during a build to achieve these two goals:
+1. Improve the UX of nix-shell by making it easier to manually run phases inside a nix-shell
+2. Improve the consistency of pre/post hooks by always running such hooks instead of only running them in non-overridden phases
 
 # Motivation
 [motivation]: #motivation
