@@ -9,14 +9,12 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-We propose to add a deprecation guideline and a set of accompanying functions to deprecate functionality in nixpkgs. This includes a way to deprecate packages, functions, aliases and function arguments (TODO: Nix version too?).
+We propose to add a deprecation guideline and a set of accompanying functions and tools to deprecate functionality in nixpkgs. Instead of removing an attribute which would result in an `attribute missing` error for users, one can deprecate a function, which will then first throw a warning and later throw an error. This is intended to be used for anything accessible from `import <nixpkgs> {}`, including the standard library, packages, functions, aliases, package sets, etc.
 
 # Motivation
 [motivation]: #motivation
 
-Currently nixpkgs doesn't have any standard way to deprecate functionality. When a pinned package version gets too bothersome to keep around, the attribute often just gets dropped (490ca6aa8ae89d0639e1e148774c3cd426fc699a, 28b6f74c3f4402156c6f3730d2ddad8cffcc3445), leaving users with an `attribute missing` error, which is neither helpful nor necessary. Sometimes a more graceful removal is done by replacing the attribute with a `throw "<reason of removal and potential remidiation>"` (6a458c169b86725b6d0b21918bee4526a9289c2f). This also applies to aliases and function arguments, e.g. 1aaf2be2a022f7cc2dcced364b8725da544f6ff7. TODO: Find more commits that remove aliases/packages/function args.
-
-These warnings often stay around for a long time and won't get removed until somebody notices them when passing by.
+Currently nixpkgs doesn't have any standard way to deprecate functionality. When something is too bothersome to keep around, the attribute often just gets dropped (490ca6aa8ae89d0639e1e148774c3cd426fc699a, 28b6f74c3f4402156c6f3730d2ddad8cffcc3445), leaving users with an `attribute missing` error, which is neither helpful nor necessary, because Nix has functionality for warning the user of deprecation or throwing useful error messages. This approach has been used before, but on a case-by-case basis (6a458c169b86725b6d0b21918bee4526a9289c2f). (Todo: link to 1aaf2be2a022f7cc2dcced364b8725da544f6ff7 and find more commits that remove aliases/packages/function args).
 
 Why are we doing this? What use cases does it support? What is the expected
 outcome?
