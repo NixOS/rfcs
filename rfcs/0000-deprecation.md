@@ -117,15 +117,19 @@ This leads us to the following allowed state transitions between our primitives:
 
 ## Implementation
 
+The implementation of such a deprecation function will purely based on the planned release version of the next release (e.g. 18.09) and release versions of past releases. An argument could then be made that deprecation dates should also just be a release version, however it appears to be more convenient and less error prone if we allow all year/month combinations. Deprecations can then be added simply by inserting the current or planned deprecation year and month, instead of having to figure out what the next (or later than next) release version is going to be. This will work correctly as long as the `<nixpkgs/.version>` file always contains a version number that's not in the past. This can indeed occur if the date of effective release stretches itself past the month of the release version, which isn't a big problem however, even if unnoticed (the deprecation will just be delayed by a release).
+
+To make implementation more efficient and easier, a pair of release version year/month will be converted into an integer corresponding to the number of months since year 2000. This means the release version `"18.09"` will be handled as `18 * 12 + 9 = 225`. In the implementation variables that contain such a value will be named `...YearMonth`.
+
 ### Release tracking
 
-To implement deprecation functions that can vary their behaviour depending on the number of releases that have passed since initial deprecation, we need to track past releases. A file `<nixpkgs/lib/releases.nix>` should be introduced with contents of the form
+To implement deprecation functions that can vary their behavior depending on the number of releases that have passed since initial deprecation, we need to track past releases. A file `<nixpkgs/lib/releases.nix>` should be introduced with contents of the form
 ```nix
 map ({ release, ... }@attrs: attrs // {
   yearMonth = let
     year = lib.toInt (lib.versions.major release);
     month = lib.toInt (lib.versions.minor release);
-    in (2000 + year) * 12 + month;
+    in year * 12 + month;
 }) [
   {
     name = "Impala";
@@ -154,7 +158,7 @@ map ({ release, ... }@attrs: attrs // {
 
 Additional fields can be added if the need arises. This file should be updated at date of release. It may also be updated already at branch-off time (TODO: Think about this some more).
 
-### Deprecation functions
+### Deprecation function
 
 A function `lib.deprecate` will be introduced. When an attribute should be deprecated, it can be used like follows:
 ```nix
@@ -163,27 +167,27 @@ A function `lib.deprecate` will be introduced. When an attribute should be depre
     year = 2018;
     month = 8;
     warnFor = 2;
-    reason = "Use bar instead";
+    reason = "foo has been deprecated, use bar instead";
     value = "foo";
   };
 }
 ```
 
-Optionally, for convenience, a shorthand `lib.deprecate'` can be provided as well:
+Optionally, for convenience, a shorthand `lib.deprecate'` could be provided as well:
 ```nix
 {
-  bar = lib.deprecate 2018 8 "Bar is a burden to the codebase" "bar";
+  bar = lib.deprecate' 2018 8 "bar is a burden to the codebase, refrain from using it" "bar";
 }
 ```
 
 Which will correspond to
 ```nix
 {
-  bar = lib.deprecate' {
+  bar = lib.deprecate {
     year = 2018;
     month = 8;
     warnFor = 1;
-    reason = "Bar is a burden to the codebase";
+    reason = "bar is burden to the codebase, refrain from using it";
     value = "bar";
   };
 }
@@ -195,13 +199,13 @@ The basic implementation and meaning of arguments is a follows (Note: I didn't t
   releaseYearMonth = let
     year = lib.toInt (lib.versions.major lib.trivial.release);
     month = lib.toInt (lib.versions.minor lib.trivial.release);
-    in (2000 + year) * 12 + month;
+    in year * 12 + month;
     
   allReleases = [ releaseYearMonth ] ++ map (r: r.yearMonth) releases;
   
   takeWhile = pred: list: ...;
     
-  deprecate' =
+  deprecate =
     { year # Year of deprecation as an integer
     , month # Month of deprecation as an integer
     , warnFor ? 1 # Number of releases to warn before throwing
@@ -210,7 +214,7 @@ The basic implementation and meaning of arguments is a follows (Note: I didn't t
     }@args:
     if warnFor < 0 then abort "the warnFor argument to lib.deprecate needs to be non-negative" else
     let
-      deprecationYearMonth = year * 12 + month;
+      deprecationYearMonth = (year - 2000) * 12 + month;
       depReleases = takeWhile (ym: ym > deprecationYearMonth) allReleases;
       location = let pos = unsafeGetAttrPos "reason" args; in
         pos.file + ":" + toString pos.line;
@@ -221,7 +225,7 @@ The basic implementation and meaning of arguments is a follows (Note: I didn't t
       isRemoved = depReleases > warnFor;
       removedRelease = if isRemoved then elemAt depReleases (length depReleases - warnFor) else
         releaseYearMonth + ((deprecationYearMonth - releaseYearMonth) / 6 + warnFor) * 6);
-      prettyRelease = yearMonth: "${toString (div yearMonth 12 - 2000)}.${toString (mod yearMonth 12)}";
+      prettyRelease = yearMonth: "${toString (div yearMonth 12)}.${toString (mod yearMonth 12)}";
       deprecationString = if isDeprecated then "Deprecated since ${prettyRelease deprecationRelease}" else
         "Will be deprecated in ${prettyRelease deprecationRelease}";
       removedString = if isRemoved then ", removed since ${prettyRelease removedRelease}" else
@@ -236,7 +240,24 @@ The basic implementation and meaning of arguments is a follows (Note: I didn't t
 
 ### Configuration
 
-Sometimes more one might wish to either silence certain warnings or 
+Sometimes one might wish to either silence certain warnings or turn on warnings for planned deprecations. To do this, the nixpkgs `config` attribute will be used:
+```nix
+import <nixpkgs> {
+  config.deprecation = {
+    warnPlannedDeprecations = true;
+    warnOverrides = {
+      foo.bar = false; # Turn off warning for foo.bar
+      qux.florp = true; # Turn on warning for qux.florp if it's a planned warning for now
+    };
+  };
+}
+```
+
+TODO: Could there warning overrides be used for more than just deprecations?
+
+Implementation details: Add a `config` attribute to `lib` with the value `{}` and use it for the deprecation function. This value can be changed by using `lib.extends (self: super: { config = <newvalue>; } }`. Define `pkgs.lib` as `lib.extends (self: super: { config = config.deprecation; }`.
+
+## 
 
 ### Cases
 
@@ -268,6 +289,7 @@ https://github.com/NixOS/nixpkgs/pull/45717#issuecomment-418424080
 ## Todo
 
 - Option to silence warnings, option to show warnings
+- Introduce automatic capture of attribute path in nixpkgs for better error messages
 
 ## Examples
 
