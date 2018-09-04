@@ -207,11 +207,13 @@ The basic implementation and meaning of arguments is a follows (Note: I didn't t
     , warnFor ? 1 # Number of releases to warn before throwing
     , reason # Reason of deprecation
     , value ? null # The value to evaluate to, may be null if the current release throws
-    }:
+    }@args:
     if warnFor < 0 then abort "the warnFor argument to lib.deprecate needs to be non-negative" else
     let
       deprecationYearMonth = year * 12 + month;
       depReleases = takeWhile (ym: ym > deprecationYearMonth) allReleases;
+      location = let pos = unsafeGetAttrPos "reason" args; in
+        pos.file + ":" + toString pos.line;
         
       isDeprecated = depReleases != [];
       deprecationRelease = if isDeprecated then last depReleases else
@@ -224,59 +226,17 @@ The basic implementation and meaning of arguments is a follows (Note: I didn't t
         "Will be deprecated in ${prettyRelease deprecationRelease}";
       removedString = if isRemoved then ", removed since ${prettyRelease removedRelease}" else
         ", will be removed in ${prettyRelease removedRelease}";
-      message = "${deprecationString}${removedString}. Reason: ${reason}";
+      message = "${deprecationString}${removedString} at ${location}. ${reason}";
     in
-      if ! isDeprecated then assert value != null; value
-      else if isRemoved then throw removedString
-      else assert value != null; builtins.trace deprecationString value;
-  
-  deprecate = year: month: reason: value: deprecate {
-    inherit year month reason value;
-  };
+      if ! isDeprecated then assert value != null; value # TODO: Colors and stuff?
+      else if isRemoved then throw message
+      else assert value != null; builtins.trace message value;
 }
 ```
 
-### Nix
+### Configuration
 
-For simple cases, there should be a function `lib.deprecate` working like this:
-```nix
-# Takes current year/month, deprecation reason and the original value
-foo = deprecate 2018 8 "Foo has been deprecated" "foo";
-```
-
-The behaviour of this function should be based on the current release (from `<nixpkgs/.version>`):
-- If the deprecation date is after the current release, just return the value without warning
-- If the deprecation date is before the current release but after the last one, emit a warning while evaluating the value
-- If the deprecation date is before the current release and before the last one, throw an error
-
-This corresponds to a soft type deprecation after the given deprecation date for one release, then dropping to a hard deprecation.
-
-Sometimes more flexibility is needed, for which the following function will get introduced:
-
-```nix
-foo = deprecate' {
-  year = 2018;
-  month = 8;
-  removeWarningAfter = 2; # Number of releases to warn for before hard deprecating
-  reason = "Foo has been deprecated";
-} "foo";
-```
-
-The former function can be defined via the latter.
-
-To implement this, a file has to be introduced for tracking the past releases. The choice of only tracking year and month (and not the day) is due to it corresponding to nixpkgs' version numbers and anything more than that seems unnecessary while complicating the implementation (is 2018-09-15 before or after the 18.09 release?).
-
-```nix
-{
-  releases = [
-    {
-      name = "hummingbird";
-      year = 2018;
-      month = 3;
-    }
-  ];
-}
-```
+Sometimes more one might wish to either silence certain warnings or 
 
 ### Cases
 
