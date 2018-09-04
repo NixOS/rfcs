@@ -50,7 +50,7 @@ We'll therefore limit ourselves to everything accessible through `import <nixpkg
 - Attributes: An existing attribute continues to exist.
 - Functions: All accepted function arguments continue to be accepted.
 
-Function arguments are secondary to this RFC, as most functions are rarely changed. Therefore attributes and their existence will be the focus.
+Everything else you might assume of nixpkgs isn't meant to be kept compatible, such as how many elements are in `pkgs.hello.buildInputs` or that `pkgs.hello.outPath` stays the same, therefore we don't include them here. Function arguments are secondary to this RFC, as most functions are rarely changed (Todo: Maybe extend this RFC to function arguments or rename it to "attribute deprecation"). Therefore attributes and their existence will be the focus.
 
 Examples:
 - `pkgs.pythonPackages.pytest` continues existing
@@ -66,49 +66,54 @@ Desired deprecation properties
 - User knows deprecation reason
 - Old code can be removed
 - External code continues to work
-- (optional) The change can be undone/changed without any UX inconsistencies "predeprecation". Users shouldn't get a warning about deprecation when later a compatibility package will be added to make it work again. Once a warning of deprecation has been issued, it should be deprecated.
+- The may be undone/changed without any UX inconsistencies. This means users shouldn't get a warning about deprecation when this might get undone later, e.g. when it gets decided that deprecation isn't wanted after all, or that a compatibility package can be added. Once a warning of deprecation has been issued, it should be deprecated.
 
 Types of deprecation
 
-- Soft(delayed): Don't warn at first, then warn, then throw. "We don't know if we really want to deprecate it as of now"
-- Soft: First warn, then throw. "We're sure to deprecate it"
-- Hard: Throw. "It is deprecated and not supported anymore"
-- Instant: Remove code instantly. "It has been deprecated and we want to get the warning out of our codebase"
+Deprecation happens in a sequence of phases, which will correspond to the release cycle of nixpkgs.
+
+- Warn(delayed): Don't warn at first, then warn, then throw. Meaning: "We don't know if we really want to deprecate it as of now"
+- Warn: First warn, then throw. Meaning: "We're sure to deprecate it, but we'll keep it usable for now"
+- Throw: Throw. Meaning: "It is deprecated and not supported anymore"
+- Removal: Remove code instantly. Meaning: "It has been deprecated and we want to get our codebase rid of it now" or "This attribute wasn't even meant to be used in the first place"
 
 Which types have which properties
 
-| Property                                                     | Instant | Hard | Soft | Soft(delayed) |
-| User knows deprecation reason                                | No      | Yes  | Yes  | Yes           |
-| Old code can be instantly removed                            | Yes     | Yes  | No   | No            |
-| Users expressions continue to evaluate                       | No      | No   | Yes  | Yes           |
-| The change can be undone/replaced without UX inconsistencies | No      | No   | No   | Yes           |
+| Property                                                     | Removal | Throw | Warn | Warn(delayed) |
+| User knows deprecation reason                                | No      | Yes   | Yes  | Yes           |
+| Old code can be instantly removed                            | Yes     | Yes   | No   | No            |
+| Users expressions continue to evaluate                       | No      | No    | Yes  | Yes           |
+| The change can be undone/replaced without UX inconsistencies | No      | No    | No   | Yes           |
 
+#### State transitions
 
-### Allowed State transitions
+The properties of the four deprecation types along with the properties they ensure lead us to a set of allowed transitions between them. We will use the following primitives to represent deprecation. Here `r` represents the current release as an integer.
 
-soft d val  "Been deprecated since d, but your code using it will still work up to including release r(d), but not after that. Do the other thing instead" will change to the hard message when current release > r(d)
-hard d "Been deprecated since d, do the other thing instead"
+- `val` signifies a non-deprecated value `val`. In Nix this corresponds to `val` itself
+- `warn d n val` signifies deprecation since release `d` and unsupported since release `d + n`. In Nix this corresponds to a function like this:
+    ```nix
+    if r < d then val # The deprecation time is the future, don't emit any message right now
+    else if r >= d + n then throw "Deprecated since ${d}, removed in ${d + n}" # The current time is after the time of the planned throw
+    else builtins.trace "Deprecated since ${d}, will be removed in ${d + n}" val` # The deprecation time is not in the future and before the planned throw
+    ```
+- `throw d n` signifies a deprecation since release `d` and unsupported since release `d + n`, the same as `warn` without a `val`. In Nix this corresponds to `throw "Deprecated since ${d}, removed in ${d + n}`.
+- `removed`, the attribute is removed. In Nix this corresponds to an `attribute missing` error.
 
+Our deprecation types map to these primitives like this:
 
-Current time is t :: month, next release for a month is r :: month -> release, deprecation time is d :: month
+- Warn(delayed) is `warn d n val` with `r < d`, aka deprecate in the future
+- Warn is `warn d n val` with `r == d`, aka deprecate now
+- Throw is `throw d n`
+- Removal is `removed`
 
-val -> soft d val, if
-  - d >= t, can't deprecate in the past
-  
-val -> hard d, if
-  - d == t, can't deprecate in past nor future, because we won't have the value anymore
-  
-soft d val -> hard d, if
-  - r(t) > r(d), we have to wait for the next release to promote a soft to a hard deprecation
-  
-soft d val -> removed, if
-  - d + 24 >= t, a long time has passed
-  
-soft d val -> val, if
-  - d > t, no warnings have been issued before
-  
-hard d val -> removed, if
-  - d + 24 >= t, a long time has passed
+This leads us to the following allowed state transitions between our primitives:
+
+- `val` -> `warn d n val`, if `r <= d`, aka can't deprecate in the past
+- `warn d n val` -> `val`, if `r < d`, aka no warning has been issued yet, we can safely remove the deprecation again without causing any inconsistencies
+- `val` -> `throw d n`, if `d == r`, aka can't deprecate in past nor future, because we won't have the value anymore
+- `warn d n val` -> `throw d n`, if `r >= d -> r >= d + n`, aka if a warning has been issued, we need to wait until the warning time has passed to transition to a throw. This is the same as just `r >= d + n`
+- `warn d n val` -> `removed`, if `r >= d + n + long`, aka it should be a while before we can remove throw messages. `long` stands for the number of releases the `throw` should have been issued for.
+- `throw d n` -> removed, if `r >= d + n + long`, aka it should be a while before we can remove throw messages. `long` stands for the number of releases the `throw` should have been issued for.
 
 ### Cases
 
