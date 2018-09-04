@@ -115,20 +115,126 @@ This leads us to the following allowed state transitions between our primitives:
 - `warn d n val` -> `removed`, if `r >= d + n + long`, aka it should be a while before we can remove throw messages. `long` stands for the number of releases the `throw` should have been issued for.
 - `throw d n` -> removed, if `r >= d + n + long`, aka it should be a while before we can remove throw messages. `long` stands for the number of releases the `throw` should have been issued for.
 
-### Cases
-
-- Unsupported/deprecated (version of a) package, like `foobar_0_1` which is for some reason still in the code
-- A package gets renamed for consistency reasons
-
-## Deprecation messages
-
-Should include
-- Date of deprecation
-- (optional) Date of expected removal
-- Reason
-- (optional) Remedy
-
 ## Implementation
+
+### Release tracking
+
+To implement deprecation functions that can vary their behaviour depending on the number of releases that have passed since initial deprecation, we need to track past releases. A file `<nixpkgs/lib/releases.nix>` should be introduced with contents of the form
+```nix
+map ({ release, ... }@attrs: attrs // {
+  yearMonth = let
+    year = lib.toInt (lib.versions.major release);
+    month = lib.toInt (lib.versions.minor release);
+    in (2000 + year) * 12 + month;
+}) [
+  {
+    name = "Impala";
+    release = "18.03";
+    year = 2018;
+    month = 4;
+    day = 4;
+  }
+  {
+    name = "Hummingbird";
+    release = "17.09";
+    year = 2017;
+    month = 9;
+    day = ??;
+  }
+  {
+    name = "Gorilla";
+    release = "17.03";
+    year = 2017;
+    month = 3;
+    day = 31;
+  }
+  # ...
+]
+```
+
+Additional fields can be added if the need arises. This file should be updated at date of release. It may also be updated already at branch-off time (TODO: Think about this some more).
+
+### Deprecation functions
+
+A function `lib.deprecate` will be introduced. When an attribute should be deprecated, it can be used like follows:
+```nix
+{
+  foo = lib.deprecate' {
+    year = 2018;
+    month = 8;
+    warnFor = 2;
+    reason = "Use bar instead";
+    value = "foo";
+  };
+}
+```
+
+Optionally, for convenience, a shorthand `lib.deprecate'` can be provided as well:
+```nix
+{
+  bar = lib.deprecate 2018 8 "Bar is a burden to the codebase" "bar";
+}
+```
+
+Which will correspond to
+```nix
+{
+  bar = lib.deprecate' {
+    year = 2018;
+    month = 8;
+    warnFor = 1;
+    reason = "Bar is a burden to the codebase";
+    value = "bar";
+  };
+}
+```
+
+The basic implementation and meaning of arguments is a follows (Note: I didn't test this yet).
+```nix
+{
+  releaseYearMonth = let
+    year = lib.toInt (lib.versions.major lib.trivial.release);
+    month = lib.toInt (lib.versions.minor lib.trivial.release);
+    in (2000 + year) * 12 + month;
+    
+  allReleases = map (r: r.yearMonth) releases ++ [ releaseYearMonth ];
+  
+  takeWhile = pred: list: ...;
+    
+  deprecate' =
+    { year # Year of deprecation as an integer
+    , month # Month of deprecation as an integer
+    , warnFor ? 1 # Number of releases to warn before throwing
+    , reason # Reason of deprecation
+    , value ? null # The value to evaluate to, may be null if the current release throws
+    }:
+    if warnFor < 0 then abort "the warnFor argument to lib.deprecate needs to be non-negative" else
+    let
+      deprecationYearMonth = year * 12 + month;
+      depReleases = takeWhile (ym: ym > deprecationYearMonth) allReleases;
+        
+      isDeprecated = depReleases != [];
+      deprecationRelease = if isDeprecated then last depReleases else
+        releaseYearMonth + ((deprecationYearMonth - releaseYearMonth) / 6) * 6);
+      isRemoved = depReleases > warnFor;
+      removedRelease = if isRemoved then elemAt depReleases (length depReleases - warnFor) else
+        releaseYearMonth + ((deprecationYearMonth - releaseYearMonth) / 6 + warnFor) * 6);
+      prettyRelease = yearMonth: "${toString (div yearMonth 12 - 2000)}.${toString (mod yearMonth 12)}";
+      deprecationString = if isDeprecated then "Deprecated since ${prettyRelease deprecationRelease}" else
+        "Will be deprecated in ${prettyRelease deprecationRelease}";
+      removedString = if isRemoved then ", removed since ${prettyRelease removedRelease}" else
+        ", will be removed in ${prettyRelease removedRelease}";
+      message = "${deprecationString}${removedString}. Reason: ${reason}";
+    in
+      if ! isDeprecated then assert value != null; value
+      else if isRemoved then throw removedString
+      else assert value != null; builtins.trace deprecationString value;
+  
+  deprecate = year: month: reason: value: deprecate {
+    inherit year month reason value;
+  };
+}
+```
 
 ### Nix
 
@@ -172,6 +278,19 @@ To implement this, a file has to be introduced for tracking the past releases. T
 }
 ```
 
+### Cases
+
+- Unsupported/deprecated (version of a) package, like `foobar_0_1` which is for some reason still in the code
+- A package gets renamed for consistency reasons
+
+## Deprecation messages
+
+Should include
+- Date of deprecation
+- (optional) Date of expected removal
+- Reason
+- (optional) Remedy
+
 ## PRs
 
 https://github.com/NixOS/nixpkgs/pull/32776#pullrequestreview-84012820
@@ -183,6 +302,8 @@ https://github.com/NixOS/nixpkgs/issues/22401#issuecomment-277660080
 https://github.com/NixOS/nixpkgs/pull/45717
 
 https://github.com/NixOS/nixpkgs/pull/19315
+
+https://github.com/NixOS/nixpkgs/pull/45717#issuecomment-418424080
 
 ## Todo
 
