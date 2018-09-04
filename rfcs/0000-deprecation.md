@@ -197,7 +197,7 @@ The basic implementation and meaning of arguments is a follows (Note: I didn't t
     month = lib.toInt (lib.versions.minor lib.trivial.release);
     in (2000 + year) * 12 + month;
     
-  allReleases = map (r: r.yearMonth) releases ++ [ releaseYearMonth ];
+  allReleases = [ releaseYearMonth ] ++ map (r: r.yearMonth) releases;
   
   takeWhile = pred: list: ...;
     
