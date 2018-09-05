@@ -330,7 +330,9 @@ Drawbacks of this approach in comparison to keep doing what has been done until 
 # Alternatives
 [alternatives]: #alternatives
 
-What other designs have been considered? What is the impact of not doing this?
+- Not doing anything. keep doing deprecation on a case-by-case basis, judging the most appropriate action.
+- Having deprecation be a 0/1 thing: Either it's not deprecated and doesn't throw an error, or it is deprecated and it throws an error. The obvious disadvantage of this is that when people upgrade their nixpkgs, they can't expect their code to still work, even if they had no single warning message in the last version.
+- Not including the expected removal date in the warning message. The disadvantage of this is that it's just not as nice to the user. Seeing a time of removal gives the user a good sense of either "I need to fix this now" or "This can wait". The advantage of this would be a more flexible deprecation policy, enabling us to remove values at whatever time one wishes.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
