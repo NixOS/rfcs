@@ -288,14 +288,13 @@ Advantages of removing aliases:
     | `nix-instantiate nixos/release-combined.nix -A tested` | (5 runs) 222.6 (6.1) -> 218.2 (2.3) | 36.51GB -> 36.35GB |
 
     Putting some statistical meaning into the timings using an alpha of 2.5% (z = 1.96) leads to a result of everything but the first command being statistically significant (maybe because it's the only --eval?). So we really got ourselves about 1-3% better speed, which is not much, but it's not nothing. Also 0.4-5% less memory consumption, depending on the expression.
-
-2. Cruft can be removed, cleaner repository state.
+2. Cruft can be removed, cleaner repository state. Not that significant, since aliases are in their own file in `<nixpkgs/pkgs/top-level/aliases.nix>` and are therefore very isolated from everything else.
 
 Disadvantages of removing aliases:
 1. Deprecation needed -> People will eventually see warnings, potentially lots of them
-   Doing a quick analysis of alias introduction times using `cat pkgs/top-level/aliases.nix | rg '[0-9]+-[0-9]+-[0-9]+' -o | cut -d- -f-2 | sort | uniq -c` 
+   Doing a quick analysis of alias introduction times using `cat pkgs/top-level/aliases.nix | rg '[0-9]+-[0-9]+-[0-9]+' -o | cut -d- -f-2 | sort | uniq -c`, we get an mean of 5.5 and a median of 3 new aliases per month over the last ~4 years. This means if aliases were to be deprecated at a constant rate, we'd see about 5 new deprecations every month, so about 30 every release. Now of course not everybody uses every nixpkgs attribute, so it will be less than that for individual users. Considering that aliases will only get introduced for popular packages (since unpopular ones very little people use to begin with, so aliases wouldn't get introduced a lot), I estimate that an average user will encounter about 0-2 new alias deprecations per release. This amount will of course be bigger with "power" users, using lots of different packages. Considering that there are quite a few people only upgrading their version every 1-2 years, this can add up.
 
-Assigning weights 
+Assigning weights to 
 
 
 ### Cases
