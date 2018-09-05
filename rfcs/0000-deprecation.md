@@ -80,6 +80,7 @@ Deprecation happens in a sequence of phases, which will correspond to the releas
 Which types have which properties
 
 | Property                                                     | Removal | Throw | Warn | Warn(delayed) |
+| ---                                                          | ---     | ---   | ---  | ---           |
 | User knows deprecation reason                                | No      | Yes   | Yes  | Yes           |
 | Old code can be instantly removed                            | Yes     | Yes   | No   | No            |
 | Users expressions continue to evaluate                       | No      | No    | Yes  | Yes           |
@@ -281,11 +282,12 @@ Advantages of removing aliases:
 1. Nix evaluation will be faster and use less memory for everybody.
    Doing a quick analysis using `export NIX_SHOW_STATS=1` on nixpkgs de825a4eaacd and Nix 2.0.4 with either all or (almost) no aliases with [this diff](https://gist.github.com/7f647d15b27825c3cc4dc2079acddb39), these are the results for different commands executed in the nixpkgs root. Time has been measured with an initial unmeasured run and an average over multiple runs after that, standard derivation in parens, in seconds. Heap is deterministic.
     
-    | Command | time elapsed (aliases -> no aliases) | total Boehm heap allocations (aliases -> no aliases) |
-    | `nix-instantiate --eval -A path`| (15 runs), 0.043 (0.0041) -> 0.042 (0.0042) | 4.12MB -> 3.89MB |
-    | `nix-instantiate -A openssl`| (15 runs) 0.095 (0.0060) -> 0.090 (0.0049) | 18.5MB -> 17.7MB |
-    | `nix-instantiate nixos/release.nix -A iso_graphical` | (15 runs) 5.71 (0.19) -> 5.64 (0.10) | 839MB -> 836MB | 
-    | `nix-instantiate nixos/release-combined.nix -A tested` | (5 runs) 222.6 (6.1) -> 218.2 (2.3) | 36.51GB -> 36.35GB |
+    | Command                                                | time elapsed (aliases -> no aliases)        | total Boehm heap allocations (aliases -> no aliases) |
+    | ---                                                    | ---                                         | ---                                                  |
+    | `nix-instantiate --eval -A path`                       | (15 runs), 0.043 (0.0041) -> 0.042 (0.0042) | 4.12MB -> 3.89MB                                     |
+    | `nix-instantiate -A openssl`                           | (15 runs) 0.095 (0.0060) -> 0.090 (0.0049)  | 18.5MB -> 17.7MB                                     |
+    | `nix-instantiate nixos/release.nix -A iso_graphical`   | (15 runs) 5.71 (0.19) -> 5.64 (0.10)        | 839MB -> 836MB                                       |
+    | `nix-instantiate nixos/release-combined.nix -A tested` | (5 runs) 222.6 (6.1) -> 218.2 (2.3)         | 36.51GB -> 36.35GB                                   |
 
     Putting some statistical meaning into the timings using an alpha of 2.5% (z = 1.96) leads to a result of everything but the first command being statistically significant (maybe because it's the only --eval?). So we really got ourselves about 1-3% better speed, which is not much, but it's not nothing. Also 0.4-5% less memory consumption, depending on the expression.
 2. Cruft can be removed, cleaner repository state. Not that significant, since aliases are in their own file in `<nixpkgs/pkgs/top-level/aliases.nix>` and are therefore very isolated from everything else.
