@@ -122,6 +122,8 @@ The implementation of such a deprecation function will purely based on the plann
 
 To make implementation more efficient and easier, a pair of release version year/month will be converted into an integer corresponding to the number of months since year 2000. This means the release version `"18.09"` will be handled as `18 * 12 + 9 = 225`. In the implementation variables that contain such a value will be named `...YearMonth`.
 
+The following has been implemented in my [deprecation branch](https://github.com/infinisil/nixpkgs/tree/deprecation).
+
 ### Release tracking
 
 To implement deprecation functions that can vary their behavior depending on the number of releases that have passed since initial deprecation, we need to track past releases. A file `<nixpkgs/lib/releases.nix>` should be introduced with contents of the form
@@ -194,51 +196,6 @@ Which will correspond to
 }
 ```
 
-The basic implementation and meaning of arguments is a follows (Note: I didn't test this yet).
-```nix
-{
-  releaseYearMonth = let
-    year = lib.toInt (lib.versions.major lib.trivial.release);
-    month = lib.toInt (lib.versions.minor lib.trivial.release);
-    in year * 12 + month;
-    
-  allReleases = [ releaseYearMonth ] ++ map (r: r.yearMonth) releases;
-  
-  takeWhile = pred: list: ...;
-    
-  deprecate =
-    { year # Year of deprecation as an integer
-    , month # Month of deprecation as an integer
-    , warnFor ? 1 # Number of releases to warn before throwing
-    , reason # Reason of deprecation
-    , value ? null # The value to evaluate to, may be null if the current release throws
-    }@args:
-    if warnFor < 0 then abort "the warnFor argument to lib.deprecate needs to be non-negative" else
-    let
-      deprecationYearMonth = (year - 2000) * 12 + month;
-      depReleases = takeWhile (ym: ym > deprecationYearMonth) allReleases;
-      location = let pos = unsafeGetAttrPos "reason" args; in
-        pos.file + ":" + toString pos.line;
-        
-      isDeprecated = depReleases != [];
-      deprecationRelease = if isDeprecated then last depReleases else
-        releaseYearMonth + ((deprecationYearMonth - releaseYearMonth) / 6) * 6);
-      isRemoved = depReleases > warnFor;
-      removedRelease = if isRemoved then elemAt depReleases (length depReleases - warnFor) else
-        releaseYearMonth + ((deprecationYearMonth - releaseYearMonth) / 6 + warnFor) * 6);
-      prettyRelease = yearMonth: "${toString (div yearMonth 12)}.${toString (mod yearMonth 12)}";
-      deprecationString = if isDeprecated then "Deprecated since ${prettyRelease deprecationRelease}" else
-        "Will be deprecated in ${prettyRelease deprecationRelease}";
-      removedString = if isRemoved then ", removed since ${prettyRelease removedRelease}" else
-        ", will be removed in ${prettyRelease removedRelease}";
-      message = "${deprecationString}${removedString} at ${location}. ${reason}";
-    in
-      # TODO: Improve message for warnFor = 0
-      if ! isDeprecated then assert value != null; value # TODO: Colors and stuff?
-      else if isRemoved then throw message
-      else assert value != null; builtins.trace message value;
-}
-```
 
 ### Configuration
 
