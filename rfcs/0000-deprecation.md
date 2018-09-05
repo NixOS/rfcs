@@ -164,7 +164,7 @@ Additional fields can be added if the need arises. This file should be updated a
 A function `lib.deprecate` will be introduced. When an attribute should be deprecated, it can be used like follows:
 ```nix
 {
-  foo = lib.deprecate' {
+  foo = lib.deprecate {
     year = 2018;
     month = 8;
     warnFor = 2;
@@ -271,8 +271,9 @@ A sane default is `d = 0, w = 1`, to deprecate immediately and warn for one rele
 - A package being unable to be built anymore because it would require big changes might be deprecated immediately with no warning phase (`d = 0, w = 0`), such that the value doesn't have to be kept around anymore.
 - A change that will influence a lot of code and might be hard to migrate from could have an instant deprecation but a warning phase of 4 releases (`d = 0, w = 4`), such that people have a lot of time to migrate away from it.
 - Aliases might be deprecated only after two years so people enabling all warnings can be alarmed of the eventual removal. The warning phase could then be about 4 releases long because aliases don't cost much anyways (`d = 2 years, w = 4`).
+- A package that has a known end-of-support date such as Java 7 in July 2022 can have this reflected in the deprecation time.
 
-This isn't main focus of this RFC, however we will address some issues regarding this.
+This isn't main focus of this RFC, however we will address a controversial issues regarding this:
 
 ### Aliases
 
@@ -282,12 +283,12 @@ Advantages of removing aliases:
 1. Nix evaluation will be faster and use less memory for everybody.
    Doing a quick analysis using `export NIX_SHOW_STATS=1` on nixpkgs de825a4eaacd and Nix 2.0.4 with either all or (almost) no aliases with [this diff](https://gist.github.com/7f647d15b27825c3cc4dc2079acddb39), these are the results for different commands executed in the nixpkgs root. Time has been measured with an initial unmeasured run and an average over multiple runs after that, standard derivation in parens, in seconds. Heap is deterministic.
     
-    | Command                                                | time elapsed (aliases -> no aliases)        | total Boehm heap allocations (aliases -> no aliases) |
-    | ---                                                    | ---                                         | ---                                                  |
-    | `nix-instantiate --eval -A path`                       | (15 runs), 0.043 (0.0041) -> 0.042 (0.0042) | 4.12MB -> 3.89MB                                     |
-    | `nix-instantiate -A openssl`                           | (15 runs) 0.095 (0.0060) -> 0.090 (0.0049)  | 18.5MB -> 17.7MB                                     |
-    | `nix-instantiate nixos/release.nix -A iso_graphical`   | (15 runs) 5.71 (0.19) -> 5.64 (0.10)        | 839MB -> 836MB                                       |
-    | `nix-instantiate nixos/release-combined.nix -A tested` | (5 runs) 222.6 (6.1) -> 218.2 (2.3)         | 36.51GB -> 36.35GB                                   |
+    | Command                                                | time elapsed (aliases -> no aliases)       | total Boehm heap allocations (aliases -> no aliases) |
+    | ---                                                    | ---                                        | ---                                                  |
+    | `nix-instantiate --eval -A path`                       | (15 runs) 0.043 (0.0041) -> 0.042 (0.0042) | 4.12MB -> 3.89MB                                     |
+    | `nix-instantiate -A openssl`                           | (15 runs) 0.095 (0.0060) -> 0.090 (0.0049) | 18.5MB -> 17.7MB                                     |
+    | `nix-instantiate nixos/release.nix -A iso_graphical`   | (15 runs) 5.71 (0.19) -> 5.64 (0.10)       | 839MB -> 836MB                                       |
+    | `nix-instantiate nixos/release-combined.nix -A tested` | (5 runs) 222.6 (6.1) -> 218.2 (2.3)        | 36.51GB -> 36.35GB                                   |
 
     Putting some statistical meaning into the timings using an alpha of 2.5% (z = 1.96) leads to a result of everything but the first command being statistically significant (maybe because it's the only --eval?). So we really got ourselves about 1-3% better speed, which is not much, but it's not nothing. Also 0.4-5% less memory consumption, depending on the expression.
 2. Cruft can be removed, cleaner repository state. Not that significant, since aliases are in their own file in `<nixpkgs/pkgs/top-level/aliases.nix>` and are therefore very isolated from everything else.
@@ -296,23 +297,9 @@ Disadvantages of removing aliases:
 1. Deprecation needed -> People will eventually see warnings, potentially lots of them
    Doing a quick analysis of alias introduction times using `cat pkgs/top-level/aliases.nix | rg '[0-9]+-[0-9]+-[0-9]+' -o | cut -d- -f-2 | sort | uniq -c`, we get an mean of 5.5 and a median of 3 new aliases per month over the last ~4 years. This means if aliases were to be deprecated at a constant rate, we'd see about 5 new deprecations every month, so about 30 every release. Now of course not everybody uses every nixpkgs attribute, so it will be less than that for individual users. Considering that aliases will only get introduced for popular packages (since unpopular ones very little people use to begin with, so aliases wouldn't get introduced a lot), I estimate that an average user will encounter about 0-2 new alias deprecations per release. This amount will of course be bigger with "power" users, using lots of different packages. Considering that there are quite a few people only upgrading their version every 1-2 years, this can add up.
 
-Assigning weights to 
+Assigning subjective weights to these points: The first advantage receives a weight of 4, the second advantage a weight of 1, the disadvantage gets a weight of 20 because it's user-facing and annoying. If I didn't forget anything, this adds to a resulting 14 points for *not* deprecating aliases. In short, the cost of deprecating aliases is much bigger than the cost of leaving them in.
 
-
-### Cases
-
-- Unsupported/deprecated (version of a) package, like `foobar_0_1` which is for some reason still in the code
-- A package gets renamed for consistency reasons
-
-## Deprecation messages
-
-Should include
-- Date of deprecation
-- (optional) Date of expected removal
-- Reason
-- (optional) Remedy
-
-## PRs
+## Links
 
 https://github.com/NixOS/nixpkgs/pull/32776#pullrequestreview-84012820
 
@@ -328,19 +315,17 @@ https://github.com/NixOS/nixpkgs/pull/45717#issuecomment-418424080
 
 ## Todo
 
-- Option to silence warnings, option to show warnings
-- Introduce automatic capture of attribute path in nixpkgs for better error messages
 
 ## Examples
 
 Can be used for deprecating versions when they're not supported anymore by upstream at the exact day.
 
-Single file with all deprecations as an overlay? Can't implement everything, what about deprecated function args? What about stuff you can't overlay?
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this?
+Drawbacks of this approach in comparison to keep doing what has been done until now:
+- Deprecating lots of attributes will increase evaluation time, as the conditions for warnings/throws need to be evaluated.
+- The usage of the `deprecation` function has to be learned, it's not as simple as just removing the attribute, adding a trace or replacing it with a throw. Adding good docs will help for this.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -350,13 +335,13 @@ What other designs have been considered? What is the impact of not doing this?
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-What about errors in library functions? Correct or keep backwards compatible. #41604
-What about function arguments?
+- What about errors in library functions? Correct or keep backwards compatible? #41604
+- What about function arguments?
+- Introduce automatic capture of attribute path in nixpkgs for better error messages? Is this even possible?
 
 # Future work
 [future]: #future-work
 
-What future work, if any, would be implied or impacted by this feature
-without being directly part of the work?
+From the scope defined above it should be possible to implement a program that creates an index over nixpkgs, containing every attribute path that's intended to be used (I have a prototype of this working). This can then be used for automatically verifying backwards compatibility for commits. This can also can be used for providing a tags file to look up where functions and attributes are located, which is a much needed feature for nixpkgs. Another possible application of this is to provide documentation for attributes not directly where they're defined, but in a `attribute-docs.nix` file.
 
-From the scope defined above it should be possible to implement a program that creates an index over nixpkgs, containing everything that's intended to be used. This can then be used for automatically verifying backwards compatibility for commits. Also this can be used for providing a tags file to look up functions and attributes. Possibly also for providing an out-of-tree documentation and examples.
+Similarly, the above defined allowed state transitions can be used to check that commits or pull requests don't do invalid transitions. Also a periodic automated job could run to set deprecation values to `null` if the values aren't needed anymore. Related, one could implement a program that returns which attributes are in which deprecation stage, doing some statistics with them.
