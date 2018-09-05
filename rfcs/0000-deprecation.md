@@ -232,6 +232,7 @@ The basic implementation and meaning of arguments is a follows (Note: I didn't t
         ", will be removed in ${prettyRelease removedRelease}";
       message = "${deprecationString}${removedString} at ${location}. ${reason}";
     in
+      # TODO: Improve message for warnFor = 0
       if ! isDeprecated then assert value != null; value # TODO: Colors and stuff?
       else if isRemoved then throw message
       else assert value != null; builtins.trace message value;
@@ -257,7 +258,45 @@ TODO: Could there warning overrides be used for more than just deprecations?
 
 Implementation details: Add a `config` attribute to `lib` with the value `{}` and use it for the deprecation function. This value can be changed by using `lib.extends (self: super: { config = <newvalue>; } }`. Define `pkgs.lib` as `lib.extends (self: super: { config = config.deprecation; }`.
 
-## 
+## Deprecation process
+
+When a decision has been made to deprecate an attribute, one has to decide:
+- Date of deprecation. Let's call it `d` here, meaning "deprecate after `d` time has passed from now on". This corresponds to the `year` and `month` arguments to the deprecation function.
+- The number of releases it should still be evaluable for albeit with a warning, let's call it `w` here, meaning it should warn for `w` releases. This corresponds to the `warnFor` argument of the deprecation function.
+
+A sane default is `d = 0, w = 1`, to deprecate immediately and warn for one release. In general, it depends on the situation. Some more interesting examples might include:
+
+- Pinning an old release of a package `hello_0_1` could have a planned deprecation of 2 years after introduction (`d = 2 years`) such that it can be removed eventually.
+- A package being unable to be built anymore because it would require big changes might be deprecated immediately with no warning phase (`d = 0, w = 0`), such that the value doesn't have to be kept around anymore.
+- A change that will influence a lot of code and might be hard to migrate from could have an instant deprecation but a warning phase of 4 releases (`d = 0, w = 4`), such that people have a lot of time to migrate away from it.
+- Aliases might be deprecated only after two years so people enabling all warnings can be alarmed of the eventual removal. The warning phase could then be about 4 releases long because aliases don't cost much anyways (`d = 2 years, w = 4`).
+
+This isn't main focus of this RFC, however we will address some issues regarding this.
+
+### Aliases
+
+Aliases have a long history of being introduced due to either the old name being unfit, the attribute being moved to a package set (or moved from one) or naming convention changes (`_` vs `-`). The question here is: Is it even worth deprecating the old aliases? We look at advantages and disadvantages:
+
+Advantages of removing aliases:
+1. Nix evaluation will be faster and use less memory for everybody.
+   Doing a quick analysis using `export NIX_SHOW_STATS=1` on nixpkgs de825a4eaacd and Nix 2.0.4 with either all or (almost) no aliases with [this diff](https://gist.github.com/7f647d15b27825c3cc4dc2079acddb39), these are the results for different commands executed in the nixpkgs root. Time has been measured with an initial unmeasured run and an average over multiple runs after that, standard derivation in parens, in seconds. Heap is deterministic.
+    
+    | Command | time elapsed (aliases -> no aliases) | total Boehm heap allocations (aliases -> no aliases) |
+    | `nix-instantiate --eval -A path`| (15 runs), 0.043 (0.0041) -> 0.042 (0.0042) | 4.12MB -> 3.89MB |
+    | `nix-instantiate -A openssl`| (15 runs) 0.095 (0.0060) -> 0.090 (0.0049) | 18.5MB -> 17.7MB |
+    | `nix-instantiate nixos/release.nix -A iso_graphical` | (15 runs) 5.71 (0.19) -> 5.64 (0.10) | 839MB -> 836MB | 
+    | `nix-instantiate nixos/release-combined.nix -A tested` | (5 runs) 222.6 (6.1) -> 218.2 (2.3) | 36.51GB -> 36.35GB |
+
+    Putting some statistical meaning into the timings using an alpha of 2.5% (z = 1.96) leads to a result of everything but the first command being statistically significant (maybe because it's the only --eval?). So we really got ourselves about 1-3% better speed, which is not much, but it's not nothing. Also 0.4-5% less memory consumption, depending on the expression.
+
+2. Cruft can be removed, cleaner repository state.
+
+Disadvantages of removing aliases:
+1. Deprecation needed -> People will eventually see warnings, potentially lots of them
+   Doing a quick analysis of alias introduction times using `cat pkgs/top-level/aliases.nix | rg '[0-9]+-[0-9]+-[0-9]+' -o | cut -d- -f-2 | sort | uniq -c` 
+
+Assigning weights 
+
 
 ### Cases
 
