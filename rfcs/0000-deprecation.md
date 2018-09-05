@@ -313,13 +313,6 @@ https://github.com/NixOS/nixpkgs/pull/19315
 
 https://github.com/NixOS/nixpkgs/pull/45717#issuecomment-418424080
 
-## Todo
-
-
-## Examples
-
-Can be used for deprecating versions when they're not supported anymore by upstream at the exact day.
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
