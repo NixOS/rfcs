@@ -9,25 +9,39 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-We propose to add a deprecation guideline and a set of accompanying functions and tools to deprecate functionality in nixpkgs. Instead of removing an attribute which would result in an `attribute missing` error for users, one can deprecate a function, which will then first throw a warning and later throw an error. This is intended to be used for anything accessible from `import <nixpkgs> {}`, including the standard library, packages, functions, aliases, package sets, etc.
+This RFC proposes to add a very powerful function for easy deprecation and potentially a handful of automated tools to support it in the future. Instead of removing an attribute which would result in an uninformative `attribute missing` error for users, one can use said function to deprecate the value instead, which will first warn the user with a message, and in a later release throw an error. It is also possible to define a future deprecation date, up to which point no warning messages will be issued by default, unless the user enables them. Additionally the user will be able to fully control which warnings should get shown. This can be used for the standard library, packages, aliases, functions, package sets, everything in nixpkgs. Here is an example use of the current implementation:
+
+```
+{
+  foo = lib.deprecate {
+    year = 2018;
+    month = 8;
+    attrPath = [ "foo" ];
+    reason = "Was replaced with bar";
+    value = "foo";
+  };
+}
+```
+
+Evaluating `foo` will evaluate to just `"foo"` in the 18.03 release, evaluate with a warning in the 18.09 release, and throw an error in any future releases. The warning will look like this:
+```
+trace: WARNING: pkgs.foo is deprecated since 18.09 and will be removed in ~19.03: Was replaced with bar
+"foo"
+```
 
 # Motivation
 [motivation]: #motivation
 
-Currently nixpkgs doesn't have any standard way to deprecate functionality. When something is too bothersome to keep around, the attribute often just gets dropped (490ca6aa8ae89d0639e1e148774c3cd426fc699a, 28b6f74c3f4402156c6f3730d2ddad8cffcc3445), leaving users with an `attribute missing` error, which is neither helpful nor necessary, because Nix has functionality for warning the user of deprecation or throwing useful error messages. This approach has been used before, but on a case-by-case basis (6a458c169b86725b6d0b21918bee4526a9289c2f). (Todo: link to 1aaf2be2a022f7cc2dcced364b8725da544f6ff7 and find more commits that remove aliases/packages/function args).
+Currently nixpkgs doesn't have any standard way to deprecate functionality. When something is too bothersome to keep around, the attribute often just gets dropped, leaving users with an `attribute missing` error, which is neither helpful nor necessary, because Nix has functionality for warning the user of deprecation or throwing useful error messages. This approach has been used before, but only on a case-by-case basis.
 
-Why are we doing this? What use cases does it support? What is the expected
-outcome?
+The goal with this RFC is to provide a useful function that can be dropped in whenever deprecation is needed, without having to worry about the specifics. People will get proper error messages, warning them of the upcoming deprecation, and when the planned time has come, throw an error instead of keep warning. This has the effect of motivating people to update their code.
 
 # Detailed design
 [design]: #detailed-design
 
-This is the bulk of the RFC. Explain the design in enough detail for somebody
-familiar with the ecosystem to understand, and implement.  This should get
-into specifics and corner-cases, and include examples of how the feature is
-used.
-
 ## Discussion
+
+This section is mainly theory, it's not necessary to understand the RFC, but useful for the ideas described in [future work](#future-work). Feel free to skip to the [implementation section](#implementation).
 
 ### Scope
 
@@ -117,10 +131,9 @@ This leads us to the following allowed state transitions between our primitives:
 - `throw d n` -> removed, if `r >= d + n + long`, aka it should be a while before we can remove throw messages. `long` stands for the number of releases the `throw` should have been issued for.
 
 ## Implementation
+[implementation]: #implementation
 
 The implementation of such a deprecation function will purely based on the planned release version of the next release (e.g. 18.09) and release versions of past releases. An argument could then be made that deprecation dates should also just be a release version, however it appears to be more convenient and less error prone if we allow all year/month combinations. Deprecations can then be added simply by inserting the current or planned deprecation year and month, instead of having to figure out what the next (or later than next) release version is going to be. This will work correctly as long as the `<nixpkgs/.version>` file always contains a version number that's not in the past. This can indeed occur if the date of effective release stretches itself past the month of the release version, which isn't a big problem however, even if unnoticed (the deprecation will just be delayed by a release).
-
-To make implementation more efficient and easier, a pair of release version year/month will be converted into an integer corresponding to the number of months since year 2000. This means the release version `"18.09"` will be handled as `18 * 12 + 9 = 225`. In the implementation variables that contain such a value will be named `...YearMonth`.
 
 The following has been implemented in my [deprecation branch](https://github.com/infinisil/nixpkgs/tree/deprecation).
 
@@ -128,12 +141,7 @@ The following has been implemented in my [deprecation branch](https://github.com
 
 To implement deprecation functions that can vary their behavior depending on the number of releases that have passed since initial deprecation, we need to track past releases. A file `<nixpkgs/lib/releases.nix>` should be introduced with contents of the form
 ```nix
-map ({ release, ... }@attrs: attrs // {
-  yearMonth = let
-    year = lib.toInt (lib.versions.major release);
-    month = lib.toInt (lib.versions.minor release);
-    in year * 12 + month;
-}) [
+[
   {
     name = "Impala";
     release = "18.03";
@@ -146,7 +154,7 @@ map ({ release, ... }@attrs: attrs // {
     release = "17.09";
     year = 2017;
     month = 9;
-    day = ??;
+    # day = ??;
   }
   {
     name = "Gorilla";
@@ -159,6 +167,8 @@ map ({ release, ... }@attrs: attrs // {
 ]
 ```
 
+TODO: Maybe omit the year/month/day, because we don't need them for anything, yet at least.
+
 Additional fields can be added if the need arises. This file should be updated at date of release. It may also be updated already at branch-off time (TODO: Think about this some more).
 
 ### Deprecation function
@@ -170,32 +180,12 @@ A function `lib.deprecate` will be introduced. When an attribute should be depre
     year = 2018;
     month = 8;
     warnFor = 2;
+    attrPath = [ "foo" ];
     reason = "foo has been deprecated, use bar instead";
     value = "foo";
   };
 }
 ```
-
-Optionally, for convenience, a shorthand `lib.deprecate'` could be provided as well:
-```nix
-{
-  bar = lib.deprecate' 2018 8 "bar is a burden to the codebase, refrain from using it" "bar";
-}
-```
-
-Which will correspond to
-```nix
-{
-  bar = lib.deprecate {
-    year = 2018;
-    month = 8;
-    warnFor = 1;
-    reason = "bar is burden to the codebase, refrain from using it";
-    value = "bar";
-  };
-}
-```
-
 
 ### Configuration
 
@@ -212,9 +202,35 @@ import <nixpkgs> {
 }
 ```
 
-TODO: Could there warning overrides be used for more than just deprecations?
+### Extra
 
-Implementation details: Add a `config` attribute to `lib` with the value `{}` and use it for the deprecation function. This value can be changed by using `lib.extends (self: super: { config = <newvalue>; } }`. Define `pkgs.lib` as `lib.extends (self: super: { config = config.deprecation; }`.
+I have implemented a very interesting and useful but invasive change to nixpkgs in [this branch](https://github.com/infinisil/nixpkgs/tree/deprecation). The change can be separated into 2 parts, which flow hand in hand. TODO: Evaluate nixpkgs performance on this change.
+
+#### attrPath argument
+
+The first part calls every function of nixpkgs that has takes a single attribute set argument with a `attrPath` key with the corresponding attribute path. For example, if you have defined `foo` like this in `<nixpkgs/pkgs/top-level/all-packages.nix>`:
+```nix
+{
+  foo = { attrPath }:
+    "You can find me at ${lib.concatStringsSep "." attrPath}";
+}
+```
+
+Evaluating `foo` will result in `"You can find me at foo"`.
+
+This change is the one relevant to this PR, because **it allows the deprecation function to automatically know the attribute path of the package**. The user therefore won't have to provide it. This can also be used in the `gnome3` package structure: These attribute paths are needed for creating update scripts, currently they are provided manually for every package.
+
+#### attrPath and attrPos
+
+The second part of it extends every attrset in nixpkgs with 2 attributes: `attrPath` and `attrPos`. For example:
+```
+$ nix-instantiate --eval -A haskellPackages.xmonad.attrPath
+[ "haskellPackages" "xmonad" ]
+$ nix-instantiate --eval -A haskellPackages.xmonad.attrPos
+{ column = 3; file = "/home/infinisil/src/nixpkgs/pkgs/development/haskell-modules/configuration-nix.nix"; line = 225; }
+```
+
+`attrPos` is very useful if you want to look up where some attribute is defined without knowing the attribute path to it. TODO: Usecase for `attrPath` and `attrPos`.
 
 ## Deprecation process
 
@@ -230,7 +246,7 @@ A sane default is `d = 0, w = 1`, to deprecate immediately and warn for one rele
 - Aliases might be deprecated only after two years so people enabling all warnings can be alarmed of the eventual removal. The warning phase could then be about 4 releases long because aliases don't cost much anyways (`d = 2 years, w = 4`).
 - A package that has a known end-of-support date such as Java 7 in July 2022 can have this reflected in the deprecation time.
 
-This isn't main focus of this RFC, however we will address a controversial issues regarding this:
+This isn't main focus of this RFC, however I will address a controversial issues regarding this:
 
 ### Aliases
 
@@ -254,7 +270,7 @@ Disadvantages of removing aliases:
 1. Deprecation needed -> People will eventually see warnings, potentially lots of them
    Doing a quick analysis of alias introduction times using `cat pkgs/top-level/aliases.nix | rg '[0-9]+-[0-9]+-[0-9]+' -o | cut -d- -f-2 | sort | uniq -c`, we get an mean of 5.5 and a median of 3 new aliases per month over the last ~4 years. This means if aliases were to be deprecated at a constant rate, we'd see about 5 new deprecations every month, so about 30 every release. Now of course not everybody uses every nixpkgs attribute, so it will be less than that for individual users. Considering that aliases will only get introduced for popular packages (since unpopular ones very little people use to begin with, so aliases wouldn't get introduced a lot), I estimate that an average user will encounter about 0-2 new alias deprecations per release. This amount will of course be bigger with "power" users, using lots of different packages. Considering that there are quite a few people only upgrading their version every 1-2 years, this can add up.
 
-Assigning subjective weights to these points: The first advantage receives a weight of 4, the second advantage a weight of 1, the disadvantage gets a weight of 20 because it's user-facing and annoying. If I didn't forget anything, this adds to a resulting 14 points for *not* deprecating aliases. In short, the cost of deprecating aliases is much bigger than the cost of leaving them in.
+Assigning *subjective* weights to these points: The first advantage receives a weight of 4, the second advantage a weight of 1, the disadvantage gets a weight of 20 because it's user-facing and annoying. If I didn't forget anything, this adds to a resulting 14 points for *not* deprecating aliases. In short, the cost of deprecating aliases is much bigger than the cost of leaving them in.
 
 ## Links
 
@@ -269,6 +285,15 @@ https://github.com/NixOS/nixpkgs/pull/45717
 https://github.com/NixOS/nixpkgs/pull/19315
 
 https://github.com/NixOS/nixpkgs/pull/45717#issuecomment-418424080
+
+https://github.com/NixOS/nixpkgs/pull/45717#issuecomment-419393594
+
+https://github.com/NixOS/nixpkgs/commit/490ca6aa8ae89d0639e1e148774c3cd426fc699a
+https://github.com/NixOS/nixpkgs/commit/28b6f74c3f4402156c6f3730d2ddad8cffcc3445
+https://github.com/NixOS/nixpkgs/commit/6a458c169b86725b6d0b21918bee4526a9289c2f
+https://github.com/NixOS/nixpkgs/commit/1aaf2be2a022f7cc2dcced364b8725da544f6ff7 
+
+TODO: link to and find more commits that remove aliases/packages/function args
 
 # Drawbacks
 [drawbacks]: #drawbacks
