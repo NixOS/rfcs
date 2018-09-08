@@ -317,7 +317,9 @@ A sane default is `d = 0, w = 1`, to deprecate immediately and warn for one rele
 - Aliases might be deprecated only after two years so people enabling all warnings can be alarmed of the eventual removal. The warning phase could then be about 4 releases long because aliases don't cost much anyways (`d = 2 years, w = 4`).
 - A package that has a known end-of-support date such as Java 7 in July 2022 can have this reflected in the deprecation time.
 
-This isn't main focus of this RFC, however I will address a controversial issues regarding this:
+### Ridding nixpkgs of deprecated usage
+
+When something is being deprecated, one has to ensure to rid nixpkgs of all usages of the deprecated value. Otherwise the user could get warnings or error message that didn't stem from their code.
 
 ### Aliases
 
