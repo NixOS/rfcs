@@ -130,6 +130,77 @@ This leads us to the following allowed state transitions between our primitives:
 - `warn d n val` -> `removed`, if `r >= d + n + long`, aka it should be a while before we can remove throw messages. `long` stands for the number of releases the `throw` should have been issued for.
 - `throw d n` -> removed, if `r >= d + n + long`, aka it should be a while before we can remove throw messages. `long` stands for the number of releases the `throw` should have been issued for.
 
+### Function argument deprecations
+
+Possible incompatibilities:
+- Arg changed from optional (with default) -> mandatory
+- Arg changed supported input values
+  - old value can be converted to new value
+  - old value can't be converted to new value
+- Arg removed, that functionality not supported anymore
+- Arg replaced
+  - old arg can be converted to new arg
+  - old arg can't be converted to new arg
+- Arg list was previously vararg, but now isn't anymore
+
+#### Optional (with default) -> mandatory
+
+Nix: { foo ? "foo" } -> { foo }
+Nix: { ... } -> { foo, ... }:
+Detectable with functionArgs: Yes
+Detectable with args: Yes
+What do:
+  - If a suitable default value for the argument can still be provided: prewarn, warn, throw
+  - Otherwise: throw
+
+#### Valid inputs changed (such that not all permitted old values work with the new argument)
+
+Nix: { foo } -> { foo }
+Detectable with functionArgs: No
+Detectable with args: Yes
+What do:
+  - If the invalid value can be converted to a new valid value: prewarn, warn, throw
+  - Otherwise: throw
+
+#### Argument removed
+
+Nix: { foo } -> { foo ? null }@args: if args ? foo then warn -> { foo ? null }@args: if args ? foo then throw -> { }
+Nix: { foo ? "foo" } -> { }
+Detectable with functionArgs: Yes
+Detectable with args: Yes
+What do:
+  - If the old argument didn't have any effect anyways: prewarn, warn, throw
+  - Otherwise: throw
+
+#### Argument removed (with vararg)
+
+Nix: { foo } -> { ... }
+Nix: { foo ? "foo", ... } -> { ... }
+Detectable with functionArgs: Yes (but indistinguishable with previous one)
+Detectable with args: No
+What do: Can't do anything, only change this if the behaviour doesn't change
+
+#### Argument renamed/changed
+
+Nix: { foo } -> { foo ? null, bar }@args: if args ? foo then warn -> { foo ? null, bar }@args: if args ? foo then throw -> { bar }
+Nix: { foo ? "foo" } -> { bar }
+Detectable with functionArgs: Yes
+Detectable with args: Yes
+What do:
+  - If the old argument value can be converted into the new one: prewarn, warn, throw
+  - Otherwise: throw
+
+#### vararg -> not vararg
+
+Nix: { ... } -> { foo, ... }@args: (doesn't work when input only contained foo already) if attrNames args != [ "foo" ] then warn -> { foo }
+Nix: { foo, ... } -> { foo, ... }@args: if attrNames args != [ "foo" ] then warn -> { foo }
+Detectable with functionArgs: No
+Detectable with args: Yes
+What do:
+  - If old arguments can be converted into new one: prewarn, warn, throw
+  - Otherwise: throw
+
+
 ## Implementation
 [implementation]: #implementation
 
