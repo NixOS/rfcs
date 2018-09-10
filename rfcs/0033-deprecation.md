@@ -2,7 +2,7 @@
 feature: deprecation
 start-date: 2018-08-25
 author: Silvan Mosberger (@infinisil)
-co-authors: (find a buddy later to help our with the RFC)
+co-authors: John Ericson (@Ericson2314)
 related-issues: (will contain links to implementation PRs)
 ---
 
