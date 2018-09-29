@@ -24,7 +24,7 @@ code execution on NixOS systems if any of the following are true:
 
   * A Github employee is coerced or malicious
   * The Github account credentials of any maintainer are compromised
-  * A successful BGP attack on github.com or similar to create an MITM
+  * A successful (even limited) MITM attack on github.com
 
 Essentially NixOS has many single points of trust, and thus single points of
 failure.
@@ -49,8 +49,8 @@ See examples of major security incidents in other package managers:
 
 ### Workflow
 
-  1. Author and test a nixpkg
-  2. PR a signed commit adding adding nixpkg to NixOS/nixpkgs repo
+  1. Author and test a nix expression
+  2. PR a signed commit adding nix expression to NixOS/nixpkgs repo
 
 ### Notes
 
