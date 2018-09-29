@@ -1,5 +1,5 @@
 ---
-feature: package-integrity
+feature: expression-integrity
 start-date: 2018-09-28
 author: lrvick
 co-authors:
@@ -13,25 +13,20 @@ related-issues:
 [summary]: #summary
 
 This RFC seeks to provide a strategy to allow NixOs to strongly attest who
-authored a package, who reviewed it, and that the package has not been tampered
-with.
+authored a nix expression, who reviewed it, and that it has not been tampered
+with outside the review flow.
 
 # Motivation
 [motivation]: #motivation
 
-Nix currently does not have any method to attest who authored a nixpkg, who
-reviewed it, or that a given binary cached package was actually built from
-a given .nix file in version control.
-
-In practice this means that a bad actor can gain remote code execution on NixOS
-systems if any of the following are true:
+Due to the lack of VCS integrety on NixOS today a bad actor can gain remote
+code execution on NixOS systems if any of the following are true:
 
   * A Github employee is coerced or malicious
   * The Github account credentials of any maintainer are compromised
   * A successful BGP attack on github.com or similar to create an MITM
-  * A cache server is compromised
 
-Essentially NixOS has many single points of trust, and thus single, points of
+Essentially NixOS has many single points of trust, and thus single points of
 failure.
 
 This is a serious design flaw and we can learn lessons from other package
@@ -55,8 +50,7 @@ See examples of major security incidents in other package managers:
 ### Workflow
 
   1. Author and test a nixpkg
-  2. Builds a nixpkg and adds the hash of the binary to the nixpkg
-  3. PR a signed commit adding adding nixpkg to NixOS/nixpkgs repo
+  2. PR a signed commit adding adding nixpkg to NixOS/nixpkgs repo
 
 ### Notes
 
@@ -73,39 +67,24 @@ See examples of major security incidents in other package managers:
     * Add key ID to contributors list if not already present
   3. Review content of new PR for general best practices
   4. Ensure signatures/hashes verified for third party code referenced
-  5. Build package and verify artifact hash matches hash contained in nixpkg
-  6. Make signed merge commit to master of NixOS/nixpkgs
+  5. Make signed merge commit to master of NixOS/nixpkgs
 
 ### Notes
 
   * Maintainer signatures should be a hard requirement
   * Maintainer and Contributor should never be the same person.
-  * Some packages may not be reproducible and should get special flag set
-
-## Cache maintainer
-
-### Workflow
-
-  1. Pull code from VCS repo
-  2. Compile all new nixpkgs
-  3. Publish artifacts
-
-### Notes
-
-  * signed nixpkgs now contain artifact hashes removing need for cache signing
 
 ## Nix Clients
 
 ### Workflow
 
-  1. Pull latest nixpkgs VCS repo
-  2. Verify author/reviewer commit signatures for all nixpkg.
-  3. Attempt to fetch cached artifact during install
-  4. Verify artifact hash against hash in given nixpkg during install
+  1. Pull latest nix expressions from VCS repo
+  2. Verify author/reviewer commit signatures for all nix expressions
+  3. Build/Install nix expression
 
 ### Notes
 
-  * Nix clients can opt to only trust reproducible builds with hashes.
+  * Local building is required for integrity as no trusted cache system exists
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -119,7 +98,7 @@ additional security work.
 ## Git Notes signing
 
 Reviewer/maintainer signatures could be added to the Git Notes interface on
-a given ref allowing m-of-n signing for security critical packages.
+a given ref allowing m-of-n signing for security critical expressions.
 
 This would additionally negate the need for merge commits and would allow
 VCS automatic merging to be used if desired.
@@ -145,11 +124,18 @@ add their detached .nix.sig files to a PR before it merges.
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
+Currently this scheme does not attempt to solve how to tie trusted cached
+binaries to their signed VCS commits. Until a solution for this is reached
+users will have to build every expression locally which makes securely using
+NixOS impractical on low-spec systems or users with limited time to wait on
+compiles.
+
+There are other proposals in progress to address this.
 
 # Future work
 [future]: #future-work
 
-It may be desireable to continue to have an untrusted package repo like the
+It may be desireable to continue to have an untrusted expression repo like the
 one used today that users can install from by hand as they please.
 
 This could be an analogue of the Arch Linux User Repository (AUR) vs the
