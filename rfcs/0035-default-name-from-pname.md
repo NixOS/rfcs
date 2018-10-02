@@ -18,16 +18,16 @@ Whenever the `version` and `pname` attribute are both present, use
 
 The string `"${pname}-${version}"` appears verbatim in the nixpkgs repo [627
 times](appendixA), at the time of this writing. Variants of this string appear
-[746 times](appendixA), with the most common variant being `baseName`. This RFC
+[746 times][appendixA], with the most common variant being `baseName`. This RFC
 would reduce repetition in nixpkgs, and would allow for the `rec` keyword to be
 removed from an unknown number of places.
 
-This RFC was originally submitted as [nixpkgs PR #41627](originalPR). This PR
+This RFC was originally submitted as [nixpkgs PR #41627][originalPR]. This PR
 received some positive attention:
 
-![Positive attention on the original PR](Upvotes)
+![Positive attention on the original PR][Upvotes]
 
-However, it was [suggested](useRFC) by @edolstra that this should go through the
+However, it was [suggested][useRFC] by @edolstra that this should go through the
 RFC process instead of directly implementing it in nixpkgs.
 
 # Detailed design
@@ -35,12 +35,12 @@ RFC process instead of directly implementing it in nixpkgs.
 
 The basic design is simple: change the default value for the `name` attribute of
 `mkDerivation` to `"${pname}-${version}"` if both attributes are present
-(implemented in [`c313e07`](basicChange))
+(implemented in [`c313e07`][basicChange])
 
 Care should be taken to assure that position information is transferred
-correctly (implemented in [`0c1d5d1`](positionInfo)) and to add an assertion
+correctly (implemented in [`0c1d5d1`][positionInfo]) and to add an assertion
 that the generated name is consistent with the actual name if all three
-attributes are present (implemented in [`e0d2348`](checkConsistent)).
+attributes are present (implemented in [`e0d2348`][checkConsistent]).
 
 `git cherry-pick`-ing these three commits should be sufficient to get this RFC
 implemented. It is discouraged to continue on the original PR, since a lot of it
