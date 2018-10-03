@@ -54,6 +54,8 @@ has gone out of date since.
   * It makes a currently unofficial (but not discouraged) practice official,
     and enshrines the `pname` attribute name into "law". Once this RFC is
     implemented, there is no easy way of changing this attribute name again.
+    _Note: `pname` is already used for Python packages, but in this context,
+    `name = "${python.libPrefix}-${pname}-${version}"`.
 
 # Alternatives
 [alternatives]: #alternatives
