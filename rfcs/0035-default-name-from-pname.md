@@ -40,11 +40,14 @@ The basic design is simple: change the default value for the `name` attribute of
 Care should be taken to assure that position information is transferred
 correctly (implemented in [`0c1d5d1`][positionInfo]) and to add an assertion
 that the generated name is consistent with the actual name if all three
-attributes are present (implemented in [`e0d2348`][checkConsistent]).
+attributes are present (implemented in [`e0d2348`][checkConsistent]). Because
+some packages already define a prefix to their `pname`-`version` pair (for
+example: `python2.7-setuptools-40.2.0`), it might be better to use
+`lib.strings.hasSuffix` here instead of `(==)`.
 
-`git cherry-pick`-ing these three commits should be sufficient to get this RFC
-implemented. It is discouraged to continue on the original PR, since a lot of it
-has gone out of date since.
+`git cherry-pick`-ing these three commits (keeping the mentioned caviats in
+mind) should be sufficient to get this RFC implemented. It is discouraged to
+continue on the original PR, since a lot of it has gone out of date since.
 
 # Drawbacks
 [drawbacks]: #drawbacks
