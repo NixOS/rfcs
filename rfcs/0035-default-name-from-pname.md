@@ -45,7 +45,7 @@ some packages already define a prefix to their `pname`-`version` pair (for
 example: `python2.7-setuptools-40.2.0`), it might be better to use
 `lib.strings.hasSuffix` here instead of `(==)`.
 
-`git cherry-pick`-ing these three commits (keeping the mentioned caviats in
+`git cherry-pick`-ing these three commits (keeping the mentioned caveats in
 mind) should be sufficient to get this RFC implemented. It is discouraged to
 continue on the original PR, since a lot of it has gone out of date since.
 
