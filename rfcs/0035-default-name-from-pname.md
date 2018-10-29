@@ -5,6 +5,7 @@ author: Patrick Hilhorst (@Synthetica9)
 co-authors: (find a buddy later to help our with the RFC)
 related-issues:
   - https://github.com/NixOS/nixpkgs/pull/41627
+  - https://github.com/NixOS/nixpkgs/pull/49398
 ---
 
 # Summary
