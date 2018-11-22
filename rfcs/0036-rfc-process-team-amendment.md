@@ -45,15 +45,15 @@ new Shepherds. They also are in charge of merging accepted and rejected RFCs.
 Generally by these expectations they should find time to meet once a week for
 about an hour.
 
-##### Shepherd
+##### Shepherd Team
 A team of 3-4 community members defined unanimously by the RFC Steering
-Committee, responsible for accepting or rejecting RFCs. This team is created per
+Committee, responsible for accepting or rejecting a specific RFC. This team is created per
 RFC from community members nominated in the discussion on that RFC.
 
 This team should be people who are very familiar with the main components
 touched by the RFC.
 
-##### Leader
+##### Shepherd Leader
 The Shepherd Leader is in charge of the RFC process for a specific RFC, and is
 responsible for ensuring the process is followed in a timely fashion. 
 
