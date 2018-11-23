@@ -31,7 +31,7 @@ and we have adapted to our needs.
 # Detailed design
 [design]: #detailed-design
 
-## Glossary
+## Terminology
 
 ##### RFC Steering Committee
 A team of people defined by _this_ RFC and stays consistent until the team
