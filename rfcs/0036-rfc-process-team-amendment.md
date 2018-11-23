@@ -88,9 +88,7 @@ with the goal of eventual inclusion into Nix or nixpkgs.*
 6. Build consensus and integrate feedback. RFCs that have broad support are much
    more likely to make progress than those that don't receive any comments. Feel
    free to reach out to the RFC Shepherd Team leader in particular to get help
-   identifying stakeholders and obstacles. We would like to encourage reviewers
-   to only make comments on the content of the RFC and reach out to the author
-   directly (via IRC, e-mail, etc.) for wording or typos.
+   identifying stakeholders and obstacles.
 7. The RFC Shepherd Team will discuss the RFC pull request, as much as possible
    in the comment thread of the pull request itself. Discussion outside of the
    pull request, either offline or in a video conference, that might be
