@@ -12,7 +12,7 @@ related-issues: 1 (initial process), 24 (implementation)
 This RFC proposes an RFC Steering Committee who decide on a group of RFC
 shepherds for each RFC who guide the discussion to a general consensus and then
 propose a motion for a "Final Comment Period" (FCP) with a disposition for
-acception, rejection or postponing. (see Glossary for a short definition of
+acception, rejection or postponing. (see Terminology for a short definition of
 these terms)
 
 
@@ -45,18 +45,38 @@ new Shepherds. They also are in charge of merging accepted and rejected RFCs.
 Generally by these expectations they should find time to meet once a week for
 about an hour.
 
+They have no special responsibility with regard to the content of an RFC, they
+can weigh in on them, the same as any other community member, but are only in
+charge of:
+ * selecting the Shepherds unanimously
+ * supervising that the Shepherds are carrying out their work
+ * committing the final RFC
+
 ##### Shepherd Team
 A team of 3-4 community members defined unanimously by the RFC Steering
 Committee, responsible for accepting or rejecting a specific RFC. This team is
 created per RFC from community members nominated in the discussion on that RFC.
 
 This team should be people who are very familiar with the main components
-touched by the RFC. The author and co-author cannot be part of the Shepherd
-Team.
+touched by the RFC. The author cannot be part of the Shepherd Team. In addition,
+at most half of the Shepherd Team can be part of the RFC Steering Committee.
+
+The resposibility of the team is to guide the discussion as long as it is
+constructive, new points are brought up and the RFC is iterated on and from time
+to time summarise the current state of discussion. If this is the case no longer,
+then the Shepherd Team shall step in with a motion for FCP.
 
 ##### Shepherd Leader
 The Shepherd Leader is in charge of the RFC process for a specific RFC, and is
-responsible for ensuring the process is followed in a timely fashion. 
+responsible for ensuring the process is followed in a timely fashion. He has no
+special resposibility with regard to moving an undecided Shepherd Team to a
+certain decision.
+
+##### Final Comment Period (FCP)
+A period of ten calendar days, which will be called by the Shepherd Team after
+the RFC has received ample discussion and enough of the tradeoffs have been
+discussed. The Shepherd Team will propose to either accept, reject or postpone
+the RFC after the FCP.
 
 
 ## Process from Creation to Merge
@@ -67,15 +87,16 @@ first get the RFC merged into the RFC repository as a markdown file under the
 with the goal of eventual inclusion into Nix or nixpkgs.*
 
 0. Have a cool idea!
-1. Find a co-author. A co-author is critical to making sure your RFC is viable
-   and will receive support. Your co-author helps flesh out the RFC, and should
-   also support the RFC.
-2. Fill in the RFC. Put care into the details: RFCs that do not present
+1. Fill in the RFC. Put care into the details: RFCs that do not present
    convincing motivation, demonstrate understanding of the impact of the design,
    or are disingenuous about the drawbacks or alternatives tend to be
    poorly-received. You might want to create a PR in your fork of the RFCs
-   report to help you flesh it out with a few supporters or chat/video
+   repository to help you flesh it out with a few supporters or chat/video
    conference with a few people involved in the topic of the RFC.
+2. In case your RFC is a technical proposal, you might want to prepare a
+   prototype of your idea to firstly make yourself aware of potential pitfalls
+   and also help reviewers understand the RFC. Code may be able to explain some
+   issues in short.
 3. Submit a pull request. As a pull request the RFC will receive design feedback
    from the larger community, and the author should be prepared to revise it in
    response.
@@ -139,7 +160,9 @@ Once an RFC is accepted the authors may implement it and submit the feature as a
 pull request to the Nix or nixpkgs repo. Being accepted is not a rubber stamp,
 and in particular still does not mean the feature will ultimately be merged; it
 does mean that in principle all the major stakeholders have agreed to the
-feature and are amenable to merging it.
+feature and are amenable to merging it. In general though this means that the
+implementation will be merged as long as there are no substantial technical
+objections to the implementation.
 
 Furthermore, the fact that a given RFC has been accepted implies nothing about
 what priority is assigned to its implementation, nor does it imply anything
@@ -187,6 +210,13 @@ Precious time and energy will need to be devoted to discussions.
 
 The current state, which hardly ever results in an RFC being accepted.
 
+A possibility could also be to define owners for particular domains who have the
+responsibility of deciding to accept changes in that area. An extreme example of
+this case is a BDFL responsible for all final decisions. This would mirror the
+model of decisions in the kernel development. Although a soft form of "code
+owners" could be the base of decisions for Shepherd nominees for different RFCs,
+similar to the Rust RFC model having subteams, to whom RFCs are assigned.
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
@@ -198,4 +228,6 @@ None, as of now.
 Work on auto-labeling RFCs and automation of parts of the process that either do
 not need human intervention or to remind people to continue their work.
 
-Define how the Steering Committee is picked in the future.
+Define how the Steering Committee is picked in the future and how to replace
+members thereof if they are not able to participate in the meetings, including
+guidelines on when to replace members. (a timeline, not being active, etc.)
