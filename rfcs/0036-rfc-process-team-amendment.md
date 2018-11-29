@@ -47,11 +47,12 @@ about an hour.
 
 ##### Shepherd Team
 A team of 3-4 community members defined unanimously by the RFC Steering
-Committee, responsible for accepting or rejecting a specific RFC. This team is created per
-RFC from community members nominated in the discussion on that RFC.
+Committee, responsible for accepting or rejecting a specific RFC. This team is
+created per RFC from community members nominated in the discussion on that RFC.
 
 This team should be people who are very familiar with the main components
-touched by the RFC.
+touched by the RFC. The author and co-author cannot be part of the Shepherd
+Team.
 
 ##### Shepherd Leader
 The Shepherd Leader is in charge of the RFC process for a specific RFC, and is
