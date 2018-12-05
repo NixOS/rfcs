@@ -12,8 +12,7 @@ related-issues: 1 (initial process), 24 (implementation)
 This RFC proposes an RFC Steering Committee who decide on a group of RFC
 shepherds for each RFC who guide the discussion to a general consensus and then
 propose a motion for a "Final Comment Period" (FCP) with a disposition for
-acception, rejection or postponing. (see Terminology for a short definition of
-these terms)
+acception or rejection (see Terminology for a short definition)
 
 
 # Motivation
@@ -75,8 +74,8 @@ certain decision.
 ##### Final Comment Period (FCP)
 A period of ten calendar days, which will be called by the Shepherd Team after
 the RFC has received ample discussion and enough of the tradeoffs have been
-discussed. The Shepherd Team will propose to either accept, reject or postpone
-the RFC after the FCP.
+discussed. The Shepherd Team will propose to either accept or reject the RFC
+after the FCP.
 
 
 ## Process from Creation to Merge
@@ -123,8 +122,8 @@ with the goal of eventual inclusion into Nix or nixpkgs.*
    Specifically, do not squash or rebase commits after they are visible on the
    pull request.
 9. At some point, a member of the RFC Shepherd Team will propose a "motion for
-final comment period" (FCP), along with a disposition for the RFC (merge, close,
-or postpone).
+   final comment period" (FCP), along with a disposition for the RFC (merge or
+   close).
     * This step is taken when enough of the tradeoffs have been discussed that
       the RFC Shepherd Team is in a position to make a decision. That does not
       require consensus amongst all participants in the RFC thread (which is
@@ -140,14 +139,18 @@ or postpone).
     * Before actually entering FCP, all members of the RFC Shepherd Team must
       sign off the motion.
 10. The FCP lasts ten calendar days, so that it is open for at least 5 business
-days. It is also advertised widely, e.g. in NixOS Weekly and through Discourse
-announcements. This way all stakeholders have a chance to lodge any final
-objections before a decision is reached.
+    days. It is also advertised widely, e.g. in NixOS Weekly and through
+    Discourse announcements. This way all stakeholders have a chance to lodge
+    any final objections before a decision is reached.
 11. In most cases, the FCP period is quiet, and the RFC is either merged or
-closed. However, sometimes substantial new arguments or ideas are raised, the
-FCP is canceled, and the RFC goes back into development mode.
+    closed. However, sometimes substantial new arguments or ideas are raised,
+    the FCP is canceled, and the RFC goes back into development mode.
 12. In case of acceptance, the RFC Steering Committee merges the PR into the
-`accepted`, in case of rejection into the `rejected` directory.
+    `accepted` directory. Otherwise the RFC's pull request is closed. If no
+    consensus can be reached on the RFC but the idea in general is accepted, it
+    gets closed, too. A note is added that is should be proposed again, when the
+    circumstances, that are stopping the discussion to come to another decision,
+    change.
 
 
 ![RFC Process](./0036-rfc-process.png)
