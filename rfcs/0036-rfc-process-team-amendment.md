@@ -66,8 +66,8 @@ to time summarise the current state of discussion. If this is the case no longer
 then the Shepherd Team shall step in with a motion for FCP.
 
 ##### Shepherd Leader
-The Shepherd Leader is in charge of the RFC process for a specific RFC, and is
-responsible for ensuring the process is followed in a timely fashion. He has no
+The person in charge of the RFC process for a specific RFC, and responsible for
+ensuring the process is followed in a timely fashion. The Shepherd Leader has no
 special resposibility with regard to moving an undecided Shepherd Team to a
 certain decision.
 
