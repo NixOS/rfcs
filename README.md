@@ -34,16 +34,16 @@ be closed if there is no RFC connected to the proposed changes.
 ## Terminology
 
 ##### RFC Steering Committee
-A team of people defined by _this_ RFC and stays consistent until the team
-members are changed via a follow-up RFC. This committee is responsible for
-forming an RFC Shepherd team from the available nominations on each RFC. This
-team also names the leader of the Shepherd team. This has to happen within 1
-week after the PR has been opened. Until then the Steering Committee is
-responsible for guiding the discussion. In case of the Shepherding Team not
-doing its work the Steering Committee shall encourage them or step in and assign
-new Shepherds. They also are in charge of merging accepted and rejected RFCs.
-Generally by these expectations they should find time to meet once a week for
-about an hour.
+A team of people defined by [RFC 36](./rfcs/0036-rfc-process-team-amendment.md)
+and stays consistent until the team members are changed via a follow-up RFC.
+This committee is responsible for forming an RFC Shepherd team from the
+available nominations on each RFC. This team also names the leader of the
+Shepherd team. This has to happen within 1 week after the PR has been opened.
+Until then the Steering Committee is responsible for guiding the discussion. In
+case of the Shepherding Team not doing its work the Steering Committee shall
+encourage them or step in and assign new Shepherds. They also are in charge of
+merging accepted and rejected RFCs. Generally by these expectations they should
+find time to meet once a week for about an hour.
 
 They have no special responsibility with regard to the content of an RFC, they
 can weigh in on them, the same as any other community member, but are only in
