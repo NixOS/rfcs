@@ -3,7 +3,7 @@ feature: rfc-process-team-amendment
 start-date: 2018-10-27
 author: Robin Gloster <mail@glob.in>
 co-authors: Graham Christensen <graham@grahamc.com>
-related-issues: 1 (initial process), 24 (implementation)
+related-issues: 1 (initial process), 38 (implementation)
 ---
 
 # Summary
