@@ -46,7 +46,7 @@ called "Nixpkgs Maintainers" which only grants "read" access to
 Nixpkgs.
 
 This team will not grant any privileges to the Nix ecosystem
-repositories which non-members already have. They will not be able to
+repositories which non-members don't already have. They will not be able to
 close other people's issues or PRs or push branches. Experimentation
 and documentation shows this will only grant access to a team
 discussion board on GitHub.
@@ -56,8 +56,8 @@ public member of the organization. This will show the NixOS logo on
 their GitHub profile, and people will see "Member" next to their
 account name when browsing issues.
 
-In order to be a member, each user will enable 2FA on their GitHub
-account, since [the GitHub organization requires 2FA of all
+In order to be a member, each user will need to enable 2FA on their
+GitHub account, since [the GitHub organization requires 2FA of all
 members](https://github.com/NixOS/nixpkgs/issues/42761).
 
 See
@@ -69,8 +69,8 @@ for more information about what this will grant.
 The existing Nixpkgs maintainer list already contains a structured
 attribute set of per-maintainer details, including GitHub account
 names. Automation will sync this list of GitHub handles with the
-team's membership, automatically adding and removing people as the
-list changes.
+team's membership, automatically adding and removing people to/from
+the team as the list changes.
 
 GitHub handles can change from one user to another, and so we will
 change the maintainer list to include the GitHub user *ID* as well as
@@ -79,8 +79,8 @@ matches. GitHub User IDs are easily found at
 `https://api.github.com/users/«username»`.
 
 If a user ID's GitHub handle changes, the maintainer should remain
-part of the team under their new name. The repository's nickname
-should be updated to reflect their new nickname.
+part of the team under their new handle. The user's entry in
+`maintainer-list.nix` should be updated to reflect their new handle.
 
 ## Team Automation
 
