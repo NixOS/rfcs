@@ -61,7 +61,7 @@ This team should be people who are very familiar with the main components
 touched by the RFC. The author cannot be part of the Shepherd Team. In addition,
 at most half of the Shepherd Team can be part of the RFC Steering Committee.
 
-The resposibility of the team is to guide the discussion as long as it is
+The responsibility of the team is to guide the discussion as long as it is
 constructive, new points are brought up and the RFC is iterated on and from time
 to time summarise the current state of discussion. If this is the case no longer,
 then the Shepherd Team shall step in with a motion for FCP.
@@ -69,7 +69,7 @@ then the Shepherd Team shall step in with a motion for FCP.
 ##### Shepherd Leader
 The person in charge of the RFC process for a specific RFC, and responsible for
 ensuring the process is followed in a timely fashion. The Shepherd Leader has no
-special resposibility with regard to moving an undecided Shepherd Team to a
+special responsibility with regard to moving an undecided Shepherd Team to a
 certain decision.
 
 ##### Final Comment Period (FCP)
@@ -81,10 +81,10 @@ after the FCP.
 
 ## Process from Creation to Merge
 
-*In short, to get a major change included in Nix or nixpkgs, one must
+*In short, to get a major change included in Nix or Nixpkgs, one must
 first get the RFC merged into the RFC repository as a markdown file under the
 `accepted` directory. At that point the RFC is accepted and may be implemented
-with the goal of eventual inclusion into Nix or nixpkgs.*
+with the goal of eventual inclusion into Nix or Nixpkgs.*
 
 0. Have a cool idea!
 1. Fill in the RFC. Put care into the details: RFCs that do not present
@@ -161,7 +161,7 @@ with the goal of eventual inclusion into Nix or nixpkgs.*
 ## The RFC life-cycle
 
 Once an RFC is accepted the authors may implement it and submit the feature as a
-pull request to the Nix or nixpkgs repo. Being accepted is not a rubber stamp,
+pull request to the Nix or Nixpkgs repo. Being accepted is not a rubber stamp,
 and in particular still does not mean the feature will ultimately be merged; it
 does mean that in principle all the major stakeholders have agreed to the
 feature and are amenable to merging it. In general though this means that the
@@ -170,7 +170,7 @@ objections to the implementation.
 
 Furthermore, the fact that a given RFC has been accepted implies nothing about
 what priority is assigned to its implementation, nor does it imply anything
-about whether a Nix/nixpkgs developer has been assigned the task of implementing
+about whether a Nix/Nixpkgs developer has been assigned the task of implementing
 the feature. While it is not necessary that the author of the RFC also write the
 implementation, it is by far the most effective way to see an RFC through to
 completion: authors should not expect that other project developers will take on
