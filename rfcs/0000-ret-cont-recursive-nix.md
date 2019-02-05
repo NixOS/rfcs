@@ -10,9 +10,9 @@ related-issues: (will contain links to implementation PRs)
 [summary]: #summary
 
 "Ret-cont" recursive Nix is a restricted form of recursive Nix, where one builds a derivations instead of executing builds during the builds.
-This avoids some platform-specific relating to nested sandboxing.
+This avoids some platform-specific contortions relating to nested sandboxing.
 More importantly, it prevents imperative and overly linear direct-style build scripts;
-easy to write but throwing the benefits of Nix.
+easy to write but throwing away the benefits of Nix.
 
 # Motivation
 [motivation]: #motivation
@@ -34,7 +34,8 @@ This gives the "return" part of the name.
 
 I've always been concerned with the ease of which someone can just "nix-build ...; nix-build ...; nix-build ..." within a derivation with recursive Nix.
 This creates a linear chain of dependencies, which isn't terribly performent: shorter critical paths are crucial for parallelism and incrementality and this fails with both.
-Building derivations is lot less convenient, but
+Building derivations is lot less convenient, but makes linear chains and the proper dependency graph *equally* less convenient, removing the perverse incentive.
+And in general, dynamism in the dependency graph, which is the essence of what recursive Nix provides, is only a feature of last resort, so making it more difficult across the board isn't concerning.
 
 Additionally, see https://github.com/edolstra/nix/commit/1a27aa7d64ffe6fc36cfca4d82bdf51c4d8cf717 for Eelco's draft implementation of recursive Nix, and the Darwin sandboxing restriction.
 Sandboxing and Darwin are crucial to Nix today, and we shouldn't sacrifice either of them.
@@ -62,7 +63,7 @@ We shouldn't be so worried about policing good taste in derivations, and allow f
 [alternatives]: #alternatives
 
 Full recursive Nix (builds within builds), or keeping the status quo and use vendoring.
-Important from derivation has been traditionally considered an alternative to this, but I will soon propose an implementation of that relying on this; I know longer consider the two in conflict.
+Important from derivation has been traditionally considered an alternative to this, but I will soon propose an implementation of that relying on this; I no longer consider the two in conflict.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
