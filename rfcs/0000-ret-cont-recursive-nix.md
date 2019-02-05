@@ -44,26 +44,51 @@ With "ret-cont" recursive Nix, actual builds are never nested, so we don't need 
 # Detailed design
 [design]: #detailed-design
 
-I defer to https://github.com/edolstra/nix/commit/1a27aa7d64ffe6fc36cfca4d82bdf51c4d8cf717 with the exact details of setting up the daemon, etc.
-The meaningful distinction of this plan is how the derivation "handoff" works.
-A derivation can call `nix-instantiate` (or really communicate with the daemon however it wants) to create an arbitrary graph of derivations.
-It produces outputs which symlink to those derivations.
-Each of those outputs would then be replaced with the symlink's output of the same name in a downstream derivation.
+Derivations building derivations should have some special attribute indicating this, and two outputs, "store" and "drv".
+"store" would be a local Nix store limited to just drvs and fixed output builds.
+"drv" would contain a symlink to one the derivations in the store, the root.
+After the build completes, Nix verifies all the drv files and fixed outputs are valid (contents match hashes, etc.) and merges the built store into the ambient store.
+\[This should be an untrusted operation because drvs and fixed-output builds are fully verifiable.]
+Finally, any uses of the original derivation can be substituted to instead use the symlinked derivation.
 \[The substitution of drvs in a downstream derivation reminds me of the substitution of drvs for content hashes with the intensional store.
 We should muse on this point when implementing to reduce code and perhaps have good insights.]
-Those drvs are then built, perhaps building more derivations like this; it's possible to never terminate but that's the user's fault.
-We can detect simple cycles analogous to black holes in thunks: if a derivation produces a redirected derivation creating a cycle, we can error out instead of looping.
+
+The *building* itself of derivations is unchanged:
+everything in the previous paragraph just describes marking derivations and post-processing their build results.
+Because drvs and produce plans of drvs producing more drvs ad-infinitum, it's possible to never terminate but that's the user's fault.
+We can detect simple cycles analogous to black holes in thunks: if a derivation produces a redirected derivation depending on the original, a cycle is effectively recreated even though we don't have a hash fixed point.
+\[Instead, the drv->drv substitution would never terminate.]
+Nix can should raise an error rather than looping, but either behavior is permissible.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-We shouldn't be so worried about policing good taste in derivations, and allow full recursive Nix.
+ - The opinionated nature may put of those who think Nix is too hard to learn already, and think simple recursive "nix-build" is good for newcomers.
+
+ - If we ever want full recursive Nix, this doesn't really build in that direction.
+   It sidesteps the bulk of the difficulty which is in making the nested sandboxing and daemon communication secure.
+   To me though, this is a feature not a bug; I don't want to go in that direction just yet.
 
 # Alternatives
 [alternatives]: #alternatives
 
-Full recursive Nix (builds within builds), or keeping the status quo and use vendoring.
-Important from derivation has been traditionally considered an alternative to this, but I will soon propose an implementation of that relying on this; I no longer consider the two in conflict.
+ - Don't allow fixed-output builds.
+   All data can be stuck inside the drv file, so this can be cut without limiting expressive power.
+   But this is much less efficient, and more cumbersome for whatever produces the data.
+
+ - Use a socket to talk to the host daemon.
+   https://github.com/edolstra/nix/commit/1a27aa7d64ffe6fc36cfca4d82bdf51c4d8cf717, a draft implementation of full recursive Nix, has done this and we can take the details from that.
+   This might sightly more efficient by reducing moving files, but is conceptual overkill given this design.
+   No direct access to the host daemon rules about a bunch of security concerns, and simplifies the interface for non-Nix tools producing derivations.
+   The latter I very much hope will happen, just as Ninja is currently used with CMake, Meson, etc., today.
+
+ - Full recursive Nix (builds within builds)
+
+ - Important from derivation.
+   This has been traditionally considered an alternative to this, but I will soon propose an implementation of that relying on this; I no longer consider the two in conflict.
+
+ - Keeping the status quo and use vendoring.
+   But then Nix will never scale to bridging the package manager and build system divide.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
