@@ -33,7 +33,7 @@ Since the outer derivation evaluates (builds) the inner derivation rather than c
 This gives the "return" part of the name.
 
 I've always been concerned with the ease of which someone can just "nix-build ...; nix-build ...; nix-build ..." within a derivation with recursive Nix.
-This creates a linear chain of dependencies, which isn't terribly performent: shorter critical paths are crucial for parallelism and incrementality and this fails with both.
+This creates a linear chain of dependencies, which isn't terribly performant: shorter critical paths are crucial for parallelism and incrementality and this fails with both.
 Building derivations is lot less convenient, but makes linear chains and the proper dependency graph *equally* less convenient, removing the perverse incentive.
 And in general, dynamism in the dependency graph, which is the essence of what recursive Nix provides, is only a feature of last resort, so making it more difficult across the board isn't concerning.
 
