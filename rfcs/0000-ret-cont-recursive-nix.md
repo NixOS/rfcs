@@ -46,7 +46,7 @@ With "ret-cont" recursive Nix, actual builds are never nested, so we don't need 
 
 Derivations building derivations should have some special attribute indicating this, and two outputs, "store" and "drv".
 "store" would be a local Nix store limited to just drvs and fixed output builds.
-"drv" would contain a symlink to one the derivations in the store, the root.
+"drv" would contain a symlink to one of the derivations in the store, the root.
 After the build completes, Nix verifies all the drv files and fixed outputs are valid (contents match hashes, etc.) and merges the built store into the ambient store.
 \[This should be an untrusted operation because drvs and fixed-output builds are fully verifiable.]
 Finally, any uses of the original derivation can be substituted to instead use the symlinked derivation.
