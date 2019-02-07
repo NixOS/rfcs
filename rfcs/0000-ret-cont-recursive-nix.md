@@ -63,7 +63,7 @@ Nix can should raise an error rather than looping, but either behavior is permis
 # Drawbacks
 [drawbacks]: #drawbacks
 
- - The opinionated nature may put of those who think Nix is too hard to learn already, and think simple recursive "nix-build" is good for newcomers.
+ - The opinionated nature may put off those who think Nix is too hard to learn already, and think simple recursive "nix-build" is good for newcomers.
 
  - If we ever want full recursive Nix, this doesn't really build in that direction.
    It sidesteps the bulk of the difficulty which is in making the nested sandboxing and daemon communication secure.
