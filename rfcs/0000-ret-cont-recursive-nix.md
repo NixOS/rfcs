@@ -84,7 +84,7 @@ Nix can should raise an error rather than looping, but either behavior is permis
 
  - Full recursive Nix (builds within builds)
 
- - Important from derivation.
+ - Import from derivation.
    This has been traditionally considered an alternative to this, but I will soon propose an implementation of that relying on this; I no longer consider the two in conflict.
 
  - Keeping the status quo and use vendoring.
