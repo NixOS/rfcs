@@ -230,6 +230,11 @@ There's a few things we can call out from the faux-formalization.
  - Import from derivation.
    This has been traditionally considered an alternative to this, but I will soon propose an implementation of that relying on this; I no longer consider the two in conflict.
 
+ - `builtins.exec` runs an arbitrary command at eval time as the user triggering evaluation.
+   This is highly impure; nothing at all tries to make the environment deterministic.
+   It is useful for writing fetchers that need the impurities to access the internet and secrets, while also managing their own caching.
+   But for everything else, I view it strictly worse than IFD.
+
  - Keeping the status quo and use vendoring.
    But then Nix will never scale to bridging the package manager and build system divide.
 
