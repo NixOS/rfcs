@@ -125,7 +125,7 @@ Derivations remain built exactly as today, with only logic *between* building st
 
 Derivations today build outputs, and are associated to those outputs.
 We extend the derivation language by allowing a derivation to indicate their output is more derivations, and ultimately be associated with one of *those* derivations's associated outputs.
-Derivations that that do so indicate this with some special attribute, say `__recursive`.
+Derivations that do so indicate this with some special attribute, say `__recursive`.
 Such derivations must have two outputs, `store` and `drv`.
 `store` would be a local Nix store limited to just drvs and fixed output builds.
 `drv` would contain a symlink to one of the derivations in the store, the root.
