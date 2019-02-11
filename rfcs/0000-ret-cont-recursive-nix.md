@@ -123,21 +123,85 @@ Derivations remain built exactly as today, with only logic *between* building st
 # Detailed design
 [design]: #detailed-design
 
-Derivations building derivations should have some special attribute indicating this, and two outputs, "store" and "drv".
-"store" would be a local Nix store limited to just drvs and fixed output builds.
-"drv" would contain a symlink to one of the derivations in the store, the root.
+Derivations today build outputs, and are associated to those outputs.
+We extend the derivation language by allowing a derivation to indicate their output is more derivations, and ultimately be associated with one of *those* derivations's associated outputs.
+Derivations that that do so indicate this with some special attribute, say `__recursive`.
+Such derivations must have two outputs, `store` and `drv`.
+`store` would be a local Nix store limited to just drvs and fixed output builds.
+`drv` would contain a symlink to one of the derivations in the store, the root.
 After the build completes, Nix verifies all the drv files and fixed outputs are valid (contents match hashes, etc.) and merges the built store into the ambient store.
-\[This should be an untrusted operation because drvs and fixed-output builds are fully verifiable.]
 Finally, any uses of the original derivation can be substituted to instead use the symlinked derivation.
-\[The substitution of drvs in a downstream derivation reminds me of the substitution of drvs for content hashes with the intensional store.
-We should muse on this point when implementing to reduce code and perhaps have good insights.]
 
-The *building* itself of derivations is unchanged:
-everything in the previous paragraph just describes marking derivations and post-processing their build results.
-Because drvs and produce plans of drvs producing more drvs ad-infinitum, it's possible to never terminate but that's the user's fault.
-We can detect simple cycles analogous to black holes in thunks: if a derivation produces a redirected derivation depending on the original, a cycle is effectively recreated even though we don't have a hash fixed point.
-\[Instead, the drv->drv substitution would never terminate.]
-Nix can should raise an error rather than looping, but either behavior is permissible.
+To faux-formalize everything in the vein of a small-step semantics:
+```
+immediatelyDependsOn(drv0, drv1)
+immediatelyDependsOn(drv1, drv2)
+-------------------------------------------------- deps-trans
+transitivelyDependsOn(drv0, drv2)
+```
+```
+∀<d : transitivelyDependsOn(drv, -)>
+  d ? __recursive == false
+-------------------------------------------------- build-readiness
+isReadyToBuild(drv)
+```
+```
+drv0 : Drv
+∀<o : outputs(drv0)> build_o : StorePath
+∀<o : outputs(drv0)> build(drv0) = { ${o} = build_o; }
+isReadyToBuild(drv0)
+drv0 ? __recursive == false
+-------------------------------------------------- normal-build
+∀<o : outputs(drv0)> assoc(drv0, o, build_o)
+```
+```
+drv0, drv1 : Drv
+drv1path : RelativePath
+∀<o : outputs(drv0)> build0_o : StorePath
+isReadyToBuild(drv0)
+drv0 ? __recursive == true
+drv0.outputs = { "store" = ...; "drv" = ...; }
+build(drv0) = { succeeded = build0; }
+isTrustlessStore(build0_store)
+drv1 = read(build0_store + drv1path)
+readlink(build0_drv) = build0.store + drv1path
+-------------------------------------------------- immediate-drv-deligation
+reducesTo(drv0, drv1)
+```
+```
+drv0, drv1, drv2 : Drv
+reducesTo(drv1, drv2)
+immediatelyDependsOn(drv0, drv1)
+-------------------------------------------------- transitive-drv-deligation
+reducesTo(drv0, drv0[drv2/drv1])
+```
+```
+drv0, drv1 : Drv
+reducesTo(drv0, drv1)
+∀<o : outputs(drv0)> build0_o : StorePath
+∀<o : outputs(drv0)> assoc(drv0, o, build0_o)
+-------------------------------------------------- delegative-build
+∀<o : outputs(drv0)> assoc(drv1, o, build1_o)
+```
+
+## Design Notes
+
+There's a few things we can call out from the faux-formalization.
+
+ - `isTrustlessStore` is called that because the restricted on the contents—fixed output builds / plain data and drvs—is fully and cheaply verifiabled.
+   This is in contrast to normal builds,
+   where the relationship between the derivation and build can only be verified by redoing the build,
+   and where even then there's no way to know whether to blame the output for being actually malicious, or the derivation for merely being non-deterministic.
+
+ - The substitution of drvs in a downstream derivation reminds me of the substitution of drvs for content hashes with the intensional store.
+   We should muse on this point, and hopefully write a small-step semantics for both together that is more elegant than the above.
+
+ - The *building* itself of derivations is unchanged.
+   All the magic happens through the `reducesTo` relation.
+
+ - Because drvs can produce plans of drvs producing more drvs ad-infinitum, it's possible to never terminate (no `reducesTo` from a derivation to an `isReadyToBuild` derivation) but that's the user's fault.
+   We can detect simple cycles analogous to black holes in thunks: if a derivation produces a redirected derivation depending on the original, a cycle is effectively recreated even though we don't have a hash fixed point.
+   Nix should raise an error rather than looping, but either behavior is permissible.
 
 # Drawbacks
 [drawbacks]: #drawbacks
