@@ -91,7 +91,7 @@ stdenv.mkDerivation {
   doBuild = false;
 
   installPhase = ''
-    mv $(nix-instantiate -E '((import <nixpkgs> {}).callPackage ./. {}).'"$o") $drv
+    mv $(nix-instantiate -E '((import <nixpkgs> {}).callPackage ./. {})') $drv
   '';
 }
 ```
@@ -113,7 +113,7 @@ stdenv.mkDerivation {
   # ...
   outputs = [ "drv" "store" ];
   installPhase = ''
-    mv $(nix-instantiate --store $store -E '((import <nixpkgs> {}).callPackage ./. {}).'"$o") $drv
+    mv $(nix-instantiate --store $store -E '((import <nixpkgs> {}).callPackage ./. {})') $drv
   '';
 }
 ```
