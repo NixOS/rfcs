@@ -70,7 +70,7 @@ The existing Nixpkgs maintainer list already contains a structured
 attribute set of per-maintainer details, including GitHub account
 names. Automation will sync this list of GitHub handles with the
 team's membership, automatically adding and removing people to/from
-the team as the list changes.
+the team as the master branch's maintainer list changes.
 
 GitHub handles can change from one user to another, and so we will
 change the maintainer list to include the GitHub user *ID* as well as
@@ -90,12 +90,18 @@ will be written in Rust with the hubcaps library. It will run on the
 NixOS infrastructure with limited credentials, with only sufficient
 permission to manage the team.
 
-The automation will fetch a fresh version of Nixpkgs, extract the
-maintainer information, and update the team. It will support a dry-run
-option.
+The automation will fetch a fresh version of Nixpkgs's master branch,
+extract the maintainer information, and update the team. It will
+support a dry-run option.
 
 New members of the team will receive an invitation to join the GitHub
 organization.
+
+## Changes to Reviewer/Maintainer Behavior
+
+Reviewers and maintainers should use GitHub's review tools (Approve,
+Request Changes, etc.) to clearly communicate their feedback about the
+pull request.
 
 ## OfBorg changes
 
@@ -135,10 +141,8 @@ will continue to 100%.
  - Package maintainers who do have a GitHub account, but do not wish
    to use 2 factor authentication will not benefit from this change.
 
- - If a GitHub user is a real jerk on the internet, it can potentially
-   reflect negatively on the NixOS ecosystem. Someone who is banned
-   from the NixOS GitHub organization is not allowed to be a package
-   maintainer.
+ - Someone who is banned from the NixOS GitHub organization is not
+   allowed to be a package maintainer.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -147,6 +151,18 @@ Mentioning people in GitHub comments is the main alternative. This has
 the major down-side of not receiving the support of [GitHub's UI
 for requested reviews](https://github.com/pulls/review-requested).
 
+
+# Reesolved questions
+[resolved]: #reesolved-questions
+
+ - Is it possible for the automation to spam a user who doesn't want
+   to be part of the team with invitations?
+   No.
+ - Do maintainers want to be part of this team?
+ - Will the requirement of 2FA cause a significant number of people to
+   not want to participate?
+ - How will we handle people who have been invited, but have not
+   accepted the invitation?
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
