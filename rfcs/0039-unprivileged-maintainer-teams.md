@@ -152,23 +152,16 @@ the major down-side of not receiving the support of [GitHub's UI
 for requested reviews](https://github.com/pulls/review-requested).
 
 
-# Reesolved questions
-[resolved]: #reesolved-questions
+# Resolved questions
+[resolved]: #resolved-questions
 
  - Is it possible for the automation to spam a user who doesn't want
    to be part of the team with invitations?
    No.
- - Do maintainers want to be part of this team?
- - Will the requirement of 2FA cause a significant number of people to
-   not want to participate?
- - How will we handle people who have been invited, but have not
-   accepted the invitation?
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
- - Is it possible for the automation to spam a user who doesn't want
-   to be part of the team with invitations?
  - Do maintainers want to be part of this team?
  - Will the requirement of 2FA cause a significant number of people to
    not want to participate?
