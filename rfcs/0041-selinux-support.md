@@ -39,8 +39,11 @@ systems, as trying to run them from systemd or interacting with them with
 systemctl results in kernel-level denials. This includes related issue
 [NixOS/nix#2374].
 
+Simply put, implementation of this RFC allows Nix to be run on SELinux-enabled
+Linux distributions.
+
 Additionally integrating support for SELinux in NixOS will bring an additional
-level of hardening to the distributions, which increases its aptitude as a
+level of hardening to the distribution, which increases its aptitude as a
 server platform but also as a professional workstation distribution.
 
 [Fedora]: https://fedoraproject.org/wiki/SELinux_FAQ
