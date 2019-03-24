@@ -255,3 +255,5 @@ Ctrl-F for TODO
 # Future work
 [future]: #future-work
 
+- When defaults for NixOS options are set *outside* the options definition such as `config.services.foo.config.logLevel = "DEBUG"` above, it's currently not possible to see these default values in the manual. This could be improved by having the manual not only look at the option definitions `default` attribute for determining the default, but also evaluate the options value with a minimal configuration to get the actual default value. This might be non-trivial.
+
