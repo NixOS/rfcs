@@ -123,7 +123,7 @@ Depending on how default settings matter, we need to set them differently and fo
 - If the program needs a setting to be present in the configuration file because otherwise it would fail at runtime and demand a value, the module should set this value *with* a `mkDefault` to the default upstream value, which will then be the equivalent of a starter configuration file. This allows users to easily change the value, but also enables a smooth first use of the module without having to manually set such defaults to get it to a working state. Optimally modules should Just Work (tm) by setting their `enable` option to true.
 - If the module itself needs to know the value of a configuration setting at evaluation time in order to influence other options (e.g. opening the firewall for a services port), we may set upstream's default with a `mkDefault`, even though the program might start just fine without it. This allows the module to use the configuration setting directly without having to worry whether it is set at all at evaluation time.
 
-If all of the above points don't apply to a configuration setting, that is the module doesn't care about the value, the program doesn't care about the setting being present and we don't need the value at evaluation time, there should be no need to specify any default value.
+If the above points don't apply to a configuration setting, that is the module doesn't care about the value, the program doesn't care about the setting being present and we don't need the value at evaluation time, there should be no need to specify any default value.
 
 ### Configuration checking
 
@@ -131,7 +131,7 @@ One general downside of this approach is that the module system is not able to c
 
 #### Configuration checking tools
 
-A number of programs have tools for checking their configuration that don't need to start the program itself. We can use this to verify the configuration at **build time** by running the tool for a derivation build. While this is not as fast as if we had the module system do these checks, which would be at evaluation time already, it is faster than the program failing at runtime due to misconfiguration. These tools however are also more powerful than the module system and can integrate tightly with the program itself, allowing for more thorough checks. If a configuration checking tool is available, optimally by the program itself, it should be used if possible, as it can greatly improve user experience. The following illustrates an example of how this might look like
+A number of programs have tools for checking their configuration that don't need to start the program itself. We can use this to verify the configuration at **build time** by running the tool for a derivation build. While this is not as fast as if we had the module system do these checks, which would be at evaluation time already, it is faster than the program failing at runtime due to misconfiguration. These tools however are also more powerful than the module system and can integrate tightly with the program itself, allowing for more thorough checks. In addition, it reduces the amount of RAM needed for evaluation. If a configuration checking tool is available, optimally by the program itself, it should be used if possible, as it can greatly improve user experience. The following illustrates an example of how this might look like
 
 ```nix
 { config, pkgs, lib, ... }: with lib;
@@ -172,7 +172,7 @@ While not as optimal as a configuration checker tool, assertions can be used to 
         assertion = cfg.config ? port -> types.port.check cfg.config.port;
         message = "${toString cfg.config.port} is not a valid port number for `services.foo.config.port`.";
       }
-    ]
+    ];
   };
 }
 ```
