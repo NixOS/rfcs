@@ -170,7 +170,7 @@ While not as optimal as a configuration checker tool, assertions can be used to 
       }
       {
         assertion = cfg.config ? port -> types.port.check cfg.config.port;
-        message = "${toString cfg.config.port} is not a valid port number for `services.foo.config.port`."
+        message = "${toString cfg.config.port} is not a valid port number for `services.foo.config.port`.";
       }
     ]
   };
@@ -179,7 +179,11 @@ While not as optimal as a configuration checker tool, assertions can be used to 
 
 TODO: Are there any good examples of using assertions for configuration checks at all?
 
-### Configuration types
+### Implementation
+
+The implementation consists of three separate parts
+
+#### Configuration types
 
 A set of types for common configuration formats should be provided in `lib.types.config`. Such a type should encode what values can be set in files of this configuration format as a Nix value, with the module system being able to merge multiple values correctly. This is the part that checks whether the user set an encodeable value. This can be extended over time, but could include the following as a start:
 - JSON
@@ -190,11 +194,11 @@ A set of types for common configuration formats should be provided in `lib.types
 
 Sometimes programs have their own configuration formats, in which case the type should be implemented in the program's module directly.
 
-### Configuration format writers
+#### Configuration format writers
 
 To convert the Nix value into the configuration string, a set of configuration format writers should be provided under `lib.configGen`. These should make sure that the resulting text is somewhat properly formatted with readable indentation. Things like `builtins.toJSON` are therefore not optimal as it doesn't add any spacing for readability. These writers will have to include ones for all of the above-mentioned configuration types. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
 
-### Documentation
+#### Documentation
 
 The nixpkgs manual should be updated to recommend this way of doing program configuration in modules, along with examples.
 
