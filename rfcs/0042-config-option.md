@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 
 A lot of NixOS options exist to specify single settings of configuration files. Along with such options come multiple disadvantages, such as having to synchronize with upstream changes, option bloat and more. An alternative is to provide options for passing the configuration as a string, such as the common `configFile` or `extraConfig` options, but this also comes with a set of disadvantages, including difficulty to override values and bad modularity.
 
-This RFC proposes aims to solve these problems by encouraging NixOS module authors to provide an option for specifying the programs configuration file as a Nix value, providing a set of utility functions for writing these options conveniently, and updating the documentation to recommend this way of doing program configuration.
+This RFC aims to solve these problems by encouraging NixOS module authors to provide an option for specifying the programs configuration file as a Nix value, providing a set of utility functions for writing these options conveniently, and updating the documentation to recommend this way of doing program configuration.
 
 # Motivation
 [motivation]: #motivation
@@ -258,3 +258,7 @@ Ctrl-F for TODO
 
 - When defaults for NixOS options are set *outside* the options definition such as `config.services.foo.config.logLevel = "DEBUG"` above, it's currently not possible to see these default values in the manual. This could be improved by having the manual not only look at the option definitions `default` attribute for determining the default, but also evaluate the options value with a minimal configuration to get the actual default value. This might be non-trivial.
 
+
+TODO:
+- Make a note that this RFC only focuses on configuration formats that can reasonably be represented in Nix, so things like nginx's config aren't included.
+- Make a note and example for backwards compatibility with existing modules that have options for settings.
