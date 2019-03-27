@@ -49,7 +49,7 @@ An option for specifying the contents of the configuration file directly with `c
 - Because prometheus uses options to encode every possible setting, [#56017](https://github.com/NixOS/nixpkgs/pull/56017) is needed to allow users to set a part of the configuration that wasn't encoded yet.
 - Because strongswan-ctl uses options to encode its full configuration, changes like [#49197](https://github.com/NixOS/nixpkgs/pull/49197) are needed to update our options with upstream changes.
 - Pull requests like [#57036](https://github.com/NixOS/nixpkgs/pull/57036) or [#38324](https://github.com/NixOS/nixpkgs/pull/38324) are needed because users wish to have more configuration options than the ones provided.
-- [#58239](https://github.com/NixOS/nixpkgs/pull/58239)
+- [#58239](https://github.com/NixOS/nixpkgs/pull/58239), [#58181](https://github.com/NixOS/nixpkgs/pull/58181)
 
 ## Previous discussions
 
