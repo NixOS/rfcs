@@ -238,6 +238,7 @@ Limited to configuration file formats representable conveniently in Nix, such as
 
 ## Additional config options
 Sometimes it makes sense to have an additional NixOS option for a specific configuration setting. In general this should be discussed on a case-by-case basis to judge whether it makes sense. However keep in mind that it's always possible to add more options later on, but you can't as easily remove existing options. Instances of where it can make sense are:
+- Popular or main settings. Because such `config` options will have to refer to upstream documentation for all available settings, it's much harder for new module users to figure out how they can configure it. Having popular/main settings as NixOS options is a good compromise. It is up to the module author to decide which options qualify for this.
 - Settings that are necessary for the module to work and are different for every user, so they can't have a default. Examples are `services.dd-agent.api_key`, `services.davmail.url` or `services.hydra.hydraURL`. Having a separate option for these settings can give a much better error message when you don't set them (instead of failing at runtime or having to encode the requirement in an assertion) and better discoverability.
 - Password settings: Some program's configuration files require passwords in them directly. Since we try to avoid having passwords in the Nix store, it is advisable to provide a `passwordFile` option as well, which would replace a placeholder password in the configuration file at runtime.
 
@@ -270,7 +271,7 @@ Even though we have two ways of specifying this configuration setting now, the u
 
 There are some disadvantages to this approach:
 - If there is no configuration checking tool as explained in [this section](#configuration-checking-tools), the types of configuration settings can't be checked as easily, which can lead to packages failing at runtime instead of evaluation time. Refer to [Configuration checking](#configuration-checking) for more info.
-- Documentation for the configuration settings will not be available in the central NixOS manual, instead the upstream documentation has to be used, which can be unfamiliar and harder to read.
+- Documentation for the configuration settings will not be available in the central NixOS manual, instead the upstream documentation has to be used, which can be unfamiliar and harder to read. As a compromise, [additional NixOS options](#additional-config-options) can be used to bring part of the settings back into the NixOS documentation.
 
 # Alternatives
 [alternatives]: #alternatives
