@@ -232,7 +232,9 @@ The nixpkgs manual should be updated to recommend this way of doing program conf
 
 ## Limitations
 
-- Limited to configuration file formats representable conveniently in Nix, such as JSON, YAML, INI, key-value files, or similar formats. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. For those it is recommended to not hardcode anything and provide a `config` option with type `types.str` or `types.lines` if it makes sense to merge multiple assignments of it.
+### Nix-representable configuration formats
+
+Limited to configuration file formats representable conveniently in Nix, such as JSON, YAML, INI, key-value files, or similar formats. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", this the answer is probably No, and you should not use this approach. For those it is left up to the module author to decide the best set of NixOS options. Sometimes it might make sense to have both a specialized set of options for single settings (e.g. `programs.bash.environment`) and a flexible option of type `types.lines` (such as `programs.bash.promptInit`). Alternatively it might be reasonable to only provide a `config`/`configFile` option of type `types.str`/`types.path`, such as for XMonad's Haskell configuration file. And for programs that use a general purpose language even though their configuration can be represented in key-value style (such as Firefox' `autoconfig.js`, having the form `pref("key", "value");`), a `config` option as described in this RFC can be used.
 
 ## Additional config options
 Sometimes it makes sense to have an additional NixOS option for a specific configuration setting. In general this should be discussed on a case-by-case basis to judge whether it makes sense. However keep in mind that it's always possible to add more options later on, but you can't as easily remove existing options. Instances of where it can make sense are:
