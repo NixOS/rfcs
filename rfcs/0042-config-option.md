@@ -126,6 +126,33 @@ Depending on how default settings matter, we need to set them differently and fo
 
 If the above points don't apply to a configuration setting, that is the module doesn't care about the value, the program doesn't care about the setting being present and we don't need the value at evaluation time, there should be no need to specify any default value.
 
+### Backwards compatibility for configuration settings
+
+By having a single option instead of many, we by default keep responsibility for backwards compatibility at upstream. This however also means that if upstream breaks backwards compatibility, instead of the NixOS module fixing it up, the user would have to do it themselves by adjusting their NixOS configuration. However, because such `config` options allow deep introspection into their values, it is possible to provide backwards compatibility in the module itself. This is possible by not using `config` directly to write the configuration file, but instead transforming it first, adjusting everything that's needed. For a simple `key = value` type configuration format, this could look as follows:
+
+```nix
+{ config, lib, ... }: with lib;
+let
+  cfg = config.services.foo;
+
+  fixedUpConfig = let
+    renamedKeys = {
+      # foo has been renamed to bar
+      foo = "bar";
+    };
+    in
+      # Remove all renamed keys
+      removeAttrs cfg.config (attrNames renamedKeys) //
+      # Readd all renamed keys with their new name
+      mapAttrs' (name: value:
+        nameValuePair value cfg.config.${name}
+      ) (intersectAttrs cfg.config renamedKeys);
+in
+  # ...
+```
+
+If this is needed in the future, we may add a set of config deprecation fix-up functions for general use in modules.
+
 ### Configuration checking
 
 One general downside of this approach is that the module system is not able to check the types and values of the configuration file, which would be fast, simple and give good error messages by default. While it would be possible to use `types.addCheck` for the type of the `config` option, this sounds more painful than it's worth and would lead to bad error messages, so we'll ignore this here. Here are some alternatives.
@@ -257,6 +284,7 @@ Ctrl-F for TODO
 [future]: #future-work
 
 - When defaults for NixOS options are set *outside* the options definition such as `config.services.foo.config.logLevel = "DEBUG"` above, it's currently not possible to see these default values in the manual. This could be improved by having the manual not only look at the option definitions `default` attribute for determining the default, but also evaluate the options value with a minimal configuration to get the actual default value. This might be non-trivial.
+- If needed, add config transformation functions for keeping backwards compatibility with upstream changes. See [Backwards compatibility for configuration settings](#backwards-compatibility-for-configuration-settings)
 
 
 TODO:
