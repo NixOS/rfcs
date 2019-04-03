@@ -56,7 +56,7 @@ An option for specifying the contents of the configuration file directly with `c
 - https://github.com/NixOS/nixpkgs/pull/44923#issuecomment-412393196
 - https://github.com/NixOS/nixpkgs/pull/55957#issuecomment-464561483 -> https://github.com/NixOS/nixpkgs/pull/57716
 
-## Implementations
+## Previous implementations
 
 This idea has been implemented already in some places:
 - [#45470](https://github.com/NixOS/nixpkgs/pull/45470)
@@ -117,7 +117,7 @@ This approach solves all* of the above mentioned problems. In addition we have t
 
 *: The only problem it doesn't solve is the coupling to upstream defaults for required defaults, see the [Defaults](#defaults) section.
 
-### Defaults
+## Defaults
 
 Depending on how default settings matter, we need to set them differently and for different reasons:
 - If the module needs a specific value for a setting because of how the module or NixOS works (e.g. `logger = "systemd"`, because NixOS uses `systemd` for logging), then the value should *not* use `mkDefault`. This way a user can't easily override this setting (which would break the module in some way) and will have to use `mkForce` instead to change it. This also indicates that they are leaving supported territory, and will probably have to change something else to make it work again (e.g. if they set `logger = mkForce "/var/log/foo"` they'll have to change their workflow of where to look for logs).
@@ -126,117 +126,8 @@ Depending on how default settings matter, we need to set them differently and fo
 
 If the above points don't apply to a configuration setting, that is the module doesn't care about the value, the program doesn't care about the setting being present and we don't need the value at evaluation time, there should be no need to specify any default value.
 
-### Backwards compatibility for configuration settings
-
-By having a single option instead of many, we by default keep responsibility for backwards compatibility at upstream. This however also means that if upstream breaks backwards compatibility, instead of the NixOS module fixing it up, the user would have to do it themselves by adjusting their NixOS configuration. However, because such `config` options allow deep introspection into their values, it is possible to provide backwards compatibility in the module itself. This is possible by not using `config` directly to write the configuration file, but instead transforming it first, adjusting everything that's needed. For a simple `key = value` type configuration format, this could look as follows:
-
-```nix
-{ config, lib, ... }: with lib;
-let
-  cfg = config.services.foo;
-
-  fixedUpConfig = let
-    renamedKeys = {
-      # foo has been renamed to bar
-      foo = "bar";
-    };
-    in
-      # Remove all renamed keys
-      removeAttrs cfg.config (attrNames renamedKeys) //
-      # Readd all renamed keys with their new name
-      mapAttrs' (name: value:
-        nameValuePair value cfg.config.${name}
-      ) (intersectAttrs cfg.config renamedKeys);
-in
-  # ...
-```
-
-If this is needed in the future, we may add a set of config deprecation fix-up functions for general use in modules.
-
-### Configuration checking
-
-One general downside of this approach is that the module system is not able to check the types and values of the configuration file, which would be fast, simple and give good error messages by default. While it would be possible to use `types.addCheck` for the type of the `config` option, this sounds more painful than it's worth and would lead to bad error messages, so we'll ignore this here. Here are some alternatives.
-
-#### Configuration checking tools
-
-A number of programs have tools for checking their configuration that don't need to start the program itself. We can use this to verify the configuration at **build time** by running the tool for a derivation build. While this is not as fast as if we had the module system do these checks, which would be at evaluation time already, it is faster than the program failing at runtime due to misconfiguration. These tools however are also more powerful than the module system and can integrate tightly with the program itself, allowing for more thorough checks. In addition, it reduces the amount of RAM needed for evaluation. If a configuration checking tool is available, optimally by the program itself, it should be used if possible, as it can greatly improve user experience. The following illustrates an example of how this might look like
-
-```nix
-{ config, pkgs, lib, ... }: with lib;
-
-let
-
-  configText = configGen.json cfg.config;
-
-  configFile = pkgs.runCommand "foo-config.json" {
-    # Because this program will be run at build time, we need `nativeBuildInputs` instead of `buildInputs`
-    nativeBuildInputs = [ pkgs.foo ];
-
-    inherit configText;
-    passAsFile = [ "configText" ];
-  } ''
-    foo check-config $configTextPath
-    cp $configTextPath $out
-  '';
-
-in { /* ... */ }
-```
-
-#### Ad-hoc checks with assertions
-
-While not as optimal as a configuration checker tool, assertions can be used to add flexible ad-hoc checks for type or other properties at **evaluation time**. It should only be used to ensure important properties that break the service in ways that are otherwise hard or slow to detect (and easy to detect for the module system), not for things that make the service fail to start anyways (unless there's a good reason for it). The following example only demonstrates how assertions can be used for checks, but any reasonable program should bail out early in such cases, which would make these assertions redundant, and only add more coupling to upstream, which we're trying to avoid.
-
-```nix
-{ config, lib, ... }: with lib; {
-  # ...
-  config = mkIf cfg.enable {
-    # Examples only for demonstration purposes, don't actually add assertions for such properties
-    assertions = [
-      {
-        assertion = cfg.config.enableLogging or true -> cfg.config ? logLevel;
-        message = "You also need to set `services.foo.config.logLevel` if `services.foo.config.enableLogging` is turned on.";
-      }
-      {
-        assertion = cfg.config ? port -> types.port.check cfg.config.port;
-        message = "${toString cfg.config.port} is not a valid port number for `services.foo.config.port`.";
-      }
-    ];
-  };
-}
-```
-
-TODO: Are there any good examples of using assertions for configuration checks at all?
-
-### Implementation
-
-The implementation consists of three separate parts
-
-#### Configuration types
-
-A set of types for common configuration formats should be provided in `lib.types.config`. Such a type should encode what values can be set in files of this configuration format as a Nix value, with the module system being able to merge multiple values correctly. This is the part that checks whether the user set an encodeable value. This can be extended over time, but could include the following as a start:
-- JSON
-- YAML, which is probably the same as JSON
-- INI
-- A simple `key=value` format
-- A recursive `key.subkey.subsubkey=value` format
-
-Sometimes programs have their own configuration formats, in which case the type should be implemented in the program's module directly.
-
-#### Configuration format writers
-
-To convert the Nix value into the configuration string, a set of configuration format writers should be provided under `lib.configGen`. These should make sure that the resulting text is somewhat properly formatted with readable indentation. Things like `builtins.toJSON` are therefore not optimal as it doesn't add any spacing for readability. These writers will have to include ones for all of the above-mentioned configuration types. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
-
-#### Documentation
-
-The nixpkgs manual should be updated to recommend this way of doing program configuration in modules, along with examples.
-
-## Limitations
-
-### Nix-representable configuration formats
-
-Limited to configuration file formats representable conveniently in Nix, such as JSON, YAML, INI, key-value files, or similar formats. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", this the answer is probably No, and you should not use this approach. For those it is left up to the module author to decide the best set of NixOS options. Sometimes it might make sense to have both a specialized set of options for single settings (e.g. `programs.bash.environment`) and a flexible option of type `types.lines` (such as `programs.bash.promptInit`). Alternatively it might be reasonable to only provide a `config`/`configFile` option of type `types.str`/`types.path`, such as for XMonad's Haskell configuration file. And for programs that use a general purpose language even though their configuration can be represented in key-value style (such as Firefox' `autoconfig.js`, having the form `pref("key", "value");`), a `config` option as described in this RFC can be used.
-
 ## Additional config options
+
 Sometimes it makes sense to have an additional NixOS option for a specific configuration setting. In general this should be discussed on a case-by-case basis to judge whether it makes sense. However keep in mind that it's always possible to add more options later on, but you can't as easily remove existing options. Instances of where it can make sense are:
 - Popular or main settings. Because such `config` options will have to refer to upstream documentation for all available settings, it's much harder for new module users to figure out how they can configure it. Having popular/main settings as NixOS options is a good compromise. It is up to the module author to decide which options qualify for this.
 - Settings that are necessary for the module to work and are different for every user, so they can't have a default. Examples are `services.dd-agent.api_key`, `services.davmail.url` or `services.hydra.hydraURL`. Having a separate option for these settings can give a much better error message when you don't set them (instead of failing at runtime or having to encode the requirement in an assertion) and better discoverability.
@@ -266,6 +157,117 @@ This `config` approach described here is very flexible for these kind of additio
 
 Even though we have two ways of specifying this configuration setting now, the user is free to choose either way.
 
+
+## Configuration checking
+
+One general downside of this approach is that the module system is not able to check the types and values of the configuration file, which would be fast, simple and give good error messages by default. While it would be possible to use `types.addCheck` for the type of the `config` option, this sounds more painful than it's worth and would lead to bad error messages, so we'll ignore this here. Here are some alternatives.
+
+### Configuration checking tools
+
+A number of programs have tools for checking their configuration that don't need to start the program itself. We can use this to verify the configuration at **build time** by running the tool for a derivation build. While this is not as fast as if we had the module system do these checks, which would be at evaluation time already, it is faster than the program failing at runtime due to misconfiguration. These tools however are also more powerful than the module system and can integrate tightly with the program itself, allowing for more thorough checks. In addition, it reduces the amount of RAM needed for evaluation. If a configuration checking tool is available, optimally by the program itself, it should be used if possible, as it can greatly improve user experience. The following illustrates an example of how this might look like
+
+```nix
+{ config, pkgs, lib, ... }: with lib;
+
+let
+
+  configText = configGen.json cfg.config;
+
+  configFile = pkgs.runCommand "foo-config.json" {
+    # Because this program will be run at build time, we need `nativeBuildInputs` instead of `buildInputs`
+    nativeBuildInputs = [ pkgs.foo ];
+
+    inherit configText;
+    passAsFile = [ "configText" ];
+  } ''
+    foo check-config $configTextPath
+    cp $configTextPath $out
+  '';
+
+in { /* ... */ }
+```
+
+### Ad-hoc checks with assertions
+
+While not as optimal as a configuration checker tool, assertions can be used to add flexible ad-hoc checks for type or other properties at **evaluation time**. It should only be used to ensure important properties that break the service in ways that are otherwise hard or slow to detect (and easy to detect for the module system), not for things that make the service fail to start anyways (unless there's a good reason for it). The following example only demonstrates how assertions can be used for checks, but any reasonable program should bail out early in such cases, which would make these assertions redundant, and only add more coupling to upstream, which we're trying to avoid.
+
+```nix
+{ config, lib, ... }: with lib; {
+  # ...
+  config = mkIf cfg.enable {
+    # Examples only for demonstration purposes, don't actually add assertions for such properties
+    assertions = [
+      {
+        assertion = cfg.config.enableLogging or true -> cfg.config ? logLevel;
+        message = "You also need to set `services.foo.config.logLevel` if `services.foo.config.enableLogging` is turned on.";
+      }
+      {
+        assertion = cfg.config ? port -> types.port.check cfg.config.port;
+        message = "${toString cfg.config.port} is not a valid port number for `services.foo.config.port`.";
+      }
+    ];
+  };
+}
+```
+
+TODO: Are there any good examples of using assertions for configuration checks at all?
+
+## Backwards compatibility for configuration settings
+
+By having a single option instead of many, we by default keep responsibility for backwards compatibility at upstream. This however also means that if upstream breaks backwards compatibility, instead of the NixOS module fixing it up, the user would have to do it themselves by adjusting their NixOS configuration. However, because such `config` options allow deep introspection into their values, it is possible to provide backwards compatibility in the module itself. This is possible by not using `config` directly to write the configuration file, but instead transforming it first, adjusting everything that's needed. For a simple `key = value` type configuration format, this could look as follows:
+
+```nix
+{ config, lib, ... }: with lib;
+let
+  cfg = config.services.foo;
+
+  fixedUpConfig = let
+    renamedKeys = {
+      # foo has been renamed to bar
+      foo = "bar";
+    };
+    in
+      # Remove all renamed keys
+      removeAttrs cfg.config (attrNames renamedKeys) //
+      # Readd all renamed keys with their new name
+      mapAttrs' (name: value:
+        nameValuePair value cfg.config.${name}
+      ) (intersectAttrs cfg.config renamedKeys);
+in
+  # ...
+```
+
+If this is needed in the future, we may add a set of config deprecation fix-up functions for general use in modules.
+
+## Implementation parts
+
+The implementation consists of three separate parts.
+
+### Configuration types
+
+A set of types for common configuration formats should be provided in `lib.types.config`. Such a type should encode what values can be set in files of this configuration format as a Nix value, with the module system being able to merge multiple values correctly. This is the part that checks whether the user set an encodeable value. This can be extended over time, but could include the following as a start:
+- JSON
+- YAML, which is probably the same as JSON
+- INI
+- A simple `key=value` format
+- A recursive `key.subkey.subsubkey=value` format
+
+Sometimes programs have their own configuration formats, in which case the type should be implemented in the program's module directly.
+
+### Configuration format writers
+
+To convert the Nix value into the configuration string, a set of configuration format writers should be provided under `lib.configGen`. These should make sure that the resulting text is somewhat properly formatted with readable indentation. Things like `builtins.toJSON` are therefore not optimal as it doesn't add any spacing for readability. These writers will have to include ones for all of the above-mentioned configuration types. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
+
+### Documentation
+
+The nixpkgs manual should be updated to recommend this way of doing program configuration in modules, along with examples.
+
+## Limitations
+
+### Nix-representable configuration formats
+
+Limited to configuration file formats representable conveniently in Nix, such as JSON, YAML, INI, key-value files, or similar formats. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", this the answer is probably No, and you should not use this approach. For those it is left up to the module author to decide the best set of NixOS options. Sometimes it might make sense to have both a specialized set of options for single settings (e.g. `programs.bash.environment`) and a flexible option of type `types.lines` (such as `programs.bash.promptInit`). Alternatively it might be reasonable to only provide a `config`/`configFile` option of type `types.str`/`types.path`, such as for XMonad's Haskell configuration file. And for programs that use a general purpose language even though their configuration can be represented in key-value style (such as Firefox' `autoconfig.js`, having the form `pref("key", "value");`), a `config` option as described in this RFC can be used.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -291,5 +293,4 @@ Ctrl-F for TODO
 
 
 TODO:
-- Make a note that this RFC only focuses on configuration formats that can reasonably be represented in Nix, so things like nginx's config aren't included.
 - Make a note and example for backwards compatibility with existing modules that have options for settings.
