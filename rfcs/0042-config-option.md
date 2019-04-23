@@ -11,7 +11,9 @@ related-issues: (will contain links to implementation PRs)
 
 A lot of NixOS options exist to specify single settings of configuration files. Along with such options come multiple disadvantages, such as having to synchronize with upstream changes, option bloat and more. An alternative is to provide options for passing the configuration as a string, such as the common `configFile` or `extraConfig` options, but this also comes with a set of disadvantages, including difficulty to override values and bad modularity.
 
-This RFC aims to solve these problems by encouraging NixOS module authors to provide an option for specifying the programs configuration file as a Nix value, providing a set of utility functions for writing these options conveniently, and updating the documentation to recommend this way of doing program configuration.
+This RFC aims to solve these problems by encouraging NixOS module authors to provide a `config` option as a base for specifying program configurations with great flexibility. A set of utility functions for writing these options conveniently will be added and the documentation will be updated to recommend this way of writing modules that do program configuration.
+
+This RFC does *not* intend to get rid of all NixOS options related to program configuration. The previous version of this RFC had this intention, but due to feedback (and insight on my own) this was changed. Read the section on [additional config options](#additional-config-options) for details.
 
 # Motivation
 [motivation]: #motivation
@@ -66,7 +68,9 @@ This idea has been implemented already in some places:
 # Detailed design
 [design]: #detailed-design
 
-For specifying configuration files to programs in NixOS options, there should be a main single option called `config` which represents the configuration of the program as a Nix value, which can then be converted to the configuration file format the program expects. This may look as follows:
+For specifying configuration files to programs in NixOS options, there should be a main option called `config` (TODO: or `settings`, name to be decided), which represents the configuration of the program as a Nix value, which can then be converted to the configuration file format the program expects. In order for the most prominent/popular/main options of the package to be easily discoverage, they should still be specified as separate NixOS options, see the [additional config option](#additional-config-options) section for more details.
+
+As a result, modules will look as follows:
 
 ```nix
 { config, lib, ... }: with lib;
@@ -82,11 +86,20 @@ in {
     enable = mkEnableOption "foo service";
 
     config = mkOption {
-      type = lib.types.config.json;
+      type = types.config.json;
       default = {};
       description = ''
         Configuration for foo. Refer to <link xlink:href="https://example.com/docs/foo"/>
         for documentation on the supported values.
+      '';
+    };
+
+    # Because this option is a main/popular one we provide a separate
+    # option for it, to improved discoverability and error checking
+    domain = mkOption {
+      type = types.str;
+      description = ''
+        Domain this service operates on.
       '';
     };
   };
@@ -95,11 +108,15 @@ in {
   
     # Set minimal config to get service working by default
     services.foo.config = {
-      # We don't use mkDefault, as this module requires this value in order to function
-      dataPath = "/var/lib/foo";
-      logLevel = mkDefault "WARN";
+      # We don't use mkDefault here, as this module requires this value in order to function
+      data_path = "/var/lib/foo";
+
+      log_level = mkDefault "WARN";
+
       # Upstream default, needed for us to open the firewall
       port = mkDefault 2546;
+
+      domain = cfg.domain;
     };
   
     environment.etc."foo.json".text = configText;
@@ -110,12 +127,10 @@ in {
 }
 ```
 
-This approach solves all* of the above mentioned problems. In addition we have the following properties that work with this approach out of the box:
-- Ability to easily query arbitrary configuration values with `nix-instantiate --eval '<nixpkgs/nixos>' -A config.services.foo.config`
-- The configuration file is well formatted with the right amount of indentation everywhere
-- Usually hardcoded defaults can now be replaced by simple assignment of the `config` option, which also allows people to override those values. See the [Defaults](#defaults) section for more details.
-
-*: The only problem it doesn't solve is the coupling to upstream defaults for required defaults, see the [Defaults](#defaults) section.
+This approach solves all of the above mentioned problems for the settings we don't refer to in the module, the defaults we specify however are unavoidably still tied to upstream. In addition we have the following properties that work with this approach out of the box:
+- Ability to easily query arbitrary configuration values with `nix-instantiate --eval '<nixpkgs/nixos>' -A config.services.foo.config` (TODO: does `nixos-option services.foo.config` work too?)
+- The configuration file can be well formatted with the right amount of indentation everywhere
+- Usually hardcoded defaults can now be replaced by simple assignment of the `config` option, which in addition allows people to override those values. See the [Defaults](#defaults) section for more details.
 
 ## Defaults
 
@@ -128,12 +143,14 @@ If the above points don't apply to a configuration setting, that is the module d
 
 ## Additional config options
 
-Sometimes it makes sense to have an additional NixOS option for a specific configuration setting. In general this should be discussed on a case-by-case basis to judge whether it makes sense. However keep in mind that it's always possible to add more options later on, but you can't as easily remove existing options. Instances of where it can make sense are:
+For multiple reasons, one may wish to still have additional options available for configuration settings:
 - Popular or main settings. Because such `config` options will have to refer to upstream documentation for all available settings, it's much harder for new module users to figure out how they can configure it. Having popular/main settings as NixOS options is a good compromise. It is up to the module author to decide which options qualify for this.
 - Settings that are necessary for the module to work and are different for every user, so they can't have a default. Examples are `services.dd-agent.api_key`, `services.davmail.url` or `services.hydra.hydraURL`. Having a separate option for these settings can give a much better error message when you don't set them (instead of failing at runtime or having to encode the requirement in an assertion) and better discoverability.
 - Password settings: Some program's configuration files require passwords in them directly. Since we try to avoid having passwords in the Nix store, it is advisable to provide a `passwordFile` option as well, which would replace a placeholder password in the configuration file at runtime.
 
-This `config` approach described here is very flexible for these kind of additions, here's an example where we add a `domain` setting to the above service as a separate NixOS option:
+Keep in mind that while it's trivial to add new options with the approach in this RFC, removing them again is hard (even without this RFC). So instead of introducing a lot of additional options when the module gets written, authors should try to keep the initial number low, to not introduce options almost nobody will end up using. Every additional option might be nice to use, but increases coupling to upstream, burden on nixpkgs maintainers and bug potential. Thus we should strive towards a balance between too little and too many options, between "I have no idea how to use this module because it provides too little options" and "This module has become too problematic due to its size". And because this balance can only be approached from below (we can only add options, not remove them), additional options should be used conservatively from the start.
+
+This `config` approach described here is very flexible for these kind of additions. As already showcased in the above example, an implementation of such an option looks like this:
 ```nix
 { config, lib, ... }: with lib; {
 
@@ -157,14 +174,13 @@ This `config` approach described here is very flexible for these kind of additio
 
 Even though we have two ways of specifying this configuration setting now, the user is free to choose either way.
 
-
 ## Configuration checking
 
-One general downside of this approach is that the module system is not able to check the types and values of the configuration file, which would be fast, simple and give good error messages by default. While it would be possible to use `types.addCheck` for the type of the `config` option, this sounds more painful than it's worth and would lead to bad error messages, so we'll ignore this here. Here are some alternatives.
+One general downside of this approach is that the module system is not able to check the types and values of the configuration file, which could be fast, simple and give good error messages by default. While it would be possible to use `types.addCheck` for the type of the `config` option, this sounds more painful than it's worth and would lead to bad error messages, so we'll ignore this here. Here are some alternatives.
 
 ### Configuration checking tools
 
-A number of programs have tools for checking their configuration that don't need to start the program itself. We can use this to verify the configuration at **build time** by running the tool for a derivation build. While this is not as fast as if we had the module system do these checks, which would be at evaluation time already, it is faster than the program failing at runtime due to misconfiguration. These tools however are also more powerful than the module system and can integrate tightly with the program itself, allowing for more thorough checks. In addition, it reduces the amount of RAM needed for evaluation. If a configuration checking tool is available, optimally by the program itself, it should be used if possible, as it can greatly improve user experience. The following illustrates an example of how this might look like
+Occasionally programs have tools for checking their configuration without the need to start the program itself. We can use this to verify the configuration at **build time** by running the tool for a derivation build. While this is not as fast as if we had the module system do these checks, which would be at evaluation time already, it is better than the program failing at runtime due to misconfiguration. These tools however are also more powerful than the module system and can integrate tightly with the program itself, allowing for more thorough checks. In addition, it reduces the amount of RAM needed for evaluation. If a configuration checking tool is available, optimally by the program itself, it should be used if possible, as it can greatly improve user experience. The following illustrates an example of how this might look like
 
 ```nix
 { config, pkgs, lib, ... }: with lib;
@@ -214,7 +230,7 @@ TODO: Are there any good examples of using assertions for configuration checks a
 
 ## Backwards compatibility for configuration settings
 
-By having a single option instead of many, we by default keep responsibility for backwards compatibility at upstream. This however also means that if upstream breaks backwards compatibility, instead of the NixOS module fixing it up, the user would have to do it themselves by adjusting their NixOS configuration. However, because such `config` options allow deep introspection into their values, it is possible to provide backwards compatibility in the module itself. This is possible by not using `config` directly to write the configuration file, but instead transforming it first, adjusting everything that's needed. For a simple `key = value` type configuration format, this could look as follows:
+By having a single option instead of many, we by default keep responsibility for backwards compatibility in upstream. This however also means that if upstream breaks backwards compatibility, instead of the NixOS module fixing it up, the user would have to do it themselves by adjusting their NixOS configuration. However, because such `config` options allow deep introspection into their values, it is possible to provide backwards compatibility in the module itself. This is possible by not using `config` directly to write the configuration file, but instead transforming it first, adjusting everything that's needed. For a simple `key = value` type configuration format, this could look as follows (TODO: Verify that this code works):
 
 ```nix
 { config, lib, ... }: with lib;
