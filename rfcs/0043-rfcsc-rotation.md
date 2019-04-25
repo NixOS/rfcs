@@ -83,9 +83,11 @@ vote and how to hold them.
 # Alternatives
 [alternatives]: #alternatives
 
-Do nothing: then the current members of the RFC Steering Committee as defined
-in RFC 36 could stay on the Committee indefinitely or at least until that part
-of RFC 36 is overridden by a newly accepted RFC.
+ * Do nothing: then the current members of the RFC Steering Committee as
+   defined in RFC 36 could stay on the Committee indefinitely or at least until
+   that part of RFC 36 is overridden by a newly accepted RFC.
+ * Rigorously defining a voting procedure (though possible, but probably too
+   complex)
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
