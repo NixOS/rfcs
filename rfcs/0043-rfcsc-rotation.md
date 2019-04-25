@@ -28,7 +28,7 @@ such that the RFC process can keep running smoothly at all times.
 [design]: #detailed-design
 
 The RFC Steering Committee shall always have five members. If membership drops
-below five members (for example by abdication of a member as detailed below), a
+below five members (for example by resignation of a member as detailed below), a
 new member shall directly be elected after a nomination period of at least two
 weeks (see below for nomination and selection process). If the number of
 members of the RFCSC drops below 4 people, it cannot proceed with shepherd team
@@ -40,13 +40,13 @@ Committee by either of the following four mechanisms, ordered from most
 frequent to least:
 
 1. At the end of an election period.
-2. Abdication.
+2. Resignation
 3. Unanimous vote by all other members after having missed two or more regular
    meetings without giving an appropriate excuse.
 4. Unanimous vote by all other members due to conduct unbecoming of a member.
 
-A member can abdicate from the RFC Steering Committee at any time and for any
-reason. A member planning to abdicate should inform the rest of the RFC
+A member can resign from the RFC Steering Committee at any time and for any
+reason. A member planning to resign should inform the rest of the RFC
 Steering Committee of their intention at their earliest convenience.
 
 ## Becoming a member
