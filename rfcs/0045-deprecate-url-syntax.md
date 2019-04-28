@@ -63,3 +63,6 @@ Currently none.
 
 In case of a future major changes in the Nix syntax, removal of special URL
 syntax might be considered.
+
+Explore options for automated tracking of the number of unquoted URLs in 
+Nixpkgs.
