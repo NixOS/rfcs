@@ -19,6 +19,8 @@ Nix language has a special syntax for URLs. However, unlike paths, URLs do not
 have any special support that would make the difference useful. Moreover, using
 variable expansion in URLs requires some URLs to be quoted strings anyway. So
 the most consistent approach is to always use quoted strings to represent URLs.
+Additionally, a semicolon immediately after the URL can be mistaken for a part
+of URL by language-agnostic tools such as terminal emulators.
 
 In case of future breaking changes in the Nix syntax, it would be nice to make
 the `x:x` snippet parse to the identity function, and not to an URL. Tools
