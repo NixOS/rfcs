@@ -69,10 +69,19 @@ such discussions more efficient.
   and other compilers/build tools, or to be general cleanups that just happen
   to be optional on upper-tier platforms.
 
+* Embedded systems like `arm-embedded`, `armhf-embedded` or even `avr`.
+  Status: only cross-compilation targets, no tooling support, no expectations
+  of attention from non-users. Platform-specific fixes are expected to only
+  touch immediate compiler toolchain.
+
 ## Adding a new platform
 
-A proposal to add a new platform should justify the level of platform-specific
-fixes to be tolerated.
+It is expected that embedded-level support (platform definition, basic support
+for the target, maybe a toolchain in the binary cache) can added as long as
+the support code works and is contained in the expected places. If the
+platform users want to set higher expectations, a motivation should be
+provided. User interest, platform perspectives and development effort
+commitment are usually taken into account.
 
 Before adding an expectation that platform non-users pay attention whether
 upgrades break a lower-tier platform, support for testing on this platform
