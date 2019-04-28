@@ -47,11 +47,11 @@ might not be worth making a specific decision.
 # Alternatives
 [alternatives]: #alternatives
 
-Do nothing; get PRs from time to time that make homepages uniformly quoted
-strings or uniformly unquoted.
+* Do nothing; get PRs from time to time that make homepages uniformly quoted
+  strings or uniformly unquoted.
 
-Decide to use unquoted URLs for all URLs without special characters or variable
-expansion.
+* Decide to use unquoted URLs for all URLs without special characters or
+  variable expansion.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
