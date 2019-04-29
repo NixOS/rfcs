@@ -64,6 +64,7 @@ This idea has been implemented already in some places:
 - [#45470](https://github.com/NixOS/nixpkgs/pull/45470)
 - [#52096](https://github.com/NixOS/nixpkgs/pull/52096)
 - [My Murmur module](https://github.com/Infinisil/system/blob/45c3ea36651a2f4328c8a7474148f1c5ecb18e0a/config/new-modules/murmur.nix)
+- [#55413](https://github.com/NixOS/nixpkgs/pull/55413)
 
 # Detailed design
 [design]: #detailed-design
