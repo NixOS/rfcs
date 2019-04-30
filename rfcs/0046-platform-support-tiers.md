@@ -2,7 +2,7 @@
 feature: platform_support_tiers
 start-date: 2019-04-28
 author: Michael Raskin
-co-authors:
+co-authors: Matthew Bauer
 related-issues:
 ---
 
@@ -49,43 +49,140 @@ such discussions more efficient.
 
 ## Platforms
 
-* `x86_64-linux`, native builds with `gcc` and `glibc`. Status: default
-  platform, the only truly first-tier platform. All packages not specifically
-  defined in terms of OS-specific or CPU-specific tooling for other platforms
-  are expected to work if they work anywhere.
+### Tier 1
 
-* `aarch64-linux`, native builds with `gcc` and `glibc`. `x86_64-darwin` as a
-  name for macOS with `clang` compiler. Status: second-tier platforms. Many
-  packages are supposed to work, the main Hydra puts a lot of binary packages
-  into the binary cache, there is tooling support to check builds on these
-  platforms and some level of effort is expected to be spent on investigating
-  new failures after update.
+Aims: all packages should work (unless they don't make sense)
 
-* `i686-linux`, `armv7l-linux`, `x86_64-linux` with `musl`, static builds.
-  Status: cross-compilation targets in different meanings of these words. No
-  binary cache available, checking a cross-build via ofBorg is possible but
-  complicated, no expectations on upgrade. Fixes not necessary on upper-tier
-  platforms are expected to be either localised inside `stdenv` dependencies
-  and other compilers/build tools, or to be general cleanups that just happen
-  to be optional on upper-tier platforms.
+A platform-specific fix is expected to be applied in `master`
 
-* Embedded systems like `arm-embedded`, `armhf-embedded` or even `avr`.
-  Status: only cross-compilation targets, no tooling support, no expectations
-  of attention from non-users. Platform-specific fixes are expected to only
-  touch immediate compiler toolchain.
+Support: good binary cache coverage, full support in tooling
+
+Developer/user base: most of the Nix developers/users
+
+* `x86_64-linux`, `gcc`+`glibc`
+
+### Tier 1.5
+
+Same aims and tooling support
+
+Fewer developers and users, less testing — significantly more broken packages
+
+* `aarch64-linux`, `gcc`+`glibc`
+
+* `x86_64-darwin`, `clang`+Darwin/macOS
+
+### Tier 2-ε
+
+Aims: most of the popular packages work
+
+Platform-specific things for arbitrary packages should not be too complicated
+
+Support: native bootstrap tools are available, cross-build toolchains in the
+binary cache, partial tooling support
+
+Package updates might break build on the platforms of this tier and lower
+
+* `i686-linux`, `gcc`+`glibc` — `ofBorg` builds via `pkgsi686Linux`, binary
+  cache contains `wine` dependencies
+
+### Tier 2
+
+Aims: most of the popular packages work
+
+Support: native bootstrap tools are available, cross-build toolchains in the
+binary cache
+
+* `armv{6,7,8}*-linux`, `gcc`+`glibc`
+
+* `mipsel-linux`, `gcc`+`glibc`
+
+* `x86_64-linux`, `gcc`+`musl`
+
+* `x86_64-linux`, `clang`+`glibc`
+
+### Tier 3
+
+Aims: some packages are expected to work
+
+Platform-specific fixes limited to general cleanups of non-standard
+assumptions in the upstream code and basic toolchain fixes
+
+* `aarch64-none`
+
+* `avr`
+
+* `arm-none`
+
+* `i686-none`
+
+* `x86_64-none`
+
+* `powerpc-none`
+
+* `powerpcle-none`
+
+* `x86_64-mingw32`
+
+* `i686-mingw32`
+
+* `x86_64-linux`, `gcc`+`musl` — static
+
+* `x86_64-linux`, `clang`+`glibc` — `llvm` linker
+
+* `x86_64-linux` — Android
+
+* `aarch64-linux` — Android
+
+* `armv{7,8}-linux` — Android
+
+### Tier 4
+
+Aims: none
+
+Support: none or accidental
+
+Platform definitions present
+
+A small amount of packages seems to work, maybe by luck
+
+* `x86_64-linux`, `gcc`+`glibc` — static
+
+* `x86_64-linux`, `gcc`+`glibc` — `llvm` linker
+
+### Tier 4.5
+
+Work ongoing to provide/merge Tier 4 support
+
+* `wasm-wasi`
+
+* `powerpc64le-linux`, `gcc`+`glibc`
+
+### Tier 5
+
+Aims: none
+
+Support: none
+
+No current support, but previous support of clear path to add support
+
+* `aarch64-darwin`
+
+* `i686-darwin`
+
+* `x86_64-freebsd`
 
 ## Adding a new platform
 
-It is expected that embedded-level support (platform definition, basic support
-for the target, maybe a toolchain in the binary cache) can added as long as
-the support code works and is contained in the expected places. If the
-platform users want to set higher expectations, a motivation should be
-provided. User interest, platform perspectives and development effort
-commitment are usually taken into account.
+It is expected that Tier-4 support can be added freely, and Tier-3 support is
+added once enough packages are tested and sustained development happens.
+Tier-2 support (and higher tolerance to platform-specific fixes in
+non-toolchain packages) is generally linked to higher user interest and
+sustainability of both the platform itself and Nixpkgs development for the
+platform.
 
-Before adding an expectation that platform non-users pay attention whether
-upgrades break a lower-tier platform, support for testing on this platform
-must be available.
+Support above Tier-2 (and expectation that platform non-users pay attention to
+the platform support on updates) requires deployment of test infrastructure
+for the platform.
 
 # Drawbacks
 [drawbacks]: #drawbacks
