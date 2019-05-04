@@ -15,7 +15,7 @@ Nixpkgs.
 # Motivation
 [motivation]: #motivation
 
-Nix language has a special syntax for URLs. However, unlike paths, URLs do not
+The Nix language has a special syntax for URLs even though quoted strings can also be used to represent them. Unlike paths, URLs do not
 have any special support that would make the difference useful. Moreover, using
 variable expansion in URLs requires some URLs to be quoted strings anyway. So
 the most consistent approach is to always use quoted strings to represent URLs.
@@ -65,7 +65,7 @@ Currently none.
 # Future work
 [future]: #future-work
 
-In case of a future major changes in the Nix syntax, removal of special URL
+In case of future major changes in the Nix syntax, removal of special URL
 syntax might be considered.
 
 Explore options for automated tracking of the number of unquoted URLs in 
