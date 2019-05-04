@@ -37,8 +37,10 @@ Add a note in the Nixpkgs manual that the unquoted URL syntax is deprecated,
 changes to Nixpkgs should not increase its use, and it is recommended to
 convert URLs to quoted strings when changing them.
 
-Accept PRs that convert unquoted URLs to quoted strings if such PRs are
-submitted.
+Convert all the unquoted URLs in the Nixpkgs codebase to quoted strings.
+
+Add an ofBorg check that verifies that no new unquoted URLs have been added in
+a PR.
 
 # Drawbacks
 [drawbacks]: #drawbacks
