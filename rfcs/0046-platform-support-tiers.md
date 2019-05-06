@@ -106,8 +106,6 @@ This tier and lower doesn't affect channel updates
 
 * `x86_64-linux`, `gcc`+`musl`
 
-* `x86_64-linux`, `clang`+`glibc`
-
 ### Tier 3
 
 Aims: some packages are expected to work
@@ -134,6 +132,8 @@ assumptions in the upstream code and basic toolchain fixes
 * `i686-mingw32`
 
 * `x86_64-linux`, `gcc`+`musl` — static
+
+* `x86_64-linux`, `clang`+`glibc`
 
 * `x86_64-linux`, `clang`+`glibc` — `llvm` linker
 
