@@ -71,9 +71,24 @@ Same aims and tooling support, there are channel blocking jobs
 
 Fewer developers and users, less testing — significantly more broken packages
 
+If a package update breaks a previously working package on that platform,
+update author should check if some easy fix follows from the build logs or is
+mentioned in the upstream bugtracker.
+
 * `aarch64-linux`, `gcc`+`glibc`
 
+A team @NixOS/aarch64-maintainers shall be created to include people who
+understand the platform and use it.
+
+If there is a complicated problem on this platform when updating a package
+that was previously built succesfully on macOS, @NixOS/aarch64-maintainers team
+should be informed.
+
 * `x86_64-darwin`, `clang`+Darwin/macOS
+
+If there is a complicated problem on this platform when updating a package
+that was previously built succesfully on macOS, @NixOS/darwin-maintainers team
+should be informed.
 
 ### Tier 2-ε
 
