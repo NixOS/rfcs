@@ -39,6 +39,7 @@ such discussions more efficient.
 * How many users there are / how much testing one can expect?
 * How much complexity is a platform-specific fix allowed to carry?
 * Is there a binary cache for the platform?
+* What platform-related builds are channel update blockers?
 * Is the platform normally tested by the tools like ofBorg? Is it possible to
   get something tested with reasonable effort?
 * Is there expectation that updates do not break things for this platform?
@@ -57,13 +58,16 @@ A platform-specific fix is expected to be applied in `master`
 
 Support: good binary cache coverage, full support in tooling
 
+A platform in this tier has a set of build jobs that block a channel update in
+case of failure.
+
 Developer/user base: most of the Nix developers/users
 
 * `x86_64-linux`, `gcc`+`glibc`
 
 ### Tier 1.5
 
-Same aims and tooling support
+Same aims and tooling support, there are channel blocking jobs
 
 Fewer developers and users, less testing — significantly more broken packages
 
@@ -80,6 +84,8 @@ Platform-specific things for arbitrary packages should not be too complicated
 Support: native bootstrap tools are available, cross-build toolchains in the
 binary cache, partial tooling support
 
+Native stdenv is a channel-blocking job
+
 Package updates might break build on the platforms of this tier and lower
 
 * `i686-linux`, `gcc`+`glibc` — `ofBorg` builds via `pkgsi686Linux`, binary
@@ -91,6 +97,8 @@ Aims: most of the popular packages work
 
 Support: native bootstrap tools are available, cross-build toolchains in the
 binary cache
+
+This tier and lower doesn't affect channel updates
 
 * `armv{6,7,8}*-linux`, `gcc`+`glibc`
 
