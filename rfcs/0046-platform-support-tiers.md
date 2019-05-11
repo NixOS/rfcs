@@ -99,7 +99,7 @@ Platform-specific things for arbitrary packages should not be too complicated
 Support: native bootstrap tools are available, cross-build toolchains in the
 binary cache, partial tooling support
 
-Native stdenv is a channel-blocking job
+Pure stdenv for native builds is a channel-blocking job
 
 Package updates might break build on the platforms of this tier and lower
 
