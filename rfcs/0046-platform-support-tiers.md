@@ -81,8 +81,8 @@ A team @NixOS/aarch64-maintainers shall be created to include people who
 understand the platform and use it.
 
 If there is a complicated problem on this platform when updating a package
-that was previously built succesfully on macOS, @NixOS/aarch64-maintainers team
-should be informed.
+that was previously built succesfully on Aarch64, @NixOS/aarch64-maintainers
+team should be informed.
 
 * `x86_64-darwin`, `clang`+Darwin/macOS
 
