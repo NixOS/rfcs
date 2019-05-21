@@ -36,8 +36,8 @@ of members of the RFCSC drops below 4 people, it cannot proceed with shepherd
 team selections until new members have been selected.
 
 ## Ending membership
-A member can end their membership in the Steering
-Committee by either of the following four mechanisms:
+Membership in the Steering Committee can end by either of the following four
+mechanisms:
 
 1. At the end of an election period.
 2. Resignation
