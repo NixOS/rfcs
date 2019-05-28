@@ -1,10 +1,16 @@
 ---
 feature: nix-core-team
 start-date: 2018-01-31
+end-date: 2019-04-25
 author: Graham Christensen
 co-authors: Daniel Peebles, Eelco Dolstra, Peter Simons, Shea Levy, Vladimír Čunát
-related-issues:
+related-issues: #44 (disbands the team)
 ---
+
+# Superseded!
+
+This RFC is superseded by [RFC 44](./0044-disband-nix-core.md). The original text
+is preserved below.
 
 # Summary
 [summary]: #summary
