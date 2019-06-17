@@ -41,7 +41,7 @@ such discussions more efficient.
 * Is there a binary cache for the platform?
 * What platform-related builds are channel update blockers?
 * Is the platform normally tested by the tools like ofBorg? Is it possible to
-  get something tested with reasonable effort?
+  get something tested with a reasonable effort?
 * Is there expectation that updates do not break things for this platform?
 * How many developers are interested in the platform? How easy it it to get a
   non-trivial fix reviewed?
@@ -118,7 +118,7 @@ Most of the popular packages work.
 
 #### Tier 3
 
-Some packages work
+Some packages work.
 
 #### Tier 4
 
