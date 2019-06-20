@@ -83,7 +83,7 @@ after the FCP.
 
 *In short, to get a major change included in Nix or Nixpkgs, one must
 first get the RFC merged into the RFC repository as a markdown file under the
-`accepted` directory. At that point the RFC is accepted and may be implemented
+`rfcs` directory. At that point the RFC is accepted and may be implemented
 with the goal of eventual inclusion into Nix or Nixpkgs.*
 
 0. Have a cool idea!
@@ -146,8 +146,8 @@ with the goal of eventual inclusion into Nix or Nixpkgs.*
 11. In most cases, the FCP period is quiet, and the RFC is either merged or
     closed. However, sometimes substantial new arguments or ideas are raised,
     the FCP is canceled, and the RFC goes back into development mode.
-12. In case of acceptance, the RFC Steering Committee merges the PR into the
-    `accepted` directory. Otherwise the RFC's pull request is closed. If no
+12. In case of acceptance, the RFC Steering Committee merges the PR.
+    Otherwise the RFC's pull request is closed. If no
     consensus can be reached on the RFC but the idea in general is accepted, it
     gets closed, too. A note is added that is should be proposed again, when the
     circumstances, that are stopping the discussion to come to another decision,
