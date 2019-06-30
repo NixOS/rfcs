@@ -204,6 +204,8 @@ let
 in { /* ... */ }
 ```
 
+TODO: Explain how `options.services.foo.config.files` can be used to give a better indication of where a failure occurs.
+
 ### Ad-hoc checks with assertions
 
 While not as optimal as a configuration checker tool, assertions can be used to add flexible ad-hoc checks for type or other properties at **evaluation time**. It should only be used to ensure important properties that break the service in ways that are otherwise hard or slow to detect (and easy to detect for the module system), not for things that make the service fail to start anyways (unless there's a good reason for it). The following example only demonstrates how assertions can be used for checks, but any reasonable program should bail out early in such cases, which would make these assertions redundant, and only add more coupling to upstream, which we're trying to avoid.
