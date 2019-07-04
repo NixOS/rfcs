@@ -215,7 +215,7 @@ Work ongoing to provide/merge Tier 4 support
 
 ### Tier 5
 
-No current support, but previous support of clear path to add support
+No current support, but previous support or clear path to add support
 
 * `aarch64-darwin`
 
