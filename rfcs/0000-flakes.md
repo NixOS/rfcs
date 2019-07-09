@@ -125,14 +125,15 @@ rather than a separate tool.
 A flake is a Git repository that contains a file named `flake.nix` in
 the root directory. (In the future, there might be other types of
 flakes, such as Mercurial repositories or tarballs.) `flake.nix`
-specifies some metadata about the flake such as dependencies, as well
-as its *outputs* (the Nix values such as packages or NixOS modules
-provided by the flake).
+specifies some metadata about the flake such as dependencies (called
+*inputs*), as well as its *outputs* (the Nix values such as packages
+or NixOS modules provided by the flake).
 
 As an example, below is the `flake.nix` of
-[`dwarffs`](https://github.com/edolstra/dwarffs). It depends on the
-Nixpkgs flake and provides a package (i.e. an installable derivation)
-and a NixOS module.
+[`dwarffs`](https://github.com/edolstra/dwarffs) (a FUSE filesystem
+for automatically fetching DWARF debug symbols by ELF build ID). It
+depends on the Nixpkgs flake and provides a package (i.e. an
+installable derivation) and a NixOS module.
 
 ```
 {
@@ -146,10 +147,12 @@ and a NixOS module.
 
   outputs = inputs: rec {
     packages.dwarffs =
-      with import inputs.nixpkgs { system = "x86_64-linux"; };
+      with inputs.nixpkgs.packages;
+      with inputs.nixpkgs.builders;
+      with inputs.nixpkgs.lib;
 
       stdenv.mkDerivation {
-        name = "dwarffs-0.1.${lib.substring 0 8 inputs.self.lastModified}";
+        name = "dwarffs-0.1.${substring 0 8 inputs.self.lastModified}";
 
         buildInputs = [ fuse nix nlohmann_json boost ];
 
@@ -198,9 +201,42 @@ A flake has the following attributes:
   references (described below).
 
 * `outputs`: A function that, given an attribute set containing the
-  outputs of each of the inputs, yields the Nix values provided by
-  this flake. A number of outputs have a special meaning, as discussed
-  below.
+  outputs of each of the input flakes keyed by their identifier,
+  yields the Nix values provided by this flake. Thus, in the example
+  above, `inputs.nixpkgs` contains the result of the call to the
+  `outputs` function of the `nixpkgs` flake, and
+  `inputs.nixpkgs.packages.fuse` refers to the `packages.fuse` output
+  attribute of `nixpkgs`.
+
+  In addition to the outputs of each input, each input in `inputs`
+  also contains some metadata about the inputs. These are:
+
+  * `outPath`: The path in the Nix store of the flake's source
+    tree. This means that you could import Nixpkgs in a more
+    legacy-ish way by writing
+
+        with import inputs.nixpkgs { system = "x86_64-linux"; };
+
+    since `nixpkgs` still contains a `/default.nix`. In this case we
+    bypass its outputs entirely and only use the flake mechanism to
+    get its source tree.
+
+  * `rev`: The commit hash of the flake's Git repository.
+
+  * `revCount`: The number of ancestors of the revision `rev`. This is
+    not available for `github:...` repositories (see below), since
+    they're fetched as tarballs rather than as Git repositories.
+
+  * `lastModified`: The commit time of the revision `rev`, in the
+    format `%Y%m%d%H%M%S` (e.g. `20181231100934`). Unlike `revCount`,
+    this is available for both Git and GitHub repositories, so it's
+    useful for generating (hopefully) monotonically increasing version
+    strings.
+
+  The special input named `self` refers to the outputs and source tree
+  of *this* flake.
+
+  A number of outputs have a special meaning, as discussed below.
 
 ## Well-known outputs
 
@@ -215,7 +251,7 @@ Hydra. Currently, these are:
   evaluate each attribute in the set, just to discover which packages
   are provided.)
 
-* `defaultPackage`: A derivations used as a default by most `nix`
+* `defaultPackage`: A derivation used as a default by most `nix`
   commands if no attribute is specified. For example, `nix run
   dwarffs` uses the `defaultPackage` attribute of the `dwarffs` flake.
 
@@ -233,7 +269,7 @@ Hydra. Currently, these are:
   example, `nix app blender-bin:blender_2_79` uses the
   `apps.blender_2_79` output of the `blender-bin` flake.
 
-* `defaultApp`: A app definition used by the `nix app` command when no
+* `defaultApp`: An app definition used by the `nix app` command when no
   specific attribute is given. For example, `nix app blender-bin` uses
   the `defaultApp` output of the `blender-bin` flake.
 
@@ -252,9 +288,9 @@ Currently the following types of flake references are supported:
 
       (http|https|ssh|git|file):(//<server>)?<path>(\?<params>)?
 
-  with the constraint that <path> must end with `.git` for non-`file`
-  repositories. <params> are a list of key/value pairs in URI query
-  parameter syntax. The following parameters are supported:
+  with the constraint that `<path>` must end with `.git` for
+  non-`file` repositories. `<params>` are a list of key/value pairs in
+  URI query parameter syntax. The following parameters are supported:
 
   * `ref`: The branch or tag to fetch. The default is `master`.
   * `rev`: The Git commit hash to fetch. Note that this commit must be
@@ -380,13 +416,13 @@ changes. The legacy commands (`nix-build`, `nix-shell`, `nix-env` and
 `nix-instantiate`) should not be changed to avoid breakage.
 
 Most `nix` subcommands work on a list of arguments called
-"installables" by lack of a better term. For example,
+"installables" for lack of a better word. For example,
 
     # nix run nixpkgs:hello dwarffs:dwarffs
 
 takes two flake-based installables. The general form is:
 
-    <flake-ref>:<attr-path>
+    <flake-ref>(:<attr-path>)?
 
 Examples of installables:
 
@@ -414,23 +450,23 @@ expressions using `-f`, e.g. `nix build -f foo.nix foo.bar`.
 
 ## Lock files and reproducible evaluation
 
-Dependencies specified in `flake.nix` are typically "unlocked": they
-are specified as flake references that don't specify an exact revision
-(e.g. `nixpkgs` rather than
+Inputs specified in `flake.nix` are typically "unlocked": they are
+flake references that don't specify an exact revision (e.g. `nixpkgs`
+rather than
 `github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082`). To
 ensure reproducibility, Nix will automatically generate and use a
 *lock file* called `flake.lock` in the flake's directory. The lock
 file contains a tree of mappings from the flake references specified
 in `flake.nix` to direct flake references that contain revisions.
 
-For example, the inputs
+For example, if `flake.nix` contains
 ```
 inputs =
   [ "nixpkgs"
     github:edolstra/import-cargo
   ];
 ```
-might result in the following lock file:
+then the resulting lock file might be:
 ```
 {
     "version": 2,
@@ -473,10 +509,10 @@ evaluation. It is also necessary to prevent certain impurities. In
 particular, the `nix` command now defaults to evaluating in "pure"
 mode, which means that the following are disallowed:
 
-* Access to files outside of the top-level flake, its inputs, or paths
-  fetched using `fetchTarball`, `fetchGit` and so on with a commit
-  hash or content hash. In particular this means that Nixpkgs will not
-  be able to use `~/.config/nixpkgs` anymore.
+* Access to files outside of the top-level flake or its inputs, as
+  well as paths fetched using `fetchTarball`, `fetchGit` and so on
+  with a commit hash or content hash. In particular this means that
+  Nixpkgs will not be able to use `~/.config/nixpkgs` anymore.
 
 * Access to the environment. This means that `builtins.getEnv "<var>"`
   always returns an empty string.
@@ -529,7 +565,7 @@ flakes. These are:
 
 * `nix flake add <from-flake-ref> <to-flake-ref>`: Add an entry to the
   local registry. (Recall that this overrides the global registry.)
-  For examples,
+  For example,
 
       # nix flake add nixpkgs github:my-repo/my-nixpkgs
 
@@ -575,8 +611,7 @@ offline use at least as well. Channels only require network access
 when you do `nix-channel --update`. By contrast, the `nix` command
 will periodically fetch the latest version of the global registry and
 of the top-level flake (e.g. `nix build nixpkgs:hello` may cause it to
-fetch a new version of Nixpkgs). To make sure things work offline, we
-do the following:
+fetch a new version of Nixpkgs). To make sure things work offline:
 
 * It's not a failure if we can't fetch the registry.
 
@@ -591,6 +626,16 @@ do the following:
   registry or doing other things that need the network (such as
   substituting). This is the default if there are no configured
   non-loopback network interfaces.
+
+## CI integration
+
+Flakes are useful for CI systems since `flake.nix` and the lock file
+exactly specify the input repositories. For Hydra this means that you
+no longer need to configure any jobset inputs; just a top-level flake
+reference is enough. For example, the [configuration of the `patchelf`
+jobset](https://hydra.nixos.org/jobset/patchelf/master#tabs-configuration)
+just points to `github:NixOS/patchelf` and doesn't need to specify
+`nixpkgs`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -653,6 +698,10 @@ complex, possibly non-terminating program.
 
 * Automatically generate documentation from flakes. This partially
   depends on the previous item.
+
+* Evaluation caches could be shared in a binary-cache-like
+  mechanism. This might make the use of import-from-derivation in
+  Nixpkgs acceptable.
 
 # Acknowledgements
 
