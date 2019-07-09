@@ -1,6 +1,6 @@
 ---
 feature: flakes
-start-date: 2019-06-25
+start-date: 2019-07-09
 author: Eelco Dolstra
 co-authors: TBD
 shepherd-team: (names, to be nominated and accepted by RFC steering committee)
