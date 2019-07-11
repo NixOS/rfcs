@@ -139,7 +139,7 @@ installable derivation) and a NixOS module.
 {
   name = "dwarffs";
 
-  epoch = 201906;
+  edition = 201906;
 
   description = "A filesystem that fetches DWARF debug info from the Internet on demand";
 
@@ -183,13 +183,13 @@ installable derivation) and a NixOS module.
 
 A flake has the following attributes:
 
-* `epoch`: A number that specifies the version of the flake
+* `edition`: A number that specifies the version of the flake
   syntax/semantics to be used. This allows the interpretation of
   flakes to change in the future. It also enables some evolution of
   the Nix language; for example, the Nix files in the flake could be
-  parsed using a syntax determined by the epoch. The only currently
+  parsed using a syntax determined by the edition. The only currently
   allowed value is `201906`. Nix rejects flakes with an unsupported
-  epoch.
+  edition.
 
 * `name`: A identifier for the flake, used to reference it from
   `inputs`. (E.g. the `nixpkgs` in `inputs.nixpkgs` refers to the
@@ -684,10 +684,10 @@ complex, possibly non-terminating program.
 # Future work
 [future]: #future-work
 
-* The "epoch" feature enables future Nix changes, including language
+* The "edition" feature enables future Nix changes, including language
   changes. For example, changing the parsing of multiline strings
   (https://github.com/NixOS/nix/pull/2490) could be conditional on the
-  flake's epoch.
+  flake's edition.
 
 * Currently flake outputs are untyped; we only have some conventions
   about what they should be (e.g. `packages` should be an attribute
