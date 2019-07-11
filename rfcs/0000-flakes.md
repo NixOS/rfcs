@@ -99,7 +99,7 @@ Flakes are motivated by a number of serious shortcomings in Nix:
   that it is hard to ensure reproducible evaluation of NixOS or NixOps
   configurations.
 
-* Nix projects lake discoverability and a standard structure. For
+* Nix projects lack discoverability and a standard structure. For
   example, it's just convention that a repository has a `release.nix`
   for Hydra jobs and a `default.nix` for packages.
 
