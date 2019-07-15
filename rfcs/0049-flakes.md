@@ -703,7 +703,7 @@ complex, possibly non-terminating program.
   mechanism. This might make the use of import-from-derivation in
   Nixpkgs acceptable.
 
-# Acknowledgements
+# Acknowledgments
 
 Funding for the development of the flakes prototype was provided by
 [Target Corporation](https://www.target.com/).
