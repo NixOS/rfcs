@@ -586,7 +586,7 @@ flakes. These are:
 
       # nix flake pin nixpkgs
 
-  will add an mapping like `nixpkgs` ->
+  will add a mapping like `nixpkgs` ->
   `github:NixOS/nixpkgs/444f22ca892a873f76acd88d5d55bdc24ed08757` to
   the local registry.
 
