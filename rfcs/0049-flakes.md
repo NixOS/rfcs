@@ -191,7 +191,7 @@ A flake has the following attributes:
   allowed value is `201906`. Nix rejects flakes with an unsupported
   edition.
 
-* `name`: A identifier for the flake, used to reference it from
+* `name`: An identifier for the flake, used to reference it from
   `inputs`. (E.g. the `nixpkgs` in `inputs.nixpkgs` refers to the
   identifier of the Nixpkgs flake.)
 
