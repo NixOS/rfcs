@@ -3,6 +3,8 @@ feature: intensional_store
 start-date: 2017-08-11
 author: Wout.Mertens@gmail.com
 co-authors: (find a buddy later to help our with the RFC)
+shepherd-team: Shea Levy, Vladimír Čunát, Eelco Dolstra, Nicolas B. Pierron
+shepherd-leader: Shea Levy
 related-issues: (will contain links to implementation PRs)
 ---
 
