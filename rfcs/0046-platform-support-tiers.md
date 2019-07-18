@@ -2,7 +2,7 @@
 feature: platform_support_tiers
 start-date: 2019-04-28
 author: Michael Raskin
-shepherd-team: Ryan Mulligan, Jonas Pfenniger , Graham Christensen, John Ericson
+shepherd-team: Ryan Mulligan, Jonas Pfenniger, Graham Christensen, John Ericson
 shepherd-leader: John Ericson
 co-authors: Matthew Bauer
 related-issues:
