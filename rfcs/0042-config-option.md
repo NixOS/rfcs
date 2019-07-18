@@ -3,6 +3,8 @@ feature: config-option
 start-date: 2019-03-10
 author: Silvan Mosberger
 co-authors: (find a buddy later to help our with the RFC)
+shepherd-leader: Robin Gloster
+shepherd-team: Robin Gloster, Eelco Dolstra, Robert Helgesson, Franz Pletz
 related-issues: (will contain links to implementation PRs)
 ---
 
