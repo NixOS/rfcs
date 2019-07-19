@@ -491,11 +491,12 @@ commit hash.
 Note that lock files are only used at top-level: the `flake.lock` files
 in dependencies (if they exist) are ignored.
 
-Nix automatically creates a `flake.lock` file when you build a local
-repository (e.g. `nix build /path/to/repo`). It will also update the
-lock file if inputs are added or removed. You can pass
-`--recreate-lock-file` to force Nix to recreate the lock file from
-scratch (and thus check for the latest version of each input).
+When you build a local repository (e.g. `nix build /path/to/repo`),
+Nix automatically creates a `flake.lock` file if it doesn't already
+exists. It will also update the lock file if inputs are added or
+removed. You can pass `--recreate-lock-file` to force Nix to recreate
+the lock file from scratch (and thus check for the latest version of
+each input).
 
 Lock files are not sufficient by themselves to ensure reproducible
 evaluation. It is also necessary to prevent certain impurities. In
