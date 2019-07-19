@@ -25,6 +25,8 @@ Contents:
 # Summary
 [summary]: #summary
 
+The RFC consists of two parts which flow hand-in-hand
+
 ## Part 1: Structural `settings` instead of stringly `extraConfig`
 [part1]: #part-1-structural-settings-instead-of-stringly-extraconfig
 
@@ -66,7 +68,7 @@ The second part of this RFC aims to encourage module authors to strike a balance
 
 ## [Part 1][part1]
 
-Stringly-typed options such as `extraConfig` have multiple disadvantages:
+Stringly-typed options such as `extraConfig` have multiple disadvantages in comparison to a structural `settings` option.
 - Impossible to even implement correctly with configuration formats like JSON (because concatenation doesn't make sense)
 - Bad modularity
   - No proper merging: Multiple assignments get merged together with string concatenation which can't merge assignments of the same setting
@@ -84,27 +86,20 @@ NixOS modules with dozens of options aren't optimal for these reasons:
   - Documentation will get out of date as the package updates
   - If upstream removes a setting, the NixOS module is broken for every user until somebody fixes it with a PR.
 - With overlays or `disabledModules`, the user can bring the NixOS module out of sync with the package in nixpkgs, which can lead to the same problems as in the previous point.
+- The bigger the module, the more likely it contains bugs
 - Responsibility for backwards compatibility is now not only in upstream, but also on our side.
 
-## Occurences of problems
-
+Problem instances:
+- The [i2pd module](https://github.com/NixOS/nixpkgs/blob/2a669d3ee1308c7fd73f15beb35c0456ff9202bc/nixos/modules/services/networking/i2pd.nix) has a long [history](https://github.com/NixOS/nixpkgs/commits/2a669d3ee1308c7fd73f15beb35c0456ff9202bc/nixos/modules/services/networking/i2pd.nix) of option additions due to upstream updates, bug fixes and documentation changes
 - Because prometheus uses options to encode every possible setting, PR's like [#56017](https://github.com/NixOS/nixpkgs/pull/56017) are needed to allow users to set a part of the configuration that wasn't encoded yet.
 - Because strongswan-ctl uses options to encode its full configuration, changes like [#49197](https://github.com/NixOS/nixpkgs/pull/49197) are needed to update our options with upstream changes.
-- Pull requests like [#57036](https://github.com/NixOS/nixpkgs/pull/57036) or [#38324](https://github.com/NixOS/nixpkgs/pull/38324) are needed because users wish to have more configuration options than the ones provided.
-- [#58239](https://github.com/NixOS/nixpkgs/pull/58239), [#58181](https://github.com/NixOS/nixpkgs/pull/58181)
+
+These are only examples of where people *found* problems and fixed them. The number of modules that have outdated options and require maintenance is probably rather high.
 
 ## Previous discussions
 
 - https://github.com/NixOS/nixpkgs/pull/44923#issuecomment-412393196
 - https://github.com/NixOS/nixpkgs/pull/55957#issuecomment-464561483 -> https://github.com/NixOS/nixpkgs/pull/57716
-
-## Previous implementations
-
-This idea has been implemented already in some places:
-- [#45470](https://github.com/NixOS/nixpkgs/pull/45470)
-- [#52096](https://github.com/NixOS/nixpkgs/pull/52096)
-- [My Murmur module](https://github.com/Infinisil/system/blob/45c3ea36651a2f4328c8a7474148f1c5ecb18e0a/config/new-modules/murmur.nix)
-- [#55413](https://github.com/NixOS/nixpkgs/pull/55413)
 
 # Detailed design
 [design]: #detailed-design
@@ -380,3 +375,11 @@ This sweet-spot is only approachable from below, because once you add an option,
 
 
 
+
+### Previous implementations
+
+This idea has been implemented already in some places:
+- [#45470](https://github.com/NixOS/nixpkgs/pull/45470)
+- [#52096](https://github.com/NixOS/nixpkgs/pull/52096)
+- [My Murmur module](https://github.com/Infinisil/system/blob/45c3ea36651a2f4328c8a7474148f1c5ecb18e0a/config/new-modules/murmur.nix)
+- [#55413](https://github.com/NixOS/nixpkgs/pull/55413)
