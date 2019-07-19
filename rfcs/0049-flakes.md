@@ -521,9 +521,9 @@ Pure mode can be disabled by passing `--impure` on the command line.
 
 ## Evaluation caching
 
-The fact that evaluation is now hermetic allows `nix` to cache flake
-attributes. For example (doing `nix build` on an already present
-package):
+The fact that by default (i.e. in pure mode) evaluation is hermetic
+allows `nix` to cache flake attributes. For example (doing `nix build`
+on an already present package):
 
     $ time nix build nixpkgs:firefox
     real    0m1.497s
