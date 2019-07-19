@@ -6,49 +6,89 @@ co-authors: (find a buddy later to help our with the RFC)
 related-issues: (will contain links to implementation PRs)
 ---
 
+Contents:
+- Mention part 1 (not using stringly typed extraConfig), mention the problems with stringly typed options
+- Mention part 2 (encouraging most important options, high-quality, more advanced users can use config, options can't be removed, etc.). Mention the problems with many options. Show examples of maintenance PR's that were needed because of this, e.g. i2pc, prometheus
+- Implementation
+  - Part 1: Adding formatters, types (mention how types.attrs doesn't work correctly) and docs
+    - Defaults
+  - Part 2: Adding docs for encouraging most important options
+- Limitations
+- Future work
+  - showing defaults in the manual
+  - Command line options
+- Addendums
+  - Configuration checking
+  - Backwards compatibility
+  - configFile
+
 # Summary
 [summary]: #summary
 
-A lot of NixOS options exist to specify single settings of configuration files. Along with such options come multiple disadvantages, such as having to synchronize with upstream changes, option bloat and more. An alternative is to provide options for passing the configuration as a string, such as the common `configFile` or `extraConfig` options, but this also comes with a set of disadvantages, including difficulty to override values and bad modularity.
+## Part 1: Structural `settings` instead of stringly `extraConfig`
+[part1]: #part-1-structural-settings-instead-of-stringly-extraconfig
 
-This RFC aims to solve these problems by encouraging NixOS module authors to provide a `config` option as a base for specifying program configurations with great flexibility. A set of utility functions for writing these options conveniently will be added and the documentation will be updated to recommend this way of writing modules that do program configuration.
+NixOS modules often use stringly-typed options like `extraConfig` to allow specifying extra settings in addition to the default ones. This has multiple disadvantages: The defaults can't be changed, multiple values might not get merged properly, inspection of it is almost impossible because it's an opaque string and more. The first part of this RFC aims to solve such problems by discouraging such options and instead to use a `settings` option which encodes the modules configuration file as a structural generic Nix value. Here is an example showcasing some advantages:
 
-This RFC does *not* intend to get rid of all NixOS options related to program configuration. The previous version of this RFC had this intention, but due to feedback (and insight on my own) this was changed. Read the section on [additional config options](#additional-config-options) for details.
+```nix
+{
+  # Old way
+  services.foo.extraConfig = ''
+    # Can't be set in multiple files because string concatenation doesn't merge such lists
+    listen-ports = 456, 457, 458 
+    
+    # Can't override this setting because the module hardcodes it
+    # bootstrap-ips = 172.22.68.74
+
+    enable-ipv6 = 0
+    ${optionalString isServer "check-interval = 3600"}
+  };
+  
+  # New way
+  services.foo.settings = {
+    listen-ports = [ 456 457 458 ];
+    bootstrap-ips = [ "172.22.68.74" ];
+    enable-ipv6 = false;
+    check-interval = mkIf isServer 3600;
+  };
+}
+```
+
+## Part 2: Balancing module option count
+[part2]: #part-2-balancing-module-option-count
+
+Since with this approach there will be no more hardcoded defaults and composability is not a problem anymore, there is not a big need to have NixOS options for every setting anymore. Traditionally this has lead to huge NixOS modules with dozens of options, each of them only for a single field in the configuration. Such modules are problematic because they're hard to review and maintain, require constant care as to keep all those options in line with upstream changes, are generally of lower quality and more. Such options aren't without advantages however: They will be presented in the NixOS manual and can have better type checking than the equivalent with `settings`.
+
+The second part of this RFC aims to encourage module authors to strike a balance for the number of such additional options such as to not make the module too big, but still provide the most commonly used settings as separate NixOS options. Quality is encouraged over quantity: Authors should spend more time on thinking about which options to add, documenting them properly, thinking about interactions with the rest of NixOS, or even writing useful high-level options instead. This is in contrast to the fiddly labor of copying dozens of options from upstream to NixOS. With a `settings` option, it's also always easy to add more options over time in a backwards-compatible way, whereas removing options has always been practically impossible.
 
 # Motivation
 [motivation]: #motivation
 
-NixOS commonly has 2 models of specifying configuration for programs, each with their own set of problems. This RFC aims to solve all of them.
+## [Part 1][part1]
 
-## Single option for every setting
+Stringly-typed options such as `extraConfig` have multiple disadvantages:
+- Impossible to even implement correctly with configuration formats like JSON (because concatenation doesn't make sense)
+- Bad modularity
+  - No proper merging: Multiple assignments get merged together with string concatenation which can't merge assignments of the same setting
+  - No priorities: `mkDefault` and co. won't work on settings
+- Values within it can't be inspected, since it's just an opaque string
+- Syntax of assigned values can easily be wrong, especially with escaping sequences
 
-Having a single option for every setting in the configuration file, this often gets combined with an `extraConfig` option to provide greater flexibility. Problems:
+## [Part 2][part2]
 
-- Coupling to upstream
-  - When upstream adds or removes settings, the NixOS module needs to be updated to reflect that.
-    - Upstream adds a setting: If the module has an `extraConfig` option people might set the new setting there. But if we ever add it as a NixOS option, we'll have trouble merging the values together with what the user already specified in `extraConfig`
-    - Upstream removes a setting (backwards incompatible): The NixOS module is straight up broken in nixpkgs until somebody fixes it, end users can't fix it themselves (unless the module provides a `configFile` option which can override the generated one). The same can also happen when the user uses overlays or `disabledModules` to cause a module/package version mismatch.
-  - The documentation of the upstream settings needs to be copied over to the NixOS options, which means it might get out of sync with changes
-  - The upstream defaults are being copied to the NixOS modules, so we need to also update the defaults whenever upstream changes them. This can be solved by using `nullOr` to allow for a `null` value to indicate that the upstream default shall be used, but that's not very nice.
-- Option bloat: <s>NixOS evaluation time is still linear in the number of *available* options for all users, even though everybody only uses a fraction of them. This means that when a module adds 100 new options, this leads to a direct increase in evaluation time for every `nixos-rebuild switch` of everybody using NixOS.</s> With high confidence debunked in [#57477](https://github.com/NixOS/nixpkgs/issues/57477).
-- Timeconsuming to implement, tedious to review and hard to maintain
-  - It takes a non-zero amount of time to write all the wanted options out into a NixOS module
-  - Reviewing is tedious because people need to make sure types are correct, descriptions are fitting, defaults are acceptable, for every option added. Due to the size and repetitiveness, people are also less willing to thoroughly review the code.
-  - The bigger the NixOS module is the harder it is to maintain, and the less people want to actually maintain it. 
-- Responsibility for backwards compatibility: By adding such options, we obligate ourselves to handle backwards incompatibilites on our side. We will have to support these options for a long time and can't remove them without at least one person being annoyed about it.
-
-## `configFile` or `extraConfig` option
-
-An option for specifying the contents of the configuration file directly with `configFile` or `extraConfig`. Problems:
-
-- Not very modular at all
-  - In case of json or a `configFile` option, you can only assign the option once, merging is impossible
-  - In case of ini (or similar), assigning a single option multiple times to make use of list concatenation, ordering or priorities is impossible, so in general you can't e.g. override a default value set somewhere else.
-- No syntax checking: Users will have to know the syntax of the configuration language and encode their values properly, any syntax error will only be realized when the program errors at runtime.
+NixOS modules with dozens of options aren't optimal for these reasons:
+- Writing takes a lot of time and is a repetitive task of copying the settings from upstream
+- Reviewing is tedious because of the big size of it, which in turn demotivates reviewers to even do it
+- Maintenance is hard to keep up with because upstream can add/remove/change settings over time
+  - If the module copied defaults from upstream, these might need to be updated. This is especially important for security. A workaround is using `types.nullOr` with `null` signifying that the upstream default should be used, but that's not very nice.
+  - Documentation will get out of date as the package updates
+  - If upstream removes a setting, the NixOS module is broken for every user until somebody fixes it with a PR.
+- With overlays or `disabledModules`, the user can bring the NixOS module out of sync with the package in nixpkgs, which can lead to the same problems as in the previous point.
+- Responsibility for backwards compatibility is now not only in upstream, but also on our side.
 
 ## Occurences of problems
 
-- Because prometheus uses options to encode every possible setting, [#56017](https://github.com/NixOS/nixpkgs/pull/56017) is needed to allow users to set a part of the configuration that wasn't encoded yet.
+- Because prometheus uses options to encode every possible setting, PR's like [#56017](https://github.com/NixOS/nixpkgs/pull/56017) are needed to allow users to set a part of the configuration that wasn't encoded yet.
 - Because strongswan-ctl uses options to encode its full configuration, changes like [#49197](https://github.com/NixOS/nixpkgs/pull/49197) are needed to update our options with upstream changes.
 - Pull requests like [#57036](https://github.com/NixOS/nixpkgs/pull/57036) or [#38324](https://github.com/NixOS/nixpkgs/pull/38324) are needed because users wish to have more configuration options than the ones provided.
 - [#58239](https://github.com/NixOS/nixpkgs/pull/58239), [#58181](https://github.com/NixOS/nixpkgs/pull/58181)
@@ -317,4 +357,26 @@ Ctrl-F for TODO
 
 - When defaults for NixOS options are set *outside* the options definition such as `config.services.foo.config.logLevel = "DEBUG"` above, it's currently not possible to see these default values in the manual. This could be improved by having the manual not only look at the option definitions `default` attribute for determining the default, but also evaluate the options value with a minimal configuration to get the actual default value. This might be non-trivial.
 - If needed, add config transformation functions for keeping backwards compatibility with upstream changes. See [Backwards compatibility for configuration settings](#backwards-compatibility-for-configuration-settings)
+
+
+# Arguments for Part 2
+
+- We currently have a lot of NixOS modules with a lot of options. We can't really get rid of them to simplify the module. Removing/deprecating options would annoy users and give the feeling off that functionality is reduced.
+- In comparison if the module is small to start with, we can easily add more options as needed. This gives off the idea that new functionality is added.
+
+
+
+
+- Typed config instead of stringly-typed
+
+# The option count scale
+
+- config option only: Very simple module, easy to maintain, but very little documentation in the NixOS manual, almost everything is a runtime error
+- Every program setting as an option: Very big module, hard to maintain, but everything is neatly documented and eval errors for a lot of things
+
+Somewhere in-between is the sweet spot, where the module has the necessary options to be useful for most people, but where it's still reviewable and maintainable.
+
+This sweet-spot is only approachable from below, because once you add an option, you can't really remove it without users being annoyed that it broke their setup or people feeling they get robbed of functionality.
+
+
 
