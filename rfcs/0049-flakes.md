@@ -256,7 +256,7 @@ Hydra. Currently, these are:
   dwarffs` uses the `defaultPackage` attribute of the `dwarffs` flake.
 
 * `checks`: A non-nested set of derivations built by the `nix flake
-  check` command, or by Hydra if a flake does not have a `hydraJobs`
+  check` command, and by Hydra if a flake does not have a `hydraJobs`
   attribute.
 
 * `hydraJobs`: A nested set of derivations built by Hydra.
@@ -264,14 +264,6 @@ Hydra. Currently, these are:
 * `devShell`: A derivation that defines the shell environment used by
   `nix dev-shell` if no specific attribute is given. If it does not
   exist, then `nix dev-shell` will use `defaultPackage`.
-
-* `apps`: A set of app definitions used by the `nix app` command. For
-  example, `nix app blender-bin:blender_2_79` uses the
-  `apps.blender_2_79` output of the `blender-bin` flake.
-
-* `defaultApp`: An app definition used by the `nix app` command when no
-  specific attribute is given. For example, `nix app blender-bin` uses
-  the `defaultApp` output of the `blender-bin` flake.
 
 TODO: NixOS-related outputs such as `nixosModules` and `nixosSystems`.
 
@@ -296,7 +288,8 @@ Currently the following types of flake references are supported:
   * `rev`: The Git commit hash to fetch. Note that this commit must be
     an ancestor of `ref`, since Nix doesn't clone the entire
     repository, only the specified `ref` (and the Git protocol doesn't
-    allow fetching a `rev` without a known `ref`).
+    allow fetching a `rev` without a known `ref`). The default is the
+    commit currently pointed to by `ref`.
   * `dir`: The subdirectory of the repository in which `flake.nix` is
     located. This parameter enables having multiple flakes in a
     repository. The default is the root directory.
