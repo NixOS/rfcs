@@ -104,80 +104,90 @@ These are only examples of where people *found* problems and fixed them. The num
 # Detailed design
 [design]: #detailed-design
 
-For specifying configuration files to programs in NixOS options, there should be a main option called `config` (TODO: or `settings`, name to be decided), which represents the configuration of the program as a Nix value, which can then be converted to the configuration file format the program expects. In order for the most prominent/popular/main options of the package to be easily discoverage, they should still be specified as separate NixOS options, see the [additional config option](#additional-config-options) section for more details.
+## [Part 1][part1]
 
-As a result, modules will look as follows:
+Whether having a structural `settings` option for a module makes sense depends on whether the program's configuration format has a direct mapping from Nix. This includes formats like JSON, YAML, INI and similar. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", then the answer is probably No, and you should not use this approach. This RFC does not specify anything for unsuitable configuration formats, but there is [an addendum on that][unsuitable].
+
+### Configuration format types
+
+In order for a structural `settings` to enforce a valid value and work correctly with merging and priorities, it needs to have a type that corresponds to its configuration format, `types.attrs` won't do. As an example, the INI type could be represented with `attrsOf (attrsOf (nullOr (either int str)))`, which means there's multiple named sections, each of which can contain a key-value pair where the value is either `null`, an integer or a string, where `null` signifies a key not being present (which is useful for unsetting existing values).
+
+Common format types will be provided under `lib.types.settings`. This could include JSON, YAML, INI, a simple `key=value` format and a recursive `key.subkey.subsubkey=value` format for a start. Sometimes programs have their own configuration formats which are specific to them, in which case the type should be specified in that programs module directly instead of going in `lib.types.settings`.
+
+### Configuration format writers
+
+In order for the final value of `settings` to be turned into a string, a set of configuration format writers should be provided under `lib.settings`. These should ideally make sure that the resulting text is somewhat properly formatted with readable indentation. Things like `builtins.toJSON` are therefore not optimal as it doesn't add any spacing for readability. These writers will have to include ones for all of the above-mentioned configuration types. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
+
+### Default values
+
+Ideally modules should work by just setting `enable = true`. Often this requires the configuration to include some default settings. Defaults should get specified in the `config` section of the module by assigning the values to the `settings` option directly. Depending on how default settings matter, we need to set them differently and for different reasons:
+- If the program needs a setting to be present in the configuration file because otherwise it would fail at runtime and demand a value, the module should set this value with a `mkDefault` to the default upstream value, which will then be the equivalent of a starter configuration file. This allows users to easily change the value, but also enables a smooth first use of the module without having to manually set such defaults to get it to a working state. Note that this doesn't necessarily require the module to be updated when upstream defaults change, because that's the expected behavior with starter configurations.
+- If the module needs a specific value for a setting because of how the module or NixOS works (e.g. `logger = "systemd"`, because NixOS uses `systemd` for logging), then the value should *not* use `mkDefault`. This way a user can't easily override this setting (which would break the module in some way) and will have to use `mkForce` instead to change it. This also indicates that they are leaving supported territory, and will probably have to change something else to make it work again (e.g. if they set `logger = mkForce "/var/log/foo"` they'll have to change their workflow of where to look for logs).
+- If the module itself needs to know the value of a configuration setting at evaluation time in order to influence other options (e.g. opening the firewall for a services port), we may set upstream's default with a `mkDefault`, even though the program might start just fine without it. This allows the module to use the configuration setting directly without having to worry whether it is set at all at evaluation time.
+
+If the above points don't apply to a configuration setting, that is the module doesn't care about the value, the program doesn't care about the setting being present and we don't need the value at evaluation time, there should be no need to specify any default value.
+
+TODO: Nice table for default kind / how to set it / whether it needs to track upstream / examples
+
+### Additional options for single settings
+
+One can easily add additional options that correspond to single configuration settings. This is done by defining an option as usual, then applying it to `settings` with a `mkDefault`. This approach allows users to set the value either through the specialized option, or `settings`, which also means that new options can be added without any worry for backwards incompatibility.
+
+### Documentation
+
+The nixpkgs manual should be updated to explain this way of doing program configuration.
+
+### An example
+
+Putting it all together, here is an example of a NixOS module that uses such an approach:
 
 ```nix
-{ config, lib, ... }: with lib;
-let
-
-  cfg = config.services.foo;
-
-  configText = configGen.json cfg.config;
-
+{ config, lib, ... }:
+let cfg = config.services.foo;
 in {
 
   options.services.foo = {
-    enable = mkEnableOption "foo service";
+    enable = lib.mkEnableOption "foo service";
 
-    config = mkOption {
-      type = types.config.json;
+    settings = lib.mkOption {
+      type = lib.types.settings.json;
       default = {};
       description = ''
-        Configuration for foo. Refer to <link xlink:href="https://example.com/docs/foo"/>
-        for documentation on the supported values.
+        Configuration for foo, see <link xlink:href="https://example.com/docs/foo"/>
       '';
     };
 
-    # Because this option is a main/popular one we provide a separate
-    # option for it, to improved discoverability and error checking
-    domain = mkOption {
-      type = types.str;
-      description = ''
-        Domain this service operates on.
-      '';
+    # An additional option for a setting so we have an eval error if this is missing
+    domain = lib.mkOption {
+      type = lib.types.str;
+      description = "Domain this service operates on.";
     };
   };
   
-  config = mkIf cfg.enable {
-  
-    # Set minimal config to get service working by default
-    services.foo.config = {
-      # We don't use mkDefault here, as this module requires this value in order to function
+  config = lib.mkIf cfg.enable {
+    services.foo.settings = {
+      # Fails at runtime without any value set
+      log_level = lib.mkDefault "WARN";
+    
+      # We use systemd's `StateDirectory`, so we require this (no mkDefault)
       data_path = "/var/lib/foo";
-
-      log_level = mkDefault "WARN";
-
-      # Upstream default, needed for us to open the firewall
-      port = mkDefault 2546;
-
-      domain = cfg.domain;
+      
+      # We use this to open the firewall, so we need to know about the default at eval time
+      port = lib.mkDefault 2546;
+      
+      # Apply our specialized setting.
+      domain = lib.mkDefault cfg.domain;
     };
   
-    environment.etc."foo.json".text = configText;
+    environment.etc."foo/config.json".text = lib.settings.genJSON cfg.settings;
     
-    networking.firewall.allowedTCPPorts = [ cfg.config.port ];
+    networking.firewall.allowedTCPPorts = [ cfg.settings.port ];
     # ...
   };
 }
 ```
 
-This approach solves all of the above mentioned problems for the settings we don't refer to in the module, the defaults we specify however are unavoidably still tied to upstream. In addition we have the following properties that work with this approach out of the box:
-- Ability to easily query arbitrary configuration values with `nix-instantiate --eval '<nixpkgs/nixos>' -A config.services.foo.config` (TODO: does `nixos-option services.foo.config` work too?)
-- The configuration file can be well formatted with the right amount of indentation everywhere
-- Usually hardcoded defaults can now be replaced by simple assignment of the `config` option, which in addition allows people to override those values. See the [Defaults](#defaults) section for more details.
-
-## Defaults
-
-Depending on how default settings matter, we need to set them differently and for different reasons:
-- If the module needs a specific value for a setting because of how the module or NixOS works (e.g. `logger = "systemd"`, because NixOS uses `systemd` for logging), then the value should *not* use `mkDefault`. This way a user can't easily override this setting (which would break the module in some way) and will have to use `mkForce` instead to change it. This also indicates that they are leaving supported territory, and will probably have to change something else to make it work again (e.g. if they set `logger = mkForce "/var/log/foo"` they'll have to change their workflow of where to look for logs).
-- If the program needs a setting to be present in the configuration file because otherwise it would fail at runtime and demand a value, the module should set this value *with* a `mkDefault` to the default upstream value, which will then be the equivalent of a starter configuration file. This allows users to easily change the value, but also enables a smooth first use of the module without having to manually set such defaults to get it to a working state. Optimally modules should Just Work (tm) by setting their `enable` option to true.
-- If the module itself needs to know the value of a configuration setting at evaluation time in order to influence other options (e.g. opening the firewall for a services port), we may set upstream's default with a `mkDefault`, even though the program might start just fine without it. This allows the module to use the configuration setting directly without having to worry whether it is set at all at evaluation time.
-
-If the above points don't apply to a configuration setting, that is the module doesn't care about the value, the program doesn't care about the setting being present and we don't need the value at evaluation time, there should be no need to specify any default value.
-
-## Additional config options
+## [Part 2][part2]
 
 For multiple reasons, one may wish to still have additional options available for configuration settings:
 - Popular or main settings. Because such `config` options will have to refer to upstream documentation for all available settings, it's much harder for new module users to figure out how they can configure it. Having popular/main settings as NixOS options is a good compromise. It is up to the module author to decide which options qualify for this.
@@ -185,30 +195,6 @@ For multiple reasons, one may wish to still have additional options available fo
 - Password settings: Some program's configuration files require passwords in them directly. Since we try to avoid having passwords in the Nix store, it is advisable to provide a `passwordFile` option as well, which would replace a placeholder password in the configuration file at runtime.
 
 Keep in mind that while it's trivial to add new options with the approach in this RFC, removing them again is hard (even without this RFC). So instead of introducing a lot of additional options when the module gets written, authors should try to keep the initial number low, to not introduce options almost nobody will end up using. Every additional option might be nice to use, but increases coupling to upstream, burden on nixpkgs maintainers and bug potential. Thus we should strive towards a balance between too little and too many options, between "I have no idea how to use this module because it provides too little options" and "This module has become too problematic due to its size". And because this balance can only be approached from below (we can only add options, not remove them), additional options should be used conservatively from the start.
-
-This `config` approach described here is very flexible for these kind of additions. As already showcased in the above example, an implementation of such an option looks like this:
-```nix
-{ config, lib, ... }: with lib; {
-
-  options.services.foo = {
-    # ...
-    
-    domain = mkOption {
-      type = types.str;
-      description = "Domain this service operates on.";
-    };
-  };
-  
-  config = mkIf cfg.enable {
-    services.foo.config = {
-      # ...
-      domain = mkDefault cfg.domain;
-    };
-  };
-}
-```
-
-Even though we have two ways of specifying this configuration setting now, the user is free to choose either way.
 
 ## Configuration checking
 
@@ -293,42 +279,22 @@ in
 
 If this is needed in the future, we may add a set of config deprecation fix-up functions for general use in modules.
 
-## Implementation parts
-
-The implementation consists of three separate parts.
-
-### Configuration types
-
-A set of types for common configuration formats should be provided in `lib.types.config`. Such a type should encode what values can be set in files of this configuration format as a Nix value, with the module system being able to merge multiple values correctly. This is the part that checks whether the user set an encodeable value. This can be extended over time, but could include the following as a start:
-- JSON
-- YAML, which is probably the same as JSON
-- INI
-- A simple `key=value` format
-- A recursive `key.subkey.subsubkey=value` format
-
-Sometimes programs have their own configuration formats, in which case the type should be implemented in the program's module directly.
-
-### Configuration format writers
-
-To convert the Nix value into the configuration string, a set of configuration format writers should be provided under `lib.configGen`. These should make sure that the resulting text is somewhat properly formatted with readable indentation. Things like `builtins.toJSON` are therefore not optimal as it doesn't add any spacing for readability. These writers will have to include ones for all of the above-mentioned configuration types. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
-
-### Documentation
-
-The nixpkgs manual should be updated to recommend this way of doing program configuration in modules, along with examples.
 
 ## Limitations
 
-### Nix-representable configuration formats
-
-Limited to configuration file formats representable conveniently in Nix, such as JSON, YAML, INI, key-value files, or similar formats. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", then the answer is probably No, and you should not use this approach.
-
-For unsuitable formats it is left up to the module author to decide the best set of NixOS options. Sometimes it might make sense to have both a specialized set of options for single settings (e.g. `programs.bash.environment`) and a flexible option of type `types.lines` (such as `programs.bash.promptInit`). Alternatively it might be reasonable to only provide a `config`/`configFile` option of type `types.str`/`types.path`, such as for XMonad's Haskell configuration file. And for programs that use a general purpose language even though their configuration can be represented in key-value style (such as [Roundcube's PHP configuration](https://github.com/NixOS/nixpkgs/blob/e03966a60f517700f5fee5182a5a798f8d0709df/nixos/modules/services/mail/roundcube.nix#L86-L93) of the form `$config['key'] = 'value';`), a `config` option as described in this RFC could be used as well as a `configFile` option for more flexibility if needed.
 
 ### Backwards compatibility with existing modules
 
 This RFC has to be thought of as a basis for *new* modules first and foremost. By using this approach we can provide a good basis for a new module, with great flexibility for future changes.
 
 A lot of already existing NixOS modules provide a mix of options for single settings and `extraConfig`-style options, which as explained in the [Motivation](#motivation) section leads to problems. In general it is not easy or even impossible to convert such a module to the style described in this RFC in a backwards-compatible way without any workarounds. One workaround is to add an option `useLegacyConfig` or `declarative` which determines the modules behavior in regards to old options.
+
+## Addendums
+
+### Unsuitable configuration formats
+[unsuitable]: #unsuitable-configuration-formats
+
+For unsuitable formats it is left up to the module author to decide the best set of NixOS options. Sometimes it might make sense to have both a specialized set of options for single settings (e.g. `programs.bash.environment`) and a flexible option of type `types.lines` (such as `programs.bash.promptInit`). Alternatively it might be reasonable to only provide a `config`/`configFile` option of type `types.str`/`types.path`, such as for XMonad's Haskell configuration file. And for programs that use a general purpose language even though their configuration can be represented in key-value style (such as [Roundcube's PHP configuration](https://github.com/NixOS/nixpkgs/blob/e03966a60f517700f5fee5182a5a798f8d0709df/nixos/modules/services/mail/roundcube.nix#L86-L93) of the form `$config['key'] = 'value';`), a `config` option as described in this RFC could be used as well as a `configFile` option for more flexibility if needed.
 
 # Drawbacks
 [drawbacks]: #drawbacks
