@@ -504,7 +504,7 @@ mode, which means that the following are disallowed:
 
 * Access to files outside of the top-level flake or its inputs, as
   well as paths fetched using `fetchTarball`, `fetchGit` and so on
-  with a commit hash or content hash. In particular this means that
+  without a commit hash or content hash. In particular this means that
   Nixpkgs will not be able to use `~/.config/nixpkgs` anymore.
 
 * Access to the environment. This means that `builtins.getEnv "<var>"`
