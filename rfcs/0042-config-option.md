@@ -181,12 +181,11 @@ The second part of this RFC aims to encourage people to write better NixOS modul
 
 ### Valuable options
 
-TODO: Add table
-
-- Popular or main settings. Because such `settings` options will have to refer to upstream documentation for all available settings, it's much harder for new module users to figure out how they can configure it. Having popular/main settings as NixOS options is therefore a good idea
-- Settings that are necessary for the module to work and are different for every user, so they can't have a default. Examples are `services.dd-agent.api_key`, `services.davmail.url` or `services.hydra.hydraURL`. Having a separate option for these settings can give a much better error message when you don't set them (instead of failing at runtime or having to encode the requirement in an assertion) and better discoverability.
-- Password settings: Some program's configuration files require passwords in them directly. Since we try to avoid having passwords in the Nix store, it is advisable to provide a `passwordFile` option as well, which would replace a placeholder password in the configuration file at runtime.
-
+| Kind | Why | Examples | Notes |
+| --- | --- | --- | --- |
+| Main/popular settings | These options are what you'll need for basic module usage, they provide a good overview and should be enough for most users | [`services.i2pd.address`](https://nixos.org/nixos/manual/options.html#opt-services.i2pd.address), [`services.taskserver.organisations`](https://nixos.org/nixos/manual/options.html#opt-services.taskserver.organisations) but **not** [~~`services.i2pd.logCLFTime`~~](https://nixos.org/nixos/manual/options.html#opt-services.i2pd.logCLFTime) and **not** [~~`services.taskserver.extensions`~~](https://nixos.org/nixos/manual/options.html#opt-services.taskserver.extensions) | Settings only needed by few can be set through the `settings` option instead |
+| Mandatory user-specific values | Reminds the user that they have to set this in order for the program to work, an evaluation error will catch a missing value early | [`services.hydra.hydraURL`](https://nixos.org/nixos/manual/options.html#opt-services.hydra.hydraURL), [`services.davmail.url`](https://nixos.org/nixos/manual/options.html#opt-services.davmail.url) | |
+| Sensitive data, passwords | To avoid those ending in the Nix store, ideally an option like `passwordFile` should replace a password placeholder in the configuration file at runtime | | This is specifically about configuration files that have a `password`-like setting |
 
 ## Backwards compatibility with existing modules
 
