@@ -93,17 +93,29 @@ These are only examples of where people *found* problems and fixed them. The num
 
 ## [Part 1][part1]
 
+### Configuration format types
+
+In order for a structural `settings` to enforce a valid value and work correctly with merging and priorities, it needs to have a type that corresponds to its configuration format, `types.attrs` won't do. As an example, the INI type could be represented with `attrsOf (attrsOf (nullOr (either int str)))`, which means there's multiple named sections, each of which can contain a key-value pair where the value is either `null`, an integer or a string, where `null` signifies a key not being present (which is useful for unsetting existing values).
+
+Common format types will be provided under `lib.types.settings`. This could include JSON, YAML, INI, a simple `key=value` format and a recursive `key.subkey.subsubkey=value` format for a start. Sometimes programs have their own configuration formats which are specific to them, in which case the type should be specified in that programs module directly instead of going in `lib.types.settings`.
+
+### Configuration format writers
+
+In order for the final value of `settings` to be turned into a string, a set of configuration format writers should be provided under `lib.settings`. These should ideally make sure that the resulting text is somewhat properly formatted with readable indentation. Things like `builtins.toJSON` are therefore not optimal as it doesn't add any spacing for readability. These writers will have to include ones for all of the above-mentioned configuration types. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
+
 ### Additions to the NixOS documentation
+
+The following sections should be added to the NixOS documentation (not verbatim however).
 
 #### Writing options for program configuration
 
-TODO: Write this section, followed by another section on `configFile`
+Whether having a structural `settings` option for a module makes sense depends on whether the program's configuration format has an obvious mapping from Nix. This includes formats like JSON, YAML, INI and similar. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", then the answer is probably No, and you should not use this approach. This RFC does not specify anything for unsuitable configuration formats, but there is [an addendum on that][unsuitable].
 
-Whether having a structural `settings` option for a module makes sense depends on whether the program's configuration format has a direct mapping from Nix. This includes formats like JSON, YAML, INI and similar. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", then the answer is probably No, and you should not use this approach. This RFC does not specify anything for unsuitable configuration formats, but there is [an addendum on that][unsuitable].
+The two main ingredients for writing a `settings` option is to define its type as the one corresponding to the programs configuration format (e.g. `lib.types.settings.json`), and to convert that setting to a string with the corresponding function (e.g. `lib.settings.genJSON`). Very important for writing such options is to link to the upstream documentation.
 
 #### Default values
 
-Ideally modules should work by just setting `enable = true`, which often means setting some defaults. They should get specified in the `config` section of the module by assigning the values to the `settings` option directly. Depending on how default settings matter, we need to set them differently and for different reasons:
+Ideally modules should work by just setting `enable = true`, which often requires setting some default settings. These should get specified in the `config` section of the module by assigning the values to the `settings` option directly. Depending on how default settings matter, we need to set them differently and for different reasons:
 
 | Reason | How to assign | Needs to track upstream | Examples | Note |
 | --- | --- | --- | --- | --- |
@@ -165,16 +177,6 @@ in {
 }
 ```
 
-### Configuration format types
-
-In order for a structural `settings` to enforce a valid value and work correctly with merging and priorities, it needs to have a type that corresponds to its configuration format, `types.attrs` won't do. As an example, the INI type could be represented with `attrsOf (attrsOf (nullOr (either int str)))`, which means there's multiple named sections, each of which can contain a key-value pair where the value is either `null`, an integer or a string, where `null` signifies a key not being present (which is useful for unsetting existing values).
-
-Common format types will be provided under `lib.types.settings`. This could include JSON, YAML, INI, a simple `key=value` format and a recursive `key.subkey.subsubkey=value` format for a start. Sometimes programs have their own configuration formats which are specific to them, in which case the type should be specified in that programs module directly instead of going in `lib.types.settings`.
-
-### Configuration format writers
-
-In order for the final value of `settings` to be turned into a string, a set of configuration format writers should be provided under `lib.settings`. These should ideally make sure that the resulting text is somewhat properly formatted with readable indentation. Things like `builtins.toJSON` are therefore not optimal as it doesn't add any spacing for readability. These writers will have to include ones for all of the above-mentioned configuration types. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
-
 ## [Part 2][part2]
 
 The second part of this RFC aims to encourage people to write better NixOS modules in terms of quality, maintainability and discoverability by limiting NixOS options representing single settings to a set of most "valuable" options. The general idea of valuable options is that they provide more value (used by people, provide safety) than the trouble they're worth (bloated option listings, maintenance cost). Of course this isn't something we can measure, so it's up to the module author to make a reasonable decision, but some general suggestions are given in the next section. As more such options are deemed valuable they can be added to the module over time as well.
@@ -233,6 +235,8 @@ Sometimes programs use command arguments for configuration. While in general the
 By using such an encoding, it would be possible to get all the benefits of a `settings` option. However this encoding isn't entirely obvious, so this should be thought about more.
 
 # Addendums
+
+## `configFile`
 
 ## Unsuitable configuration formats
 [unsuitable]: #unsuitable-configuration-formats
