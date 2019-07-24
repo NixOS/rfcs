@@ -175,9 +175,7 @@ In order for the final value of `settings` to be turned into a string, a set of 
 
 ## [Part 2][part2]
 
-TODO: write what goes in the NixOS docs
-
-The second part of this RFC aims to encourage people to write better NixOS modules in terms of quality, maintainability and discoverability by limiting NixOS options representing single settings to a set of most "valuable" options. Of course in general "valuable" doesn't have a clear definition, so it's up to the module author and other people familiar with the program to decide on it, but in the following section some conventions will be given. As more such options are deemed "valuable" they can be added to the module over time.
+The second part of this RFC aims to encourage people to write better NixOS modules in terms of quality, maintainability and discoverability by limiting NixOS options representing single settings to a set of most "valuable" options. The general idea of valuable options is that they provide more value (used by people, provide safety) than the trouble they're worth (bloated option listings, maintenance cost). Of course this isn't something we can measure, so it's up to the module author to make a reasonable decision, but some general suggestions are given in the next section. As more such options are deemed valuable they can be added to the module over time as well.
 
 ### Valuable options
 
@@ -187,12 +185,13 @@ The second part of this RFC aims to encourage people to write better NixOS modul
 | Mandatory user-specific values | Reminds the user that they have to set this in order for the program to work, an evaluation error will catch a missing value early | [`services.hydra.hydraURL`](https://nixos.org/nixos/manual/options.html#opt-services.hydra.hydraURL), [`services.davmail.url`](https://nixos.org/nixos/manual/options.html#opt-services.davmail.url) | |
 | Sensitive data, passwords | To avoid those ending in the Nix store, ideally an option like `passwordFile` should replace a password placeholder in the configuration file at runtime | | This is specifically about configuration files that have a `password`-like setting |
 
+This should be described in the NixOS manual.
+
 ## Backwards compatibility with existing modules
 
 This RFC has to be thought of as a basis for *new* modules first and foremost. By using this approach we can provide a good basis for a new module, with great flexibility for future changes.
 
 A lot of already existing NixOS modules provide a mix of options for single settings and `extraConfig`-style options, which as explained in the [Motivation](#motivation) section leads to problems. In general it is not easy or even impossible to convert such a module to the style described in this RFC in a backwards-compatible way without any workarounds. One workaround is to add an option `useLegacyConfig` or `declarative` which determines the modules behavior in regards to old options.
-
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -204,7 +203,7 @@ There are some disadvantages to this approach:
 # Alternatives
 [alternatives]: #alternatives
 
-See [Motivation](#motivation)
+The trivial alternative of not doing that, see [Motivation](#motivation)
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
