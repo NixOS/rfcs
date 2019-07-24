@@ -38,6 +38,8 @@ NixOS modules often use stringly-typed options like `extraConfig` to allow speci
 }
 ```
 
+See [here](#an-example) for an example for how a NixOS module will look like.
+
 ## Part 2: Balancing module option count
 [part2]: #part-2-balancing-module-option-count
 
