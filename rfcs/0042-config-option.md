@@ -15,10 +15,6 @@ Contents:
 - Future work
   - showing defaults in the manual
   - Command line options
-- Addendums
-  - Configuration checking
-  - Backwards compatibility
-  - configFile
 
 # Summary
 [summary]: #summary
@@ -99,12 +95,8 @@ Problem instances:
 - Because prometheus uses options to encode every possible setting, PR's like [#56017](https://github.com/NixOS/nixpkgs/pull/56017) are needed to allow users to set a part of the configuration that wasn't encoded yet.
 - Because strongswan-ctl uses options to encode its full configuration, changes like [#49197](https://github.com/NixOS/nixpkgs/pull/49197) are needed to update our options with upstream changes.
 
-These are only examples of where people *found* problems and fixed them. The number of modules that have outdated options and require maintenance is probably rather high.
+These are only examples of where people *found* problems and fixed them. The number of modules that have outdated options and require maintenance is probably much higher.
 
-## Previous discussions
-
-- https://github.com/NixOS/nixpkgs/pull/44923#issuecomment-412393196
-- https://github.com/NixOS/nixpkgs/pull/55957#issuecomment-464561483 -> https://github.com/NixOS/nixpkgs/pull/57716
 
 # Detailed design
 [design]: #detailed-design
@@ -208,11 +200,63 @@ TODO: Add table
 - Settings that are necessary for the module to work and are different for every user, so they can't have a default. Examples are `services.dd-agent.api_key`, `services.davmail.url` or `services.hydra.hydraURL`. Having a separate option for these settings can give a much better error message when you don't set them (instead of failing at runtime or having to encode the requirement in an assertion) and better discoverability.
 - Password settings: Some program's configuration files require passwords in them directly. Since we try to avoid having passwords in the Nix store, it is advisable to provide a `passwordFile` option as well, which would replace a placeholder password in the configuration file at runtime.
 
-### Configuration checking
+
+## Backwards compatibility with existing modules
+
+This RFC has to be thought of as a basis for *new* modules first and foremost. By using this approach we can provide a good basis for a new module, with great flexibility for future changes.
+
+A lot of already existing NixOS modules provide a mix of options for single settings and `extraConfig`-style options, which as explained in the [Motivation](#motivation) section leads to problems. In general it is not easy or even impossible to convert such a module to the style described in this RFC in a backwards-compatible way without any workarounds. One workaround is to add an option `useLegacyConfig` or `declarative` which determines the modules behavior in regards to old options.
+
+
+# Drawbacks
+[drawbacks]: #drawbacks
+
+There are some disadvantages to this approach:
+- If there is no configuration checking tool as explained in [this section](#configuration-checking-tools), the types of configuration settings can't be checked as easily, which can lead to packages failing at runtime instead of evaluation time. Refer to [Configuration checking](#configuration-checking) for more info.
+- Documentation for the configuration settings will not be available in the central NixOS manual, instead the upstream documentation has to be used, which can be unfamiliar and harder to read. As a compromise, [additional NixOS options](#additional-config-options) can be used to bring part of the settings back into the NixOS documentation.
+
+# Alternatives
+[alternatives]: #alternatives
+
+See [Motivation](#motivation)
+
+# Unresolved questions
+[unresolved]: #unresolved-questions
+
+Ctrl-F for TODO
+
+# Future work
+[future]: #future-work
+
+## Documentation defaults
+When defaults for NixOS options are set *outside* the options definition such as `config.services.foo.settings.log_level = lib.mkDefault "WARN"` above, it's currently not possible to see these default values in the manual. This could be improved by having the manual not only look at the option definitions `default` attribute for determining the default, but also evaluate the options values with a minimal configuration to get the actual default value. This might be pretty hard to achieve, because oftentimes those defaults are only even assigned if `cfg.enable = true` which won't be the case for a minimal configuration. The real solution might be to specify defaults even when the module is disabled, but this would need a rewrite of almost every module, which is impractical.
+
+## Command line interfaces
+Sometimes programs use command arguments for configuration. While in general there's no trivial way to convert a NixOS value to those, most command line interfaces can be described as having arguments, options and flags, which could be mapped to from Nix values as follows (showing a `nix-build` invocation):
+
+```nix
+{
+  arguments = [ "nixos/release.nix" ]; # nixos/release.nix
+  options.attr = "tests.nginx.x86_64-linux"; # --attr tests.nginx.x86_64-linux
+  flags.pure-eval = true # --pure-eval
+  flags.v = 3; # -vvv
+}
+```
+
+By using such an encoding, it would be possible to get all the benefits of a `settings` option. However this encoding isn't entirely obvious, so this should be thought about more.
+
+# Addendums
+
+## Unsuitable configuration formats
+[unsuitable]: #unsuitable-configuration-formats
+
+For unsuitable formats it is left up to the module author to decide the best set of NixOS options. Sometimes it might make sense to have both a specialized set of options for single settings (e.g. `programs.bash.environment`) and a flexible option of type `types.lines` (such as `programs.bash.promptInit`). Alternatively it might be reasonable to only provide a `config`/`configFile` option of type `types.str`/`types.path`, such as for XMonad's Haskell configuration file. And for programs that use a general purpose language even though their configuration can be represented in key-value style (such as [Roundcube's PHP configuration](https://github.com/NixOS/nixpkgs/blob/e03966a60f517700f5fee5182a5a798f8d0709df/nixos/modules/services/mail/roundcube.nix#L86-L93) of the form `$config['key'] = 'value';`), a `config` option as described in this RFC could be used as well as a `configFile` option for more flexibility if needed.
+
+## Configuration checking
 
 One downside of using `settings` instead of having a dedicated NixOS option is that values can't be checked to have the correct key and type at evaluation time. Instead the default mode of operation will be to fail at runtime when the program reads the configuration. There are ways this can be improved however.
 
-#### Configuration checking tools
+### Configuration checking tools
 
 Occasionally programs have tools for checking their configuration without the need to start the program itself. We can use this to verify the configuration at build time by running the tool during a derivation build. These tools are generally more thorough than the module system and can integrate tightly with the program itself, which can greatly improve user experience. A good side effect of this approach is that less RAM is needed for evaluation. The following illustrates an example of how this might look like:
 
@@ -271,7 +315,7 @@ While not as good as a configuration checker tool, assertions can be used to add
 
 TODO: Are there any good examples of using assertions for configuration checks at all?
 
-### Backwards compatibility for configuration settings
+## Backwards compatibility for configuration settings
 
 By shifting values from a specific NixOS option to the general `settings` one, guarding against upstream changes will have to be done differently. Due to the structural nature of `settings` options, it's possible to deeply inspect and rewrite them however needed before converting them to a string. If the need arises, convenience library functions can be written for such transformations. This might look as follows:
 
@@ -299,43 +343,6 @@ in {
 }
 ```
 
-## Backwards compatibility with existing modules
-
-This RFC has to be thought of as a basis for *new* modules first and foremost. By using this approach we can provide a good basis for a new module, with great flexibility for future changes.
-
-A lot of already existing NixOS modules provide a mix of options for single settings and `extraConfig`-style options, which as explained in the [Motivation](#motivation) section leads to problems. In general it is not easy or even impossible to convert such a module to the style described in this RFC in a backwards-compatible way without any workarounds. One workaround is to add an option `useLegacyConfig` or `declarative` which determines the modules behavior in regards to old options.
-
-
-# Drawbacks
-[drawbacks]: #drawbacks
-
-There are some disadvantages to this approach:
-- If there is no configuration checking tool as explained in [this section](#configuration-checking-tools), the types of configuration settings can't be checked as easily, which can lead to packages failing at runtime instead of evaluation time. Refer to [Configuration checking](#configuration-checking) for more info.
-- Documentation for the configuration settings will not be available in the central NixOS manual, instead the upstream documentation has to be used, which can be unfamiliar and harder to read. As a compromise, [additional NixOS options](#additional-config-options) can be used to bring part of the settings back into the NixOS documentation.
-
-# Alternatives
-[alternatives]: #alternatives
-
-See [Motivation](#motivation)
-
-# Unresolved questions
-[unresolved]: #unresolved-questions
-
-Ctrl-F for TODO
-
-# Future work
-[future]: #future-work
-
-- When defaults for NixOS options are set *outside* the options definition such as `config.services.foo.config.logLevel = "DEBUG"` above, it's currently not possible to see these default values in the manual. This could be improved by having the manual not only look at the option definitions `default` attribute for determining the default, but also evaluate the options value with a minimal configuration to get the actual default value. This might be non-trivial.
-- If needed, add config transformation functions for keeping backwards compatibility with upstream changes. See [Backwards compatibility for configuration settings](#backwards-compatibility-for-configuration-settings)
-
-# Addendums
-
-## Unsuitable configuration formats
-[unsuitable]: #unsuitable-configuration-formats
-
-For unsuitable formats it is left up to the module author to decide the best set of NixOS options. Sometimes it might make sense to have both a specialized set of options for single settings (e.g. `programs.bash.environment`) and a flexible option of type `types.lines` (such as `programs.bash.promptInit`). Alternatively it might be reasonable to only provide a `config`/`configFile` option of type `types.str`/`types.path`, such as for XMonad's Haskell configuration file. And for programs that use a general purpose language even though their configuration can be represented in key-value style (such as [Roundcube's PHP configuration](https://github.com/NixOS/nixpkgs/blob/e03966a60f517700f5fee5182a5a798f8d0709df/nixos/modules/services/mail/roundcube.nix#L86-L93) of the form `$config['key'] = 'value';`), a `config` option as described in this RFC could be used as well as a `configFile` option for more flexibility if needed.
-
 ## Previous implementations
 
 This idea has been implemented already in some places:
@@ -343,3 +350,8 @@ This idea has been implemented already in some places:
 - [#52096](https://github.com/NixOS/nixpkgs/pull/52096)
 - [My Murmur module](https://github.com/Infinisil/system/blob/45c3ea36651a2f4328c8a7474148f1c5ecb18e0a/config/new-modules/murmur.nix)
 - [#55413](https://github.com/NixOS/nixpkgs/pull/55413)
+
+## Previous discussions
+
+- https://github.com/NixOS/nixpkgs/pull/44923#issuecomment-412393196
+- https://github.com/NixOS/nixpkgs/pull/55957#issuecomment-464561483 -> https://github.com/NixOS/nixpkgs/pull/57716
