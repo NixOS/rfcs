@@ -6,20 +6,8 @@ co-authors: (find a buddy later to help our with the RFC)
 related-issues: (will contain links to implementation PRs)
 ---
 
-Contents:
-- Implementation
-  - Part 1: Adding formatters, types (mention how types.attrs doesn't work correctly) and docs
-    - Defaults
-  - Part 2: Adding docs for encouraging most important options
-- Limitations
-- Future work
-  - showing defaults in the manual
-  - Command line options
-
 # Summary
 [summary]: #summary
-
-The RFC consists of two parts which flow hand-in-hand
 
 ## Part 1: Structural `settings` instead of stringly `extraConfig`
 [part1]: #part-1-structural-settings-instead-of-stringly-extraconfig
