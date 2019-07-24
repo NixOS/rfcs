@@ -28,7 +28,7 @@ The RFC consists of two parts which flow hand-in-hand
 ## Part 1: Structural `settings` instead of stringly `extraConfig`
 [part1]: #part-1-structural-settings-instead-of-stringly-extraconfig
 
-NixOS modules often use stringly-typed options like `extraConfig` to allow specifying extra settings in addition to the default ones. This has multiple disadvantages: The defaults can't be changed, multiple values might not get merged properly, inspection of it is almost impossible because it's an opaque string and more. The first part of this RFC aims to solve such problems by discouraging such options and instead to use a `settings` option which encodes the modules configuration file as a structural generic Nix value. Here is an example showcasing some advantages:
+NixOS modules often use stringly-typed options like `extraConfig` to allow specifying extra settings in addition to the default ones. This has multiple disadvantages: The defaults can't be changed, multiple values might not get merged properly, inspection of it is almost impossible because it's an opaque string and more. The first part of this RFC aims to discourage such options and proposes generic `settings` options instead, which can encode the modules configuration file as a structural Nix value. Here is an example showcasing some advantages:
 
 ```nix
 {
@@ -42,7 +42,7 @@ NixOS modules often use stringly-typed options like `extraConfig` to allow speci
 
     enable-ipv6 = 0
     ${optionalString isServer "check-interval = 3600"}
-  };
+  '';
   
   # New way
   services.foo.settings = {
