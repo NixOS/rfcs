@@ -7,8 +7,6 @@ related-issues: (will contain links to implementation PRs)
 ---
 
 Contents:
-- Mention part 1 (not using stringly typed extraConfig), mention the problems with stringly typed options
-- Mention part 2 (encouraging most important options, high-quality, more advanced users can use config, options can't be removed, etc.). Mention the problems with many options. Show examples of maintenance PR's that were needed because of this, e.g. i2pc, prometheus
 - Implementation
   - Part 1: Adding formatters, types (mention how types.attrs doesn't work correctly) and docs
     - Defaults
@@ -81,6 +79,7 @@ Stringly-typed options such as `extraConfig` have multiple disadvantages in comp
 NixOS modules with dozens of options aren't optimal for these reasons:
 - Writing takes a lot of time and is a repetitive task of copying the settings from upstream
 - Reviewing is tedious because of the big size of it, which in turn demotivates reviewers to even do it
+- The option listing will be filled with a lot of options almost nobody ever needs, which in turn makes it hard for people to find the options they *do* need.
 - Maintenance is hard to keep up with because upstream can add/remove/change settings over time
   - If the module copied defaults from upstream, these might need to be updated. This is especially important for security. A workaround is using `types.nullOr` with `null` signifying that the upstream default should be used, but that's not very nice.
   - Documentation will get out of date as the package updates
@@ -88,6 +87,12 @@ NixOS modules with dozens of options aren't optimal for these reasons:
 - With overlays or `disabledModules`, the user can bring the NixOS module out of sync with the package in nixpkgs, which can lead to the same problems as in the previous point.
 - The bigger the module, the more likely it contains bugs
 - Responsibility for backwards compatibility is now not only in upstream, but also on our side.
+- Making a module with many options is a one-way ticket, because options can't really be removed again. Smaller modules however can always scale up to more needs with more options.
+
+By not doing the tedious work of writing out dozens of options, module authors also have more time to do more meaningful work such as
+- Writing a NixOS test
+- Writing documentation
+- Implementing high-level options that tie different NixOS modules together in non-trivial ways (e.g. `enableACME`)
 
 Problem instances:
 - The [i2pd module](https://github.com/NixOS/nixpkgs/blob/2a669d3ee1308c7fd73f15beb35c0456ff9202bc/nixos/modules/services/networking/i2pd.nix) has a long [history](https://github.com/NixOS/nixpkgs/commits/2a669d3ee1308c7fd73f15beb35c0456ff9202bc/nixos/modules/services/networking/i2pd.nix) of option additions due to upstream updates, bug fixes and documentation changes
@@ -106,19 +111,15 @@ These are only examples of where people *found* problems and fixed them. The num
 
 ## [Part 1][part1]
 
+### Additions to the NixOS documentation
+
+#### Writing options for program configuration
+
+TODO: Write this section, followed by another section on `configFile`
+
 Whether having a structural `settings` option for a module makes sense depends on whether the program's configuration format has a direct mapping from Nix. This includes formats like JSON, YAML, INI and similar. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", then the answer is probably No, and you should not use this approach. This RFC does not specify anything for unsuitable configuration formats, but there is [an addendum on that][unsuitable].
 
-### Configuration format types
-
-In order for a structural `settings` to enforce a valid value and work correctly with merging and priorities, it needs to have a type that corresponds to its configuration format, `types.attrs` won't do. As an example, the INI type could be represented with `attrsOf (attrsOf (nullOr (either int str)))`, which means there's multiple named sections, each of which can contain a key-value pair where the value is either `null`, an integer or a string, where `null` signifies a key not being present (which is useful for unsetting existing values).
-
-Common format types will be provided under `lib.types.settings`. This could include JSON, YAML, INI, a simple `key=value` format and a recursive `key.subkey.subsubkey=value` format for a start. Sometimes programs have their own configuration formats which are specific to them, in which case the type should be specified in that programs module directly instead of going in `lib.types.settings`.
-
-### Configuration format writers
-
-In order for the final value of `settings` to be turned into a string, a set of configuration format writers should be provided under `lib.settings`. These should ideally make sure that the resulting text is somewhat properly formatted with readable indentation. Things like `builtins.toJSON` are therefore not optimal as it doesn't add any spacing for readability. These writers will have to include ones for all of the above-mentioned configuration types. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
-
-### Default values
+#### Default values
 
 Ideally modules should work by just setting `enable = true`. Often this requires the configuration to include some default settings. Defaults should get specified in the `config` section of the module by assigning the values to the `settings` option directly. Depending on how default settings matter, we need to set them differently and for different reasons:
 - If the program needs a setting to be present in the configuration file because otherwise it would fail at runtime and demand a value, the module should set this value with a `mkDefault` to the default upstream value, which will then be the equivalent of a starter configuration file. This allows users to easily change the value, but also enables a smooth first use of the module without having to manually set such defaults to get it to a working state. Note that this doesn't necessarily require the module to be updated when upstream defaults change, because that's the expected behavior with starter configurations.
@@ -129,15 +130,11 @@ If the above points don't apply to a configuration setting, that is the module d
 
 TODO: Nice table for default kind / how to set it / whether it needs to track upstream / examples
 
-### Additional options for single settings
+#### Additional options for single settings
 
 One can easily add additional options that correspond to single configuration settings. This is done by defining an option as usual, then applying it to `settings` with a `mkDefault`. This approach allows users to set the value either through the specialized option, or `settings`, which also means that new options can be added without any worry for backwards incompatibility.
 
-### Documentation
-
-The nixpkgs manual should be updated to explain this way of doing program configuration.
-
-### An example
+#### An example
 
 Putting it all together, here is an example of a NixOS module that uses such an approach:
 
@@ -187,63 +184,85 @@ in {
 }
 ```
 
+### Configuration format types
+
+In order for a structural `settings` to enforce a valid value and work correctly with merging and priorities, it needs to have a type that corresponds to its configuration format, `types.attrs` won't do. As an example, the INI type could be represented with `attrsOf (attrsOf (nullOr (either int str)))`, which means there's multiple named sections, each of which can contain a key-value pair where the value is either `null`, an integer or a string, where `null` signifies a key not being present (which is useful for unsetting existing values).
+
+Common format types will be provided under `lib.types.settings`. This could include JSON, YAML, INI, a simple `key=value` format and a recursive `key.subkey.subsubkey=value` format for a start. Sometimes programs have their own configuration formats which are specific to them, in which case the type should be specified in that programs module directly instead of going in `lib.types.settings`.
+
+### Configuration format writers
+
+In order for the final value of `settings` to be turned into a string, a set of configuration format writers should be provided under `lib.settings`. These should ideally make sure that the resulting text is somewhat properly formatted with readable indentation. Things like `builtins.toJSON` are therefore not optimal as it doesn't add any spacing for readability. These writers will have to include ones for all of the above-mentioned configuration types. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
+
 ## [Part 2][part2]
 
-For multiple reasons, one may wish to still have additional options available for configuration settings:
-- Popular or main settings. Because such `config` options will have to refer to upstream documentation for all available settings, it's much harder for new module users to figure out how they can configure it. Having popular/main settings as NixOS options is a good compromise. It is up to the module author to decide which options qualify for this.
+TODO: write what goes in the NixOS docs
+
+The second part of this RFC aims to encourage people to write better NixOS modules in terms of quality, maintainability and discoverability by limiting NixOS options representing single settings to a set of most "valuable" options. Of course in general "valuable" doesn't have a clear definition, so it's up to the module author and other people familiar with the program to decide on it, but in the following section some conventions will be given. As more such options are deemed "valuable" they can be added to the module over time.
+
+### Valuable options
+
+TODO: Add table
+
+- Popular or main settings. Because such `settings` options will have to refer to upstream documentation for all available settings, it's much harder for new module users to figure out how they can configure it. Having popular/main settings as NixOS options is therefore a good idea
 - Settings that are necessary for the module to work and are different for every user, so they can't have a default. Examples are `services.dd-agent.api_key`, `services.davmail.url` or `services.hydra.hydraURL`. Having a separate option for these settings can give a much better error message when you don't set them (instead of failing at runtime or having to encode the requirement in an assertion) and better discoverability.
 - Password settings: Some program's configuration files require passwords in them directly. Since we try to avoid having passwords in the Nix store, it is advisable to provide a `passwordFile` option as well, which would replace a placeholder password in the configuration file at runtime.
 
-Keep in mind that while it's trivial to add new options with the approach in this RFC, removing them again is hard (even without this RFC). So instead of introducing a lot of additional options when the module gets written, authors should try to keep the initial number low, to not introduce options almost nobody will end up using. Every additional option might be nice to use, but increases coupling to upstream, burden on nixpkgs maintainers and bug potential. Thus we should strive towards a balance between too little and too many options, between "I have no idea how to use this module because it provides too little options" and "This module has become too problematic due to its size". And because this balance can only be approached from below (we can only add options, not remove them), additional options should be used conservatively from the start.
+### Configuration checking
 
-## Configuration checking
+One downside of using `settings` instead of having a dedicated NixOS option is that values can't be checked to have the correct key and type at evaluation time. Instead the default mode of operation will be to fail at runtime when the program reads the configuration. There are ways this can be improved however.
 
-One general downside of this approach is that the module system is not able to check the types and values of the configuration file, which could be fast, simple and give good error messages by default. While it would be possible to use `types.addCheck` for the type of the `config` option, this sounds more painful than it's worth and would lead to bad error messages, so we'll ignore this here. Here are some alternatives.
+#### Configuration checking tools
 
-### Configuration checking tools
+Occasionally programs have tools for checking their configuration without the need to start the program itself. We can use this to verify the configuration at build time by running the tool during a derivation build. These tools are generally more thorough than the module system and can integrate tightly with the program itself, which can greatly improve user experience. A good side effect of this approach is that less RAM is needed for evaluation. The following illustrates an example of how this might look like:
 
-Occasionally programs have tools for checking their configuration without the need to start the program itself. We can use this to verify the configuration at **build time** by running the tool for a derivation build. While this is not as fast as if we had the module system do these checks, which would be at evaluation time already, it is better than the program failing at runtime due to misconfiguration. These tools however are also more powerful than the module system and can integrate tightly with the program itself, allowing for more thorough checks. In addition, it reduces the amount of RAM needed for evaluation. If a configuration checking tool is available, optimally by the program itself, it should be used if possible, as it can greatly improve user experience. The following illustrates an example of how this might look like
-
+TODO: Rewrite in terms of `configFile`
 ```nix
-{ config, pkgs, lib, ... }: with lib;
-
+{ config, lib, pkgs, ... }:
 let
-
-  configText = configGen.json cfg.config;
-
-  configFile = pkgs.runCommand "foo-config.json" {
-    # Because this program will be run at build time, we need `nativeBuildInputs` instead of `buildInputs`
-    nativeBuildInputs = [ pkgs.foo ];
-
-    inherit configText;
-    passAsFile = [ "configText" ];
+  cfg = config.services.foo;
+  
+  checkedConfig = pkgs.runCommandNoCC "foo-config.json" {
+    # Because this program will be run at build time, we need `nativeBuildInputs`
+    nativeBuildInputs = [ pkgs.foo-checker ];
+    
+    config = lib.settings.genJSON cfg.settings;
+    passAsFile = [ "config" ];
   } ''
-    foo check-config $configTextPath
-    cp $configTextPath $out
+    foo-checker "$configPath"
+    cp "$configPath" "$out"
   '';
 
-in { /* ... */ }
+in {
+  options = { /* ... */ };
+  config = lib.mkIf cfg.enable {
+  
+    environment.etc."foo/config.json".source = checkedConfig;
+    
+    # ...
+  };
+}
 ```
 
 TODO: Explain how `options.services.foo.config.files` can be used to give a better indication of where a failure occurs.
 
 ### Ad-hoc checks with assertions
 
-While not as optimal as a configuration checker tool, assertions can be used to add flexible ad-hoc checks for type or other properties at **evaluation time**. It should only be used to ensure important properties that break the service in ways that are otherwise hard or slow to detect (and easy to detect for the module system), not for things that make the service fail to start anyways (unless there's a good reason for it). The following example only demonstrates how assertions can be used for checks, but any reasonable program should bail out early in such cases, which would make these assertions redundant, and only add more coupling to upstream, which we're trying to avoid.
+While not as good as a configuration checker tool, assertions can be used to add flexible ad-hoc checks for type or other properties at evaluation time. It should only be used to ensure important properties that break the service in ways that are otherwise hard or slow to detect (and easy to detect for the module system), not for things that make the service fail to start anyways (unless there's a good reason for it). The following example only demonstrates how assertions can be used for checks, but any reasonable program should bail out early in such cases, which would make these assertions redundant, and only add more coupling to upstream, which we're trying to avoid in the first place.
 
 ```nix
-{ config, lib, ... }: with lib; {
+{ config, lib, ... }: {
   # ...
-  config = mkIf cfg.enable {
+  config = lib.mkIf cfg.enable {
     # Examples only for demonstration purposes, don't actually add assertions for such properties
     assertions = [
       {
-        assertion = cfg.config.enableLogging or true -> cfg.config ? logLevel;
-        message = "You also need to set `services.foo.config.logLevel` if `services.foo.config.enableLogging` is turned on.";
+        assertion = cfg.settings.enableLogging or true -> cfg.settings ? logLevel;
+        message = "You also need to set `services.foo.settings.logLevel` if `services.foo.settings.enableLogging` is turned on.";
       }
       {
-        assertion = cfg.config ? port -> types.port.check cfg.config.port;
-        message = "${toString cfg.config.port} is not a valid port number for `services.foo.config.port`.";
+        assertion = cfg.settings ? port -> lib.types.port.check cfg.settings.port;
+        message = "${toString cfg.settings.port} is not a valid port number for `services.foo.settings.port`.";
       }
     ];
   };
@@ -252,49 +271,40 @@ While not as optimal as a configuration checker tool, assertions can be used to 
 
 TODO: Are there any good examples of using assertions for configuration checks at all?
 
-## Backwards compatibility for configuration settings
+### Backwards compatibility for configuration settings
 
-By having a single option instead of many, we by default keep responsibility for backwards compatibility in upstream. This however also means that if upstream breaks backwards compatibility, instead of the NixOS module fixing it up, the user would have to do it themselves by adjusting their NixOS configuration. However, because such `config` options allow deep introspection into their values, it is possible to provide backwards compatibility in the module itself. This is possible by not using `config` directly to write the configuration file, but instead transforming it first, adjusting everything that's needed. For a simple `key = value` type configuration format, this could look as follows (TODO: Verify that this code works):
+By shifting values from a specific NixOS option to the general `settings` one, guarding against upstream changes will have to be done differently. Due to the structural nature of `settings` options, it's possible to deeply inspect and rewrite them however needed before converting them to a string. If the need arises, convenience library functions can be written for such transformations. This might look as follows:
 
 ```nix
-{ config, lib, ... }: with lib;
+{ config, lib, ... }:
 let
   cfg = config.services.foo;
-
-  fixedUpConfig = let
-    renamedKeys = {
-      # foo has been renamed to bar
-      foo = "bar";
-    };
-    in
-      # Remove all renamed keys
-      removeAttrs cfg.config (attrNames renamedKeys) //
-      # Readd all renamed keys with their new name
-      mapAttrs' (name: value:
-        nameValuePair value cfg.config.${name}
-      ) (intersectAttrs cfg.config renamedKeys);
-in
-  # ...
+  
+  fixedUpSettings =
+    let
+      renamedKeys = builtins.intersectAttrs cfg.settings {
+        # foo has been renamed to bar
+        foo = "bar";
+      };
+      conflicts = lib.filter (from: cfg.settings ? ${renamedKeys.${from}}) (lib.attrNames renamedKeys);
+    in if conflicts == [] then lib.mapAttrs' (from: to:
+      lib.nameValuePair to cfg.settings.${from}
+    ) renamedKeys // builtins.removeAttrs cfg.settings (lib.attrNames renamedKeys)
+    else throw (lib.concatMapStringsSep "," (from:
+      "Can't mix the deprecated setting \"${from}\" with its replacement \"${renamedKeys.${from}}\""
+    ) conflicts);
+  
+in {
+  config.environment.etc."foo/config.json".text = lib.settings.genJSON fixedUpsettings;
+}
 ```
 
-If this is needed in the future, we may add a set of config deprecation fix-up functions for general use in modules.
-
-
-## Limitations
-
-
-### Backwards compatibility with existing modules
+## Backwards compatibility with existing modules
 
 This RFC has to be thought of as a basis for *new* modules first and foremost. By using this approach we can provide a good basis for a new module, with great flexibility for future changes.
 
 A lot of already existing NixOS modules provide a mix of options for single settings and `extraConfig`-style options, which as explained in the [Motivation](#motivation) section leads to problems. In general it is not easy or even impossible to convert such a module to the style described in this RFC in a backwards-compatible way without any workarounds. One workaround is to add an option `useLegacyConfig` or `declarative` which determines the modules behavior in regards to old options.
 
-## Addendums
-
-### Unsuitable configuration formats
-[unsuitable]: #unsuitable-configuration-formats
-
-For unsuitable formats it is left up to the module author to decide the best set of NixOS options. Sometimes it might make sense to have both a specialized set of options for single settings (e.g. `programs.bash.environment`) and a flexible option of type `types.lines` (such as `programs.bash.promptInit`). Alternatively it might be reasonable to only provide a `config`/`configFile` option of type `types.str`/`types.path`, such as for XMonad's Haskell configuration file. And for programs that use a general purpose language even though their configuration can be represented in key-value style (such as [Roundcube's PHP configuration](https://github.com/NixOS/nixpkgs/blob/e03966a60f517700f5fee5182a5a798f8d0709df/nixos/modules/services/mail/roundcube.nix#L86-L93) of the form `$config['key'] = 'value';`), a `config` option as described in this RFC could be used as well as a `configFile` option for more flexibility if needed.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -319,30 +329,14 @@ Ctrl-F for TODO
 - When defaults for NixOS options are set *outside* the options definition such as `config.services.foo.config.logLevel = "DEBUG"` above, it's currently not possible to see these default values in the manual. This could be improved by having the manual not only look at the option definitions `default` attribute for determining the default, but also evaluate the options value with a minimal configuration to get the actual default value. This might be non-trivial.
 - If needed, add config transformation functions for keeping backwards compatibility with upstream changes. See [Backwards compatibility for configuration settings](#backwards-compatibility-for-configuration-settings)
 
+# Addendums
 
-# Arguments for Part 2
+## Unsuitable configuration formats
+[unsuitable]: #unsuitable-configuration-formats
 
-- We currently have a lot of NixOS modules with a lot of options. We can't really get rid of them to simplify the module. Removing/deprecating options would annoy users and give the feeling off that functionality is reduced.
-- In comparison if the module is small to start with, we can easily add more options as needed. This gives off the idea that new functionality is added.
+For unsuitable formats it is left up to the module author to decide the best set of NixOS options. Sometimes it might make sense to have both a specialized set of options for single settings (e.g. `programs.bash.environment`) and a flexible option of type `types.lines` (such as `programs.bash.promptInit`). Alternatively it might be reasonable to only provide a `config`/`configFile` option of type `types.str`/`types.path`, such as for XMonad's Haskell configuration file. And for programs that use a general purpose language even though their configuration can be represented in key-value style (such as [Roundcube's PHP configuration](https://github.com/NixOS/nixpkgs/blob/e03966a60f517700f5fee5182a5a798f8d0709df/nixos/modules/services/mail/roundcube.nix#L86-L93) of the form `$config['key'] = 'value';`), a `config` option as described in this RFC could be used as well as a `configFile` option for more flexibility if needed.
 
-
-
-
-- Typed config instead of stringly-typed
-
-# The option count scale
-
-- config option only: Very simple module, easy to maintain, but very little documentation in the NixOS manual, almost everything is a runtime error
-- Every program setting as an option: Very big module, hard to maintain, but everything is neatly documented and eval errors for a lot of things
-
-Somewhere in-between is the sweet spot, where the module has the necessary options to be useful for most people, but where it's still reviewable and maintainable.
-
-This sweet-spot is only approachable from below, because once you add an option, you can't really remove it without users being annoyed that it broke their setup or people feeling they get robbed of functionality.
-
-
-
-
-### Previous implementations
+## Previous implementations
 
 This idea has been implemented already in some places:
 - [#45470](https://github.com/NixOS/nixpkgs/pull/45470)
