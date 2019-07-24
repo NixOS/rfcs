@@ -101,14 +101,13 @@ Whether having a structural `settings` option for a module makes sense depends o
 
 #### Default values
 
-Ideally modules should work by just setting `enable = true`. Often this requires the configuration to include some default settings. Defaults should get specified in the `config` section of the module by assigning the values to the `settings` option directly. Depending on how default settings matter, we need to set them differently and for different reasons:
-- If the program needs a setting to be present in the configuration file because otherwise it would fail at runtime and demand a value, the module should set this value with a `mkDefault` to the default upstream value, which will then be the equivalent of a starter configuration file. This allows users to easily change the value, but also enables a smooth first use of the module without having to manually set such defaults to get it to a working state. Note that this doesn't necessarily require the module to be updated when upstream defaults change, because that's the expected behavior with starter configurations.
-- If the module needs a specific value for a setting because of how the module or NixOS works (e.g. `logger = "systemd"`, because NixOS uses `systemd` for logging), then the value should *not* use `mkDefault`. This way a user can't easily override this setting (which would break the module in some way) and will have to use `mkForce` instead to change it. This also indicates that they are leaving supported territory, and will probably have to change something else to make it work again (e.g. if they set `logger = mkForce "/var/log/foo"` they'll have to change their workflow of where to look for logs).
-- If the module itself needs to know the value of a configuration setting at evaluation time in order to influence other options (e.g. opening the firewall for a services port), we may set upstream's default with a `mkDefault`, even though the program might start just fine without it. This allows the module to use the configuration setting directly without having to worry whether it is set at all at evaluation time.
+Ideally modules should work by just setting `enable = true`, which often means setting some defaults. They should get specified in the `config` section of the module by assigning the values to the `settings` option directly. Depending on how default settings matter, we need to set them differently and for different reasons:
 
-If the above points don't apply to a configuration setting, that is the module doesn't care about the value, the program doesn't care about the setting being present and we don't need the value at evaluation time, there should be no need to specify any default value.
-
-TODO: Nice table for default kind / how to set it / whether it needs to track upstream / examples
+| Reason | How to assign | Needs to track upstream | Examples | Note |
+| --- | --- | --- | --- | --- |
+| Program would fail otherwise | `mkDefault` | No | `bootstrap_ip = "172.22.68.74"` | Equivalent to a starter configuration |
+| Needed for the module to work, NixOS specifics | **Without** `mkDefault` | No | `logger = "systemd"` `data_dir = "/var/lib/foo"` | Requires the user to use `mkForce` for overriding this, hinting that they leave supported territory |
+| Module needs value to influence other options | `mkDefault` | Yes | `port = 456` (influences `allowedTCPPorts`) | |
 
 #### Additional options for single settings
 
