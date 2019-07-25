@@ -200,9 +200,9 @@ A lot of already existing NixOS modules provide a mix of options for single sett
 # Drawbacks
 [drawbacks]: #drawbacks
 
-There are some disadvantages to this approach:
-- If there is no configuration checking tool as explained in [this section](#configuration-checking-tools), the types of configuration settings can't be checked as easily, which can lead to packages failing at runtime instead of evaluation time. Refer to [Configuration checking](#configuration-checking) for more info.
-- Documentation for the configuration settings will not be available in the central NixOS manual, instead the upstream documentation has to be used, which can be unfamiliar and harder to read. As a compromise, [additional NixOS options](#additional-config-options) can be used to bring part of the settings back into the NixOS documentation.
+For [Part 2][part2]:
+- The less encoded options there are, the less checks are happening at evaluation time, and by default this means more runtime failures for initial runs, which isn't as bad as it sounds. If available, [configuration checking tools](#configuration-checking-tools) can be used to have build-time failures instead, or alternatively [assertions][assertions] can be used to have additional evaluation-time checks.
+- Only options that are specified will appear in the central NixOS option listings. This means with fewer options there are, the more often upstream documentation is needed. Since the NixOS documentation might be very outdated and incomplete however, this can often be a good thing.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -211,8 +211,6 @@ The trivial alternative of not doing that, see [Motivation](#motivation)
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
-
-Ctrl-F for TODO
 
 # Future work
 [future]: #future-work
@@ -236,7 +234,22 @@ By using such an encoding, it would be possible to get all the benefits of a `se
 
 # Addendums
 
+## Previous implementations
+
+This idea has been implemented already in some places:
+- [#45470](https://github.com/NixOS/nixpkgs/pull/45470)
+- [#52096](https://github.com/NixOS/nixpkgs/pull/52096)
+- [My Murmur module](https://github.com/Infinisil/system/blob/45c3ea36651a2f4328c8a7474148f1c5ecb18e0a/config/new-modules/murmur.nix)
+- [#55413](https://github.com/NixOS/nixpkgs/pull/55413)
+
+## Previous discussions
+
+- https://github.com/NixOS/nixpkgs/pull/44923#issuecomment-412393196
+- https://github.com/NixOS/nixpkgs/pull/55957#issuecomment-464561483 -> https://github.com/NixOS/nixpkgs/pull/57716
+
 ## `configFile`
+
+TODO
 
 ## Unsuitable configuration formats
 [unsuitable]: #unsuitable-configuration-formats
@@ -245,11 +258,11 @@ For unsuitable formats it is left up to the module author to decide the best set
 
 ## Configuration checking
 
-One downside of using `settings` instead of having a dedicated NixOS option is that values can't be checked to have the correct key and type at evaluation time. Instead the default mode of operation will be to fail at runtime when the program reads the configuration. There are ways this can be improved however.
+One downside of using `settings` instead of having a dedicated NixOS option is that values can't easily be checked to have the correct key and type at evaluation time. Instead the default mode of operation will be to fail at runtime when the program reads the configuration initially. There are ways this can be improved however.
 
 ### Configuration checking tools
 
-Occasionally programs have tools for checking their configuration without the need to start the program itself. We can use this to verify the configuration at build time by running the tool during a derivation build. These tools are generally more thorough than the module system and can integrate tightly with the program itself, which can greatly improve user experience. A good side effect of this approach is that less RAM is needed for evaluation. The following illustrates an example of how this might look like:
+Sometimes programs have tools for checking their configuration without the need to start the program itself. We can use this to verify the configuration at build time by running the tool during a derivation build. These tools are generally more thorough than the module system and can integrate tightly with the program itself, which can greatly improve error reporting. A good side effect of this approach is that less RAM is needed for evaluation. The following illustrates an example of how this might look like:
 
 TODO: Rewrite in terms of `configFile`
 ```nix
@@ -282,6 +295,7 @@ in {
 TODO: Explain how `options.services.foo.config.files` can be used to give a better indication of where a failure occurs.
 
 ### Ad-hoc checks with assertions
+[assertions]: #ad-hoc-checks-with-assertions
 
 While not as good as a configuration checker tool, assertions can be used to add flexible ad-hoc checks for type or other properties at evaluation time. It should only be used to ensure important properties that break the service in ways that are otherwise hard or slow to detect (and easy to detect for the module system), not for things that make the service fail to start anyways (unless there's a good reason for it). The following example only demonstrates how assertions can be used for checks, but any reasonable program should bail out early in such cases, which would make these assertions redundant, and only add more coupling to upstream, which we're trying to avoid in the first place.
 
@@ -334,15 +348,3 @@ in {
 }
 ```
 
-## Previous implementations
-
-This idea has been implemented already in some places:
-- [#45470](https://github.com/NixOS/nixpkgs/pull/45470)
-- [#52096](https://github.com/NixOS/nixpkgs/pull/52096)
-- [My Murmur module](https://github.com/Infinisil/system/blob/45c3ea36651a2f4328c8a7474148f1c5ecb18e0a/config/new-modules/murmur.nix)
-- [#55413](https://github.com/NixOS/nixpkgs/pull/55413)
-
-## Previous discussions
-
-- https://github.com/NixOS/nixpkgs/pull/44923#issuecomment-412393196
-- https://github.com/NixOS/nixpkgs/pull/55957#issuecomment-464561483 -> https://github.com/NixOS/nixpkgs/pull/57716
