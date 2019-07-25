@@ -40,12 +40,16 @@ NixOS modules often use stringly-typed options like `extraConfig` to allow speci
 
 See [here](#an-example) for an example for how a NixOS module will look like.
 
+Jump to the [detailed design][part1-design] of part 1
+
 ## Part 2: Balancing module option count
 [part2]: #part-2-balancing-module-option-count
 
 Since with this approach there will be no more hardcoded defaults and composability is not a problem anymore, there is not a big need to have NixOS options for every setting anymore. Traditionally this has lead to huge modules with dozens of options, each of them only for a single field in the configuration. Such modules are problematic because they're hard to write, review and maintain, are generally of lower quality, fill the option listing with noise and more. Additional options aren't without advantages however: They are presented in the NixOS manual and can have better type checking than the equivalent with `settings`.
 
 The second part of this RFC aims to encourage module authors to strike a balance for the number of additional options such as to not make the module too big, but still provide the most commonly used settings as separate options. Quality is encouraged over quantity: Authors should spend more time on writing documentation, NixOS tests or useful high-level abstractions. This is in contrast to the fiddly labor of copying dozens of options from upstream to NixOS. With a `settings` option, it's also very easy to add additional options over time if the need arises. In contrast, removing options has always been nigh impossible.
+
+Jump to the [detailed design][part2-design] of part 2
 
 # Motivation
 [motivation]: #motivation
@@ -92,6 +96,7 @@ These are only examples of where people *found* problems and fixed them. The num
 [design]: #detailed-design
 
 ## [Part 1][part1]
+[part1-design]: #part-1-1
 
 ### Configuration format types
 
@@ -178,6 +183,7 @@ in {
 ```
 
 ## [Part 2][part2]
+[part2-design]: #part-2-1
 
 The second part of this RFC aims to encourage people to write better NixOS modules in terms of quality, maintainability and discoverability by limiting NixOS options representing single settings to a set of most "valuable" options. The general idea of valuable options is that they provide more value (used by people, provide safety) than the trouble they're worth (bloated option listings, maintenance cost). Of course this isn't something we can measure, so it's up to the module author to make a reasonable decision, but some general suggestions are given in the next section. As more such options are deemed valuable they can be added to the module over time as well.
 
