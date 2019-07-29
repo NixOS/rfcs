@@ -327,7 +327,7 @@ Currently the following types of flake references are supported:
       github:<owner>/<repo>(/<rev-or-ref>)?(\?<params>)?
 
   `<rev-or-ref>` specifies the name of a branch or tag (`ref`), or a
-  commit hash (`rev`). Note that unlike GitHub, Git allows fetching by
+  commit hash (`rev`). Note that unlike Git, GitHub allows fetching by
   commit hash without specifying a branch or tag.
 
   The only supported parameter is `dir` (see above).
