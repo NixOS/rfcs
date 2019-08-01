@@ -3,8 +3,8 @@ feature: flakes
 start-date: 2019-07-09
 author: Eelco Dolstra
 co-authors: TBD
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: Domen Kožar, Alyssa Ross, Shea Levy, John Ericson
+shepherd-leader: Domen Kožar
 related-issues: (will contain links to implementation PRs)
 ---
 
