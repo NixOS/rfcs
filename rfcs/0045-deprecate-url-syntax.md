@@ -4,7 +4,7 @@ start-date: 2019-04-28
 author: Michael Raskin
 co-authors: 
 shepherd-leader: Eelco Dolstra
-shepherd-team: Eelco Dolstra, Jonas Pfenniger, Silvan Mosberger
+shepherd-team: Eelco Dolstra, zimbatm, Silvan Mosberger
 related-issues: 
 ---
 
