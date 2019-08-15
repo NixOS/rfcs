@@ -3,6 +3,8 @@ feature: ret-cont-recursive-nix
 start-date: 2019-02-01
 author: John Ericson (@Ericson2314)
 co-authors: (find a buddy later to help our with the RFC)
+shepherd-leader: Franz Pletz
+shepherd-team: Franz Pletz, Eelco Dolstra, Shea Levy, Daniel Peebles
 related-issues: (will contain links to implementation PRs)
 ---
 
