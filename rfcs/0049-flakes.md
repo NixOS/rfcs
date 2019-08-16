@@ -520,36 +520,6 @@ mode, which means that the following are disallowed:
 
 Pure mode can be disabled by passing `--impure` on the command line.
 
-## Evaluation caching
-
-The fact that by default (i.e. in pure mode) evaluation is hermetic
-allows `nix` to cache flake attributes. For example (doing `nix build`
-on an already present package):
-
-    $ time nix build nixpkgs:firefox
-    real    0m1.497s
-
-    $ time nix build nixpkgs:firefox
-    real    0m0.052s
-
-The evaluation cache is kept in `~/.cache/nix/eval-cache-v1.sqlite`,
-which has entries like
-
-    INSERT INTO Attributes VALUES(
-      X'92a907d4efe933af2a46959b082cdff176aa5bfeb47a98fabd234809a67ab195',
-      'packages.firefox',
-      1,
-      '/nix/store/pbalzf8x19hckr8cwdv62rd6g0lqgc38-firefox-67.0.drv /nix/store/g6q0gx0v6xvdnizp8lrcw7c4gdkzana0-firefox-67.0 out');
-
-where the hash `92a9...` is a fingerprint over the flake store path
-and the contents of its lockfile. Because flakes are evaluated in pure
-mode, this uniquely identifies the evaluation result.
-
-Currently caching is only done for top-level attributes (e.g. for
-`packages.firefox` in the command above). In the future, we could also
-add other evaluated values to the cache (e.g. `packages.stdenv`) to
-speed up subsequent evaluations of other top-level attributes.
-
 ## Flake-related commands
 
 The command `nix flake` has various subcommands for managing
@@ -692,10 +662,6 @@ complex, possibly non-terminating program.
 
 * Automatically generate documentation from flakes. This partially
   depends on the previous item.
-
-* Evaluation caches could be shared in a binary-cache-like
-  mechanism. This might make the use of import-from-derivation in
-  Nixpkgs acceptable.
 
 # Acknowledgments
 
