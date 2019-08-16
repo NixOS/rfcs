@@ -628,8 +628,8 @@ complex, possibly non-terminating program.
 * How to handle the system type? Currently `x86_64-linux` is
   hard-coded everywhere.
 
-* How to do Nixpkgs overlays? In principle, overlays would just be a
-  kind of flake output.
+* What to do with Nixpkgs overlays? In principle, overlays would just
+  be a kind of flake output.
 
 * More in general, how to handle flake arguments? This must be done in
   a way that maintains hermetic evaluation and evaluation caching.
