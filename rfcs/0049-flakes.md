@@ -137,8 +137,6 @@ installable derivation) and a NixOS module.
 
 ```
 {
-  name = "dwarffs";
-
   edition = 201906;
 
   description = "A filesystem that fetches DWARF debug info from the Internet on demand";
@@ -190,10 +188,6 @@ A flake has the following attributes:
   parsed using a syntax determined by the edition. The only currently
   allowed value is `201906`. Nix rejects flakes with an unsupported
   edition.
-
-* `name`: An identifier for the flake, used to reference it from
-  `inputs`. (E.g. the `nixpkgs` in `inputs.nixpkgs` refers to the
-  identifier of the Nixpkgs flake.)
 
 * `description`: A short description of the flake.
 
