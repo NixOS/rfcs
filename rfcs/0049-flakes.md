@@ -278,11 +278,10 @@ Currently the following types of flake references are supported:
 
 * Git repositories. These have the form
 
-      (http|https|ssh|git|file):(//<server>)?<path>(\?<params>)?
+      git(+http|+https|+ssh|+git|+file|):(//<server>)?<path>(\?<params>)?
 
-  with the constraint that `<path>` must end with `.git` for
-  non-`file` repositories. `<params>` are a list of key/value pairs in
-  URI query parameter syntax. The following parameters are supported:
+  `<params>` are a list of key/value pairs in URI query parameter
+  syntax. The following parameters are supported:
 
   * `ref`: The branch or tag to fetch. The default is `master`.
   * `rev`: The Git commit hash to fetch. Note that this commit must be
@@ -296,11 +295,11 @@ Currently the following types of flake references are supported:
 
   For example, the following are valid Git flake references:
 
-  * `https://example.org/my/repo.git`
-  * `https://example.org/my/repo.git?dir=flake1`
-  * `ssh://git@github.com:NixOS/nix.git?ref=v1.2.3`
-  * `git://github.com/edolstra/dwarffs.git?ref=unstable&rev=e486d8d40e626a20e06d792db8cc5ac5aba9a5b4`
-  * `file:///home/my-user/some-repo/some-repo.git`
+  * `git+https://example.org/my/repo`
+  * `git+https://example.org/my/repo?dir=flake1`
+  * `git+ssh://git@github.com:NixOS/nix?ref=v1.2.3`
+  * `git://github.com/edolstra/dwarffs?ref=unstable&rev=e486d8d40e626a20e06d792db8cc5ac5aba9a5b4`
+  * `git+file:///home/my-user/some-repo/some-repo`
 
 * Local paths. These have the form
 
