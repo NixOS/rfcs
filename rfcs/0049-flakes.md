@@ -372,7 +372,7 @@ There are multiple registries:
   automatically fetches this registry periodically. The check interval
   is determined by the `tarball-ttl` option.
 
-* The local registry `~/.config/nix/registry.json`.
+* The local registry `$XDG_CONFIG_HOME/nix/registry.json`.
 
 * Registry entries specified on the command line.
 
