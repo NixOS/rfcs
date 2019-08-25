@@ -41,7 +41,7 @@ efforts on the ones that have at least one person interested in them.
    # Issues with these labels will never be considered stale
    exemptLabels:
    # Label to use when marking an issue as stale
-   staleLabel: stale
+   staleLabel: 2.status: stale
    # Comment to post when marking an issue as stale. Set to `false` to disable
    markComment: >
      This issue has been automatically marked as stale because it has not had
