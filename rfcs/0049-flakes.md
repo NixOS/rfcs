@@ -137,26 +137,24 @@ installable derivation) and a NixOS module.
 
 ```
 {
-  edition = 201906;
+  edition = 201909;
 
   description = "A filesystem that fetches DWARF debug info from the Internet on demand";
 
-  inputs = [ "nixpkgs" ];
-
-  outputs = inputs: rec {
+  outputs = { self, nixpkgs }: rec {
     packages.dwarffs =
-      with inputs.nixpkgs.packages;
-      with inputs.nixpkgs.builders;
-      with inputs.nixpkgs.lib;
+      with nixpkgs.packages;
+      with nixpkgs.builders;
+      with nixpkgs.lib;
 
       stdenv.mkDerivation {
-        name = "dwarffs-0.1.${substring 0 8 inputs.self.lastModified}";
+        name = "dwarffs-0.1.${substring 0 8 self.lastModified}";
 
         buildInputs = [ fuse nix nlohmann_json boost ];
 
         NIX_CFLAGS_COMPILE = "-I ${nix.dev}/include/nix -include ${nix.dev}/include/nix/config.h -D_FILE_OFFSET_BITS=64";
 
-        src = inputs.self;
+        src = self;
 
         installPhase =
           ''
@@ -170,7 +168,7 @@ installable derivation) and a NixOS module.
           '';
       };
 
-    nixosModules.dwarffs = import ./module.nix inputs;
+    nixosModules.dwarffs = ...;
 
     defaultPackage = packages.dwarffs;
 
@@ -186,13 +184,13 @@ A flake has the following attributes:
   flakes to change in the future. It also enables some evolution of
   the Nix language; for example, the Nix files in the flake could be
   parsed using a syntax determined by the edition. The only currently
-  allowed value is `201906`. Nix rejects flakes with an unsupported
+  allowed value is `201909`. Nix rejects flakes with an unsupported
   edition.
 
 * `description`: A short description of the flake.
 
-* `inputs`: The dependencies of the flake, as a list of flake
-  references (described below).
+* `inputs`: An attrset specifying the dependencies of the flake
+  (described below).
 
 * `outputs`: A function that, given an attribute set containing the
   outputs of each of the input flakes keyed by their identifier,
@@ -227,9 +225,6 @@ A flake has the following attributes:
     useful for generating (hopefully) monotonically increasing version
     strings.
 
-  The special input named `self` refers to the outputs and source tree
-  of *this* flake.
-
   A number of outputs have a special meaning, as discussed below.
 
 ## Well-known outputs
@@ -261,12 +256,65 @@ Hydra. Currently, these are:
 
 TODO: NixOS-related outputs such as `nixosModules` and `nixosSystems`.
 
+## Flake inputs
+
+The attribute `inputs` specifies the dependencies of a flake. These
+specify the location of the dependency using a flake reference (see
+below). For example, the following specifies a dependency on the Nixpkgs
+and Hydra repositories:
+
+    # An indirection through the flake registry.
+    inputs.nixpkgs.uri = "nixpkgs";
+
+    # A GitHub repository.
+    inputs.import-cargo.uri = "github:edolstra/import-cargo";
+
+If the `uri` attribute is omitted, it defaults to the attribute
+name. Thus,
+
+    inputs.nixpkgs = {};
+
+is equivalent to `inputs.nixpkgs.uri = "nixpkgs";`.
+
+Each input is fetched, evaluated and passed to the `outputs` function
+as a set of attributes with the same name as the corresponding
+input. The special input named `self` refers to the outputs and source
+tree of *this* flake. Thus, a typical `outputs` function looks like
+this:
+
+    outputs = { self, nixpkgs, import-cargo }: {
+      ... outputs ...
+    };
+
+It is also possible to omit inputs entirely and *only* list them as
+expected function arguments in `outputs`. Thus,
+
+    outputs = { self, nixpkgs }: ...;
+
+without an `inputs.nixpkgs` attribute will simply look up `nixpkgs` in
+the flake registry.
+
+Repositories that don't contain a `flake.nix` can also be used as
+inputs, by setting the input's `flake` attribute to `false`:
+
+    inputs.grcov = {
+      uri = github:mozilla/grcov;
+      flake = false;
+    };
+
+    outputs = { self, nixpkgs, grcov }: {
+      packages.grcov = stdenv.mkDerivation {
+        src = grcov;
+        ...
+      };
+    };
+
 ## Flake references
 
 Flake references are a vaguely URL-like syntax to specify which flake
 to use. This is used on the command line (e.g. in `nix build
 nixpkgs:hello`, `nixpkgs` is a flake reference), and in the list of
-flake dependencies in `flake.nix` (e.g. in `inputs = [ "nixpkgs" ];`).
+flake dependencies in `flake.nix` (e.g. in `inputs.nixpkgs = {};`).
 
 Currently the following types of flake references are supported:
 
@@ -447,24 +495,20 @@ in `flake.nix` to direct flake references that contain revisions.
 
 For example, if `flake.nix` contains
 ```
-inputs =
-  [ "nixpkgs"
-    github:edolstra/import-cargo
-  ];
+inputs.nixpkgs = {};
+inputs.import-cargo.uri = "github:edolstra/import-cargo";
 ```
 then the resulting lock file might be:
 ```
 {
     "version": 2,
     "inputs": {
-        "github:edolstra/import-cargo": {
-            "id": "import-cargo",
+        "import-cargo": {
             "inputs": {},
             "narHash": "sha256-mxwKMDFOrhjrBQhIWwwm8mmEugyx/oVlvBH1CKxchlw=",
             "uri": "github:edolstra/import-cargo/c33e13881386931038d46a7aca4c9561144d582e"
         },
         "nixpkgs": {
-            "id": "nixpkgs",
             "inputs": {},
             "narHash": "sha256-p7UqhvhwS5MZfqUbLbFm+nfG/SMJrgpNXxWpRMFif8c=",
             "uri": "github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082"
