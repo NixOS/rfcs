@@ -65,6 +65,7 @@ Stringly-typed options such as `extraConfig` have multiple disadvantages in comp
   - No priorities: `mkDefault` and co. won't work on settings
 - Values within it can't be inspected, since it's just an opaque string
 - Syntax of assigned values can easily be wrong, especially with escaping sequences
+- Can break services if users assign a value to `extraConfig` which later gets turned into a specialized option, [here](https://github.com/NixOS/nixpkgs/commit/23d1c7f4749#diff-d66632f8013e5976f782de43a0043604R750) is an example of this.
 
 ## [Part 2][part2]
 
