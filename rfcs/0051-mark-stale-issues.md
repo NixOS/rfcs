@@ -18,8 +18,9 @@ GitHub.
 # Motivation
 [motivation]: #motivation
 
-The Nixpkgs GitHub page has a large number of open issues causing
-community angst and misrepresenting the responsiveness of the project.
+We have a large number of open issues and PRs that have accumulated
+over the years. Not all of them are still valid and need our
+attention.
 
 By marking stale issues, we can more easily filter issues for ones
 that have at least one person interested in them.
