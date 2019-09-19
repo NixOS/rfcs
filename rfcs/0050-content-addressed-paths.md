@@ -75,74 +75,78 @@ rec {
     contentAdressed = true;
     … # Some extra arguments
   };
-  dependent1 = mkDerivation {
-    name = "dependent1";
+  dependent = mkDerivation {
+    name = "dependent";
     buildInputs = [ contentAdressed ];
+    … # Some extra arguments
   };
-  dependent2 = mkDerivation {
-    name = "dependent2";
-    buildInputs = [ dependent1 ];
+  transitivelyDependent = mkDerivation {
+    name = "transitivelyDependent";
+    buildInputs = [ dependent ];
+    … # Some extra arguments
   };
 }
 ```
 
-Suppose that we want to build `dependent2`.
+Suppose that we want to build `transitivelyDependent`.
 What will happen is the following
 
 - We instantiate the nix code, this gives us three drv files:
-  `contentAdressed.drv`, `dependent1.drv` and `dependent2.drv`
-- We build `contentAdressed.drv`.
-  - We first rewrite it to `dynamic(contentAdressed.drv)` to replace its
-    inputs by their real output path. Since there is none, we
-    have here `dynamic(contentAdressed.drv) == contentAdressed.drv`
-  - We realise `dynami(contentAdressed.drv)`. This gives us an output path
-    `out(contentAdressed'.drv)`
-  - We move `out(dynamic(contentAdressed.drv))` to its content-adressed path
-    `sha256(out(contentAdressed'.drv))`
-- We build `dependent1.drv`
-  - We first rewrite it to `dynamic(dependent1.drv)` to replace its
-    inputs by their real output path.
-    In that case, we replace `contentAdressed.drv!out` by
-    `sha256(out(dynamic(contentAdressed.drv)))`
-  - We realise `dynamic(dependent1.drv)`. This gives us an output path
-    `out(dynamic(dependent1.drv))`
-- We build `dependent2.drv`
-  - We first rewrite it to `dynamic(dependent2.drv)` to replace its
-    inputs by their real output path.
-    In that case, that means replacing `dependent1.drv!out` by
-    `dynamic(dependent1.drv)!out`
-  - We realise `dynamic(dependent2.drv)`. This gives us an output path
-    `out(dynamic(dependent2.drv))`
-
-Now suppose that we slightly change the definition of `contentAdressed` in such
-a way that `contentAdressed.drv` will be modified, but its output will be the
-same and try to rebuild `dependent2`. What happens is the following:
-
-- We instantiate the nix code, this gives us three new drv files:
-  `contentAdressed.drv`, `dependent1.drv` and `dependent2.drv`
+  `contentAdressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
 - We build `contentAdressed.drv`.
   - We first rewrite it to `dynamic(contentAdressed.drv)` to replace its
     inputs by their real output path. Since there is none, we
     have here `dynamic(contentAdressed.drv) == contentAdressed.drv`
   - We realise `dynamic(contentAdressed.drv)`. This gives us an output path
-    `out(contentAdressed'.drv)`
-  - We compute `sha256(out(dynamic(contentAdressed.drv)))` and notice that the
-    path already exists (since it's the same as the one we built previously),
-    so we discard the result.
-- We build `dependent1.drv`
-  - We first rewrite it to `dynamic(dependent1.drv)` to replace its
+    `out(dynamic(contentAdressed.drv))`
+  - We move `out(dynamic(contentAdressed.drv))` to its content-adressed path
+    `ca(contentAdressed.drv)` which derives from
+    `sha256(out(dynamic(contentAdressed.drv)))`
+- We build `dependent.drv`
+  - We first rewrite it to `dynamic(dependent.drv)` to replace its
     inputs by their real output path.
     In that case, we replace `contentAdressed.drv!out` by
-    `sha256(out(dynamic(contentAdressed.drv)))`
-  - We notice that `dynamic(dependent1.drv)` is the same as before (since 
-    `sha256(out(dynamic(contentAdressed.drv)))` is the same as before), so we
-    just return the already existing path
-- We build `dependent2.drv`
-  - We first rewrite it to `dynamic(dependent2.drv)` to replace its
+    `ca(contentAdressed.drv)`
+  - We realise `dynamic(dependent.drv)`. This gives us an output path
+    `out(dynamic(dependent.drv))`
+- We build `transitivelyDependent.drv`
+  - We first rewrite it to `dynamic(transitivelyDependent.drv)` to replace its
     inputs by their real output path.
-    In that case, that means replacing `dependent1.drv!out` by
-    `dynamic(dependent1.drv)!out`
-  - Here again, we notice that `dynamic(dependent2.drv)` is the same as before,
+    In that case, that means replacing `dependent.drv!out` by
+    `out(dynamic(dependent.drv))`
+  - We realise `dynamic(transitivelyDependent.drv)`. This gives us an output path
+    `out(dynamic(transitivelyDependent.drv))`
+
+Now suppose that we slightly change the definition of `contentAdressed` in such
+a way that `contentAdressed.drv` will be modified, but its output will be the
+same. We try to rebuild the new `transitivelyDependent`. What happens is the
+following:
+
+- We instantiate the nix code, this gives us three new drv files:
+  `contentAdressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
+- We build `contentAdressed.drv`.
+  - We first rewrite it to `dynamic(contentAdressed.drv)` to replace its
+    inputs by their real output path. Since there is none, we
+    have here `dynamic(contentAdressed.drv) == contentAdressed.drv`
+  - We realise `dynamic(contentAdressed.drv)`. This gives us an output path
+    `out(dynamic(contentAdressed.drv))`
+  - We compute `ca(contentAdressed.drv)` and notice that the
+    path already exists (since it's the same as the one we built previously),
+    so we discard the result.
+- We build `dependent.drv`
+  - We first rewrite it to `dynamic(dependent.drv)` to replace its
+    inputs by their real output path.
+    In that case, we replace `contentAdressed.drv!out` by
+    `ca(contentAdressed.drv)`
+  - We notice that `dynamic(dependent.drv)` is the same as before (since 
+    `ca(contentAdressed.drv)` is the same as before), so we
+    just return the already existing path
+- We build `transitivelyDependent.drv`
+  - We first rewrite it to `dynamic(transitivelyDependent.drv)` to replace its
+    inputs by their real output path.
+    In that case, that means replacing `dependent.drv!out` by
+    `out(dynamic(dependent.drv))`
+  - Here again, we notice that `dynamic(transitivelyDependent.drv)` is the same as before,
     so we don't build anything
 
 ## nix-build process
