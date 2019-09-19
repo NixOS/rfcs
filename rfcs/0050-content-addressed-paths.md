@@ -27,6 +27,9 @@ That way we don't have to worry about the fact that hash-rewriting is only an
 approximation nor by the semantics of the distribution of non-deterministic
 paths, **but** we also leave the option to lift these restrictions later.
 
+This RFC already has a (somewhat working) POC at
+https://github.com/regnat/nix/tree/cas
+
 # Motivation
 [motivation]: #motivation
 
