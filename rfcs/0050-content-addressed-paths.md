@@ -224,6 +224,19 @@ There exist some solutions to this problem (including one presented in Eelco's
 thesis), but for the sake of simplicity, this RFC simply forbids to mark a
 derivation as ca if its build is not deterministic.
 
+## Client support
+
+The bulk of the job here is done by the nix daemon.
+
+Depending on the details of the current Nix implementation, there might or
+might not be a need for the client to also support it (which would require the
+daemon and the client to be updated in synchronously)
+
+## Old Nix versions and caching
+
+What happens (and should happen) if a nix not supporting the cas model queries
+a cache with cas paths in it is not clear yet.
+
 # Future work
 [future]: #future-work
 
