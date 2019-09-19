@@ -158,9 +158,13 @@ following:
 
 To allow this, we add a new type of store path: aliases paths.
 These paths don't actually exist in the store, just in the database and point to
-another path
+another path (so they are morally symlinks, but inside the db rather than
+on-disk)
 
 ### Building a ca derivation
+
+ca derivations are derivations with the `contentAdressed` argument set to
+`true`.
 
 The process for building a content-adressed derivation is the following:
 - We build it like a normal derivation to get an output path `$out`.
