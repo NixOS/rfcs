@@ -28,7 +28,8 @@ approximation nor by the semantics of the distribution of non-deterministic
 paths, **but** we also leave the option to lift these restrictions later.
 
 This RFC already has a (somewhat working) POC at
-<https://github.com/regnat/nix/tree/cas>
+<https://github.com/regnat/nix/tree/cas>, and I (@regnat) got some credits to
+work on it part-time (with some help from @Eelco)
 
 # Motivation
 [motivation]: #motivation
