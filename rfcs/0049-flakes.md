@@ -24,7 +24,7 @@ mechanisms such as Nix channels and the Nix search path.
 
 * Flakes replace channels. For example,
 
-      # nix run nixpkgs:hello -c hello
+      # nix run nixpkgs#hello -c hello
 
   fetches the latest version of [the `nixpkgs`
   flake](https://github.com/edolstra/nixpkgs/blob/release-19.03/flake.nix)
@@ -46,7 +46,7 @@ mechanisms such as Nix channels and the Nix search path.
 * For a reproducible result, you can also use a specific revision:
 
   ```
-  # nix build nixpkgs/a0e1f50e6f72e5037d71a0b65c67cf0605349a06:hello
+  # nix build nixpkgs/a0e1f50e6f72e5037d71a0b65c67cf0605349a06#hello
   ```
 
 * To get information about a flake:
@@ -399,11 +399,11 @@ Flake registries map symbolic flake identifiers (e.g. `nixpkgs`) to
 "direct" flake references (i.e. any type of flake reference that's not
 an indirection). This is a convenience to users, allowing them to do
 
-    nix run nixpkgs:hello
+    nix run nixpkgs#hello
 
 rather than
 
-    nix run github:NixOS/nixpkgs:hello
+    nix run github:NixOS/nixpkgs#hello
 
 There are multiple registries:
 
@@ -452,24 +452,24 @@ changes. The legacy commands (`nix-build`, `nix-shell`, `nix-env` and
 Most `nix` subcommands work on a list of arguments called
 "installables" for lack of a better word. For example,
 
-    # nix run nixpkgs:hello dwarffs:dwarffs
+    # nix run nixpkgs#hello dwarffs#dwarffs
 
 takes two flake-based installables. The general form is:
 
-    <flake-ref>(:<attr-path>)?
+    <flake-ref>(#<attr-path>)?
 
 Examples of installables:
 
-* `nixpkgs:packages.hello`
-* `nixpkgs:hello` - short for `nixpkgs:packages.hello`
-* `nixpkgs/release-19.03:hello` - overrides the Git branch to use
-* `github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082:hello` -
+* `nixpkgs#packages.hello`
+* `nixpkgs#hello` - short for `nixpkgs:packages.hello`
+* `nixpkgs/release-19.03#hello` - overrides the Git branch to use
+* `github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082#hello` -
   specifies the exact Git revision to use
-* `dwarffs` - short for `dwarffs:defaultPackage`
-* `nix:hydraJobs.build.x86_64-darwin`
-* `.:hydraJobs.build.x86_64-darwin` - refers to the flake in the
+* `dwarffs` - short for `dwarffs#defaultPackage`
+* `nix#hydraJobs.build.x86_64-darwin`
+* `.#hydraJobs.build.x86_64-darwin` - refers to the flake in the
   current directory (which can be a dirty Git tree)
-* `.` - short for `.:defaultPackage`
+* `.` - short for `.#defaultPackage`
 
 If no argument is given, the default is `.`; thus,
 
@@ -477,7 +477,7 @@ If no argument is given, the default is `.`; thus,
 
 is equivalent to
 
-    # nix build .:defaultPackage
+    # nix build .#defaultPackage
 
 For backwards compatibility, it's possible to use non-flake Nix
 expressions using `-f`, e.g. `nix build -f foo.nix foo.bar`.
@@ -501,17 +501,19 @@ inputs.import-cargo.uri = "github:edolstra/import-cargo";
 then the resulting lock file might be:
 ```
 {
-    "version": 2,
+    "version": 3,
     "inputs": {
         "import-cargo": {
             "inputs": {},
             "narHash": "sha256-mxwKMDFOrhjrBQhIWwwm8mmEugyx/oVlvBH1CKxchlw=",
-            "uri": "github:edolstra/import-cargo/c33e13881386931038d46a7aca4c9561144d582e"
+            "uri": "github:edolstra/import-cargo/c33e13881386931038d46a7aca4c9561144d582e",
+            "originalUri": "github:edolstra/import-cargo"
         },
         "nixpkgs": {
             "inputs": {},
             "narHash": "sha256-p7UqhvhwS5MZfqUbLbFm+nfG/SMJrgpNXxWpRMFif8c=",
-            "uri": "github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082"
+            "uri": "github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082",
+            "originalUri": "nixpkgs"
         }
     }
 }
