@@ -3,8 +3,8 @@ feature: mark-stale-issues
 start-date: 2019-08-24
 author: Ryan Mulligan
 co-authors: (find a buddy later to help our with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @globin, @grahamc, and @peti
+shepherd-leader: @peti
 related-issues: (will contain links to implementation PRs)
 ---
 
