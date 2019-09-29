@@ -75,6 +75,11 @@ The responsibilities of every role is defined by the following diagram:
 * modules should not be Backported
 * Backports of modules must be pretty good argued.
 
+## Links
+
+* [How to write Module Tests](https://nixos.org/nixos/manual/index.html#sec-nixos-tests)
+* [Contribution Guidelines](https://github.com/NixOS/nixpkgs/blob/master/.github/CONTRIBUTING.md)
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
@@ -88,4 +93,5 @@ The responsibilities of every role is defined by the following diagram:
 [future]: #future-work
 
 * The Pull-Request template needs an option "Backport needed?"
-* Add or link a description on how to write module tests in [the wiki](https://nixos.wiki/wiki/NixOS_Modules)
+* Add a link to this document in the 
+  [Contribution Guidelines](https://github.com/NixOS/nixpkgs/blob/master/.github/CONTRIBUTING.md)
