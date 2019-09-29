@@ -62,7 +62,7 @@ The responsibilities of every role is defined by the following diagram:
 
 ![pull-request activity](0053-pull-request-workflow/pull-request-roles.svg)
 
-## About Pull-Request
+## About Pull-Requests
 
 ### Packages
 
