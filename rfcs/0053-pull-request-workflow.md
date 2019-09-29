@@ -66,7 +66,7 @@ The responsibilities of every role is defined by the following diagram:
 * after the Pull-Request to `master`, `staging` or `staging-next` is merged,
   the Backport Pull-Request is created
 * Backport Pull-Requests must be linked to the original Pull-Requests (using `git cherry-pick -x`).
-* reviewer and maintainer can deny the Backport
+* @NixOS/nixpkgs-maintainers, @NixOS/nixpkgs-committers and @NixOS/backports can deny the backport.
 
 ### Modules
 
