@@ -12,7 +12,9 @@ related-issues:
 [summary]: #summary
 
 Pull-Request on GitHub are the main way we improve our code base.
-This Document should settle everything that needs to be done to bring code upstream.
+This Document should settle everything that needs to be done
+to bring code upstream in the
+[Nixpkgs Repository](https://github.com/nixos/nixpkgs/).
 
 # Motivation
 [motivation]: #motivation
@@ -21,8 +23,6 @@ Eliminate questions from contributors and maintainers
 about what should be done next and who should do it.
 This is not a new approach, it is more a settlement
 on how we do it now.
-This RFC is based on my experiences and talks I had
-with other contributors and maintainers.
 
 # Detailed design
 [design]: #detailed-design
@@ -63,8 +63,9 @@ The responsibilities of every role is defined by the following diagram:
 ### Packages
 
 * contributor must decide if a Backport is necessary
-* after the Pull-Request to master is merged the Backport Pull-Request is created
-* Backport Pull-Requests must be linked to the original Pull-Requests in master
+* after the Pull-Request to `master`, `staging` or `staging-next` is merged,
+  the Backport Pull-Request is created
+* Backport Pull-Requests must be linked to the original Pull-Requests (using `git cherry-pick -x`).
 * reviewer and maintainer can deny the Backport
 
 ### Modules
@@ -73,9 +74,6 @@ The responsibilities of every role is defined by the following diagram:
 * new modules must have tests
 * modules should not be Backported
 * Backports of modules must be pretty good argued.
-
-Modules are written by people who use NixOS every day.
-So writing a test should be part of their skill-set.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
