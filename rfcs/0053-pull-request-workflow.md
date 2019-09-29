@@ -30,16 +30,20 @@ on how we do it now.
 Define all steps of a Pull-Request.
 Use Roles to define responsibilities in every step.
 
+Terms like **SHOULD** and **MUST** are defined in 
+[IETF RFC 2119](https://tools.ietf.org/html/rfc2119).
+
 ## Roles
 [roles]: #roles
 
 Everybody involved in the process of contributing has one or multiple
 of the following roles
 
-* Contributor
-* Bot
-* Reviewer
-* Maintainer (has merge privileges)
+* `Contributor` is the person proposing the Pull-Request
+* `Bot` is a bot that provides automated feedback
+* `Reviewer` is any person that reviews the Pull-Request
+  (for example a member of [NixOS/nixpkgs-maintainers](https://github.com/orgs/NixOS/teams/nixpkgs-maintainers))
+* `Merger` is any person with merge privileges
 
 The responsibilities of theses roles are defined in the rest of this RFC.
 
@@ -62,17 +66,24 @@ The responsibilities of every role is defined by the following diagram:
 
 ### Packages
 
-* contributor must decide if a Backport is necessary
+* contributors **SHOULD** evaluate and signal that a Backport is necessary.
+* the [NixOS/backports team](https://github.com/orgs/NixOS/teams/backports)
+  **SHOULD** be pinged in situations that are unclear.
+* the [NixOS/backports team](https://github.com/orgs/NixOS/teams/backports)
+  **MUST** be informed about every Backport.
 * after the Pull-Request to `master`, `staging` or `staging-next` is merged,
   the Backport Pull-Request is created
 * Backport Pull-Requests must be linked to the original Pull-Requests (using `git cherry-pick -x`).
-* @NixOS/nixpkgs-maintainers, @NixOS/nixpkgs-committers and @NixOS/backports can deny the backport.
+* [NixOS/nixpkgs-maintainers](https://github.com/orgs/NixOS/teams/nixpkgs-maintainers)
+  and 
+  [NixOS/backports](https://github.com/orgs/NixOS/teams/backports)
+  can deny the backport.
 
 ### Modules
 
-* modules should have tests
-* new modules must have tests
-* modules should not be Backported
+* modules **SHOULD** have tests
+* reviewers **SHOULD** encourage contributors to write tests for new modules
+* modules **SHOULD NOT** be Backported
 * Backports of modules must be pretty good argued.
 
 ## Links
@@ -86,7 +97,7 @@ The responsibilities of every role is defined by the following diagram:
 * The Pull-Request of a Backport should be created by the bot.
   But if that is the case, the original contributor might not be able
   to make changes on the branch behind the Pull-Request.
-* Backports without changes in master are not discussed.
+* Backports without changes in `master` are not discussed.
   for example security patches that only affect older versions in stable.
 
 # Future work

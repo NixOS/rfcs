@@ -44,7 +44,7 @@
       <text x="160.4478" xml:space="preserve" font-size="12px" y="35.1887" clip-path="url(#clipPath2)" stroke="none">Contributor</text>
       <text x="369.9889" xml:space="preserve" font-size="12px" y="35.1887" clip-path="url(#clipPath2)" stroke="none">Bot</text>
       <text x="558.4186" xml:space="preserve" font-size="12px" y="35.1887" clip-path="url(#clipPath2)" stroke="none">Reviewer</text>
-      <text x="768.0473" xml:space="preserve" font-size="12px" y="35.1887" clip-path="url(#clipPath2)" stroke="none">Maintainer</text>
+      <text x="778.726" xml:space="preserve" font-size="12px" y="35.1887" clip-path="url(#clipPath2)" stroke="none">Merger</text>
     </g>
     <g text-rendering="geometricPrecision" stroke-miterlimit="1.45" shape-rendering="geometricPrecision" font-family="sans-serif" transform="matrix(-0,-1,1,-0,18.6441,307.9781)" stroke-linecap="butt">
       <text x="2" xml:space="preserve" y="13.1387" clip-path="url(#clipPath3)" stroke="none">master branch</text>
