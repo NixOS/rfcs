@@ -73,7 +73,7 @@ The responsibilities of every role is defined by the following diagram:
   **MUST** be informed about every Backport.
 * after the Pull-Request to `master`, `staging` or `staging-next` is merged,
   the Backport Pull-Request is created
-* Backport Pull-Requests must be linked to the original Pull-Requests (using `git cherry-pick -x`).
+* Backport Pull-Requests **MUST** be linked to the original Pull-Requests (using `git cherry-pick -x`).
 * [NixOS/nixpkgs-maintainers](https://github.com/orgs/NixOS/teams/nixpkgs-maintainers)
   and 
   [NixOS/backports](https://github.com/orgs/NixOS/teams/backports)
@@ -84,7 +84,6 @@ The responsibilities of every role is defined by the following diagram:
 * modules **SHOULD** have tests
 * reviewers **SHOULD** encourage contributors to write tests for new modules
 * modules **SHOULD NOT** be Backported
-* Backports of modules must be pretty good argued.
 
 ## Links
 
