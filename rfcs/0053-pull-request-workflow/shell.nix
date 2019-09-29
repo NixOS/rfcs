@@ -2,7 +2,7 @@ with import <nixpkgs> {};
 
 stdenv.mkDerivation rec {
 
-  name = "nixos-diagrams";
+  name = "rfc-53";
 
   env = buildEnv {
     name = name;
@@ -10,13 +10,7 @@ stdenv.mkDerivation rec {
   };
 
   buildInputs = [
-    feh
-    plantuml
     yed
   ];
-
-  shellHook = ''
-    HISTFILE=${toString ./.}/.history
-  '';
 
 }
