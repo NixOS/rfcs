@@ -40,7 +40,7 @@
       <rect fill="none" x="84.6441" width="822.4079" height="397.1875" y="429.0625" clip-path="url(#clipPath2)"/>
     </g>
     <g font-size="15px" stroke-linecap="butt" transform="matrix(1,0,0,1,-69,26)" text-rendering="geometricPrecision" font-family="sans-serif" shape-rendering="geometricPrecision" stroke-miterlimit="1.45">
-      <text x="386.2448" xml:space="preserve" y="8.9733" clip-path="url(#clipPath2)" stroke="none">Pull-Request Roles and Steps</text>
+      <text x="389.2917" xml:space="preserve" y="8.9733" clip-path="url(#clipPath2)" stroke="none">Pull request, roles and steps</text>
       <text x="160.4478" xml:space="preserve" font-size="12px" y="35.1887" clip-path="url(#clipPath2)" stroke="none">Contributor</text>
       <text x="369.9889" xml:space="preserve" font-size="12px" y="35.1887" clip-path="url(#clipPath2)" stroke="none">Bot</text>
       <text x="558.4186" xml:space="preserve" font-size="12px" y="35.1887" clip-path="url(#clipPath2)" stroke="none">Reviewer</text>
@@ -57,7 +57,7 @@
     </g>
     <g text-rendering="geometricPrecision" stroke-miterlimit="1.45" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-69,26)" stroke-linecap="butt">
       <rect x="123.9" y="155" clip-path="url(#clipPath2)" fill="none" width="131" rx="4" ry="4" height="31"/>
-      <text x="130.7535" xml:space="preserve" y="174.6543" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">create Pull-Request</text>
+      <text x="132.523" xml:space="preserve" y="174.6543" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">create pull request</text>
     </g>
     <g fill="rgb(255,204,0)" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-69,26)" stroke="rgb(255,204,0)">
       <path d="M340.5 170.5 L377 145 L413.5 170.5 L377 196 Z" fill-rule="evenodd" clip-path="url(#clipPath2)" stroke="none"/>
@@ -71,7 +71,7 @@
     </g>
     <g text-rendering="geometricPrecision" stroke-miterlimit="1.45" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-69,26)" stroke-linecap="butt">
       <rect x="123.9" y="241" clip-path="url(#clipPath2)" fill="none" width="131" rx="4" ry="4" height="31"/>
-      <text x="128.7906" xml:space="preserve" y="260.6543" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">update Pull-Request</text>
+      <text x="130.5602" xml:space="preserve" y="260.6543" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">update pull request</text>
     </g>
     <g fill="rgb(255,204,0)" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-69,26)" stroke="rgb(255,204,0)">
       <rect x="511.9" y="152.45" clip-path="url(#clipPath2)" width="131" rx="4" ry="4" height="36.1" stroke="none"/>
@@ -92,7 +92,7 @@
     </g>
     <g text-rendering="geometricPrecision" stroke-miterlimit="1.45" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-69,26)" stroke-linecap="butt">
       <rect x="746.8625" y="238.45" clip-path="url(#clipPath2)" fill="none" width="131" rx="4" ry="4" height="36.1"/>
-      <text x="753.3908" xml:space="preserve" y="260.6543" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">merge Pull-Request</text>
+      <text x="755.1603" xml:space="preserve" y="260.6543" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">merge pull request</text>
     </g>
     <g fill="rgb(255,204,0)" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-69,26)" stroke="rgb(255,204,0)">
       <path d="M123.9 362.979 L189.4 324.679 L254.9 362.979 L189.4 401.279 Z" fill-rule="evenodd" clip-path="url(#clipPath2)" stroke="none"/>
@@ -107,7 +107,7 @@
     <g text-rendering="geometricPrecision" stroke-miterlimit="1.45" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-69,26)" stroke-linecap="butt">
       <rect x="123.9" y="486.029" clip-path="url(#clipPath2)" fill="none" width="131" rx="4" ry="4" height="31"/>
       <text x="141.7574" xml:space="preserve" y="498.6989" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">create backport</text>
-      <text x="151.8385" xml:space="preserve" y="512.6677" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">Pull-Request</text>
+      <text x="153.608" xml:space="preserve" y="512.6677" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">pull request</text>
     </g>
     <g fill="rgb(255,204,0)" text-rendering="geometricPrecision" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-69,26)" stroke="rgb(255,204,0)">
       <path d="M340.5 596.2791 L377 570.7791 L413.5 596.2791 L377 621.7791 Z" fill-rule="evenodd" clip-path="url(#clipPath2)" stroke="none"/>
@@ -122,7 +122,7 @@
     <g text-rendering="geometricPrecision" stroke-miterlimit="1.45" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-69,26)" stroke-linecap="butt">
       <rect x="123.9" y="580.779" clip-path="url(#clipPath2)" fill="none" width="131" rx="4" ry="4" height="31"/>
       <text x="137.8873" xml:space="preserve" y="593.449" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">update backport </text>
-      <text x="151.8385" xml:space="preserve" y="607.4177" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">Pull-Request</text>
+      <text x="153.608" xml:space="preserve" y="607.4177" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">pull request</text>
     </g>
     <g text-rendering="geometricPrecision" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,720.3625,504.529)" image-rendering="optimizeQuality">
       <image x="0" y="0" clip-path="url(#clipPath5)" width="105" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGkAAAAzCAYAAACUlyarAAAD9UlEQVR42u2b61Ia&#10;QRCFJ7pcNERjlKiBGDWKdwOKGm8RWRHR93+f9FSdLoZlgAUWTKVOV50StPyz3/Tp&#10;ntkeYxgMBoPBYDAYjDjxoY8Y7wxlRjQrChylnM+z0AyBTReOgrEw0qKsaF70Ecrh&#10;p/3dHP6edqAR1gTDhZMFiAXRkmhF9FW0CtnPedEy/r4AaBn8P2FNKHsUTg4P3oIo&#10;iH6ItkU7ohK0i+9bog3ROkB+BtwMMmuGjzcZQLOwq3k8ZAvnOyAciE5FFdG56AKq&#10;4ntZdCLaB8gCMmwBVpgiqOQA5WBd9iH/FB0BzJXoRnQv+iN6ENXw036/E10DXBlQ&#10;t5BZSwBPUGMCygBQHra1h4d9BTAWSCh6EjVEz1ADsr+vA9otYJ3CDi3wLwQ1XpOQ&#10;dgDZunMIC7sFnCcAaYpeoJYj/V0TwELAukYW7sE2FVTAZmK4LEqhwC8jgw5RZ+6R&#10;GS6cVgwpLAv2ERZ5BlAF1Losu77hbC6LB1dA0VdAIQBF4bz2URRUwwFVgfWtoZlI&#10;0/bi2VwKNreKDq4Ci6t7AEWBvDnywXJB1WB9p2gmVmh7w2XREmzuWPQbK78XoLcY&#10;8oF6Qgd4ga7PZu0isyleLcphL7SLunGPB9qMAHobQS6oZ2SnzdJfTjbNYbEwelhd&#10;Bqu5gGbhypNFowKKgnKzqYomYg2LJEUc/lCrsy3xJlb3LZqF5ggWFzebHmGpx2jJ&#10;1fJYlzwRoHDncapwjlXeSDCLXFBam1zL28QiybIu+etRgL2R7epKKOgPWO2tCUBS&#10;ywtR986wOLQuEVKfpmEN9eESbfKkIWldOkfLn2fzMBjSOjawl07TMA1IVXSUhMRM&#10;+r9qUhU1aVKNg68mbaMmsXGI2d2dTbi7ayFLQ093lyGk0fdJSW5mX5zDVt0nFblP&#10;in/iUBxw4jDOsVCcE4eAOPo3D1qXdjxnd+OAeu1x2nDjnN0ts2mIb3l6Cn4EK6pF&#10;alPSp+D7pvMUnFY3wPKi75PKpvt9UjSjXgfA6fU+yS6AE9P9PokxwPJ8b2btHubO&#10;9H51PsybWfcVetnwzexYe6Z50z3joKAanqwaNN/wDEA1wxmHxGxPp4WsDdlpoQPT&#10;OS0UOrCajl4i3xVOHTXInRYqGk4LjZVNUVAbsD6du7sDrLppz97p/J1+DmFtvrk7&#10;FxDn7sasT9EJ1h3Tf4JVxQnWKWdUyrRnwW3X55sFr5ruWfCK6ZwFL5rOWXAO7Sdc&#10;owLTHjv23aqwFlZCrSkB4jZs8hvgLGKznGaTMFn7i3M/Se8o6f2kT6Z9P0mzh4Cm&#10;YIGBad/0mzOdt/3cm356cYxw3hmY3o11787yviyDwWAwGAwGg8H41+MvnHzRERgx&#10;WsoAAAAASUVORK5CYII=" height="51" preserveAspectRatio="none"/>
@@ -158,7 +158,7 @@
     <g text-rendering="geometricPrecision" stroke-miterlimit="1.45" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,-69,26)" stroke-linecap="butt">
       <rect x="746.8625" y="664.229" clip-path="url(#clipPath2)" fill="none" width="131" rx="4" ry="4" height="36.1"/>
       <text x="764.3947" xml:space="preserve" y="679.449" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">merge backport</text>
-      <text x="774.801" xml:space="preserve" y="693.4177" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">Pull-Request</text>
+      <text x="776.5705" xml:space="preserve" y="693.4177" clip-path="url(#clipPath2)" font-family="sans-serif" stroke="none">pull request</text>
     </g>
     <g text-rendering="geometricPrecision" shape-rendering="geometricPrecision" transform="matrix(1,0,0,1,97.4,88)" image-rendering="optimizeQuality">
       <image x="0" y="0" clip-path="url(#clipPath6)" width="108" xlink:href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGwAAAAzCAYAAAByvu3vAAAD/klEQVR42u2be1Pa&#10;UBDFbzU8tFRrFR+F+qri24Ki1ldFIiL6/b9P986cnVxCEIgJOuPZmTMSGP/JL3t2&#10;781eYxgMBoPBYDAYjHHGl1fE+ECAJkSTIs9Rxvk8CU0Q3vuBUkgWTFaUF02LvkIF&#10;/LXfTeH3rAOQ4MYULqg8oMyI5kQLoqJoCVrE9Tx+nwHAHP6f4MaQVQqqAAgWSkm0&#10;JtoUbYkq0DauN0SrohVA/Q7QOWTcBG9v8rAmYWnTuOEW1C8A2RMdi2qiU9EZVMd1&#10;VXQk2gXUEjJvBnaZIbR0YBVgb/aG/xYdANKF6Ep0K/onuhM18Nde34guAbEKwBvI&#10;uDk8BISWIKwcYBVhbTu48ReAZOH4ogdRS/QItSD7fRMArwHuGJZp4f8gtOQajKwD&#10;y9apfdjcNUA9AE5b9AR1HOl3bcDzAe4S2bkDa1VoHhuR+NmVQXMwj8zaR126Rca4&#10;oDpDSMFZyPew0RNAK6E25tk9xrfCPG5iCQ2DwvIBKwzq+RWFobUcaDXY4zIakSyt&#10;cXQrzMAKl9AJ1mCDzQhYYTgvjqLAudAasMdjNCILtMb42TUHKzwU/UVG9IP1MoSi&#10;oD2gkzxD92izeZZZNnrtKmCttY06c4ub2w7BeokhF9ojstZm7x8ny6bw4DCGsMMc&#10;nvISGo2LiOyKCysMzc2yOhqQZTwwGeIYHGqHts1ex1N/jUajHcMGh82ye9juIdp8&#10;tUXWsQHhoegXsZtxiqe/lWB2udC0lrm2uI4HJs86Nrh+eVh72e6wgmbgDlnQSQGY&#10;2qKPOnmCB0XrGIEN2XAso56co/VOG5jWsVMsI4psPEYDtoLF8rnTcIwDWB2dKYEx&#10;wz5HDaujhqXVdETVsE3UMDYdMbrEk5S7xA6y14/oEnMElsw6LMmF85MJNoJ1HVbm&#10;OizeTkd5wE7HW7amhtnp8Ihj+MZD69hWxF7iW6A999nluHL2EufZcMSzRd2tP4Bd&#10;NUK1LOnd+l3TvVtPOxzBFsPvw6qm931YONOeB4Dq9z7MPgxHpvd9GGMEW4x642zX&#10;SDem/3jAKG+c3TGBquEb58TWZNOmd6ZDobUism3QPMcjYDUMZzpSsUadmrJWZaem&#10;9kz31JTvgGs7egpdK6gmapY7NVU2nJpKLMvC0FZhjzqXeANwTRPMJup8on72YX9R&#10;c4kuLM4lJljPwpO/W+b1yV+d+uXk7ztmWsYEs/W2e4yara+b3tn6mumerS+b7tl6&#10;HohIsaZ5Jhjdjjq9Ym2ugtpUAdBNWOlPgJrFwjzLBmN8FtnvfNiiCc6H6RkxPR/2&#10;zQTnwzSrCGvMNumZ4ATmlOk+hemewNRDfAT1geDpWWb3rDPPNzMYDAaDwWAwGIzP&#10;Hv8BVQLRDx7Xa+YAAAAASUVORK5CYII=" height="51" preserveAspectRatio="none"/>
