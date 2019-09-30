@@ -89,6 +89,8 @@ The responsibilities of every role is defined by the following diagram:
 
 * [How to write Module Tests](https://nixos.org/nixos/manual/index.html#sec-nixos-tests)
 * [Contribution Guidelines](https://github.com/NixOS/nixpkgs/blob/master/.github/CONTRIBUTING.md)
+* [What to Backport](https://gist.github.com/grahamc/c60578c6e6928043d29a427361634df6#what-to-backport)
+* [RFC26 : Staging Workflow](./0026-staging-workflow.md)
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
