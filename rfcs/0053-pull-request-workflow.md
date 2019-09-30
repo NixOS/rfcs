@@ -67,8 +67,7 @@ The responsibilities of every role is defined by the following diagram:
 ### Packages
 
 * Contributors **SHOULD** evaluate and signal that a backport is necessary.
-  * What to backport is documented [here](https://gist.github.com/grahamc/c60578c6e6928043d29a427361634df6#what-to-backport)
-  * The [NixOS/backports team](https://github.com/orgs/NixOS/teams/backports)
+* The [NixOS/backports team](https://github.com/orgs/NixOS/teams/backports)
   **SHOULD** be pinged in situations that are unclear.
 * Backport pull requests **MUST** be linked to the original pull requests (using `git cherry-pick -x`).
 * [NixOS/nixpkgs-maintainers](https://github.com/orgs/NixOS/teams/nixpkgs-maintainers)
@@ -84,7 +83,25 @@ The responsibilities of every role is defined by the following diagram:
 * Reviewers **SHOULD** encourage contributors to write tests for new modules
 * Module changes **SHOULD NOT** be backported.
   * For example a module change that's needed due to a package backport is a valid exception
-  
+
+# What to backport
+
+* Security patches which aren't major updates
+* If a security patch is a major upgrade, try and find patches to our
+  current version which accomplish the same goal. Apply the major
+  update to master, and the patches to stable.
+* Bug fixes to applications which, again, aren't major updates.
+  Generally be cautious about these.
+* Any updates when the current stable version is utterly broken. A
+  key example of this is Spotify, who regularly breaks their old
+  versions.
+* Extremely security-sensitive software, in particular Chrome,
+  Chromium, Firefox, Thunderbird, and of course the kernel.
+
+## Don't backport if ...
+
+* the patch is just for Darwin, they use nixpkgs-unstable not a
+  stable branch.
 
 ## Links
 
