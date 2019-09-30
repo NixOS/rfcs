@@ -39,11 +39,11 @@ Terms like **SHOULD** and **MUST** are defined in
 Everybody involved in the process of contributing has one or multiple
 of the following roles
 
-* `Contributor` is the person proposing the pull request
-* `Bot` is a bot that provides automated feedback
-* `Reviewer` is any person that reviews the pull request
+* *Contributor* is the person proposing the pull request
+* *Bot* is a bot that provides automated feedback
+* *Reviewer* is any person that reviews the pull request
   (for example a member of [NixOS/nixpkgs-maintainers](https://github.com/orgs/NixOS/teams/nixpkgs-maintainers))
-* `Merger` is any person with merge privileges
+* *Merger* is any person with merge privileges
 
 The responsibilities of theses roles are defined in the rest of this RFC.
 
