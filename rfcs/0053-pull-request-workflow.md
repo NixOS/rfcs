@@ -45,7 +45,7 @@ of the following roles
   (for example a member of [NixOS/nixpkgs-maintainers](https://github.com/orgs/NixOS/teams/nixpkgs-maintainers))
 * `Merger` is any person with merge privileges
 
-The responsibilities of theses roles are defined in the rest of this RFC.
+The responsibilities of these roles are defined in the rest of this RFC.
 
 ## States of a pull request
 [state]:#states
