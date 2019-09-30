@@ -84,7 +84,7 @@ The responsibilities of every role is defined by the following diagram:
 * Module changes **SHOULD NOT** be backported.
   * For example a module change that's needed due to a package backport is a valid exception
 
-# What to backport
+## What to backport
 
 * Security patches which aren't major updates
 * If a security patch is a major upgrade, try and find patches to our
@@ -98,7 +98,7 @@ The responsibilities of every role is defined by the following diagram:
 * Extremely security-sensitive software, in particular Chrome,
   Chromium, Firefox, Thunderbird, and of course the kernel.
 
-## Don't backport if ...
+### Don't backport if ...
 
 * the patch is just for Darwin, they use nixpkgs-unstable not a
   stable branch.
