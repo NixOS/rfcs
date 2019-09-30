@@ -67,30 +67,31 @@ The responsibilities of every role is defined by the following diagram:
 ### Packages
 
 * Contributors **SHOULD** evaluate and signal that a backport is necessary.
-* The [NixOS/backports team](https://github.com/orgs/NixOS/teams/backports)
+  * What to backport is documented [here](https://gist.github.com/grahamc/c60578c6e6928043d29a427361634df6#what-to-backport)
+  * The [NixOS/backports team](https://github.com/orgs/NixOS/teams/backports)
   **SHOULD** be pinged in situations that are unclear.
-* The [NixOS/backports team](https://github.com/orgs/NixOS/teams/backports)
-  **MUST** be informed about every backport.
-* After the pull request to `master`, `staging` or `staging-next` is merged,
-  the backport pull request is created
 * Backport pull requests **MUST** be linked to the original pull requests (using `git cherry-pick -x`).
 * [NixOS/nixpkgs-maintainers](https://github.com/orgs/NixOS/teams/nixpkgs-maintainers)
   and 
   [NixOS/backports](https://github.com/orgs/NixOS/teams/backports)
   can deny the backport.
+* After the pull request to `master`, `staging` or `staging-next` is merged,
+  the backport pull request is created
 
 ### Modules
 
 * Modules **SHOULD** have tests
 * Reviewers **SHOULD** encourage contributors to write tests for new modules
-* Modules **SHOULD NOT** be backported
+* Module changes **SHOULD NOT** be backported.
+  * For example a module change that's needed due to a package backport is a valid exception
+  
 
 ## Links
 
-* [How to write Module Tests](https://nixos.org/nixos/manual/index.html#sec-nixos-tests)
-* [Contribution Guidelines](https://github.com/NixOS/nixpkgs/blob/master/.github/CONTRIBUTING.md)
-* [What to Backport](https://gist.github.com/grahamc/c60578c6e6928043d29a427361634df6#what-to-backport)
-* [RFC26 : Staging Workflow](./0026-staging-workflow.md)
+* [How to write module tests](https://nixos.org/nixos/manual/index.html#sec-nixos-tests)
+* [Contribution guidelines](https://github.com/NixOS/nixpkgs/blob/master/.github/CONTRIBUTING.md)
+* [What to backport](https://gist.github.com/grahamc/c60578c6e6928043d29a427361634df6#what-to-backport)
+* [RFC26 : staging workflow](./0026-staging-workflow.md)
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
