@@ -660,6 +660,17 @@ simpler format such as JSON or TOML. This avoids the Turing tarpit
 where getting flake metadata requires the execution of an arbitrarily
 complex, possibly non-terminating program.
 
+Flakes could be implemented as an external tool on top of Nix. Indeed,
+there is nothing that flakes allow you to do that couldn't previously
+be done using `fetchGit`, the `--pure-eval` flag and some shell
+scripting. However, implementing flake-like functionality in an
+external tool would defeat the goals of this RFC. First, it probably
+wouldn't lead to a standard way to structure and compose Nix projects,
+since we might well end up with numerous competing
+"standards". Second, it would degrade rather than improve the Nix UX,
+since users would now have to deal with Nix *and* the flake-like tool
+on top of it.
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
