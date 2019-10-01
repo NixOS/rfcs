@@ -110,7 +110,7 @@
     </g>
     <g text-rendering="geometricPrecision" stroke-miterlimit="1.45" shape-rendering="geometricPrecision" font-family="sans-serif" transform="matrix(1,0,0,1,214,-140)" stroke-linecap="butt">
       <text x="419.0684" xml:space="preserve" y="239.1387" clip-path="url(#clipPath2)" stroke="none">Open</text>
-      <text x="238" xml:space="preserve" y="265.1074" clip-path="url(#clipPath2)" stroke="none">Contributor has done his work</text>
+      <text x="238" xml:space="preserve" y="265.1074" clip-path="url(#clipPath2)" stroke="none">Contributor has done their work</text>
       <text x="238" xml:space="preserve" y="279.0762" clip-path="url(#clipPath2)" stroke="none">Contributor has referenced all issues fixed by the pull request</text>
       <text x="238" xml:space="preserve" y="293.0449" clip-path="url(#clipPath2)" stroke="none">Contributor has decided if the pull request needs a backport</text>
     </g>
