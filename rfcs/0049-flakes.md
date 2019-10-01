@@ -113,9 +113,7 @@ Flakes are motivated by a number of serious shortcomings in Nix:
   users cannot easily pin specific versions of channels, channels
   interact in *ad hoc* ways with the Nix search path, and so on.
 
-The flakes mechanism seeks to address all these problems. It can be
-seen as a "Cargo/NPM/... for Nix" except that it's built into Nix
-rather than a separate tool.
+The flakes mechanism seeks to address all these problems.
 
 # Detailed design
 [design]: #detailed-design
