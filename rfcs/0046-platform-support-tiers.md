@@ -225,6 +225,10 @@ No current support, but previous support or clear path to add support
 
 * `x86_64-freebsd`
 
+* `i686-solaris`
+
+* `x86_64-illumos`
+
 ## Adding a new platform
 
 It is expected that Tier-4 support can be added freely, and Tier-3 support is
