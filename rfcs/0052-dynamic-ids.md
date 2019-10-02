@@ -84,6 +84,18 @@ Therefore the number of different services using dynamic ids that can be enabled
 
 The implementation of this is in PR [#65698](https://github.com/NixOS/nixpkgs/pull/65698).
 
+## Changing user declarations
+
+Are there any problems when moving between different user declarations? Note that `StateDirectory` has to be used with `DynamicUser` if state is needed, we'll ignore `ReadWritePaths` because it's inferior.
+
+| From \ To | `DynamicUser` | dynamic NixOS ids | static NixOS ids |
+| --- | --- | --- | --- |
+| `DynamicUser` | - | unproblematic because `StateDirectory` was used | unproblematic because `StateDirectory` was used |
+| dynamic NixOS ids | unproblematic because `StateDirectory` needs to be used | - | needs manual `/var/lib/nixos/{g,u}id-map` change if different id |
+| static NixOS ids | unproblematic because `StateDirectory` needs to be used | unproblematic | - |
+
+Note that changing all current NixOS services to use dynamic ids is [future work][#future].
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -99,14 +111,6 @@ Not doing anything is not an option as the currently used range is finite.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
-
-Are there any problems when moving between different user declarations? Note that `StateDirectory` has to be used (we'll ignore `ReadWritePaths` because `StateDirectory` is superior for state) with `DynamicUser` if state is needed.
-
-| From \ To | `DynamicUser` | dynamic NixOS ids | static NixOS ids |
-| --- | --- | --- | --- |
-| `DynamicUser` | - | unproblematic because `StateDirectory` was used | unproblematic because `StateDirectory` was used |
-| dynamic NixOS ids | unproblematic because `StateDirectory` needs to be used | - | needs manual `/var/lib/nixos/{g,u}id-map` change if different id |
-| static NixOS ids | unproblematic because `StateDirectory` needs to be used | unproblematic | - |
 
 # Future work
 [future]: #future-work
