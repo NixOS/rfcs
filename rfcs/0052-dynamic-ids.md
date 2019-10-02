@@ -70,7 +70,7 @@ An example:
 ### Ensuring correct directory permissions for services
 
 Services must be able to access their directories.
-- The easiest way to achieve this is to use `systemd.services.<name?>.serviceConfig.StateDirectory = "myservice"`, which ensures that `/var/lib/myservice` belongs to the services user. See `man systemd.exec` for other related directives.
+- The easiest way to achieve this is to use `systemd.services.<name?>.serviceConfig.StateDirectory = "myservice"`, which ensures that `/var/lib/myservice` belongs to the services user. See `man systemd.exec` for info on this and the related directives `CacheDirectory`, `LogsDirectory` and `ConfigurationDirectory`.
 - `systemd.tmpfiles.rules = [ "Z '/var/lib/myservice' - myuser mygroup - -" ]` can also be used, with the disadvantage that it will only run at system activation and not when the service starts. It also recursively fixes the permissions every time, meaning it can lead to considerable slowdown with many files.
 - An alternative is to assign `serviceConfig.ExecStartPre = "+${pkgs.writeScript "myservice-prestart" "..."}"` with a script to fix the permissions, where the `+` makes the script run with full root permissions as documented in `man systemd.service`.
 
