@@ -76,13 +76,13 @@ Services must be able to access their directories.
 
 ## Enlarge the reserved range of system users/groups
 
+How uid/gid ranges are decided: If `isSystemUser = false`, dynamic uids are allocated in the range `UID_MIN` to `UID_MAX`, while with `isSystemUser = true`, it's `SYS_UID_MIN` to `SYS_UID_MAX`. In contrast, gids are always allocated in the range `SYS_GID_MIN` to `SYS_GID_MAX`.
+
 Since the new recommendation is to use `isSystemUser` for system users and to not set static ids, the available ids now have the range `SYS_UID_MIN` to `SYS_UID_MAX` and `SYS_GID_MIN` to `SYS_GID_MAX`, defined in [shadow.nix](https://github.com/NixOS/nixpkgs/blob/044cc701c23ede96355eb1dc997985b4dfac0372/nixos/modules/programs/shadow.nix#L13-L21), both of which currently span from 400 to 499. This means a NixOS system could only have 100 different services using dynamically allocated ids over its lifetime. Since this is not very much, this range will be changed to span from 400 to 999, reserving an additional 500 ids for system users/groups. The range from 500 to 999 is currently not reserved for anything.
 
 Therefore the number of different services using dynamic ids that can be enabled on a single NixOS system is 600. In comparison with static ids, the number of *enabled* services on a system grows much more slowly than the number of total *existing* services in NixOS (each of which would need one of the 400 static ids).
 
 The implementation of this is in PR [#65698](https://github.com/NixOS/nixpkgs/pull/65698).
-
-A note on uids vs gids: If `isSystemUser = false`, dynamic uids are allocated in the range `UID_MIN` to `UID_MAX`, while with `isSystemUser = true`, it's `SYS_UID_MIN` to `SYS_UID_MAX`. In contrast, gids are always allocated in the range `SYS_GID_MIN` to `SYS_GID_MAX`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
