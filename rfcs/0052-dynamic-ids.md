@@ -100,13 +100,13 @@ Not doing anything is not an option as the currently used range is finite.
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-What is the migration path from different user declarations?
+Are there any problems when moving between different user declarations? Note that `StateDirectory` has to be used (we'll ignore `ReadWritePaths` because `StateDirectory` is superior for state) with `DynamicUser` if state is needed.
 
 | From \ To | `DynamicUser` | dynamic NixOS ids | static NixOS ids |
 | --- | --- | --- | --- |
-| `DynamicUser` | - | ??? | ??? |
-| dynamic NixOS ids | ??? | - | ??? |
-| static NixOS ids | ??? | ??? | - |
+| `DynamicUser` | - | unproblematic because `StateDirectory` was used | unproblematic because `StateDirectory` was used |
+| dynamic NixOS ids | unproblematic because `StateDirectory` needs to be used | - | needs manual `/var/lib/nixos/{g,u}id-map` change if different id |
+| static NixOS ids | unproblematic because `StateDirectory` needs to be used | unproblematic | - |
 
 # Future work
 [future]: #future-work
