@@ -2,7 +2,7 @@
 feature: dynamic-ids
 start-date: 2019-09-05
 author: Silvan Mosberger
-co-authors: -
+co-authors:
 shepherd-team: Arian van Putten, asymmetric, Eelco Dolstra, Jörg Thalheim, Ryan Mulligan
 shepherd-leader: Ryan Mulligan
 related-issues: https://github.com/NixOS/nixpkgs/pull/65698
