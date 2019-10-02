@@ -94,6 +94,8 @@ Are there any problems when moving between different user declarations? Note tha
 | dynamic NixOS ids | unproblematic because `StateDirectory` needs to be used | - | needs manual `/var/lib/nixos/{g,u}id-map` change if different id |
 | static NixOS ids | unproblematic because `StateDirectory` needs to be used | unproblematic | - |
 
+In addition, a transition from `isSystemUser = false` to `isSystemUser = true` can't be done automatically, the `/var/lib/nixos/uid-map` file needs to be adjusted manually for that. However without doing so, NixOS will happily continue to use the previously assigned uid without problems. This means changing this value is unproblematic.
+
 Note that changing all current NixOS services to use dynamic ids is [future work][#future].
 
 # Drawbacks
