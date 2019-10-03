@@ -14,8 +14,8 @@ A scheme for expressing and managing support of packages and for platforms in ni
 # Motivation
 [motivation]: #motivation
 
-This RFC is an offshoot of a comment in the discussion on #46, which has been stuck in discussion for months.
-Its goals are similar, but this RFC focuses on what support expectations are reasonable for each level/tier.
+Currently there is no consensus in the nixpkgs maintainer community regarding how to deal with platform-specific code and changes, as well as few official statements and processes to represent platform support to users.
+As a growing distribution, the Nix community needs to establish a framework to determine platform support and decide what platform-specific packaging code is acceptable.
 
 Providing a good base for platform discussions and defining support expectations should improve communication with users (especially those of non-mainstream platforms) and should allow establishing procedures to deal with developers wishing to add support for new architectures.
 
