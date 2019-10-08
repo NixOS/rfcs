@@ -262,17 +262,17 @@ below). For example, the following specifies a dependency on the Nixpkgs
 and Hydra repositories:
 
     # An indirection through the flake registry.
-    inputs.nixpkgs.uri = "nixpkgs";
+    inputs.nixpkgs.url = "nixpkgs";
 
     # A GitHub repository.
-    inputs.import-cargo.uri = "github:edolstra/import-cargo";
+    inputs.import-cargo.url = "github:edolstra/import-cargo";
 
-If the `uri` attribute is omitted, it defaults to the attribute
+If the `url` attribute is omitted, it defaults to the attribute
 name. Thus,
 
     inputs.nixpkgs = {};
 
-is equivalent to `inputs.nixpkgs.uri = "nixpkgs";`.
+is equivalent to `inputs.nixpkgs.url = "nixpkgs";`.
 
 Each input is fetched, evaluated and passed to the `outputs` function
 as a set of attributes with the same name as the corresponding
@@ -296,7 +296,7 @@ Repositories that don't contain a `flake.nix` can also be used as
 inputs, by setting the input's `flake` attribute to `false`:
 
     inputs.grcov = {
-      uri = github:mozilla/grcov;
+      url = github:mozilla/grcov;
       flake = false;
     };
 
@@ -422,7 +422,7 @@ A registry is a JSON file that looks like this:
     "version": 1,
     "flakes": {
         "nixpkgs": {
-            "uri": "github:NixOS/nixpkgs"
+            "url": "github:NixOS/nixpkgs"
         },
         ...
     }
@@ -494,7 +494,7 @@ in `flake.nix` to direct flake references that contain revisions.
 For example, if `flake.nix` contains
 ```
 inputs.nixpkgs = {};
-inputs.import-cargo.uri = "github:edolstra/import-cargo";
+inputs.import-cargo.url = "github:edolstra/import-cargo";
 ```
 then the resulting lock file might be:
 ```
@@ -504,14 +504,14 @@ then the resulting lock file might be:
         "import-cargo": {
             "inputs": {},
             "narHash": "sha256-mxwKMDFOrhjrBQhIWwwm8mmEugyx/oVlvBH1CKxchlw=",
-            "uri": "github:edolstra/import-cargo/c33e13881386931038d46a7aca4c9561144d582e",
-            "originalUri": "github:edolstra/import-cargo"
+            "url": "github:edolstra/import-cargo/c33e13881386931038d46a7aca4c9561144d582e",
+            "originalUrl": "github:edolstra/import-cargo"
         },
         "nixpkgs": {
             "inputs": {},
             "narHash": "sha256-p7UqhvhwS5MZfqUbLbFm+nfG/SMJrgpNXxWpRMFif8c=",
-            "uri": "github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082",
-            "originalUri": "nixpkgs"
+            "url": "github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082",
+            "originalUrl": "nixpkgs"
         }
     }
 }
