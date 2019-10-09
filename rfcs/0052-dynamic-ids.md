@@ -76,7 +76,7 @@ Services must be able to access their directories.
 
 ## Enlarge the reserved range of system users/groups
 
-How uid/gid ranges are decided: If `isSystemUser = false`, dynamic uids are allocated in the range `UID_MIN` to `UID_MAX`, while with `isSystemUser = true`, it's `SYS_UID_MIN` to `SYS_UID_MAX`. In contrast, gids are always allocated in the range `SYS_GID_MIN` to `SYS_GID_MAX`.
+How uid/gid ranges are decided: If `isSystemUser = false`, dynamic uids are allocated in the range `UID_MIN` to `UID_MAX`, while with `isSystemUser = true`, it's `SYS_UID_MIN` to `SYS_UID_MAX`. In contrast, gids are always allocated in the range `SYS_GID_MIN` to `SYS_GID_MAX`. See [#65698](https://github.com/NixOS/nixpkgs/pull/65698) for implementation details.
 
 Since the new recommendation is to use `isSystemUser` for system users and to not set static ids, the available ids now have the range `SYS_UID_MIN` to `SYS_UID_MAX` and `SYS_GID_MIN` to `SYS_GID_MAX`, defined in [shadow.nix](https://github.com/NixOS/nixpkgs/blob/044cc701c23ede96355eb1dc997985b4dfac0372/nixos/modules/programs/shadow.nix#L13-L21), both of which currently span from 400 to 499. This means a NixOS system could only have 100 different services using dynamically allocated ids over its lifetime. Since this is not very much, this range will be changed to span from 400 to 999, reserving an additional 500 ids for system users/groups. The range from 500 to 999 is currently not reserved for anything.
 
@@ -96,7 +96,7 @@ Are there any problems when moving between different user declarations? Note tha
 
 In addition, a transition from `isSystemUser = false` to `isSystemUser = true` can't be done automatically, the `/var/lib/nixos/uid-map` file needs to be adjusted manually for that. However without doing so, NixOS will happily continue to use the previously assigned uid without problems. This means changing this value is unproblematic.
 
-Note that changing all current NixOS services to use dynamic ids is [future work][#future].
+Note that changing all current NixOS services to use dynamic ids is [future work][#future-work].
 
 # Drawbacks
 [drawbacks]: #drawbacks
