@@ -96,7 +96,7 @@ Are there any problems when moving between different user declarations? Note tha
 
 In addition, a transition from `isSystemUser = false` to `isSystemUser = true` can't be done automatically, the `/var/lib/nixos/uid-map` file needs to be adjusted manually for that. However without doing so, NixOS will happily continue to use the previously assigned uid without problems. This means changing this value is unproblematic.
 
-Note that changing all current NixOS services to use dynamic ids is [future work][#future-work].
+Note that changing all current NixOS services to use dynamic ids is [future work][future-work].
 
 # Drawbacks
 [drawbacks]: #drawbacks
