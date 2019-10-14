@@ -67,6 +67,11 @@ are channel-blockers on Hydra.
 Native bootstrap tools available, cross-build toolchains in the binary cache,
 no channel-blocking jobs on Hydra.
 
+It is recommended to provide a derivation to test the software on this platform
+(e.g. a Qemu-based derivation with all the necessary scripts).
+As it is impossible to provide a legal testing setup for Tier-1 platform (macOS),
+this requirement is not strictly mandatory for Tier-2 tooling.
+
 #### Tier 3
 
 None
@@ -165,6 +170,10 @@ are available in the binary cache
 
 * `armv{6,7,8}*-linux`, `gcc`+`glibc`
 
+* `armv{6,7,8}*-linux`, `gcc`+`glibc`, cross-compilation
+
+* `aarch64-linux`, `gcc`+`glibc`, cross-compilation
+
 * `mipsel-linux`, `gcc`+`glibc`
 
 * `x86_64-linux`, `gcc`+`musl`
@@ -200,6 +209,8 @@ are available in the binary cache
 * `aarch64-linux` — Android
 
 * `armv{7,8}-linux` — Android
+
+A special team @NixOS/exotic-platform-maintainers is created and can be consulted about issues related to these platforms
 
 ### Tier 4
 
