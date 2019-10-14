@@ -11,7 +11,7 @@ related-issues:
 # Summary
 [summary]: #summary
 
-Gradually deprecate the use of unquoted URL syntax in Nix code and especially
+Discourage and eventually remove the use of unquoted URL syntax in Nix code and especially
 Nixpkgs.
 
 # Motivation
@@ -33,11 +33,9 @@ its use.
 [design]: #detailed-design
 
 Add a note in the Nix manual that the special unquoted URL syntax is
-deprecated.
+discouraged and will be eventually removed.
 
-Add a note in the Nixpkgs manual that the unquoted URL syntax is deprecated,
-changes to Nixpkgs should not increase its use, and it is recommended to
-convert URLs to quoted strings when changing them.
+Add a note in the Nixpkgs manual that the unquoted URL syntax should not be used anymore.
 
 Convert all the unquoted URLs in the Nixpkgs codebase to quoted strings.
 
@@ -67,8 +65,4 @@ Currently none.
 # Future work
 [future]: #future-work
 
-In case of future major changes in the Nix syntax, removal of special URL
-syntax might be considered.
-
-Explore options for automated tracking of the number of unquoted URLs in 
-Nixpkgs.
+In some future edition of Nix, remove the special URL syntax.
