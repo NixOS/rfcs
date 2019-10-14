@@ -48,7 +48,7 @@ that maintainers cannot make changes elsewhere in the tree and be permitted to
 submit them because they have also made a change in an expression they own. This
 also means that this process nearly only applies to leaf packages. Criteria 2)
 exists to ensure that at least the initial expression was reviewed by a member
-of @nixpkgs-maintainers.
+of @nixpkgs-committers.
 
 # Drawbacks
 [drawbacks]: #drawbacks
