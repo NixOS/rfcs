@@ -27,6 +27,8 @@ at risk of of unauthorized modification.
 
 Because every secret with push access can be leaked, we should keep their number as low as necessary,
 here by deactivating the push access of inactive committers.
+A special case of inactive committers are those who have lost access to their GitHub account entirely,
+who would be unable to remove potentially leaked secrets from their account.
 
 As of 2019-08-18, at least 2 committers have officially stepped down, and at least 1 committer has
 not pushed to nixpkgs since 2014, but are still able to push directly to nixpkgs.
