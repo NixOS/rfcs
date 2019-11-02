@@ -238,7 +238,7 @@ The shortest way to make it instead use "Ret-cont" recursive Nix is this:
 ```nix
 {nixpkgs ? <nixpkgs>}: with import nixpkgs {};
 
-in stdenv.mkDerivation {
+stdenv.mkDerivation {
   name = "README";
   unpackPhase = "true";
   outputs = [ "drv" "store" ];
