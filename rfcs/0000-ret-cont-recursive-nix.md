@@ -205,6 +205,97 @@ There's a few things we can call out from the faux-formalization.
    We can detect simple cycles analogous to black holes in thunks: if a derivation produces a redirected derivation depending on the original, a cycle is effectively recreated even though we don't have a hash fixed point.
    Nix should raise an error rather than looping, but either behavior is permissible.
 
+# Examples
+[examples]: #examples
+
+As a running example, I'll use @matthewbauer's [Reproducible résumé].
+(Do steal the method; don't steal Matt; he works with me!)
+Here's the original `default.nix`, which uses IFD:
+
+```nix
+{nixpkgs ? <nixpkgs>}: with import nixpkgs {};
+let
+
+README = stdenv.mkDerivation {
+  name = "README";
+  unpackPhase = "true";
+  buildInputs = [ emacs ];
+  installPhase = ''
+    mkdir -p $out
+    cd $out
+    cp -r ${./fonts} fonts
+    cp ${./README.org} README.org
+    emacs --batch -l ob-tangle --eval "(org-babel-tangle-file \"README.org\")"
+    cp resume.nix default.nix
+  '';
+};
+
+in import README {inherit nixpkgs;}
+```
+
+The shortest way to make it instead use "Ret-cont" recursive Nix is this:
+
+```nix
+{nixpkgs ? <nixpkgs>}: with import nixpkgs {};
+
+in stdenv.mkDerivation {
+  name = "README";
+  unpackPhase = "true";
+  outputs = [ "drv" "store" ];
+  buildInputs = [ emacs nix ];
+  __recursive = true;
+  installPhase = ''
+    mkdir -p $out
+    cd $out
+    cp -r ${./fonts} fonts
+    cp ${./README.org} README.org
+    emacs --batch -l ob-tangle --eval "(org-babel-tangle-file \"README.org\")"
+    mv $(nix-instantiate --store $store resume.nix --arg nixpkgs 'import ${nixpkgs.path}') > $drv
+  '';
+}
+```
+
+But note how this means we re-run emacs every time anything in Nixpkgs changes, no good!
+Here's a better version which is more incremental:
+
+```nix
+{nixpkgs ? <nixpkgs>}: with import nixpkgs {};
+let
+
+# Just like original
+README = stdenv.mkDerivation {
+  name = "README";
+  unpackPhase = "true";
+  buildInputs = [ emacs ];
+  installPhase = ''
+    mkdir -p $out
+    cd $out
+    cp -r ${./fonts} fonts
+    cp ${./README.org} README.org
+    emacs --batch -l ob-tangle --eval "(org-babel-tangle-file \"README.org\")"
+    cp resume.nix default.nix
+  '';
+};
+
+in stdenv.mkDerivation {
+  name = "readme-outer";
+  unpackPhase = "true";
+  buildInputs = [ nix ];
+  installPhase = ''
+    mv $(nix-instantiate --store $store ${README} --arg nixpkgs 'import ${nixpkgs.path}') > $drv
+  '';
+}
+```
+
+Now only `readme-outer` is rebuilt when Nixpkgs and Nix changes.
+This may still seem wasteful, but remember we still need to reevaluate whenever those changes.
+Now some of that evaluation work is pushed into the derivations themselves.
+
+This is actually a crucial observation:
+A limit to scaling Nix today is that while our builds are very incremental, evaluation isn't.
+But if we can "push" some of the work of evaluation "deeper" into the derivaiton graph itself, we can be incremental with respect to both.
+This means we are incremental at all levels.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -248,5 +339,59 @@ The exact way the outputs refer to the replacement derivations / their outputs i
 # Future work
 [future]: #future-work
 
-A version of IFD that delays evaluation in derivation to keep evaluation non-blocking.
-This works on the same principle as this keeps all derivations non-blocking (be they higher order or not).
+1. As the example shows, we can push the work of evaluation into builds.
+   This unlocks lots of future work in Nixpkgs:
+
+   - Leveraging language-specific tools to generate plans Nix builds, rather than reimplementing much of those tools.
+     We do this with IFD today, but both due to Hydra's architecture, and concerns about eval times regardless of Hydra, we don't allow this in Nixpkgs.
+     This is a huge loss as we either do things entirely manually (python) Or vender tons of code (Haskell).
+     We will save valuable human time, and start to bridge the distribution / ops vs developer cultural divide by making it easier to work on your own packages.
+
+   - Simply fetching and importing packages which use Nix for their build system, like Nix itself and hydra, rather than vendoring that build system in.
+     This is an easier special case of the above, where the upstream developer knows and loves Nix, and their package has a Nix-based build system.
+     Flakes are supposed to help with this, as is `builtins.fetchTarball` skirting the IFD prohibition.
+     But, it's better if the hydra evaluator can avoid blocking on the download and/or evaluating the Nix expressions therein.
+     "Ret-cont" recursive Nix would allow this by just putting the "outer" derivation in Nixpkgs.
+
+2. Better still, we can try to automatically transform evaluation without writing manually "outer" derivations.
+   With `--pure` mode, Eelco has also talked about opening the door to caching builds.
+   "Ret-cont" recursive Nix is wonderful foundation for that.
+
+   I hope to at least later proposal automatically converting IFD into "Ret-cont":
+
+   IFD is also slow because the evaluator isn't concurrent and so imported derivations get built one at a time.
+   We can fix this somewhat by modifying the evaluator so that evaluation continues where the *value* of the previously-imported derivation isn't needed.
+   But, we still will inevitably get stuck somewhere shallower in the expression when the value being built is needed.
+
+   With "Ret-cont", we can cleverly avoid needing that value in certain common situations.
+   Quite often, IFD is creating a derivation, so we will have something like:
+
+   ```nix
+   "blah blah blah ${/*some expression ... is stuck because deep inside: */ (import /* ... */) /* ... */} blah blah blah"
+   ```
+
+   Without knowing what the value of that expression is, we may reasonably assume it's coercible to a string.
+   If it isn't, well, evaluation will fail anyways.
+   We can then make a "scratch" derivation, however, that reifies the evaluation of the stuck term, we can splice the scratch derivation's hash instead:
+
+   ```nix
+   "bash balh blash /nix/store/123asdf4sdf1g2dfgh34fg8h7fg69876-i-like-to-procrastinate-and-hope-for-the-best blah blah blah"
+   ```
+
+   Now, evaluation truly isn't stuck at all, and we are as free to continue as if there was no IFD at all!
+   The only failure mode would be if the import was a string but *wasn't* a derivation.
+   But, I imagine we can annotate things such that Nix knows when to speculate like this.
+   (c.f. Compiler hot and cold pragmas.)
+   The author of the Code almost always knows what *type* of thing they are splicing, so I would think we could so annotate quite faithfully.
+   I emphasize "type" because if we ever get a type system, this becomes much easier:
+   Specifying types for imported expressions (along with other explicit signature to guide inference) is wholly sufficient to derive the type of all such splices.
+
+  Another future project would be some speculative strictness to allow one round of evaluation to return *both* a partial build plan and stuck imported derivations.
+  Currently the plan must still be evaluated entirely before any building of "actually needed" derivations, i.e. those which *aren't* imported, begins.
+
+3. More broadly, we can get rid of a special notion of "evaluation" entirely.
+   We can think of evaluation today as basically a special case single layer of dynamism, where the outer work (evaluation) is impure.
+   If all `--pure` and IFD evaluation is done inside Nix builds, then the Nix daemon need not even know about the nix language at all.
+   We can have completely separate tools running inside sandboxes that deal with the Nix expression langauge.
+
+[Reproducible résumé]: https://github.com/matthewbauer/resume
