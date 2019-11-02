@@ -51,11 +51,11 @@ that have at least one person interested in them.
      This has been automatically marked as stale because it has had no
      activity for 180 days.
 
-     If this issue is still important to you, we ask that you leave a
-     comment below. Your comment can be as simple as "still important to
-     me". This lets people sorting through the issues see the issues that
-     at least one person still cares about. Someone will have to do this
-     at most twice a year if there is no other activity.
+     If this is still important to you, we ask that you leave a
+     comment below. Your comment can be as simple as "still important
+     to me". This lets people see that at least one person still cares
+     about this. Someone will have to do this at most twice a year if
+     there is no other activity.
 
      Here are suggestions that might help resolve this more quickly:
 
