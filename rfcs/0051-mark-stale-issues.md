@@ -18,7 +18,7 @@ GitHub.
 # Motivation
 [motivation]: #motivation
 
-We have a large number of open issues and PRs that have accumulated
+We have a large number of open issues that have accumulated
 over the years. Not all of them are still valid and need our
 attention.
 
