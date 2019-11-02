@@ -242,8 +242,8 @@ stdenv.mkDerivation {
   name = "README";
   unpackPhase = "true";
   outputs = [ "drv" "store" ];
-  buildInputs = [ emacs nix ];
   __recursive = true;
+  buildInputs = [ emacs nix ];
   installPhase = ''
     mkdir -p $out
     cd $out
@@ -281,6 +281,8 @@ in stdenv.mkDerivation {
   name = "readme-outer";
   unpackPhase = "true";
   buildInputs = [ nix ];
+  outputs = [ "drv" "store" ];
+  __recursive = true;
   installPhase = ''
     mv $(nix-instantiate --store $store ${README} --arg nixpkgs 'import ${nixpkgs.path}') > $drv
   '';
