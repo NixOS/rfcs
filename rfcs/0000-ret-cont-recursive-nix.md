@@ -353,6 +353,12 @@ The exact way the outputs refer to the replacement derivations / their outputs i
      But, it's better if the hydra evaluator can avoid blocking on the download and/or evaluating the Nix expressions therein.
      "Ret-cont" recursive Nix would allow this by just putting the "outer" derivation in Nixpkgs.
 
+   As an example of the former, Ninja (is getting)[Ninja Dyndeps] a very similar notion they call `dyndep`s in their upcoming release.
+   This is needed for C++ and Fortran modules.
+   If CMake and other tools use it as expected, we would need "Ret-cont" to automatically translate their build plans for fine-grained builds of large projects like LLVM or Chromium.
+   Shake, soon Ninja, and eventually [LLBuild], are the only general purpose build systems I know that do or aim to do dynamic dependencies, but none of them sandbox.
+   If we become the only way to both correctly and incrementally build modern C++, that will be a huge opportunity for further growth.
+
 2. Better still, we can try to automatically transform evaluation without writing manually "outer" derivations.
    With `--pure` mode, Eelco has also talked about opening the door to caching builds.
    "Ret-cont" recursive Nix is wonderful foundation for that.
@@ -395,3 +401,7 @@ The exact way the outputs refer to the replacement derivations / their outputs i
    We can have completely separate tools running inside sandboxes that deal with the Nix expression langauge.
 
 [Reproducible résumé]: https://github.com/matthewbauer/resume
+
+[Ninja Dyndeps]: https://github.com/ninja-build/ninja/pull/1521
+
+[LLBuild]: https://github.com/apple/swift-llbuild
