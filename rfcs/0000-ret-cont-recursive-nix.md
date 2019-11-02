@@ -224,7 +224,7 @@ There's a few things we can call out from the faux-formalization.
  - Use a socket to talk to the host daemon.
    https://github.com/edolstra/nix/commit/1a27aa7d64ffe6fc36cfca4d82bdf51c4d8cf717, a draft implementation of full recursive Nix, has done this and we can take the details from that.
    This might sightly more efficient by reducing moving files, but is conceptual overkill given this design.
-   No direct access to the host daemon rules about a bunch of security concerns, and simplifies the interface for non-Nix tools producing derivations.
+   No direct access to the host daemon rules out a bunch of security concerns, and simplifies the interface for non-Nix tools producing derivations.
    The latter I very much hope will happen, just as Ninja is currently used with CMake, Meson, etc., today.
 
  - Full recursive Nix (builds within builds)
