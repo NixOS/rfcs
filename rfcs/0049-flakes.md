@@ -17,76 +17,6 @@ reproducible evaluation of multi-repository Nix projects; impose a
 discoverable, standard structure on Nix projects; and replace previous
 mechanisms such as Nix channels and the Nix search path.
 
-# TLDR
-
-* A prototype implementation is available in Nixpkgs: `nix run
-  nixpkgs.nixFlakes`.
-
-* Flakes replace channels. For example,
-
-      # nix run nixpkgs#hello -c hello
-
-  fetches the latest version of [the `nixpkgs`
-  flake](https://github.com/edolstra/nixpkgs/blob/release-19.03/flake.nix)
-  from GitHub and builds its `hello` package. Similarly, Nix itself is
-  a flake, so you can get the latest version as follows:
-
-      # nix run nix
-
-* Flakes are looked up in a
-  [registry](https://raw.githubusercontent.com/NixOS/flake-registry/master/flake-registry.json)
-  that maps identifiers such as `nixpkgs` to actual locations such as
-  `github:edolstra/nixpkgs/release-19.03`. You can use such locations
-  ("flake references") directly in the `nix` command:
-
-  ```
-  # nix build github:NixOS/patchelf
-  ```
-
-* For a reproducible result, you can also use a specific revision:
-
-  ```
-  # nix build nixpkgs/a0e1f50e6f72e5037d71a0b65c67cf0605349a06#hello
-  ```
-
-* To get information about a flake:
-
-  ```
-  # nix flake info nixpkgs
-  Description:   A collection of packages for the Nix package manager
-  Revision:      a0e1f50e6f72e5037d71a0b65c67cf0605349a06
-  ...
-  ```
-
-* In addition to the global registry, there is a per-user
-  registry. This can be used to pin flakes to the current version:
-  ```
-  # nix flake pin nixpkgs
-  ```
-  or to a specific version:
-  ```
-  # nix flake add nixpkgs github:edolstra/nixpkgs/a0e1f50e6f72e5037d71a0b65c67cf0605349a06
-  ```
-
-* Flakes can have dependencies on other flakes. For example, [the
-  `patchelf`
-  flake](https://github.com/NixOS/patchelf/blob/master/flake.nix)
-  depends on the `nixpkgs` flake. To ensure reproducibility,
-  dependencies are pinned to specific versions using a *lock file*
-  (e.g. [for
-  patchelf](https://github.com/NixOS/patchelf/blob/master/flake.lock)). Lock
-  files are generated automatically.
-
-* Flakes are evaluated in pure mode, meaning they can't access
-  anything other than their own source or declared dependencies. This
-  allows `nix` to cache evaluation results.
-
-* The `nix` command is flake-based. For example,
-  ```
-  # nix build
-  ```
-  builds the flake in the current directory.
-
 # Motivation
 [motivation]: #motivation
 
@@ -113,7 +43,9 @@ Flakes are motivated by a number of serious shortcomings in Nix:
   users cannot easily pin specific versions of channels, channels
   interact in *ad hoc* ways with the Nix search path, and so on.
 
-The flakes mechanism seeks to address all these problems.
+The flakes mechanism seeks to address all these problems. This RFC,
+however, only describes the format and semantics of flakes; it doesn't
+describe changes to the `nix` command to support flakes.
 
 # Detailed design
 [design]: #detailed-design
@@ -223,56 +155,29 @@ A flake has the following attributes:
     useful for generating (hopefully) monotonically increasing version
     strings.
 
-  A number of outputs have a special meaning, as discussed below.
-
-## Well-known outputs
-
-A number of outputs have a specific meaning to Nix or other tools like
-Hydra. Currently, these are:
-
-* `packages`: A set of derivations used as a default by most `nix`
-  commands. For example, `nix run nixpkgs:hello` uses the
-  `packages.hello` attribute of the `nixpkgs` flake. It cannot contain
-  any non-derivation attributes. This also means it cannot be a nested
-  set! (The rationale is that supporting nested sets requires Nix to
-  evaluate each attribute in the set, just to discover which packages
-  are provided.)
-
-* `defaultPackage`: A derivation used as a default by most `nix`
-  commands if no attribute is specified. For example, `nix run
-  dwarffs` uses the `defaultPackage` attribute of the `dwarffs` flake.
-
-* `checks`: A non-nested set of derivations built by the `nix flake
-  check` command, and by Hydra if a flake does not have a `hydraJobs`
-  attribute.
-
-* `hydraJobs`: A nested set of derivations built by Hydra.
-
-* `devShell`: A derivation that defines the shell environment used by
-  `nix dev-shell` if no specific attribute is given. If it does not
-  exist, then `nix dev-shell` will use `defaultPackage`.
-
-TODO: NixOS-related outputs such as `nixosModules` and `nixosSystems`.
+  The value returned by the `outputs` function must be an attribute
+  set. The attributes can have arbitrary values; however, some tools
+  may require specific attributes to have a specific value (e.g. the
+  `nix` command may expect the value of `packages` to be an attribute
+  set of derivations).
 
 ## Flake inputs
 
 The attribute `inputs` specifies the dependencies of a flake. These
-specify the location of the dependency using a flake reference (see
-below). For example, the following specifies a dependency on the Nixpkgs
-and Hydra repositories:
-
-    # An indirection through the flake registry.
-    inputs.nixpkgs.url = "nixpkgs";
+specify the location of the dependency, or a symbolic flake identifier
+that is looked up in a registry or in a command-line flag. For
+example, the following specifies a dependency on the Nixpkgs and Hydra
+repositories:
 
     # A GitHub repository.
-    inputs.import-cargo.url = "github:edolstra/import-cargo";
+    inputs.import-cargo = {
+      type = "github";
+      owner = "edolstra";
+      repo = "import-cargo";
+    };
 
-If the `url` attribute is omitted, it defaults to the attribute
-name. Thus,
-
-    inputs.nixpkgs = {};
-
-is equivalent to `inputs.nixpkgs.url = "nixpkgs";`.
+    # An indirection through the flake registry.
+    inputs.nixpkgs.id = "nixpkgs";
 
 Each input is fetched, evaluated and passed to the `outputs` function
 as a set of attributes with the same name as the corresponding
@@ -296,7 +201,9 @@ Repositories that don't contain a `flake.nix` can also be used as
 inputs, by setting the input's `flake` attribute to `false`:
 
     inputs.grcov = {
-      url = github:mozilla/grcov;
+      type = "github";
+      owner = "mozilla";
+      repo = "grcov";
       flake = false;
     };
 
@@ -307,238 +214,90 @@ inputs, by setting the input's `flake` attribute to `false`:
       };
     };
 
-## Flake references
+The following input types are specified at present:
 
-Flake references are a vaguely URL-like syntax to specify which flake
-to use. This is used on the command line (e.g. in `nix build
-nixpkgs:hello`, `nixpkgs` is a flake reference), and in the list of
-flake dependencies in `flake.nix` (e.g. in `inputs.nixpkgs = {};`).
+* `git`: A Git repository or dirty local working tree.
 
-Currently the following types of flake references are supported:
+* `github`: A more efficient scheme to fetch repositories from GitHub
+  as tarballs. These have slightly different semantics from `git`
+  (in particular, the `revCount` attribute is not available).
 
-* Git repositories. These have the form
+* `tarball`: A `.tar.{gz,xz,bz2}` file.
 
-      git(+http|+https|+ssh|+git|+file|):(//<server>)?<path>(\?<params>)?
+* `path`: A directory in the file system. This generally should be
+  avoided in favor of `git` inputs, since `path` inputs have no
+  concept of revisions (only a content hash) or tracked files
+  (anything in the source directory is copied).
 
-  `<params>` are a list of key/value pairs in URI query parameter
-  syntax. The following parameters are supported:
+* `hg`: A Mercurial repository.
 
-  * `ref`: The branch or tag to fetch. The default is `master`.
-  * `rev`: The Git commit hash to fetch. Note that this commit must be
-    an ancestor of `ref`, since Nix doesn't clone the entire
-    repository, only the specified `ref` (and the Git protocol doesn't
-    allow fetching a `rev` without a known `ref`). The default is the
-    commit currently pointed to by `ref`.
-  * `dir`: The subdirectory of the repository in which `flake.nix` is
-    located. This parameter enables having multiple flakes in a
-    repository. The default is the root directory.
+## Lock files
 
-  For example, the following are valid Git flake references:
+Inputs specified in `flake.nix` are typically "unlocked" in that they
+don't specify an exact revision. To ensure reproducibility, Nix will
+automatically generate and use a *lock file* called `flake.lock` in
+the flake's directory. The lock file contains a tree of mappings from
+the inputs specified in `flake.nix` to inputs specifications that
+contain revisions.
 
-  * `git+https://example.org/my/repo`
-  * `git+https://example.org/my/repo?dir=flake1`
-  * `git+ssh://git@github.com:NixOS/nix?ref=v1.2.3`
-  * `git://github.com/edolstra/dwarffs?ref=unstable&rev=e486d8d40e626a20e06d792db8cc5ac5aba9a5b4`
-  * `git+file:///home/my-user/some-repo/some-repo`
-
-* Local paths. These have the form
-
-      <path>(\?<params)?
-
-  where `<path>` must refer to (a subdirectory of) a Git repository.
-  These differ from `file://` flake references in a few ways:
-
-  * They refer to the working tree (unless an explicit `rev` or `ref`
-    is specified), so evaluation can access dirty files. (Dirty files
-    are files that are tracked by git but have uncommitted changes.)
-
-  * The `dir` parameter is automatically derived. For example, if
-    `/foo/bar` is a Git repository, then the flake reference
-    `/foo/bar/flake` is equivalent to `/foo/bar?dir=flake`.
-
-* GitHub repositories. These are downloaded as tarball archives,
-  rather than through Git. This is often much faster and uses less
-  disk space since it doesn't require fetching the entire history of
-  the repository. On the other hand, it doesn't allow incremental
-  fetching (but full downloads are often faster than incremental
-  fetches!). The syntax is:
-
-      github:<owner>/<repo>(/<rev-or-ref>)?(\?<params>)?
-
-  `<rev-or-ref>` specifies the name of a branch or tag (`ref`), or a
-  commit hash (`rev`). Note that unlike Git, GitHub allows fetching by
-  commit hash without specifying a branch or tag.
-
-  The only supported parameter is `dir` (see above).
-
-  Some examples:
-
-  * `github:edolstra/dwarffs`
-  * `github:edolstra/dwarffs/unstable`
-  * `github:edolstra/dwarffs/d3f2baba8f425779026c6ec04021b2e927f61e31`
-
-* Indirections through the flake registry. These have the form
-
-      <flake-id>(/<rev-or-ref>(/rev)?)?
-
-  These perform a lookup of `<flake-id>` in the flake registry. The
-  specified `rev` and/or `ref` are then merged with the entry in the
-  registry. (See below.) For example, `nixpkgs` and
-  `nixpkgs/release-19.03` are indirect flake references.
-
-In the future, we should also add tarball flake references
-(e.g. `https://example.org/nixpkgs.tar.xz`). It would also be
-straight-forward to add flake references to Mercurial repositories
-since Nix already has Mercurial support.
-
-## Flake registries
-
-Flake registries map symbolic flake identifiers (e.g. `nixpkgs`) to
-"direct" flake references (i.e. any type of flake reference that's not
-an indirection). This is a convenience to users, allowing them to do
-
-    nix run nixpkgs#hello
-
-rather than
-
-    nix run github:NixOS/nixpkgs#hello
-
-There are multiple registries:
-
-* The global registry
-  https://raw.githubusercontent.com/NixOS/flake-registry/master/flake-registry.json. (This
-  location can be overriden via the `flake-registry` option.) Nix
-  automatically fetches this registry periodically. The check interval
-  is determined by the `tarball-ttl` option.
-
-* The local registry `$XDG_CONFIG_HOME/nix/registry.json`.
-
-* Registry entries specified on the command line.
-
-A registry is a JSON file that looks like this:
-
+For example, if `flake.nix` has the inputs in the example above, then
+the resulting lock file might be:
 ```
 {
-    "version": 1,
-    "flakes": {
-        "nixpkgs": {
-            "url": "github:NixOS/nixpkgs"
-        },
-        ...
-    }
-}
-```
-
-With this registry, flake references resolve as follows:
-
-* `nixpkgs` -> `github:NixOS/nixpkgs`
-* `nixpkgs/release-19.03` -> `github:NixOS/nixpkgs/release-19.03`
-* `nixpkgs/f1c995e694685d6dfb877f6428d3e050d30e253c` -> `github:NixOS/nixpkgs/f1c995e694685d6dfb877f6428d3e050d30e253c`
-
-The registries are searched in reverse order. Thus the local registry
-overrides the global registry, and the command line takes precedence
-over the local and global registries.
-
-## `nix` command line interface
-
-I propose to make flakes the primary way to specify packages in the
-`nix` command line interface. Note that the `nix` UI is still marked
-as experimental, so we have some freedom to make incompatible
-changes. The legacy commands (`nix-build`, `nix-shell`, `nix-env` and
-`nix-instantiate`) should not be changed to avoid breakage.
-
-Most `nix` subcommands work on a list of arguments called
-"installables" for lack of a better word. For example,
-
-    # nix run nixpkgs#hello dwarffs#dwarffs
-
-takes two flake-based installables. The general form is:
-
-    <flake-ref>(#<attr-path>)?
-
-Examples of installables:
-
-* `nixpkgs#packages.hello`
-* `nixpkgs#hello` - short for `nixpkgs:packages.hello`
-* `nixpkgs/release-19.03#hello` - overrides the Git branch to use
-* `github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082#hello` -
-  specifies the exact Git revision to use
-* `dwarffs` - short for `dwarffs#defaultPackage`
-* `nix#hydraJobs.build.x86_64-darwin`
-* `.#hydraJobs.build.x86_64-darwin` - refers to the flake in the
-  current directory (which can be a dirty Git tree)
-* `.` - short for `.#defaultPackage`
-
-If no argument is given, the default is `.`; thus,
-
-    # nix build
-
-is equivalent to
-
-    # nix build .#defaultPackage
-
-For backwards compatibility, it's possible to use non-flake Nix
-expressions using `-f`, e.g. `nix build -f foo.nix foo.bar`.
-
-## Lock files and reproducible evaluation
-
-Inputs specified in `flake.nix` are typically "unlocked": they are
-flake references that don't specify an exact revision (e.g. `nixpkgs`
-rather than
-`github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082`). To
-ensure reproducibility, Nix will automatically generate and use a
-*lock file* called `flake.lock` in the flake's directory. The lock
-file contains a tree of mappings from the flake references specified
-in `flake.nix` to direct flake references that contain revisions.
-
-For example, if `flake.nix` contains
-```
-inputs.nixpkgs = {};
-inputs.import-cargo.url = "github:edolstra/import-cargo";
-```
-then the resulting lock file might be:
-```
-{
-    "version": 3,
+    "version": 4,
     "inputs": {
         "import-cargo": {
             "inputs": {},
             "narHash": "sha256-mxwKMDFOrhjrBQhIWwwm8mmEugyx/oVlvBH1CKxchlw=",
-            "url": "github:edolstra/import-cargo/c33e13881386931038d46a7aca4c9561144d582e",
-            "originalUrl": "github:edolstra/import-cargo"
+            "original": {
+              "type": "github",
+              "owner": "edolstra",
+              "repo": import-cargo"
+            },
+            "resolved": {
+              "type": "github",
+              "owner": "edolstra",
+              "repo": "import-cargo",
+              "rev": "c33e13881386931038d46a7aca4c9561144d582e"
+            }
         },
         "nixpkgs": {
             "inputs": {},
             "narHash": "sha256-p7UqhvhwS5MZfqUbLbFm+nfG/SMJrgpNXxWpRMFif8c=",
-            "url": "github:NixOS/nixpkgs/4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082",
-            "originalUrl": "nixpkgs"
+            "original": {
+              "type": "github",
+              "owner": "NixOS",
+              "repo": nixpkgs"
+            },
+            "resolved": {
+              "type": "github",
+              "owner": "NixOS",
+              "repo": "nixpkgs",
+              "rev": "4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082"
+            }
         }
     }
 }
 ```
 
 Thus, when we build this flake, the input `nixpkgs` is mapped to
-`github:edolstra/import-cargo/c33e13881386931038d46a7aca4c9561144d582e`. Nix
-will also check that the content hash of the input is equal to the one
-recorded in the lock file. This check is superfluous for Git
-repositories (since the commit hash serves a similar purpose), but for
-GitHub archives, we cannot directly check that the contents match the
-commit hash.
+revision `c33e13881386931038d46a7aca4c9561144d582e` of the
+`edolstra/import-cargo` repository on GitHub. Nix will also check that
+the content hash of the input is equal to the one recorded in the lock
+file. This check is superfluous for Git repositories (since the commit
+hash serves a similar purpose), but for GitHub archives, we cannot
+directly check that the contents match the commit hash.
 
-Note that lock files are only used at top-level: the `flake.lock` files
-in dependencies (if they exist) are ignored.
+Note that lock files are only used at top-level: the `flake.lock`
+files in dependencies (if they exist) are ignored. The lock file
+transitively locks direct as well as indirect dependencies.
 
-When you build a local repository (e.g. `nix build /path/to/repo`),
-Nix automatically creates a `flake.lock` file if it doesn't already
-exists. It will also update the lock file if inputs are added or
-removed. You can pass `--recreate-lock-file` to force Nix to recreate
-the lock file from scratch (and thus check for the latest version of
-each input).
+## Reproducible evaluation
 
 Lock files are not sufficient by themselves to ensure reproducible
-evaluation. It is also necessary to prevent certain impurities. In
-particular, the `nix` command now defaults to evaluating in "pure"
-mode, which means that the following are disallowed:
+evaluation. We also need to disallow certain impurities that the Nix
+language previously allowed. In particular, the following are
+disallowed in a flake:
 
 * Access to files outside of the top-level flake or its inputs, as
   well as paths fetched using `fetchTarball`, `fetchGit` and so on
@@ -554,89 +313,6 @@ mode, which means that the following are disallowed:
 
 * Use of the Nix search path (`<...>`); composition must be done
   through flake inputs or `fetchX` builtins.
-
-Pure mode can be disabled by passing `--impure` on the command line.
-
-## Flake-related commands
-
-The command `nix flake` has various subcommands for managing
-flakes. These are:
-
-* `nix flake list`: Show all flakes in the global and local registry.
-
-* `nix flake add <from-flake-ref> <to-flake-ref>`: Add an entry to the
-  local registry. (Recall that this overrides the global registry.)
-  For example,
-
-      # nix flake add nixpkgs github:my-repo/my-nixpkgs
-
-  redirects `nixpkgs` to a different repository. Similarly,
-
-      # nix flake add nixpkgs github:NixOS/nixpkgs/444f22ca892a873f76acd88d5d55bdc24ed08757
-
-  pins `nixpkgs` to a specific revision.
-
-  Note that registries only have an effect on flake references used on
-  the command line or when lock files are generated or updated.
-
-* `nix flake remove <flake-ref>`: Remove an entry from the local
-  registry.
-
-* `nix flake pin <flake-ref>`: Compute a locked flake reference and
-  add it to the local registry. For example:
-
-      # nix flake pin nixpkgs
-
-  will add a mapping like `nixpkgs` ->
-  `github:NixOS/nixpkgs/444f22ca892a873f76acd88d5d55bdc24ed08757` to
-  the local registry.
-
-* `nix flake init`: Create a skeleton `flake.nix` in the current
-  directory.
-
-* `nix flake update`: Recreate the lock file from scratch.
-
-* `nix flake check`: Do some checks on the flake (e.g. check that all
-  `packages` are really packages), then build the `checks`
-  derivations. For example, `nix flake check patchelf` fetches the
-  `patchelf` flake, evaluates it and builds it.
-
-* `nix flake clone`: Do a `git clone` to obtain the source of the
-  specified flake, e.g. `nix flake clone dwarffs` will yield a clone
-  of the `dwarffs` repository.
-
-## Offline use
-
-Since flakes replace channels, we have to make sure that they support
-offline use at least as well. Channels only require network access
-when you do `nix-channel --update`. By contrast, the `nix` command
-will periodically fetch the latest version of the global registry and
-of the top-level flake (e.g. `nix build nixpkgs:hello` may cause it to
-fetch a new version of Nixpkgs). To make sure things work offline:
-
-* It's not a failure if we can't fetch the registry.
-
-* It's not a failure if we can't fetch the latest version of a
-  flake. (For example, `fetchGit` no longer fails if we already have
-  the specified repository and `ref`.)
-
-* Fetched flakes are registered as garbage collector roots, so running
-  the garbage collector while on an airplane will not ruin your day.
-
-* There is an option `--no-net` to explicitly prevent updating the
-  registry or doing other things that need the network (such as
-  substituting). This is the default if there are no configured
-  non-loopback network interfaces.
-
-## CI integration
-
-Flakes are useful for CI systems since `flake.nix` and the lock file
-exactly specify the input repositories. For Hydra this means that you
-no longer need to configure any jobset inputs; just a top-level flake
-reference is enough. For example, the [configuration of the `patchelf`
-jobset](https://hydra.nixos.org/jobset/patchelf/master#tabs-configuration)
-just points to `github:NixOS/patchelf` and doesn't need to specify
-`nixpkgs`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -674,24 +350,18 @@ on top of it.
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-* How to handle the system type? Currently `x86_64-linux` is
-  hard-coded everywhere.
-
-* What to do with Nixpkgs overlays? In principle, overlays would just
-  be a kind of flake output.
-
-* More in general, how to handle flake arguments? This must be done in
-  a way that maintains hermetic evaluation and evaluation caching.
-
-* What are the criteria for inclusion in the global flake registry?
-
-* Hammer out the details of NixOS/NixOps support for flakes.
+* Should flakes have arguments (like "system type")? This must be done
+  in a way that maintains hermetic evaluation and evaluation caching.
 
 * Currently, if flake dependencies (repositories or branches) get
-  deleted, rebuilding the flake may fail. (This is similar to
+  deleted upstream, rebuilding the flake may fail. (This is similar to
   `fetchurl` referencing a stale URL.) We need a command to gather all
   flake dependencies and copy them somewhere else (possibly vendor
   them into the repository of the calling flake).
+
+* Maybe flake metadata should be stored in a `flake.json` or
+  `flake.toml` file. This would prevent ambiguities when the Nix
+  language changes in a future edition.
 
 # Future work
 [future]: #future-work
@@ -707,9 +377,6 @@ on top of it.
   outputs were typed. Maybe this could be done via the Nix
   configurations concept
   (https://gist.github.com/edolstra/29ce9d8ea399b703a7023073b0dbc00d).
-
-* Automatically generate documentation from flakes. This partially
-  depends on the previous item.
 
 # Acknowledgments
 
