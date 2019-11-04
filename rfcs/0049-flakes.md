@@ -67,7 +67,7 @@ installable derivation) and a NixOS module.
 
 ```
 {
-  edition = 201909;
+  edition = 201911;
 
   description = "A filesystem that fetches DWARF debug info from the Internet on demand";
 
@@ -114,7 +114,7 @@ A flake has the following attributes:
   flakes to change in the future. It also enables some evolution of
   the Nix language; for example, the Nix files in the flake could be
   parsed using a syntax determined by the edition. The only currently
-  allowed value is `201909`. Nix rejects flakes with an unsupported
+  allowed value is `201911`. Nix rejects flakes with an unsupported
   edition.
 
 * `description`: A short description of the flake.
