@@ -362,7 +362,7 @@ The exact way the outputs refer to the replacement derivations / their outputs i
    If we become the only way to both correctly and incrementally build modern C++, that will be a huge opportunity for further growth.
 
 2. Better still, we can try to automatically transform evaluation without writing manually "outer" derivations.
-   With `--pure` mode, Eelco has also talked about opening the door to caching builds.
+   With `--pure` mode, Eelco has also talked about opening the door to caching evaluation.
    "Ret-cont" recursive Nix is wonderful foundation for that.
 
    I hope to at least later proposal automatically converting IFD into "Ret-cont":
