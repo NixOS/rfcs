@@ -52,12 +52,10 @@ describe changes to the `nix` command to support flakes.
 
 ## Flakes
 
-A flake is a Git repository that contains a file named `flake.nix` in
-the root directory. (In the future, there might be other types of
-flakes, such as Mercurial repositories or tarballs.) `flake.nix`
-specifies some metadata about the flake such as dependencies (called
-*inputs*), as well as its *outputs* (the Nix values such as packages
-or NixOS modules provided by the flake).
+A flake is a directory that contains a file named `flake.nix` in the
+root directory. `flake.nix` specifies some metadata about the flake
+such as dependencies (called *inputs*), as well as its *outputs* (the
+Nix values such as packages or NixOS modules provided by the flake).
 
 As an example, below is the `flake.nix` of
 [`dwarffs`](https://github.com/edolstra/dwarffs) (a FUSE filesystem
@@ -146,8 +144,8 @@ A flake has the following attributes:
   * `rev`: The commit hash of the flake's Git repository.
 
   * `revCount`: The number of ancestors of the revision `rev`. This is
-    not available for `github:...` repositories (see below), since
-    they're fetched as tarballs rather than as Git repositories.
+    not available for `github` repositories (see below), since they're
+    fetched as tarballs rather than as Git repositories.
 
   * `lastModified`: The commit time of the revision `rev`, in the
     format `%Y%m%d%H%M%S` (e.g. `20181231100934`). Unlike `revCount`,
@@ -328,8 +326,7 @@ configurations.
 For composition of multi-repository projects, the main alternative is
 to continue on with explicit `fetchGit` / `fetchTarball` calls to pull
 in other repositories. However, since there is no explicit listing of
-dependencies, this does not provide automatic updating (i.e. there is
-no equivalent of `nix flake update`).
+dependencies, this does not provide automatic updating.
 
 Instead of a `flake.nix`, flakes could store their metadata in a
 simpler format such as JSON or TOML. This avoids the Turing tarpit
