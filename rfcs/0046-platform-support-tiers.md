@@ -21,7 +21,9 @@ When adding a new platform, be it a new C library option, a new
 cross-compilation target configuration or a new CPU architecture, there is a
 discussion of support expectations and maintenance burden. Having a documented
 vocabulary to describe the expectations and documented precedents should make
-such discussions more efficient.
+such discussions more efficient. Building a consensus about a standard list of
+restrictions for less-popular platform support can also streamline most
+of the decisions of this type.
 
 # Detailed design
 [design]: #detailed-design
@@ -52,10 +54,18 @@ such discussions more efficient.
 
 ## Main dimensions
 
+It is expected that for a platform in a stable situation the tiers
+corresponding to all the dimensions are the same or ar most adjacent. On the
+other hand, changes to the platform tiers usually include one dimension getting
+ahead of the other, with a different balance emerging afterwards.
+
 Note that Tolerance tier is never higher than Tooling tier (and normally not
 higher than Package coverage tier).
 
 ### Tooling
+
+This dimension measures how easy it is to find out what works and what doesn't
+on the platform (in particular, without being a user of the platform).
 
 #### Tier 1
 
@@ -77,6 +87,10 @@ this requirement is not strictly mandatory for Tier-2 tooling.
 None
 
 ### Tolerance/impact
+
+This dimension describes the permissible impact of a platform on the Nixpkgs
+repository. This includes the necessary patches as well as the handling of the
+build failures of updates in Nixpkgs.
 
 #### Tier 1
 
@@ -110,6 +124,9 @@ rejected.
 
 ### The number of working packages
 
+This dimension measures how useful is the current state of the platform support
+to the current and potential users.
+
 #### Tier 1
 
 Almost everything that is not explicitly platform specific and that is not
@@ -131,7 +148,78 @@ Some packages work.
 
 Platform definitions present, a small number of packages might be working.
 
-## Current platforms
+## Platform list
+
+The platform list will be added as an appendix to the Nixpkgs manual, and will
+be maintained as a part of the Nixpkgs documentation.
+
+A non-normative
+description of the platforms at the moment of discussion is provided in the 
+appendix to the RFC and will be used as a basis for a PR adding a platform list
+to the manual.
+
+## Adding a new platform
+
+It is expected that Tier-4 support can be added freely, and Tier-3 support is
+added once enough packages are tested and sustained development happens.
+Tier-2 support (and higher tolerance to platform-specific fixes in
+non-toolchain packages) is generally linked to higher user interest and
+sustainability of both the platform itself and Nixpkgs development for the
+platform. Note that Tier-2 tooling requirements imply allocation of some amount
+of recurring build resources (for building and testing the toolchain).
+
+Support above Tier-2 (and expectation that platform non-users pay attention to
+the platform support on updates) requires deployment of test infrastructure
+for the platform.
+
+Note that from the impact point of view Tier-3 only allows the platform to be a
+motivation for generic cleanups, and further tiers require commitment of
+recurring resources. We hope that this allows Tier-4 addition and Tier-3
+promotion to happen inside the scope of normal technical review by the people
+working with similar platforms; further tiers require allocation and of
+hardware resources, and procedures for coordinating such financial decisions is
+out of scope for this RFC.
+
+# Drawbacks
+[drawbacks]: #drawbacks
+
+Maintaining the list of platforms (and coordinating agreement on explicit
+support expectations) takes effort, both technical and organisational.
+
+# Alternatives
+[alternatives]: #alternatives
+
+Do nothing; make decisions on platform support trade-offs on case-by-case
+basis without a shared framework.
+
+Defining a scope for Nixpkgs platform support and dropping/separating support
+for some of the currently supported platforms.
+
+# Unresolved questions
+[unresolved]: #unresolved-questions
+
+The list of currently supported platforms is incomplete.
+
+# Future work
+[future]: #future-work
+
+Clarify what other considerations there are from the point of view of support
+expectations.
+
+Describe what expectations usually appear together.
+
+Support expectations for packages (and package options), NixOS modules, and
+hardware configurations could also be defined.
+
+Levels of desirability for tricks that are sometimes the only way but are not
+generally encouraged could be defined. (Example: when building an FHS
+environment becomes a reasonable strategy to get something running on a NixOS
+machine?)
+
+# Appendix A. Non-normative description of platforms in November 2019
+
+We currently have a relatively steady state, so the tiers for each platform do
+not differ too much and we can approximate it with a single tier per platform.
 
 ### Tier 1
 
@@ -239,49 +327,3 @@ No current support, but previous support or clear path to add support
 * `i686-solaris`
 
 * `x86_64-illumos`
-
-## Adding a new platform
-
-It is expected that Tier-4 support can be added freely, and Tier-3 support is
-added once enough packages are tested and sustained development happens.
-Tier-2 support (and higher tolerance to platform-specific fixes in
-non-toolchain packages) is generally linked to higher user interest and
-sustainability of both the platform itself and Nixpkgs development for the
-platform.
-
-Support above Tier-2 (and expectation that platform non-users pay attention to
-the platform support on updates) requires deployment of test infrastructure
-for the platform.
-
-# Drawbacks
-[drawbacks]: #drawbacks
-
-Maintaining the list of platforms (and coordinating agreement on explicit
-support expectations) takes effort, both technical and organisational.
-
-# Alternatives
-[alternatives]: #alternatives
-
-Do nothing; make decisions on platform support trade-offs on case-by-case
-basis without a shared framework.
-
-# Unresolved questions
-[unresolved]: #unresolved-questions
-
-The list of currently supported platforms is incomplete.
-
-# Future work
-[future]: #future-work
-
-Clarify what other considerations there are from the point of view of support
-expectations.
-
-Describe what expectations usually appear together.
-
-Support expectations for packages (and package options), NixOS modules, and
-hardware configurations could also be defined.
-
-Levels of desirability for tricks that are sometimes the only way but are not
-generally encouraged could be defined. (Example: when building an FHS
-environment becomes a reasonable strategy to get something running on a NixOS
-machine?)
