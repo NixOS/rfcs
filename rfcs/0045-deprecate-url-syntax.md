@@ -18,14 +18,15 @@ Nixpkgs.
 [motivation]: #motivation
 
 The Nix language has a special syntax for URLs even though quoted strings can also be used to represent them. Unlike paths, URLs do not
-have any special support that would make the difference useful. Moreover, using
+have any special properties in the Nix expression language
+that would make the difference useful.
+Moreover, using
 variable expansion in URLs requires some URLs to be quoted strings anyway. So
 the most consistent approach is to always use quoted strings to represent URLs.
 Additionally, a semicolon immediately after the URL can be mistaken for a part
 of URL by language-agnostic tools such as terminal emulators.
 
-In case of future breaking changes in the Nix syntax, it would be nice to make
-the `x:x` snippet parse to the identity function, and not to an URL. Tools
+Tools
 targeting only Nixpkgs codebase can ignore URL syntax once Nixpkgs phases out
 its use.
 
@@ -33,7 +34,7 @@ its use.
 [design]: #detailed-design
 
 Add a note in the Nix manual that the special unquoted URL syntax is
-discouraged and will be eventually removed.
+discouraged and may be removed in a future edition of the Nix language.
 
 Add a note in the Nixpkgs manual that the unquoted URL syntax should not be used anymore.
 
@@ -65,4 +66,4 @@ Currently none.
 # Future work
 [future]: #future-work
 
-In some future edition of Nix, remove the special URL syntax.
+Currently none.
