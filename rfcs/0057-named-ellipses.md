@@ -1,7 +1,7 @@
 ---
 feature: Named Ellipses OR function argument consistency
 start-date: (fill me in with today's date, YYYY-MM-DD)
-author: @deliciouslytyped
+author: deliciouslytyped
 co-authors: (find a buddy later to help our with the RFC)
 shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
