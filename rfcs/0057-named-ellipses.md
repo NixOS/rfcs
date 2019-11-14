@@ -12,9 +12,9 @@ related-issues:
 # Summary
 [summary]: #summary
 
-It should be possible to bind ellipses to a name in a function argument definitions like `{ a, ...@extra }: null`, and `{ a, extra@... }: null`. This makes intuitive sense, and would remove the need for a lot of uses of `removeAttrs` that really just want to refer to the contents of ellipses.
+It should be possible to bind ellipses to a name in a function definition like `{ a, ...@extra }: null`, and `{ a, extra@... }: null`. This makes intuitive sense, and could remove the need for a lot of uses of `removeAttrs` that really just want to refer to the contents of ellipses.
 
-TODO: The latter point should be substantiated.
+TODO: The latter could be substantiated.
 
 # Detailed design
 [design]: #detailed-design
