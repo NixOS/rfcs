@@ -22,7 +22,7 @@ This is pretty simple so it#s redundant with the summary:
 # Detailed design
 [design]: #detailed-design
 
-`{...@extraargs}: extraargs` should yield an attrset the extra arguments "in" `...`.
+`{...@extraargs}: extraargs` should yield as an attrset the extra arguments "in" `...`.
 
 Help?
 
