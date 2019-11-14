@@ -17,7 +17,7 @@ It should be possible to bind ellipses to a name in a function argument definiti
 [motivation]: #motivation
 This is pretty simple so it#s redundant with the summary:
 - I think it makes sense to be able to refer to "the rest of the arguments" as a first class object
-- This should also allow nixing a lot of usages of the `removeAttrs` pattern
+- This should also allow nixing a lot of usages of the `removeAttrs` pattern TODO: substantiate this
 
 # Detailed design
 [design]: #detailed-design
