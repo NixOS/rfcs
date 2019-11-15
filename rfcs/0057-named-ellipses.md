@@ -21,6 +21,8 @@ TODO: The latter could be substantiated.
 
 `{...@extraargs}: extraargs` should yield as an attrset the extra arguments "in" `...`.
 
+TODO: consider what other languages like Haskell do
+
 # Drawbacks
 [drawbacks]: #drawbacks
 None? This implements syntax that would not have worked before and so in theory shouldn't cause breakage in the Nix ecosystem. [Citation Needed]
