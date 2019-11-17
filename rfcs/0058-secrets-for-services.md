@@ -59,7 +59,7 @@ To summarize, necessary preconditions:
 * It's sufficiently secure to store the secrets or access tokens in a location
   only accessible by root on the system
 * The secrets store locations is secure at rest, such as full-disk-encryption.
-* Interactive unlocking scenarios are should be treated separately
+* Interactive unlocking scenarios should be treated separately
 * Linux namespaces are sufficiently secure
 * The service can be run using `PrivateTmp`
 
