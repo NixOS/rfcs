@@ -22,10 +22,19 @@ outcome?
 # Detailed design
 [design]: #detailed-design
 
-This is the bulk of the RFC. Explain the design in enough detail for somebody
-familiar with the ecosystem to understand, and implement.  This should get
-into specifics and corner-cases, and include examples of how the feature is
-used.
+This is the core, normative part of the RFC. Explain the design in enough
+detail for somebody familiar with the ecosystem to understand, and implement.
+This should get into specifics and corner-cases. Yet, this section should also
+be terse, avoiding redundancy even at the cost of clarity.
+
+# Examples and Interactions
+[examples-and-interactions]: #examples-and-interactions
+
+This section illustrates the detailed design. This section should clarify all
+confusion the reader has from the previous sections. It is especially important
+to counterbalance the desired terseness of the detailed design; if you feel
+your detailed design is rudely short, consider making this section longer
+instead.
 
 # Drawbacks
 [drawbacks]: #drawbacks
