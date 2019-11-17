@@ -130,7 +130,7 @@ their id. How a secrets identifier is resolved, should be up to the fetcher
 function and here it's just trivially the file-name (this of course does not
 allow for file extensions).
 
-These secrets are then made acessible to the target service's unit definitions as
+These secrets are then made accessible to the target service's unit definitions as
 arguments passed into a lambda within the scope. These arguments then point to
 some private location within the namespace - in our case `secret1 ->
 /tmp/secret1`.
