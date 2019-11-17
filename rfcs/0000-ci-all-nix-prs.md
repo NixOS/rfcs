@@ -49,7 +49,7 @@ More process to follow.
 1. Merely build all PRs with OfBorg.
    This is still far better than the status quo, but has the disadvantage that master must still be rebuilt as OfBorg and Hydra do not share a cache.
 
-2. Merely build all approved PRs, and maintainers are still allowed to merge broken ones / not take care to avoid untested merge commits.
+2. Merely build all approved PRs with Hydra, but maintainers are still allowed to merge broken ones / not take care to avoid untested merge commits.
    This is better still, but master could still be broken, even if only working branches are merged due to the merges not being tested.
 
 3. Build all PRs with Hydra.
