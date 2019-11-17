@@ -17,7 +17,7 @@ Do not merge any PR until it passes CI.
 # Motivation
 [motivation]: #motivation
 
-There is a [famous blog post](blog-post) about how everyone is sloppy and doing CI wrong.
+There is a [famous blog post][blog-post] about how everyone is sloppy and doing CI wrong.
 This isn't just bad for releasing software smoothly, but also increases the burden for new contributors because it is harder to judge the correctness of PRs at a glance (is it broken? Did I break it?).
 I personally find it harder to contribute, I have to worry about double checking all my work on platforms I don't have as-easy access to, like Darwin.
 
