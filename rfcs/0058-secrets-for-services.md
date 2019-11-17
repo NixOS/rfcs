@@ -75,7 +75,7 @@ Core concepts and terminology:
   `/etc/secrets`, only accessible to root
 * A *fetcher* function: a function whose task it is to resolve the secret
   identifier, retrieve the secret and place it in the service process' private
-  namespace within /tmp name
+  namespace within `/tmp` name
 * Simple helper functions to *enrich* expressions defining systemd services
   with secrets
 * "Side-car" service: A privileged systemd service running the fetcher
