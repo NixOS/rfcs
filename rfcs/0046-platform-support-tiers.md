@@ -95,7 +95,7 @@ changes on the platform without access to the platform, and to start using the
 platform). Recognition of the lower tiers (Tier 5 and below) is based on
 a technical review of the platform support code quality and requirements. For
 higher tier an explicit decision has to be made based on the technical merits,
-future expectation. resource allocation and project priorities. As this is not
+future expectations, resource allocations and project priorities. As this is not
 a purely technical decision, this RFC only stipulates that a serious discussion
 occurs once any new platform meets technical requirements of a high tier.
 
@@ -113,14 +113,14 @@ This dimension describes the permissible impact of a platform on the Nixpkgs
 repository. This includes the necessary patches as well as the handling of the
 build failures of updates in Nixpkgs.
 
-### Tooling requirments
+### Tooling requirements
 
 This dimension measures how easy it is to find out what works and what doesn't
 on the platform (in particular, without being a user of the platform).
 
-### Package coverage.
+### Package coverage
 
-This dimension measures avilability of the most important packages on the
+This dimension measures availability of the most important packages on the
 platform. It is intended to describe how useful is the current state of the
 platform support to the current and potential users.
 
@@ -176,11 +176,11 @@ Most packages work, credible ambition to reach Tier 1 coverage at some point.
 
 Completely platform-specific fixes are expected to be rare and non-intrusive.
 Fixes to the compilation toolchains are expected.
-General cleanups of non-standard assumptions (e.g. «everything that is no x86
+General cleanups of non-standard assumptions (e.g. «everything that is not x86
 is a kind of ARM» or «malloc(0) behaviour is a reliable indicator of other
-malloc features») useful for this platforms are welcome.
+malloc features») useful for these platforms are welcome.
 
-Updates might break builds on this platform .
+Updates might break builds on this platform.
 
 No channel-blocking jobs on Hydra.
 
@@ -203,7 +203,7 @@ Most of the popular packages work.
 
 Fixes necessary for this platforms must be either limited to compilation
 toolchains, or general cleanups of non-standard assumptions (e.g. «everything
-that is no x86 is a kind of ARM» or «malloc(0) behaviour is a reliable
+that is not x86 is a kind of ARM» or «malloc(0) behaviour is a reliable
 indicator of other malloc features»). These fixes must be generic: there
 should be a reasonable expectation that other exotic platforms would equally
 benefit from the exact same fix.
@@ -269,7 +269,7 @@ are out of scope for this RFC.
 
 When a platform starts falling out of use, its support tier (and permitted
 impact) is reduced once it becomes clear that the current tier requirements
-will stop being met in the near future. Platform-specifing patches no longer
+will stop being met in the near future. Platform-specific patches no longer
 permissible in the context of the new support tier can be removed at will by
 the package maintainers.
 
