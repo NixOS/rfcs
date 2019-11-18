@@ -314,6 +314,10 @@ machine?)
 Define the expetations of maintenance for specific packages; consider the
 notion of platform-specific maintenance.
 
+Define the preferences about the amount of time to wait for Tier-2 platform
+fixes in various situations, and about interim resolution in case of failure
+(keep old version on one platform, mark as broken, something else).
+
 # Appendix A. Non-normative description of platforms in November 2019
 
 We currently have a relatively steady state, so the tiers for each platform do
