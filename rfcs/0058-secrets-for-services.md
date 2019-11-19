@@ -81,7 +81,7 @@ Core concepts and terminology:
 * "Side-car" service: A privileged systemd service running the fetcher
   function to retrieve the secret, and initially create the service
   namespace
-* Secrets scope: provides a context in swhich secrets are accessible as
+* Secrets scope: provides a context in which secrets are accessible as
   attributes resolving to path names within the private namespace
 
 The general idea is centered around this simple process:
