@@ -25,7 +25,7 @@ like NixOps, or a simple secrets folder.
 There is currently a lack of consistent and safe mechanisms to make secrets
 available to systemd services in NixOS. Various modules implement it in various
 ways across the ecosystem. There have also been ideas like adjustments to the
-Nix Store (like issue https://github.com/NixOS/nixpkgs/issues/8), which
+Nix Store (like [issue #8](https://github.com/NixOS/nix/issues/8)), which
 would allow for non-world-readable files, but this issue has made no progress
 in several years.
 
