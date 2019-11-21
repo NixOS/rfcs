@@ -6,11 +6,6 @@ implemented and reviewed via the normal GitHub pull request workflow.
 Some changes though are "substantial", and we ask that these be put through a
 bit of a design process and produce a consensus among the Nix community.
 
-This is the bulk of the RFC. Explain the design in enough detail for somebody
-familiar with the ecosystem to understand, and implement.  This should get
-into specifics and corner-cases, and include examples of how the feature is
-used.
-
 ## When this process is followed
 
 This process is followed when one intends to make "substantial" changes to the
