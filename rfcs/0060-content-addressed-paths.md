@@ -72,7 +72,7 @@ The gist of the design is that
 Since the design is non trivial, better start with an example to give an
 intuition of what's happening:
 
-In this example, we have the following nix code:
+In this example, we have the following Nix expression:
 
 ```nix
 rec {
@@ -97,7 +97,7 @@ rec {
 Suppose that we want to build `transitivelyDependent`.
 What will happen is the following
 
-- We instantiate the nix code, this gives us three drv files:
+- We instantiate the Nix expression, this gives us three drv files:
   `contentAdressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
 - We build `contentAdressed.drv`.
   - We first compute `dynamic(contentAdressed.drv)` to replace its
@@ -128,7 +128,7 @@ a way that `contentAdressed.drv` will be modified, but its output will be the
 same. We try to rebuild the new `transitivelyDependent`. What happens is the
 following:
 
-- We instantiate the nix code, this gives us three new drv files:
+- We instantiate the Nix expression, this gives us three new drv files:
   `contentAdressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
 - We build `contentAdressed.drv`.
   - We first compute `dynamic(contentAdressed.drv)` to replace its
@@ -155,7 +155,7 @@ following:
   - Here again, we notice that `dynamic(transitivelyDependent.drv)` is the same as before,
     so we don't build anything
 
-## nix-build process
+## Nix-build process
 
 ### Aliases paths
 
@@ -245,7 +245,7 @@ is the case).
 
 ## Client support
 
-The bulk of the job here is done by the nix daemon.
+The bulk of the job here is done by the Nix daemon.
 
 Depending on the details of the current Nix implementation, there might or
 might not be a need for the client to also support it (which would require the
@@ -253,7 +253,7 @@ daemon and the client to be updated in synchronously)
 
 ## Old Nix versions and caching
 
-What happens (and should happen) if a nix not supporting the cas model queries
+What happens (and should happen) if a Nix not supporting the cas model queries
 a cache with cas paths in it is not clear yet.
 
 In particular, the content (and the existence) of the physical path of the
