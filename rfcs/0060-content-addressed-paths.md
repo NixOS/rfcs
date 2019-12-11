@@ -29,7 +29,7 @@ approximation nor by the semantics of the distribution of non-deterministic
 paths, **but** we also leave the option to lift these restrictions later.
 
 This RFC already has a (somewhat working) POC at
-<https://github.com/regnat/nix/tree/cas>.
+<https://github.com/NixOS/nix/pull/3262>.
 
 # Motivation
 
@@ -42,8 +42,8 @@ chapter in [Eelco's PHD thesis][nixphd].
 This was never done because it represents a quite big change in Nix's model,
 with some non-totally-solved implications (regarding the trust model in
 particular).
-Even without going all the way down to a fully intensional model (yet), we can
-make certain paths content-adressed, which can give some important benefits of
+Even without going all the way down to a fully intensional model, we can
+make specific paths content-adressed, which can give some important benefits of
 the intensional store at a much lower price. In particular, setting some
 critical derivations as content-adressed can lead to some substancial build
 cutoffs.
