@@ -23,7 +23,7 @@ are allowed to be ca to avoid some tricky issues that can arise with
 content-adressability.
 In particular, we restrict ourselves to paths without any non-textual
 self-reference (_i.e_ a self-reference hidden inside a zip file) and known to
-be deterministic (for caching reasons, see [#caching]).
+be deterministic (for caching reasons, see [caching]).
 That way we don't have to worry about the fact that hash-rewriting is only an
 approximation nor by the semantics of the distribution of non-deterministic
 paths, **but** we also leave the option to lift these restrictions later.
