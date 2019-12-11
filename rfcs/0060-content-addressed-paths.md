@@ -21,12 +21,17 @@ now (modulo some mandatory drv rewriting before the build, see below)
 By making this opt-in, we can impose arbitrary limitations to the paths that
 are allowed to be ca to avoid some tricky issues that can arise with
 content-adressability.
-In particular, we restrict ourselves to paths without any non-textual
-self-reference (_i.e_ a self-reference hidden inside a zip file) and known to
-be deterministic (for caching reasons, see [caching]).
+
+In particular, we restrict ourselves to paths that are:
+
+- without any non-textual self-reference (_i.e_ a self-reference hidden inside a zip file)
+- known to be deterministic (for caching reasons, see [caching]).
+
 That way we don't have to worry about the fact that hash-rewriting is only an
 approximation nor by the semantics of the distribution of non-deterministic
-paths, **but** we also leave the option to lift these restrictions later.
+paths.
+
+We also leave the option to lift these restrictions later.
 
 This RFC already has a (somewhat working) POC at
 <https://github.com/NixOS/nix/pull/3262>.
