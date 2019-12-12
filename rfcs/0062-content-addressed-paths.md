@@ -81,14 +81,14 @@ In this example, we have the following Nix expression:
 
 ```nix
 rec {
-  contentAdressed = mkDerivation {
-    name = "contentAdressed";
-    contentAdressed = true;
+  contentAddressed = mkDerivation {
+    name = "contentAddressed";
+    __contentAddressed = true;
     … # Some extra arguments
   };
   dependent = mkDerivation {
     name = "dependent";
-    buildInputs = [ contentAdressed ];
+    buildInputs = [ contentAddressed ];
     … # Some extra arguments
   };
   transitivelyDependent = mkDerivation {
@@ -103,21 +103,21 @@ Suppose that we want to build `transitivelyDependent`.
 What will happen is the following
 
 - We instantiate the Nix expression, this gives us three drv files:
-  `contentAdressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
-- We build `contentAdressed.drv`.
-  - We first compute `dynamic(contentAdressed.drv)` to replace its
+  `contentAddressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
+- We build `contentAddressed.drv`.
+  - We first compute `dynamic(contentAddressed.drv)` to replace its
     inputs by their real output path. Since there is none, we
-    have here `dynamic(contentAdressed.drv) == contentAdressed.drv`
-  - We realise `dynamic(contentAdressed.drv)`. This gives us an output path
-    `out(dynamic(contentAdressed.drv))`
-  - We move `out(dynamic(contentAdressed.drv))` to its content-adressed path
-    `ca(contentAdressed.drv)` which derives from
-    `sha256(out(dynamic(contentAdressed.drv)))`
+    have here `dynamic(contentAddressed.drv) == contentAddressed.drv`
+  - We realise `dynamic(contentAddressed.drv)`. This gives us an output path
+    `out(dynamic(contentAddressed.drv))`
+  - We move `out(dynamic(contentAddressed.drv))` to its content-adressed path
+    `ca(contentAddressed.drv)` which derives from
+    `sha256(out(dynamic(contentAddressed.drv)))`
 - We build `dependent.drv`
   - We first compute `dynamic(dependent.drv)` to replace its
     inputs by their real output path.
-    In that case, we replace `contentAdressed.drv!out` by
-    `ca(contentAdressed.drv)`
+    In that case, we replace `contentAddressed.drv!out` by
+    `ca(contentAddressed.drv)`
   - We realise `dynamic(dependent.drv)`. This gives us an output path
     `out(dynamic(dependent.drv))`
 - We build `transitivelyDependent.drv`
@@ -128,29 +128,29 @@ What will happen is the following
   - We realise `dynamic(transitivelyDependent.drv)`. This gives us an output path
     `out(dynamic(transitivelyDependent.drv))`
 
-Now suppose that we slightly change the definition of `contentAdressed` in such
-a way that `contentAdressed.drv` will be modified, but its output will be the
+Now suppose that we slightly change the definition of `contentAddressed` in such
+a way that `contentAddressed.drv` will be modified, but its output will be the
 same. We try to rebuild the new `transitivelyDependent`. What happens is the
 following:
 
 - We instantiate the Nix expression, this gives us three new drv files:
-  `contentAdressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
-- We build `contentAdressed.drv`.
-  - We first compute `dynamic(contentAdressed.drv)` to replace its
+  `contentAddressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
+- We build `contentAddressed.drv`.
+  - We first compute `dynamic(contentAddressed.drv)` to replace its
     inputs by their real output path. Since there is none, we
-    have here `dynamic(contentAdressed.drv) == contentAdressed.drv`
-  - We realise `dynamic(contentAdressed.drv)`. This gives us an output path
-    `out(dynamic(contentAdressed.drv))`
-  - We compute `ca(contentAdressed.drv)` and notice that the
+    have here `dynamic(contentAddressed.drv) == contentAddressed.drv`
+  - We realise `dynamic(contentAddressed.drv)`. This gives us an output path
+    `out(dynamic(contentAddressed.drv))`
+  - We compute `ca(contentAddressed.drv)` and notice that the
     path already exists (since it's the same as the one we built previously),
     so we discard the result.
 - We build `dependent.drv`
   - We first compute `dynamic(dependent.drv)` to replace its
     inputs by their real output path.
-    In that case, we replace `contentAdressed.drv!out` by
-    `ca(contentAdressed.drv)`
+    In that case, we replace `contentAddressed.drv!out` by
+    `ca(contentAddressed.drv)`
   - We notice that `dynamic(dependent.drv)` is the same as before (since
-    `ca(contentAdressed.drv)` is the same as before), so we
+    `ca(contentAddressed.drv)` is the same as before), so we
     just return the already existing path
 - We build `transitivelyDependent.drv`
   - We first compute `dynamic(transitivelyDependent.drv)` to replace its
@@ -171,7 +171,7 @@ on-disk)
 
 ### Building a ca derivation
 
-ca derivations are derivations with the `contentAdressed` argument set to
+ca derivations are derivations with the `__contentAddressed` argument set to
 `true`.
 
 The process for building a content-adressed derivation is the following:
@@ -208,7 +208,7 @@ The process for building a normal derivation is the following:
   particular, the caching model needs some modifications (see [caching]);
 
 - We specify that only a sub-category of derivations can safely be marked as
-  `contentAdressed`, but there's no way to enforce these restricitions;
+  `contentAddressed`, but there's no way to enforce these restricitions;
 
 - This will probably be a breaking-change for some tooling since the output path
   that's stored in the `.drv` files doesn't correspond to the actual on-disk
