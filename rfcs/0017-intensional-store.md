@@ -67,7 +67,7 @@ When garbage collecting, the Nix store should also remove `$out` references (be 
   * However, this makes it hard to find out what derivation a certain `$cas` is
   * Furthermore, different inputs with the same contents are very unlikely, and there is no reduction in builds that need to be done.
 
-Finally, `nix-store` supports hardlinking duplicate files, so the above optimizations are useless.
+Finally, `nix-store` supports hardlinking duplicate files, so the above optimizations are superfluous.
 
 # Drawbacks
 [drawbacks]: #drawbacks
