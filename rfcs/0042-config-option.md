@@ -5,7 +5,7 @@ author: Silvan Mosberger
 co-authors: (find a buddy later to help our with the RFC)
 shepherd-leader: Robin Gloster
 shepherd-team: Robin Gloster, Eelco Dolstra, Robert Helgesson, Franz Pletz
-related-issues: https://github.com/NixOS/nixpkgs/pull/65728, https://github.com/NixOS/nixpkgs/pull/70138, TBD
+related-issues: https://github.com/NixOS/nixpkgs/pull/65728, https://github.com/NixOS/nixpkgs/pull/70138, https://github.com/NixOS/nixpkgs/pull/75584, TBD
 ---
 
 # Summary
