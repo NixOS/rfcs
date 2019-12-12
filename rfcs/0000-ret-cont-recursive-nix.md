@@ -136,14 +136,16 @@ Finally, any uses of the original derivation can be substituted to instead use t
 
 To faux-formalize everything in the vein of a small-step semantics:
 ```
-immediatelyDependsOn(drv0, drv1)
-immediatelyDependsOn(drv1, drv2)
--------------------------------------------------- deps-trans
-transitivelyDependsOn(drv0, drv2)
+∀<d : immediatelyDependsOn(drv, -)>
+  isValue(d)
+drv ? __recursive == false
+drv ? outputHash == false
+-------------------------------------------------- normalized
+isValue(drv)
 ```
 ```
-∀<d : transitivelyDependsOn(drv, -)>
-  d ? __recursive == false
+∀<d : immediatelyDependsOn(drv, -)>
+  isValue(d)
 -------------------------------------------------- build-readiness
 isReadyToBuild(drv)
 ```
@@ -152,29 +154,34 @@ drv0 : Drv
 ∀<o : outputs(drv0)> build_o : StorePath
 ∀<o : outputs(drv0)> build(drv0) = { ${o} = build_o; }
 isReadyToBuild(drv0)
-drv0 ? __recursive == false
--------------------------------------------------- normal-build
+-------------------------------------------------- simple-build
 ∀<o : outputs(drv0)> assoc(drv0, o, build_o)
+```
+```
+drv : Drv
+drv.outputs = { "out" = ...; }
+drv ? outputHash == true
+-------------------------------------------------- immediate-reduction-fixed-output
+reducesTo(drv0, stubDrv(drv.outputHash))
 ```
 ```
 drv0, drv1 : Drv
 drv1path : RelativePath
-∀<o : outputs(drv0)> build0_o : StorePath
-isReadyToBuild(drv0)
-drv0 ? __recursive == true
 drv0.outputs = { "store" = ...; "drv" = ...; }
-build(drv0) = { succeeded = build0; }
+∀<o : outputs(drv0)> build0_o : StorePath
+∀<o : outputs(drv0)> assoc(drv0, o, build0_o)
+drv0 ? __recursive == true
 isTrustlessStore(build0_store)
 drv1 = read(build0_store + drv1path)
 readlink(build0_drv) = build0.store + drv1path
--------------------------------------------------- immediate-drv-deligation
+-------------------------------------------------- immediate-reduction-drv-deligation
 reducesTo(drv0, drv1)
 ```
 ```
 drv0, drv1, drv2 : Drv
 reducesTo(drv1, drv2)
 immediatelyDependsOn(drv0, drv1)
--------------------------------------------------- transitive-drv-deligation
+-------------------------------------------------- transitive-reduction
 reducesTo(drv0, drv0[drv2/drv1])
 ```
 ```
@@ -190,13 +197,18 @@ reducesTo(drv0, drv1)
 
 There's a few things we can call out from the faux-formalization.
 
+ - When we build a derivation, we don't want it's associated build.
+   This is because it may not exist if it is not in normal form, and may be an intermediate result if the derivation is recursive.
+   Instead, we we want the associated build of the *evaluation* of the given derivation.
+
  - `isTrustlessStore` is called that because the restricted on the contents—fixed output builds / plain data and drvs—is fully and cheaply verifiabled.
    This is in contrast to normal builds,
    where the relationship between the derivation and build can only be verified by redoing the build,
    and where even then there's no way to know whether to blame the output for being actually malicious, or the derivation for merely being non-deterministic.
 
- - The substitution of drvs in a downstream derivation reminds me of the substitution of drvs for content hashes with the intensional store.
-   We should muse on this point, and hopefully write a small-step semantics for both together that is more elegant than the above.
+ - The substitution of drvs in a downstream derivation is very realted to the substitution of drvs for content hashes with the intensional store.
+   I included the normalization of content adressible stores, today done with `hashDerivationModulo` to to help make that clear, and show that we already normalize derivations.
+   I hope to eventually share a formalism for this and RFC #62.
 
  - The *building* itself of derivations is unchanged.
    All the magic happens through the `reducesTo` relation.
