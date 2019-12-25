@@ -55,9 +55,10 @@ met.
 ## Platform elements
 
 * CPU architecture (possibly: subarchitecture, optional features)
-* OS kernel
+* OS ABI
 * C compiler
 * C library
+* OS kernel
 * NixOS/non-NixOS global layout, in case of Linux with glibc
 * Global linking options
 
