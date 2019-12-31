@@ -1,0 +1,101 @@
+---
+feature: documentation-format
+start-date: 2019-12-31
+author: Silvan Mosberger (infinisil)
+co-authors: (find a buddy later to help out with the RFC)
+shepherd-team: (names, to be nominated and accepted by RFC steering committee)
+shepherd-leader: (name to be appointed by RFC steering committee)
+related-issues: (will contain links to implementation PRs)
+---
+
+# Summary
+[summary]: #summary
+
+The Nix community wants to move away from using Docbook as our documentation format and replace it with something else. However it is unclear what it should be replaced with. This RFC gives a concrete process for determining the new documentation format. It does NOT say what format should be used.
+
+# Motivation
+[motivation]: #motivation
+
+There's been enough bike-shedding over the documentation format to use. We should finally settle this debate by deciding and committing on a single format such that we can move forward and improve our documentation situation.
+
+# Detailed design
+[design]: #detailed-design
+
+The process for determining the doc format is as follows:
+- This RFC is filled out with a good and objective overview of each format with their advantages/disadvantages. This gets refined through the RFC process such that all shepherd members are satisfied with it and the RFC is accepted
+- A [Discourse](https://discourse.nixos.org/) post is created with these overviews, along with a **poll** such that people can vote on the formats they prefer. This poll will be open to the whole community and should be advertised as such
+- Whatever format wins in the poll is chosen as the new default documentation format. If later it is discovered that the winner is infeasible for any reason, the format on second place is chosen instead, and so on.
+
+## Format overviews
+
+### Markdown
+
+TODO: Short overview
+
+Tooling:
+- [Sphinx](https://www.sphinx-doc.org/)
+
+### reStructuredText
+
+TODO: Short overview
+
+[Primer](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html), [Demo](https://docutils.readthedocs.io/en/sphinx-docs/user/rst/demo.html)
+
+Tooling:
+- [Sphinx](https://www.sphinx-doc.org/)
+- [Docutils](https://docutils.sourceforge.io/)
+
+### Asciidoc
+
+TODO: Short overview
+
+[Demo](https://github.com/opendevise/asciidoc-samples/blob/master/demo.adoc)
+
+Tooling:
+- [Antora](https://antora.org/)
+- [Asciidoctor](https://asciidoctor.org/)
+
+### Docbook
+
+TODO: Short overview
+
+[Primer](https://docbook.rocks/)
+
+### Comparisons
+
+| Format | Rendered in GitHub | Adoption | Standardized | Goal |
+| --- | --- | --- | --- | --- |
+| Markdown | Yes | Great among websites | No | Easy to use |
+| reStructuredText | Yes | Great among tech docs | Yes | Easy to use, customizable |
+| Asciidoc | Yes | ? | Yes | Easy to use, customizable |
+| Docbook | No | ? | Yes | Semantic structure |
+
+Cheatsheet comparison: http://hyperpolyglot.org/lightweight-markup
+
+- Linux kernel, why Sphinx/reStructuredText (2016): https://lwn.net/Articles/692704/
+
+TODO: More online comparisons?
+
+## Poll
+
+The poll is of the following form:
+- Multiple-choice, allowing people to select all formats they accept
+- Results are only shown when the poll is closed for it to not be influenced by non-final tallies
+- It runs for 1 month to give enough time for less-active people to see it
+- Who voted for which options is made public (Only possible with bar chart in Discourse)
+
+# Drawbacks
+[drawbacks]: #drawbacks
+
+
+# Alternatives
+[alternatives]: #alternatives
+
+
+# Unresolved questions
+[unresolved]: #unresolved-questions
+
+
+# Future work
+[future]: #future-work
+
