@@ -64,7 +64,7 @@ met.
 
 ## Questions to answer for each platform
 
-* What fraction of packages is expected to work?
+* What fraction of packages are expected to work?
 * How many users there are / how much testing one can expect?
 * How much complexity is a platform-specific fix allowed to carry?
 * Is there a binary cache for the platform?
