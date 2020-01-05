@@ -26,6 +26,14 @@ The process for determining the doc format is as follows:
 - A [Discourse](https://discourse.nixos.org/) post is created with these overviews, along with a **poll** such that people can vote on the formats they prefer. This poll will be open to the whole community and should be advertised as such
 - Whatever format wins in the poll is chosen as the new default documentation format. If later it is discovered that the winner is infeasible for any reason, the format on second place is chosen instead, and so on.
 
+## Poll
+
+The poll is of the following form:
+- Multiple-choice, allowing people to select all formats they accept
+- Results are only shown when the poll is closed for it to not be influenced by non-final tallies
+- It runs for 1 month to give enough time for less-active people to see it
+- Who voted for which options is made public (Only possible with bar chart in Discourse)
+
 ## Format overviews
 
 ### Markdown
@@ -76,13 +84,6 @@ Cheatsheet comparison: http://hyperpolyglot.org/lightweight-markup
 
 TODO: More online comparisons?
 
-## Poll
-
-The poll is of the following form:
-- Multiple-choice, allowing people to select all formats they accept
-- Results are only shown when the poll is closed for it to not be influenced by non-final tallies
-- It runs for 1 month to give enough time for less-active people to see it
-- Who voted for which options is made public (Only possible with bar chart in Discourse)
 
 # Drawbacks
 [drawbacks]: #drawbacks
