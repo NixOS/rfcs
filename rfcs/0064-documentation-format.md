@@ -31,6 +31,7 @@ The process for determining the doc format is as follows:
 The poll is of the following form:
 - Multiple-choice, allowing people to select all formats they accept
 - Results are only shown when the poll is closed for it to not be influenced by non-final tallies
+- Answers can be changed while the poll is still active, allowing people to discuss about formats and change their opinion
 - It runs for 1 month to give enough time for less-active people to see it
 - Who voted for which options is made public (Only possible with bar chart in Discourse)
 
