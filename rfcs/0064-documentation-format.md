@@ -87,6 +87,12 @@ Tooling:
 - [Antora](https://antora.org/)
 - [Asciidoctor](https://asciidoctor.org/)
 
+### Texinfo
+
+TODO: Short overview
+
+Powerful, interactive and very nice to use (check out `pinfo`), but harder to write.
+
 ### Docbook
 
 TODO: Short overview
