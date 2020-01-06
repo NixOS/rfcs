@@ -37,12 +37,17 @@ The poll is of the following form:
 
 ## Format overviews
 
-### Markdown
+### Markdown (CommonMark)
 
 TODO: Short overview
 
 Tooling:
 - [Sphinx](https://www.sphinx-doc.org/)
+
+#### Why CommonMark instead of another Markdown flavor?
+- CommonMark is very near to having a 1.0 release for a standardized and unambiguous syntax specification for Markdown
+- The popular Sphinx documentation generator [supports CommonMark](https://www.sphinx-doc.org/en/master/usage/markdown.html) (in addition to reStructuredText)
+- GitHub's Markdown is [a strict superset of CommonMark](https://github.blog/2017-03-14-a-formal-spec-for-github-markdown/) and they are committed to having full CommonMark conformance
 
 ### reStructuredText
 
