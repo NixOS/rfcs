@@ -39,7 +39,7 @@ The poll is of the following form:
 
 ### Markdown (CommonMark)
 
-TODO: Short overview
+Markdown is probably the most well-known markup language, used for discussions on many websites such as GitHub, StackExchange, Reddit, Bitbucket and more. While the original description of Markdown was ambiguous, in current times [CommonMark](https://commonmark.org/) provides a clear specification for it. Markdown is designed to be easy to read and write. If you don't know it already, just after a [one minute tutorial](https://commonmark.org/help/) you can be productive with it.
 
 Tooling:
 - [Sphinx](https://www.sphinx-doc.org/)
