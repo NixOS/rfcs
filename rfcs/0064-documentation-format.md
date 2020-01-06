@@ -22,18 +22,34 @@ There's been enough bike-shedding over the documentation format to use. We shoul
 [design]: #detailed-design
 
 The process for determining the doc format is as follows:
-- This RFC is filled out with a good and objective overview of each format with their advantages/disadvantages. This gets refined through the RFC process such that all shepherd members are satisfied with it and the RFC is accepted
-- A [Discourse](https://discourse.nixos.org/) post is created with these overviews, along with a **poll** such that people can vote on the formats they prefer. This poll will be open to the whole community and should be advertised as such
-- Whatever format wins in the poll is chosen as the new default documentation format. If later it is discovered that the winner is infeasible for any reason, the format on second place is chosen instead, and so on.
+- A set of requirements for the doc format is decided through the RFC discussion
+- Doc format candidates are collected and evaluated to see if they fulfil the requirements.
+- A short objective overview of each valid candidate format is written, along with their advantages/disadvantages
+- The RFC is accepted
+- A [Discourse](https://discourse.nixos.org/) post is created with these overviews, along with a poll such that people can vote on the formats they prefer. This poll will be open to the whole community and should be advertised as such
+- Whatever format wins in the poll is chosen as the new default documentation format. If later it is discovered that the winner is infeasible for any reason, e.g. if it doesn't meet the requirements after all, the format on second place is chosen instead, and so on.
 
 ## Poll
 
 The poll is of the following form:
-- Multiple-choice, allowing people to select all formats they accept
+- Multiple-choice, allowing people to select all formats they agree with
 - Results are only shown when the poll is closed for it to not be influenced by non-final tallies
-- Answers can be changed while the poll is still active, allowing people to discuss about formats and change their opinion
+- Answers can be changed while the poll is still active, allowing people to discuss about formats and change their opinion (this is not optional in Discourse)
 - It runs for 1 month to give enough time for less-active people to see it
-- Who voted for which options is made public (Only possible with bar chart in Discourse)
+- Who voted for which options is made public (Only possible with bar chart in Discourse) TODO: Do we want this or not? Why would we?
+
+## Requirements
+
+- Can be converted to HTML and man pages
+- Inter-file references for being able to link to options from anywhere
+- Ability to create link anchors to most places such that we can link to e.g. paragraphs
+- Errors are easily and quickly detectable, e.g. with a fast and good processor, a live-view, or highlighting editor plugins
+- Is decently fast to fully generate, in the range of 10 seconds for the full documentation on an average machine
+
+### Nice-to-have's
+
+- Annotations/links inside code listings for e.g. linking to option docs in `configuration.nix` snippets
+- Ability to make `$ `'s in command line snippets non-copyable
 
 ## Format overviews
 
@@ -41,8 +57,10 @@ The poll is of the following form:
 
 Markdown is probably the most well-known markup language, used for discussions on many websites such as GitHub, StackExchange, Reddit, Bitbucket and more. While the original description of Markdown was ambiguous, in current times [CommonMark](https://commonmark.org/) provides a clear specification for it. Markdown is designed to be easy to read and write. If you don't know it already, just after a [one minute tutorial](https://commonmark.org/help/) you can be productive with it.
 
-Tooling:
-- [Sphinx](https://www.sphinx-doc.org/)
+Links:
+- [The latest CommonMark specification](https://spec.commonmark.org/current/)
+- [Pandoc](https://pandoc.org/) can convert from/to Markdown to/from many other formats
+- [Sphinx](https://www.sphinx-doc.org/), a popular documentation generator, known for its [readthedocs](https://readthedocs.org/) pages supports Markdown
 
 #### Why CommonMark instead of another Markdown flavor?
 - CommonMark is very near to having a 1.0 release for a standardized and unambiguous syntax specification for Markdown
