@@ -86,6 +86,8 @@ Links:
 format originally developed as part of the Docutils project for documenting the Python language.
 Since then, support was added for reST to Sphinx, a popular tool for documenting (Python) projects, and pandoc.
 
+With Sphinx it is possible to document various languages using the concept of [domains](https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html). E.g., if we were to have a format for documenting Nix functions, we could implement a domain in Sphinx, as well as a parser that could parse Nix functions from comments and convert them to the Sphinx domain, as is done currently with the [Nixpkgs library](https://github.com/NixOS/nixpkgs/pull/53055).
+
 Language:
 - [Specification](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html)
 - [Primer](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html)
