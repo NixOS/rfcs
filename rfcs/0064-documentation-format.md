@@ -47,7 +47,7 @@ The poll is of the following form:
 - Widespread editor integration featuring at least highlighting and preferably live-view
 - Good error detection in toolchain and editors, e.g. with a fast and good processor
 - Is decently fast to fully generate, in the range of 10 seconds for the full documentation on an average machine
-- Closure-size of toolchain should be small.
+- Closure-size of toolchain should be [small](https://github.com/NixOS/nixpkgs/issues/63513).
 - Supports syntax highlighting (with Nix support)
 - Active community supporting the tooling infrastructure
 - Good conversion story from Docbook
