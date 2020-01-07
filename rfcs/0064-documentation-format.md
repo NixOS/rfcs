@@ -49,7 +49,7 @@ The poll is of the following form:
 ### Nice-to-have's
 
 - Annotations/links inside code listings for e.g. linking to option docs in `configuration.nix` snippets
-- Ability to make `$ `'s in command line snippets non-copyable
+- Ability to make `$ `, `nix-repl>` and other prompts in command line snippets non-copyable
 
 ## Format overviews
 
