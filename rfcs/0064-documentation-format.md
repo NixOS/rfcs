@@ -82,13 +82,25 @@ Links:
 
 ### reStructuredText
 
-TODO: Short overview
+[reStructuredText (reST)](https://en.wikipedia.org/wiki/ReStructuredText) is a file
+format originally developed as part of the Docutils project for documenting the Python language.
+Since then, support was added for reST to Sphinx, a popular tool for documenting (Python) projects, and pandoc.
 
-[Primer](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html), [Demo](https://docutils.readthedocs.io/en/sphinx-docs/user/rst/demo.html)
+Language:
+- [Specification](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html)
+- [Primer](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html)
+- [Demo](https://docutils.readthedocs.io/en/sphinx-docs/user/rst/demo.html)
 
 Tooling:
 - [Sphinx](https://www.sphinx-doc.org/)
 - [Docutils](https://docutils.sourceforge.io/)
+- [Pandoc](https://pandoc.org/) can convert from/to reST to/from many other formats
+
+Examples of users:
+- Python
+- Linux kernel
+- CMake
+- Majority of Python packages
 
 ### Asciidoc
 
