@@ -43,13 +43,17 @@ The poll is of the following form:
 - Can be converted to HTML and man pages
 - Inter-file references for being able to link to options from anywhere
 - Ability to create link anchors to most places such that we can link to e.g. paragraphs
-- Errors are easily and quickly detectable, e.g. with a fast and good processor, a live-view, or highlighting editor plugins
+- Errors are easily and quickly detectable, e.g. with a fast and good processor, a live-view, or highlighting editor plugins for most editors
 - Is decently fast to fully generate, in the range of 10 seconds for the full documentation on an average machine
+- Supports syntax highlighting (with Nix support)
+- Active community supporting the tooling infrastructure
+- Good conversion story from Docbook
 
 ### Nice-to-have's
 
 - Annotations/links inside code listings for e.g. linking to option docs in `configuration.nix` snippets
 - Ability to make `$ `, `nix-repl>` and other prompts in command line snippets non-copyable
+- Good search feature (better than Ctrl-F)
 
 ## Format overviews
 
@@ -121,6 +125,7 @@ TODO: Short overview
 Cheatsheet comparison: http://hyperpolyglot.org/lightweight-markup
 
 - Linux kernel, why Sphinx/reStructuredText (2016): https://lwn.net/Articles/692704/
+- Why not Markdown: https://mister-gold.pro/posts/en/asciidoc-vs-markdown/
 
 TODO: More online comparisons?
 
