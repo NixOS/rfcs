@@ -144,6 +144,15 @@ Cheatsheet comparison: http://hyperpolyglot.org/lightweight-markup
 
 TODO: More online comparisons?
 
+### Comparison of tools
+
+For the following comparison NixOS 19.09 is used.
+
+| Name         | Attribute             | Closure size |
+|--------------|-----------------------|--------------|
+| Sphinx       | `python3.pkgs.sphinx` | 195 MB       |
+| Pandoc       | `pandoc`              | 2.4 GB       |
+| Asciidoctor  | `asciidoctor`         | 1.0 GB       |
 
 # Drawbacks
 [drawbacks]: #drawbacks
