@@ -16,7 +16,8 @@ The Nix community wants to move away from using Docbook as our documentation for
 # Motivation
 [motivation]: #motivation
 
-There's been enough bike-shedding over the documentation format to use. We should finally settle this debate by deciding and committing on a single format such that we can move forward and improve our documentation situation.
+The current format for documentation of NixOS projects is DocBook. The format has been a discussion for many years for multiple reasons.
+This RFC describes a method for deciding on what format to use, and should allow us to decide on a format for the coming years, and improve our documentation situation.
 
 # Detailed design
 [design]: #detailed-design
@@ -43,8 +44,10 @@ The poll is of the following form:
 - Can be converted to HTML and man pages
 - Inter-file references for being able to link to options from anywhere
 - Ability to create link anchors to most places such that we can link to e.g. paragraphs
-- Errors are easily and quickly detectable, e.g. with a fast and good processor, a live-view, or highlighting editor plugins for most editors
+- Widespread editor integration featuring at least highlighting and preferably live-view
+- Good error detection in toolchain and editors, e.g. with a fast and good processor
 - Is decently fast to fully generate, in the range of 10 seconds for the full documentation on an average machine
+- Closure-size of toolchain should be [small](https://github.com/NixOS/nixpkgs/issues/63513).
 - Supports syntax highlighting (with Nix support)
 - Active community supporting the tooling infrastructure
 - Good conversion story from Docbook
@@ -53,7 +56,7 @@ The poll is of the following form:
 
 - Annotations/links inside code listings for e.g. linking to option docs in `configuration.nix` snippets
 - Ability to make `$ `, `nix-repl>` and other prompts in command line snippets non-copyable
-- Good search feature (better than Ctrl-F)
+- Good search integration, e.g. by providing a well-functioning search field
 
 ## Format overviews
 
@@ -79,13 +82,27 @@ Links:
 
 ### reStructuredText
 
-TODO: Short overview
+[reStructuredText (reST)](https://en.wikipedia.org/wiki/ReStructuredText) is a file
+format originally developed as part of the Docutils project for documenting the Python language.
+Since then, support was added for reST to Sphinx, a popular tool for documenting (Python) projects, and pandoc.
 
-[Primer](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html), [Demo](https://docutils.readthedocs.io/en/sphinx-docs/user/rst/demo.html)
+With Sphinx it is possible to document various languages using the concept of [domains](https://www.sphinx-doc.org/en/master/usage/restructuredtext/domains.html). E.g., if we were to have a format for documenting Nix functions, we could implement a domain in Sphinx, as well as a parser that could parse Nix functions from comments and convert them to the Sphinx domain, as is done currently with the [Nixpkgs library](https://github.com/NixOS/nixpkgs/pull/53055).
+
+Language:
+- [Specification](https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html)
+- [Primer](https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html)
+- [Demo](https://docutils.readthedocs.io/en/sphinx-docs/user/rst/demo.html)
 
 Tooling:
 - [Sphinx](https://www.sphinx-doc.org/)
 - [Docutils](https://docutils.sourceforge.io/)
+- [Pandoc](https://pandoc.org/) can convert from/to reST to/from many other formats
+
+Examples of users:
+- Python
+- Linux kernel
+- CMake
+- Majority of Python packages
 
 ### Asciidoc
 
@@ -129,6 +146,15 @@ Cheatsheet comparison: http://hyperpolyglot.org/lightweight-markup
 
 TODO: More online comparisons?
 
+### Comparison of tools
+
+For the following comparison NixOS 19.09 is used.
+
+| Name         | Attribute             | Closure size |
+|--------------|-----------------------|--------------|
+| Sphinx       | `python3.pkgs.sphinx` | 195 MB       |
+| Pandoc       | `pandoc`              | 2.4 GB       |
+| Asciidoctor  | `asciidoctor`         | 1.0 GB       |
 
 # Drawbacks
 [drawbacks]: #drawbacks
