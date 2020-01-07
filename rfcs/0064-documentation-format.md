@@ -44,8 +44,10 @@ The poll is of the following form:
 - Can be converted to HTML and man pages
 - Inter-file references for being able to link to options from anywhere
 - Ability to create link anchors to most places such that we can link to e.g. paragraphs
-- Errors are easily and quickly detectable, e.g. with a fast and good processor, a live-view, or highlighting editor plugins for most editors
+- Widespread editor integration featuring at least highlighting and preferably live-view
+- Good error detection in toolchain and editors, e.g. with a fast and good processor
 - Is decently fast to fully generate, in the range of 10 seconds for the full documentation on an average machine
+- Closure-size of toolchain should be small.
 - Supports syntax highlighting (with Nix support)
 - Active community supporting the tooling infrastructure
 - Good conversion story from Docbook
@@ -54,7 +56,7 @@ The poll is of the following form:
 
 - Annotations/links inside code listings for e.g. linking to option docs in `configuration.nix` snippets
 - Ability to make `$ `, `nix-repl>` and other prompts in command line snippets non-copyable
-- Good search feature (better than Ctrl-F)
+- Good search integration, e.g. by providing a well-functioning search field
 
 ## Format overviews
 
