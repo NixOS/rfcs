@@ -16,7 +16,8 @@ The Nix community wants to move away from using Docbook as our documentation for
 # Motivation
 [motivation]: #motivation
 
-There's been enough bike-shedding over the documentation format to use. We should finally settle this debate by deciding and committing on a single format such that we can move forward and improve our documentation situation.
+The current format for documentation of NixOS projects is DocBook. The format has been a discussion for many years for multiple reasons.
+This RFC describes a method for deciding on what format to use, and should allow us to decide on a format for the coming years, and improve our documentation situation.
 
 # Detailed design
 [design]: #detailed-design
