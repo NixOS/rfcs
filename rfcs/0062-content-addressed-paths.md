@@ -266,6 +266,15 @@ static derivation isn't decided. A backwards-compatible choice would be to make
 this a symlink to the dynamic path, but this is also very leaky and potentially
 unsound.
 
+## Garbage collection
+
+Another major open issue is garbage collection of the aliases table. It's not
+clear when entries should be deleted. The paths in the domain are "fake" so we
+can't use them for expiration. The paths in the codomain could be used (i.e. if
+a path is GC'ed, we delete the alias entries that map to it) but it's not clear
+whether that's desirable since you may want to bring back the path via
+substitution in the future.
+
 # Future work
 
 [future]: #future-work
