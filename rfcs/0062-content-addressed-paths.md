@@ -60,17 +60,15 @@ cutoffs.
 In all that follows, we pretend that each derivation has only one output.
 This doesn't change the reasoning but makes things easier to state.
 
-The gist of the design is that
+The gist of the design is that:
 
 - Some derivations can be marked as content-adressed (ca), in which case their
   output will be moved to a path `ca` determined only by its content after the
   build
-- Each (non content-adressed) derivation will have two outputs: A `static` one
-  computed at evaluation time and a `dynamic` one computed from the dynamic
-  outputs of its dependencies. These outputs may be identical if the derivation
-  doesn't (transitively) depend on any ca derivation
-- just prior to being realized, each derivation gets rewritten by replacing
-  each of its dependencies by its `dynamic` or `ca` path
+- When asked to build a derivation, Nix will instead compute a `dynamic`
+  version of that derivation (where all the ca dependencies are replaced by
+  their content addressed path), build this dynamic derivation and link back
+  the original one to this build result.
 
 ## Example
 
