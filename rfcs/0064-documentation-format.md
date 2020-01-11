@@ -11,26 +11,30 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-The Nix community wants to move away from using Docbook as our documentation format and replace it with something else. However it is unclear what it should be replaced with. This RFC gives a concrete process for determining the new documentation format. It does NOT say what format should be used.
+Many people from the Nix community are interested in evaluating alternatives to DocBook as the documentation format for nixpkgs/NixOS.
+Through the process of this RFC, a potentially new doc format will be decided.
 
 # Motivation
 [motivation]: #motivation
 
-The current format for documentation of NixOS projects is DocBook. The format has been a discussion for many years for multiple reasons.
-This RFC describes a method for deciding on what format to use, and should allow us to decide on a format for the coming years, and improve our documentation situation.
+The current doc format for nixpkgs (including NixOS) is DocBook, which has seen a lot of criticism over the years.
+With a more approachable and well-known documentation format we expect to have more doc contributions from more people.
+This should improve our docs to be more up-to-date and complete.
 
 # Detailed design
 [design]: #detailed-design
 
 The process for determining the doc format is as follows:
 - A set of requirements for the doc format is decided through the RFC discussion
-- Doc format candidates are collected and evaluated to see if they fulfil the requirements.
+- Doc format candidates are collected and evaluated to see if they fulfil the requirements. This should include a small demonstration
 - A short objective overview of each valid candidate format is written, along with their advantages/disadvantages
-- The RFC is accepted
 - A [Discourse](https://discourse.nixos.org/) post is created with these overviews, along with a poll such that people can vote on the formats they prefer. This poll will be open to the whole community and should be advertised as such
-- Whatever format wins in the poll is chosen as the new default documentation format. If later it is discovered that the winner is infeasible for any reason, e.g. if it doesn't meet the requirements after all, the format on second place is chosen instead, and so on.
+- Whatever format wins in the poll is chosen as the new default documentation format. This decision is added to the RFC text after which it is merged.
+- People are then free to work towards that new documentation format and the committers of nixpkgs must not oppose these efforts due to the format choice
 
 ## Poll
+
+Since documentation needs to be written and read by the many people from the community, we should incorporate them as possible into this important decision. Discussions in RFCs aren't optimal for this, since not many people are willing to comment, meaning the few people with the strongest opinion will be the main participants, in addition to GitHub's comment section being very annoying to navigate. Because of this, a public poll on Discourse is held instead, allowing many people to easily give their preferences.
 
 The poll is of the following form:
 - Multiple-choice, allowing people to select all formats they agree with
@@ -51,6 +55,7 @@ The poll is of the following form:
 - Supports syntax highlighting (with Nix support)
 - Active community supporting the tooling infrastructure
 - Good conversion story from Docbook
+- Can be used and integrated from NixOS option declarations
 
 ### Nice-to-have's
 
@@ -58,13 +63,38 @@ The poll is of the following form:
 - Ability to make `$ `, `nix-repl>` and other prompts in command line snippets non-copyable
 - Good search integration, e.g. by providing a well-functioning search field
 
-## Format overviews
+## Format Candidates
 
-Should contain for each format:
-- A short description
+All format candidates are listed here with links to demonstrations showing off required features and to get a feel for it. Any tooling can be used to achieve this.
+Ideally this should consist of a standalone repository created for this purpose, not a nixpkgs fork.
+
+| Format | Source | Rendered |
+| --- | --- | --- |
+| Markdown | TODO | TODO | 
+| reST | TODO | TODO | 
+| Asciidoc | TODO | TODO | 
+| DocBook | TODO | TODO | 
+| Texinfo | TODO | TODO | 
+| Nix EDSL | TODO | TODO | 
+
+### Closure sizes of different tools
+
+TODO: Remove this section, as long as tools aren't too big, this isn't relevant or could be showed off in the demos
+For the following comparison NixOS 19.09 is used.
+
+| Name         | Attribute             | Closure size |
+|--------------|-----------------------|--------------|
+| Sphinx       | `python3.pkgs.sphinx` | 195 MB       |
+| Pandoc       | `pandoc`              | 2.4 GB       |
+| Asciidoctor  | `asciidoctor`         | 1.0 GB (on master: 80% smaller)      |
+
+## Format Overviews
+
+This section is to be used in the Discourse post, ordered before the poll. For each format it should contain: (in this order)
+- A short description (history, where it's used, design goals, selling points)
+- A short example of source code for it and links to the demonstrations from above
 - Noteworthy advantages/disadvantages
 - Links to tutorials, documentation and tooling
-- A short sample
 
 ### Markdown (CommonMark)
 
@@ -130,7 +160,7 @@ TODO: Short overview
 
 [Primer](https://docbook.rocks/)
 
-### Comparisons
+### Overall Comparisons
 
 | Format | Rendered in GitHub | Adoption | Standardized | Goal |
 | --- | --- | --- | --- | --- |
@@ -141,20 +171,13 @@ TODO: Short overview
 
 Cheatsheet comparison: http://hyperpolyglot.org/lightweight-markup
 
+
+
+## Some links that don't fit anywhere else in the RFC
+
+TODO: Move or remove this section
 - Linux kernel, why Sphinx/reStructuredText (2016): https://lwn.net/Articles/692704/
 - Why not Markdown: https://mister-gold.pro/posts/en/asciidoc-vs-markdown/
-
-TODO: More online comparisons?
-
-### Comparison of tools
-
-For the following comparison NixOS 19.09 is used.
-
-| Name         | Attribute             | Closure size |
-|--------------|-----------------------|--------------|
-| Sphinx       | `python3.pkgs.sphinx` | 195 MB       |
-| Pandoc       | `pandoc`              | 2.4 GB       |
-| Asciidoctor  | `asciidoctor`         | 1.0 GB       |
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -163,11 +186,14 @@ For the following comparison NixOS 19.09 is used.
 # Alternatives
 [alternatives]: #alternatives
 
+Not doing anything
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-
 # Future work
 [future]: #future-work
 
+- This RFC only determines the doc format, implementing this change needs to be done in the future
+- During that process it would be ideal to move the docs closer to the code they document
+- Also during that it would be good to revise the docs overall and update them where necessary
