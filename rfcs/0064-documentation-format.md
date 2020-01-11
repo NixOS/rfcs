@@ -29,7 +29,7 @@ The process for determining the doc format is as follows:
 - Doc format candidates are collected and evaluated to see if they fulfil the requirements. This should include a small demonstration
 - A short objective overview of each valid candidate format is written, along with their advantages/disadvantages
 - A [Discourse](https://discourse.nixos.org/) post is created with these overviews, along with a poll such that people can vote on the formats they prefer. This poll will be open to the whole community and should be advertised as such
-- Whatever format wins in the poll is chosen as the new default documentation format. This decision is added to the RFC text after which it is merged.
+- With the result of the poll as an input, the shepherd team decides on a doc format to be used. This decision is added to the RFC, after which it is merged.
 - People are then free to work towards that new documentation format and the committers of nixpkgs must not oppose these efforts due to the format choice
 
 ## Poll
