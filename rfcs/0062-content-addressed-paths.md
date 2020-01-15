@@ -70,10 +70,45 @@ The gist of the design is that:
   their content addressed path), build this dynamic derivation and link back
   the original one to this build result.
 
-## Example
+## Nix-build process
 
-Since the design is non trivial, better start with an example to give an
-intuition of what's happening:
+### Output mappings
+
+A major consequence of allowing content-addressed derivations is that the
+actual output path of a derivation might not match its output hash anymore.
+
+To express this, we introduce a new mapping `pathOf` that associates the hash
+of every live derivation to its store path.
+
+### Building a ca derivation
+
+ca derivations are derivations with the `__contentAddressed` argument set to
+`true`.
+
+The process for building a content-adressed derivation is the following:
+
+- We build it like a normal derivation to get an output path `$out`.
+- We compute a cryptographic hash `$chash` of `$out`[^modulo-hashing]
+- We move `$out` to `/nix/store/$chash-$name`
+- We create a mapping from `$dhash` (the hash computed at eval-time) to
+  `/nix/store/$chash-$name`
+
+[^modulo-hashing]:
+
+  We can possibly normalize all the self-references before
+  computing the hash and rewrite them when moving the path to handle paths with
+  self-references, but this isn't strictly required for a first iteration
+
+### Building a normal derivation
+
+The process for building a normal derivation is the following:
+
+- We replace each input derivation `drv` by `pathOf(dhash(drv))`
+- We compute the `dynamic` output of the derivation from the patched version
+- We then try to substitute and build the new derivation
+- We add a new mapping `pathOf(dhash(drv)) = out(dynamic)`
+
+## Example
 
 In this example, we have the following Nix expression:
 
@@ -157,44 +192,6 @@ following:
     `out(dynamic(dependent.drv))`
   - Here again, we notice that `dynamic(transitivelyDependent.drv)` is the same as before,
     so we don't build anything
-
-## Nix-build process
-
-### Output mappings
-
-A major consequence of allowing content-addressed derivations is that the
-actual output path of a derivation might not match its output hash anymore.
-
-To express this, we introduce a new mapping `pathOf` that associates the hash
-of every live derivation to its store path.
-
-### Building a ca derivation
-
-ca derivations are derivations with the `__contentAddressed` argument set to
-`true`.
-
-The process for building a content-adressed derivation is the following:
-
-- We build it like a normal derivation to get an output path `$out`.
-- We compute a cryptographic hash `$chash` of `$out`[^modulo-hashing]
-- We move `$out` to `/nix/store/$chash-$name`
-- We create a mapping from `$dhash` (the hash computed at eval-time) to
-  `/nix/store/$chash-$name`
-
-[^modulo-hashing]:
-
-  We can possibly normalize all the self-references before
-  computing the hash and rewrite them when moving the path to handle paths with
-  self-references, but this isn't strictly required for a first iteration
-
-### Building a normal derivation
-
-The process for building a normal derivation is the following:
-
-- We replace each input derivation `drv` by `pathOf(dhash(drv))`
-- We compute the `dynamic` output of the derivation from the patched version
-- We then try to substitute and build the new derivation
-- We add a new mapping `pathOf(dhash(drv)) = out(dynamic)`
 
 ## Wrapping it up
 
