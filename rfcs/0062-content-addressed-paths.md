@@ -160,12 +160,13 @@ following:
 
 ## Nix-build process
 
-### Aliases paths
+### Output mappings
 
-To allow this, we add a new type of store path: aliases paths.
-These paths don't actually exist in the store, just in the database and point to
-another path (so they are morally symlinks, but inside the db rather than
-on-disk)
+A major consequence of allowing content-addressed derivations is that the
+actual output path of a derivation might not match its output hash anymore.
+
+To express this, we introduce a new mapping `pathOf` that associates the hash
+of every live derivation to its store path.
 
 ### Building a ca derivation
 
@@ -177,7 +178,8 @@ The process for building a content-adressed derivation is the following:
 - We build it like a normal derivation to get an output path `$out`.
 - We compute a cryptographic hash `$chash` of `$out`[^modulo-hashing]
 - We move `$out` to `/nix/store/$chash-$name`
-- We create an alias path from `$out` to `/nix/store/$chash-$name`
+- We create a mapping from `$dhash` (the hash computed at eval-time) to
+  `/nix/store/$chash-$name`
 
 [^modulo-hashing]:
 
@@ -189,12 +191,10 @@ The process for building a content-adressed derivation is the following:
 
 The process for building a normal derivation is the following:
 
-- We look into the drv for all the inputs paths of the build
-- For each input path, we look whether the path is an alias. If so we replace it
-  by its target
+- We replace each input derivation `drv` by `pathOf(dhash(drv))`
 - We compute the `dynamic` output of the derivation from the patched version
 - We then try to substitute and build the new derivation
-- We create an alias path from the `static` output to the `dynamic` one
+- We add a new mapping `pathOf(dhash(drv)) = out(dynamic)`
 
 ## Wrapping it up
 
