@@ -65,10 +65,15 @@ The gist of the design is that:
 - Some derivations can be marked as content-adressed (ca), in which case their
   output will be moved to a path `ca` determined only by its content after the
   build
-- When asked to build a derivation, Nix will instead compute a `dynamic`
-  version of that derivation (where all the ca dependencies are replaced by
-  their content addressed path), build this dynamic derivation and link back
-  the original one to this build result.
+- We introduce the notion of a `resolved derivation` which is a derivation that
+  doesn't refer to any other derivation but only to concrete store paths.
+  To prevent ambiguities, we might speak of a `symbolic derivation` to
+  designate a derivation that's not necessarily resolved.
+  We also define a `resolving` function that given a symbolic derivation
+  returns a new resolved derivation with the same semantics.
+- When asked to build a derivation, Nix will first resolve it, build the
+  resolved derivation and link back the symbolic one to the out path of the
+  resolved one.
 
 ## Nix-build process
 
@@ -79,6 +84,7 @@ actual output path of a derivation might not match its output hash anymore.
 
 To express this, we introduce a new mapping `pathOf` that associates the hash
 of every live derivation to its store path.
+By extension, we also define `pathOf(drv) = pathOf(hash(drv))`
 
 ### Building a ca derivation
 
@@ -87,7 +93,7 @@ ca derivations are derivations with the `__contentAddressed` argument set to
 
 The process for building a content-adressed derivation is the following:
 
-- We build it like a normal derivation to get an output path `$out`.
+- We build it like a normal derivation (see below) to get an output path `$out`.
 - We compute a cryptographic hash `$chash` of `$out`[^modulo-hashing]
 - We move `$out` to `/nix/store/$chash-$name`
 - We create a mapping from `$dhash` (the hash computed at eval-time) to
@@ -101,12 +107,26 @@ The process for building a content-adressed derivation is the following:
 
 ### Building a normal derivation
 
-The process for building a normal derivation is the following:
+#### Resolved derivations
 
-- We replace each input derivation `drv` by `pathOf(dhash(drv))`
-- We compute the `dynamic` output of the derivation from the patched version
-- We then try to substitute and build the new derivation
-- We add a new mapping `pathOf(dhash(drv)) = out(dynamic)`
+We define a `resolved derivation` as a derivation that has no reference to any
+other derivation (but can refere to store paths).
+
+For a derivation `drv` whose input derivations have all been realised, we define
+its `associated resolved derivation` of `drv` (`resolved(drv)`) as
+`drv` in which we replace every input derivation `inDrv` of `drv` by
+`pathOf(inDrv)` (and update the output hash accordingly).
+
+`resolved` is (intentionally) not injective: If `drv` and `drv'` only differ because one depends on `dep` and the other on `dep'`, but `dep` and `dep'` are content-addressed and have the same output hash, then `resolved(drv)` and `resolved(drv')` will be equal.
+
+Derivations that don't transitively depend on any ca derivation are “equivalent” to their associated resolved derivation in that they refer to the same inputs and have the same output hash.
+
+#### Build process
+
+When asked to build a derivation `drv`, we instead:
+
+1. Try to substitute and build `resolved(drv)`. Possibly this is a no-op because it may be that `resolved(drv)` has already been built.
+2. Add a new mapping `pathOf(hash(drv)) = out(resolved(drv))`
 
 ## Example
 
@@ -138,28 +158,28 @@ What will happen is the following
 - We instantiate the Nix expression, this gives us three drv files:
   `contentAddressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
 - We build `contentAddressed.drv`.
-  - We first compute `dynamic(contentAddressed.drv)` to replace its
+  - We first compute `resolved(contentAddressed.drv)` to replace its
     inputs by their real output path. Since there is none, we
-    have here `dynamic(contentAddressed.drv) == contentAddressed.drv`
-  - We realise `dynamic(contentAddressed.drv)`. This gives us an output path
-    `out(dynamic(contentAddressed.drv))`
-  - We move `out(dynamic(contentAddressed.drv))` to its content-adressed path
+    have here `resolved(contentAddressed.drv) == contentAddressed.drv`
+  - We realise `resolved(contentAddressed.drv)`. This gives us an output path
+    `out(resolved(contentAddressed.drv))`
+  - We move `out(resolved(contentAddressed.drv))` to its content-adressed path
     `ca(contentAddressed.drv)` which derives from
-    `sha256(out(dynamic(contentAddressed.drv)))`
+    `sha256(out(resolved(contentAddressed.drv)))`
 - We build `dependent.drv`
-  - We first compute `dynamic(dependent.drv)` to replace its
+  - We first compute `resolved(dependent.drv)` to replace its
     inputs by their real output path.
     In that case, we replace `contentAddressed.drv!out` by
     `ca(contentAddressed.drv)`
-  - We realise `dynamic(dependent.drv)`. This gives us an output path
-    `out(dynamic(dependent.drv))`
+  - We realise `resolved(dependent.drv)`. This gives us an output path
+    `out(resolved(dependent.drv))`
 - We build `transitivelyDependent.drv`
-  - We first compute `dynamic(transitivelyDependent.drv)` to replace its
+  - We first compute `resolved(transitivelyDependent.drv)` to replace its
     inputs by their real output path.
     In that case, that means replacing `dependent.drv!out` by
-    `out(dynamic(dependent.drv))`
-  - We realise `dynamic(transitivelyDependent.drv)`. This gives us an output path
-    `out(dynamic(transitivelyDependent.drv))`
+    `out(resolved(dependent.drv))`
+  - We realise `resolved(transitivelyDependent.drv)`. This gives us an output path
+    `out(resolved(transitivelyDependent.drv))`
 
 Now suppose that we slightly change the definition of `contentAddressed` in such
 a way that `contentAddressed.drv` will be modified, but its output will be the
@@ -169,28 +189,28 @@ following:
 - We instantiate the Nix expression, this gives us three new drv files:
   `contentAddressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
 - We build `contentAddressed.drv`.
-  - We first compute `dynamic(contentAddressed.drv)` to replace its
+  - We first compute `resolved(contentAddressed.drv)` to replace its
     inputs by their real output path. Since there is none, we
-    have here `dynamic(contentAddressed.drv) == contentAddressed.drv`
-  - We realise `dynamic(contentAddressed.drv)`. This gives us an output path
-    `out(dynamic(contentAddressed.drv))`
+    have here `resolved(contentAddressed.drv) == contentAddressed.drv`
+  - We realise `resolved(contentAddressed.drv)`. This gives us an output path
+    `out(resolved(contentAddressed.drv))`
   - We compute `ca(contentAddressed.drv)` and notice that the
     path already exists (since it's the same as the one we built previously),
     so we discard the result.
 - We build `dependent.drv`
-  - We first compute `dynamic(dependent.drv)` to replace its
+  - We first compute `resolved(dependent.drv)` to replace its
     inputs by their real output path.
     In that case, we replace `contentAddressed.drv!out` by
     `ca(contentAddressed.drv)`
-  - We notice that `dynamic(dependent.drv)` is the same as before (since
+  - We notice that `resolved(dependent.drv)` is the same as before (since
     `ca(contentAddressed.drv)` is the same as before), so we
     just return the already existing path
 - We build `transitivelyDependent.drv`
-  - We first compute `dynamic(transitivelyDependent.drv)` to replace its
+  - We first compute `resolved(transitivelyDependent.drv)` to replace its
     inputs by their real output path.
     In that case, that means replacing `dependent.drv!out` by
-    `out(dynamic(dependent.drv))`
-  - Here again, we notice that `dynamic(transitivelyDependent.drv)` is the same as before,
+    `out(resolved(dependent.drv))`
+  - Here again, we notice that `resolved(transitivelyDependent.drv)` is the same as before,
     so we don't build anything
 
 ## Wrapping it up
@@ -255,11 +275,6 @@ daemon and the client to be updated in synchronously)
 
 What happens (and should happen) if a Nix not supporting the cas model queries
 a cache with cas paths in it is not clear yet.
-
-In particular, the content (and the existence) of the physical path of the
-static derivation isn't decided. A backwards-compatible choice would be to make
-this a symlink to the dynamic path, but this is also very leaky and potentially
-unsound.
 
 ## Garbage collection
 
