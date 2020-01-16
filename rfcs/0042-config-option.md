@@ -103,13 +103,13 @@ These are only examples of where people *found* problems and fixed them. The num
 
 ### Configuration format types
 
-In order for a structural `settings` to enforce a valid value and work correctly with merging and priorities, it needs to have a type that corresponds to its configuration format, `types.attrs` won't do. As an example, the INI type could be represented with `attrsOf (attrsOf (nullOr (either int str)))`, which means there's multiple named sections, each of which can contain a key-value pair where the value is either `null`, an integer or a string, where `null` signifies a key not being present (which is useful for unsetting existing values).
+In order for a structural `settings` to enforce a valid value and work correctly with merging and priorities, it needs to have a type that corresponds to its configuration format, `types.attrs` won't do. In [PR 75584](https://github.com/NixOS/nixpkgs/pull/75584) fully specified types for JSON, INI, YAML and TOML are implemented in `lib.formats.{json,ini,yaml,toml}.type`.
 
-Common format types will be provided under `lib.types.settings`. This could include JSON, YAML, INI, a simple `key=value` format and a recursive `key.subkey.subsubkey=value` format for a start. Sometimes programs have their own configuration formats which are specific to them, in which case the type should be specified in that programs module directly instead of going in `lib.types.settings`.
+Sometimes programs have their own configuration formats which are specific to them, in which case the type should be specified in that programs module directly instead of going in `lib.types.settings`.
 
-### Configuration format writers
+### Configuration format generators
 
-In order for the final value of `settings` to be turned into a string, a set of configuration format writers should be provided under `lib.settings`. These should ideally make sure that the resulting text is somewhat properly formatted with readable indentation. Things like `builtins.toJSON` are therefore not optimal as it doesn't add any spacing for readability. These writers will have to include ones for all of the above-mentioned configuration types. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
+In order for the final value of `settings` to be turned into a string, an accompanying set of config format generators is available under `lib.formats.{json,ini,yaml,toml}.generate`. These writers will have to have support all of their accompanying type's values. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
 
 ### Additions to the NixOS documentation
 
@@ -117,9 +117,9 @@ The following sections should be added to the NixOS documentation (not verbatim 
 
 #### Writing options for program configuration
 
-Whether having a structural `settings` option for a module makes sense depends on whether the program's configuration format has an obvious mapping from Nix. This includes formats like JSON, YAML, INI and similar. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", then the answer is probably No, and you should not use this approach. This RFC does not specify anything for unsuitable configuration formats, but there is [an addendum on that][unsuitable].
+Whether having a structural `settings` option for a module makes sense depends on whether the program's configuration format has an obvious mapping from Nix. This includes formats like JSON, YAML, INI and similar ones. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", then the answer is probably No, and you should not use this approach. This RFC does not specify anything for unsuitable configuration formats, but there is [an addendum on that][unsuitable] regarding this.
 
-The two main ingredients for writing a `settings` option is to define its type as the one corresponding to the programs configuration format (e.g. `lib.types.settings.json`), and to convert that setting to a string with the corresponding function (e.g. `lib.settings.genJSON`). Very important for writing such options is to link to the upstream documentation.
+The two main ingredients for writing a `settings` option is to define its type as the one corresponding to the programs configuration format (e.g. `lib.formats.json.type`), and to convert that options value to a string with the corresponding generator function (e.g. `lib.formats.json.generate`). Since these options won't include documentation for all supported values, upstream docs should be linked in the description.
 
 #### Default values
 
@@ -133,25 +133,28 @@ Ideally modules should work by just setting `enable = true`, which often require
 
 #### Additional options for single settings
 
-One can easily add additional options that correspond to single configuration settings. This is done by defining an option as usual, then applying it to `settings` with a `mkDefault`. This approach allows users to set the value either through the specialized option, or `settings`, which also means that new options can be added without any worry for backwards incompatibility.
+One can easily add additional options that correspond to single configuration settings. This is done by defining an option as usual, then applying it to `settings` with a `mkDefault`. This approach allows users to set the value either through the specialized option or `settings`, which also means that new options can be added without having to worry about backwards-compatibility.
 
 #### An example
 
 Putting it all together, here is an example of a NixOS module that uses such an approach:
 
 ```nix
-{ config, lib, ... }:
-let cfg = config.services.foo;
+{ config, lib, pkgs, ... }:
+let
+  cfg = config.services.foo;
+  format = lib.formats.json;
 in {
 
   options.services.foo = {
     enable = lib.mkEnableOption "foo service";
 
     settings = lib.mkOption {
-      type = lib.types.settings.json;
+      type = format.type;
       default = {};
       description = ''
         Configuration for foo, see <link xlink:href="https://example.com/docs/foo"/>
+        for supported values.
       '';
     };
 
@@ -161,24 +164,24 @@ in {
       description = "Domain this service operates on.";
     };
   };
-  
+
   config = lib.mkIf cfg.enable {
     services.foo.settings = {
       # Fails at runtime without any value set
       log_level = lib.mkDefault "WARN";
-    
+
       # We use systemd's `StateDirectory`, so we require this (no mkDefault)
       data_path = "/var/lib/foo";
-      
+
       # We use this to open the firewall, so we need to know about the default at eval time
       port = lib.mkDefault 2546;
-      
+
       # Apply our specialized setting.
       domain = lib.mkDefault cfg.domain;
     };
-  
-    environment.etc."foo/config.json".text = lib.settings.genJSON cfg.settings;
-    
+
+    environment.etc."foo-config".source = format.generate pkgs "foo-config.json" cfg.settings;
+
     networking.firewall.allowedTCPPorts = [ cfg.settings.port ];
     # ...
   };
@@ -228,18 +231,7 @@ The trivial alternative of not doing that, see [Motivation](#motivation)
 When defaults for NixOS options are set *outside* the options definition such as `config.services.foo.settings.log_level = lib.mkDefault "WARN"` above, it's currently not possible to see these default values in the manual. This could be improved by having the manual not only look at the option definitions `default` attribute for determining the default, but also evaluate the options values with a minimal configuration to get the actual default value. This might be pretty hard to achieve, because oftentimes those defaults are only even assigned if `cfg.enable = true` which won't be the case for a minimal configuration. The real solution might be to specify defaults even when the module is disabled, but this would need a rewrite of almost every module, which is impractical.
 
 ## Command line interfaces
-Sometimes programs use command arguments for configuration. While in general there's no trivial way to convert a NixOS value to those, most command line interfaces can be described as having arguments, options and flags, which could be mapped to from Nix values as follows (showing a `nix-build` invocation):
-
-```nix
-{
-  arguments = [ "nixos/release.nix" ]; # nixos/release.nix
-  options.attr = "tests.nginx.x86_64-linux"; # --attr tests.nginx.x86_64-linux
-  flags.pure-eval = true # --pure-eval
-  flags.v = 3; # -vvv
-}
-```
-
-By using such an encoding, it would be possible to get all the benefits of a `settings` option. However this encoding isn't entirely obvious, so this should be thought about more.
+Sometimes programs use command arguments for configuration. Since [PR 75539](https://github.com/NixOS/nixpkgs/pull/75539) there is `lib.encodeGNUCommandLine` to convert a Nix value to an argument string. With compatible programs this brings all the above-mentioned benefits to those programs as well.
 
 # Addendums
 
