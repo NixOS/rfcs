@@ -3,7 +3,7 @@ feature: Simple content-adressed store paths
 start-date: 2019-08-14
 author: Théophane Hufschmitt
 co-authors: (find a buddy later to help our with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
+shepherd-team: @layus, @edolstra and @Ericson2314
 shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: (will contain links to implementation PRs)
 ---
