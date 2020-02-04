@@ -70,8 +70,8 @@ installable derivation) and a NixOS module.
   description = "A filesystem that fetches DWARF debug info from the Internet on demand";
 
   outputs = { self, nixpkgs }: rec {
-    packages.dwarffs =
-      with nixpkgs.packages;
+    packages.x86_64-linux.dwarffs =
+      with nixpkgs.packages.x86_64-linux;
       with nixpkgs.builders;
       with nixpkgs.lib;
 
@@ -98,9 +98,9 @@ installable derivation) and a NixOS module.
 
     nixosModules.dwarffs = ...;
 
-    defaultPackage = packages.dwarffs;
+    defaultPackage.x86_64-linux = packages.x86_64-linux.dwarffs;
 
-    checks.build = packages.dwarffs;
+    checks.build = packages.x86_64-linux.dwarffs;
   };
 }
 ```
@@ -156,8 +156,9 @@ A flake has the following attributes:
   The value returned by the `outputs` function must be an attribute
   set. The attributes can have arbitrary values; however, some tools
   may require specific attributes to have a specific value (e.g. the
-  `nix` command may expect the value of `packages` to be an attribute
-  set of derivations).
+  `nix` command may expect the value of `packages.x86_64-linux` to be
+  an attribute set of derivations built for the `x86_64-linux`
+  platform).
 
 ## Flake inputs
 
@@ -206,7 +207,7 @@ inputs, by setting the input's `flake` attribute to `false`:
     };
 
     outputs = { self, nixpkgs, grcov }: {
-      packages.grcov = stdenv.mkDerivation {
+      packages.x86_64-linux.grcov = stdenv.mkDerivation {
         src = grcov;
         ...
       };
