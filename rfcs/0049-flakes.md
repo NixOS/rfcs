@@ -242,53 +242,76 @@ For example, if `flake.nix` has the inputs in the example above, then
 the resulting lock file might be:
 ```
 {
-    "version": 4,
-    "inputs": {
-        "import-cargo": {
-            "inputs": {},
-            "narHash": "sha256-mxwKMDFOrhjrBQhIWwwm8mmEugyx/oVlvBH1CKxchlw=",
-            "original": {
-              "type": "github",
-              "owner": "edolstra",
-              "repo": import-cargo"
-            },
-            "resolved": {
-              "type": "github",
-              "owner": "edolstra",
-              "repo": "import-cargo",
-              "rev": "c33e13881386931038d46a7aca4c9561144d582e"
-            }
-        },
-        "nixpkgs": {
-            "inputs": {},
-            "narHash": "sha256-p7UqhvhwS5MZfqUbLbFm+nfG/SMJrgpNXxWpRMFif8c=",
-            "original": {
-              "type": "github",
-              "owner": "NixOS",
-              "repo": nixpkgs"
-            },
-            "resolved": {
-              "type": "github",
-              "owner": "NixOS",
-              "repo": "nixpkgs",
-              "rev": "4a7047c6e93e8480eb4ca7fd1fd5a2aa457d9082"
-            }
-        }
+  "version": 4,
+  "inputs": {
+    "grcov": {
+      "info": {
+        "lastModified": 1580729070,
+        "narHash": "sha256-235uMxYlHxJ5y92EXZWAYEsEb6mm+b069GAd+BOIOxI="
+      },
+      "inputs": {},
+      "locked": {
+        "owner": "mozilla",
+        "repo": "grcov",
+        "rev": "989a84bb29e95e392589c4e73c29189fd69a1d4e",
+        "type": "github"
+      },
+      "original": {
+        "owner": "mozilla",
+        "repo": "grcov",
+        "type": "github"
+      }
+    },
+    "import-cargo": {
+      "info": {
+        "lastModified": 1567183309,
+        "narHash": "sha256-wIXWOpX9rRjK5NDsL6WzuuBJl2R0kUCnlpZUrASykSc="
+      },
+      "inputs": {},
+      "locked": {
+        "owner": "edolstra",
+        "repo": "import-cargo",
+        "rev": "8abf7b3a8cbe1c8a885391f826357a74d382a422",
+        "type": "github"
+      },
+      "original": {
+        "owner": "edolstra",
+        "repo": "import-cargo",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "info": {
+        "lastModified": 1580555482,
+        "narHash": "sha256-OnpEWzNxF/AU4KlqBXM2s5PWvfI5/BS6xQrPvkF5tO8="
+      },
+      "inputs": {},
+      "locked": {
+        "owner": "edolstra",
+        "repo": "nixpkgs",
+        "rev": "7f8d4b088e2df7fdb6b513bc2d6941f1d422a013",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
     }
+  }
 }
 ```
 
 Thus, when we build this flake, the input `nixpkgs` is mapped to
-revision `c33e13881386931038d46a7aca4c9561144d582e` of the
-`edolstra/import-cargo` repository on GitHub. Nix will also check that
-the content hash of the input is equal to the one recorded in the lock
+revision `7f8d4b088e2df7fdb6b513bc2d6941f1d422a013` of the
+`edolstra/nixpkgs` repository on GitHub. Nix will also check that the
+content hash of the input is equal to the one recorded in the lock
 file. This check is superfluous for Git repositories (since the commit
 hash serves a similar purpose), but for GitHub archives, we cannot
 directly check that the contents match the commit hash.
 
-Note that lock files are only used at top-level: the `flake.lock`
-files in dependencies (if they exist) are ignored. The lock file
-transitively locks direct as well as indirect dependencies.
+The lock file transitively locks direct as well as indirect
+dependencies. However, lock file generation itself *does* use the lock
+files of dependencies.
 
 ## Reproducible evaluation
 
