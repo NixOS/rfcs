@@ -233,6 +233,38 @@ The following input types are specified at present:
 
 * `hg`: A Mercurial repository.
 
+Transivitive inputs can be overriden from a `flake.nix` file. For
+example, the following overrides the `nixpkgs` input of the `nixops`
+input:
+
+    inputs.nixops.inputs.nixpkgs = {
+      type = "github";
+      owner = "my-org";
+      repo = "nixpkgs";
+    };
+
+It is also possible to "inherit" an input from another input. This is
+useful to minimize flake dependencies. For example, the following sets
+the `nixpkgs` input of the top-level flake to be equal to the
+`nixpkgs` input of the `dwarffs` input of the top-level flake:
+
+    inputs.nixops.follows = "dwarffs/nixpkgs";
+
+The value of the `follows` attribute is a `/`-separated sequence of
+input names denoting the path of inputs to be followed from the root
+flake.
+
+Overrides and `follows` can be combined, e.g.
+
+    inputs.nixops.inputs.nixpkgs.follows = "dwarffs/nixpkgs";
+
+sets the `nixpkgs` input of `nixops` to be the same as the `nixpkgs`
+input of `dwarffs`. It is worth noting, however, that it is generally
+not useful to eliminate transitive `nixpkgs` flake inputs in this
+way. Most flakes provide their functionality through Nixpkgs overlays
+or NixOS modules, which are composed into the top-level flake's
+`nixpkgs` input; so their own `nixpkgs` input is usually irrelevant.
+
 ## Lock files
 
 Inputs specified in `flake.nix` are typically "unlocked" in that they
