@@ -405,4 +405,7 @@ on top of it.
 # Acknowledgments
 
 Funding for the development of the flakes prototype was provided by
-[Target Corporation](https://www.target.com/).
+[Target Corporation](https://www.target.com/). The flakes project was
+inspired/motivated by [Shea Levy's work on
+`require.nix`](https://www.youtube.com/watch?v=DHOLjsyXPtM) and
+ensuing discussions at NixCon 2018.
