@@ -141,7 +141,7 @@ A flake has the following attributes:
     bypass its outputs entirely and only use the flake mechanism to
     get its source tree.
 
-  * `rev`: The commit hash of the flake's Git repository.
+  * `rev`: The commit hash of the flake's repository, if applicable.
 
   * `revCount`: The number of ancestors of the revision `rev`. This is
     not available for `github` repositories (see below), since they're
@@ -152,6 +152,9 @@ A flake has the following attributes:
     this is available for both Git and GitHub repositories, so it's
     useful for generating (hopefully) monotonically increasing version
     strings.
+
+  * `narHash`: The SHA-256 (in SRI format) of the NAR serialization of
+    the flake's source tree.
 
   The value returned by the `outputs` function must be an attribute
   set. The attributes can have arbitrary values; however, some tools
