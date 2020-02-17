@@ -280,6 +280,16 @@ a path is GC'ed, we delete the alias entries that map to it) but it's not clear
 whether that's desirable since you may want to bring back the path via
 substitution in the future.
 
+## Ensuring that no temporary output path leaks in the result
+
+One possible issue with the ca model is that the output paths get moved after being built, which breaks self-references. Hash rewriting solves this in most cases, but it is only heuristic and there is no way to truly ensure that we don't leak a self-reference (for example if a self-reference appears in a zipped file − like it's often the case for man pages or java jars, the hash-rewriting machinery won't detect it).
+Having leaking self-references is annoying since
+
+- These self-references change each time the inputs of the derivation change, making ca useless (because the output will _always_ change when the input change)
+- More annoyingly, these references become dangling and can cause runtime failures
+
+We however have a way to dectect these: If we have leaking self-references then the output will change if we artificially change its output path. This could be integrated in the `--check` option of `nix-store`.
+
 # Future work
 
 [future]: #future-work
