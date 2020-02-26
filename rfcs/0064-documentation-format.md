@@ -132,6 +132,7 @@ Examples of users:
 - Python
 - Linux kernel
 - CMake
+- LLVM
 - Majority of Python packages
 
 ### Asciidoc
