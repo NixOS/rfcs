@@ -134,6 +134,8 @@ Examples of users:
 - CMake
 - LLVM
 - Majority of Python packages
+- PowerDNS: ReST with [Sphinx](https://www.sphinx-doc.org/) for
+  manuals, guides and manpages
 
 ### Asciidoc
 
