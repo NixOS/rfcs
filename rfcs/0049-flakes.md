@@ -270,35 +270,45 @@ or NixOS modules, which are composed into the top-level flake's
 Inputs specified in `flake.nix` are typically "unlocked" in that they
 don't specify an exact revision. To ensure reproducibility, Nix will
 automatically generate and use a *lock file* called `flake.lock` in
-the flake's directory. The lock file contains a tree of mappings from
-the inputs specified in `flake.nix` to inputs specifications that
-contain revisions.
+the flake's directory. The lock file contains a graph structure
+isomorphic to the graph of dependencies of the root flake. Each node
+in the graph (except the root node) maps the (usually) unlocked input
+specifications in `flake.nix` to locked input specifications. Each
+node also contains some metadata, such as the dependencies (outgoing
+edges) of the node.
 
 For example, if `flake.nix` has the inputs in the example above, then
 the resulting lock file might be:
 ```
 {
-  "version": 4,
-  "inputs": {
-    "grcov": {
+  "version": 5,
+  "root": "n1",
+  "nodes": {
+    "n1": {
+      "inputs": {
+        "nixpkgs": "n2",
+        "import-cargo": "n3",
+        "grcov": "n4"
+      }
+    },
+    "n2": {
       "info": {
-        "lastModified": 1580729070,
-        "narHash": "sha256-235uMxYlHxJ5y92EXZWAYEsEb6mm+b069GAd+BOIOxI="
+        "lastModified": 1580555482,
+        "narHash": "sha256-OnpEWzNxF/AU4KlqBXM2s5PWvfI5/BS6xQrPvkF5tO8="
       },
       "inputs": {},
       "locked": {
-        "owner": "mozilla",
-        "repo": "grcov",
-        "rev": "989a84bb29e95e392589c4e73c29189fd69a1d4e",
+        "owner": "edolstra",
+        "repo": "nixpkgs",
+        "rev": "7f8d4b088e2df7fdb6b513bc2d6941f1d422a013",
         "type": "github"
       },
       "original": {
-        "owner": "mozilla",
-        "repo": "grcov",
-        "type": "github"
+        "id": "nixpkgs",
+        "type": "indirect"
       }
     },
-    "import-cargo": {
+    "n3": {
       "info": {
         "lastModified": 1567183309,
         "narHash": "sha256-wIXWOpX9rRjK5NDsL6WzuuBJl2R0kUCnlpZUrASykSc="
@@ -316,38 +326,96 @@ the resulting lock file might be:
         "type": "github"
       }
     },
-    "nixpkgs": {
+    "n4": {
       "info": {
-        "lastModified": 1580555482,
-        "narHash": "sha256-OnpEWzNxF/AU4KlqBXM2s5PWvfI5/BS6xQrPvkF5tO8="
+        "lastModified": 1580729070,
+        "narHash": "sha256-235uMxYlHxJ5y92EXZWAYEsEb6mm+b069GAd+BOIOxI="
       },
       "inputs": {},
       "locked": {
-        "owner": "edolstra",
-        "repo": "nixpkgs",
-        "rev": "7f8d4b088e2df7fdb6b513bc2d6941f1d422a013",
+        "owner": "mozilla",
+        "repo": "grcov",
+        "rev": "989a84bb29e95e392589c4e73c29189fd69a1d4e",
         "type": "github"
       },
       "original": {
-        "id": "nixpkgs",
-        "type": "indirect"
-      }
+        "owner": "mozilla",
+        "repo": "grcov",
+        "type": "github"
+      },
+      "flake": false
     }
   }
 }
 ```
 
-Thus, when we build this flake, the input `nixpkgs` is mapped to
-revision `7f8d4b088e2df7fdb6b513bc2d6941f1d422a013` of the
-`edolstra/nixpkgs` repository on GitHub. Nix will also check that the
-content hash of the input is equal to the one recorded in the lock
-file. This check is superfluous for Git repositories (since the commit
-hash serves a similar purpose), but for GitHub archives, we cannot
-directly check that the contents match the commit hash.
+This graph has 4 nodes: the root flake, and its 3 dependencies. The
+nodes have arbitrary labels (e.g. `n1`). The label of the root node of
+the graph is specified by the `root` attribute. Nodes contain the
+following fields:
 
-The lock file transitively locks direct as well as indirect
-dependencies. However, lock file generation itself *does* use the lock
-files of dependencies.
+* `info`: Metadata about the source tree. This always includes
+  `narHash`. It also includes input type-specific attributes such as
+  the `lastModified` or `revCount`. The main reason for these
+  attributes is to allow flake inputs to be substituted from a binary
+  cache: `narHash` allows the store path to be computed, while the
+  other attributes are necessary because they provide information not
+  stored in the store path.
+
+* `inputs`: The dependencies of this node, as a mapping from input
+  names (e.g. `nixpkgs`) to node labels (e.g. `n2`).
+
+* `original`: The original input specification from `flake.lock`, as a
+  set of `builtins.fetchTree` arguments.
+
+* `locked`: The locked input specification, as a set of
+  `builtins.fetchTree` arguments. Thus, in the example above, when we
+  build this flake, the input `nixpkgs` is mapped to revision
+  `7f8d4b088e2df7fdb6b513bc2d6941f1d422a013` of the `edolstra/nixpkgs`
+  repository on GitHub.
+
+* `flake`: A Boolean denoting whether this is a flake or non-flake
+  dependency. Corresponds to the `flake` attribute in the `inputs`
+  attribute in `flake.nix`.
+
+The `info`, `original` and `locked` attributes are omitted for the
+root node. This is because we cannot record the commit hash or content
+hash of the root flake, since modifying `flake.lock` will invalidate
+these.
+
+The graph representation of lock files allows circular dependencies
+between flakes. For example, here are two flakes that reference each
+other:
+```
+{
+  edition = 201909;
+  inputs.b = ... location of flake B ...;
+  # Tell the 'b' flake not to fetch 'a' again, to ensure its 'a' is
+  # *this* 'a'.
+  inputs.b.inputs.a.follows = "";
+  outputs = { self, b }: {
+    foo = 123 + b.bar;
+    xyzzy = 1000;
+  };
+}
+```
+and
+```
+{
+  edition = 201909;
+  inputs.a = ... location of flake A ...;
+  inputs.a.inputs.b.follows = "";
+  outputs = { self, a }: {
+    bar = 456 + a.xyzzy;
+  };
+}
+```
+
+Lock files transitively lock direct as well as indirect
+dependencies. That is, if a lock file exists and is up to date, Nix
+will not look at the lock files of dependencies. However, lock file
+generation itself *does* use the lock files of dependencies by
+default.
 
 ## Reproducible evaluation
 
