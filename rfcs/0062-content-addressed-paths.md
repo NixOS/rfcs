@@ -59,18 +59,14 @@ cutoffs.
 
 The gist of the design is that:
 
-- Some derivations can be marked as content-adressed (ca), in which case each
-  one of their output will be moved to a path `ca` determined only by its
-  content after the build
-- We introduce the notion of a `resolved derivation` which is a derivation that
-  doesn't refer to any other derivation but only to concrete store paths.
-  To prevent ambiguities, we might speak of a `symbolic derivation` to
-  designate a derivation that's not necessarily resolved.
-  We also define a `resolving` function that given a symbolic derivation
-  returns a new resolved derivation with the same semantics.
-- When asked to build a derivation, Nix will first resolve it, build the
-  resolved derivation and link back the symbolic one to the out path of the
-  resolved one.
+- Derivations can be marked as content-adressed (ca), in which case each
+  one of their output will be moved to content-addressed `ca` store path.
+  This extends the current notion of "fixed-output" derivations.
+- We introduce the notion of "resolving" a derivation, which extends to
+  arbitrary `ca` derivations the current behavior of replacing fixed-outputs
+  derivations by their output hash.
+- We refine the build process so that every derivation is first normalized
+  before being realized
 
 ## Nix-build process
 
