@@ -15,7 +15,7 @@ related-issues: (will contain links to implementation PRs)
 Add some basic but simple support for content-adressed store paths to Nix.
 
 We plan here to give the possibility to mark certain store paths as
-content-adressed (ca), while keeping the other dependency-adressed as they are
+content-adressed (ca), while keeping the other input-adressed as they are
 now (modulo some mandatory drv rewriting before the build, see below)
 
 By making this opt-in, we can impose arbitrary limitations to the paths that
@@ -70,6 +70,10 @@ The gist of the design is that:
 
 ## Nix-build process
 
+For the sake of clarity, we will refer to the current model (where the
+derivations are indexed by their inputs, also sometimes called "extensional") as
+the `input-addressed` model
+
 ### Output mappings
 
 For each output `output` of a derivation `drv`, we define
@@ -82,7 +86,7 @@ For each output `output` of a derivation `drv`, we define
 > Unresolved: should we already include the `truster` field in `DrvOutputId`
 > even if it's not used atm? What would be the cost of adding it later?
 
-In a dependency-addressed-only world, the concrete path for a derivation output was a pure function of this output's id that could be computed at eval-time. However this won't be the case anymore once we allow content-addressed derivations, so we now need to store the results the `PathOf` function in the Nix database as a new table:
+In a input-addressed-only world, the concrete path for a derivation output was a pure function of this output's id that could be computed at eval-time. However this won't be the case anymore once we allow content-addressed derivations, so we now need to store the results the `PathOf` function in the Nix database as a new table:
 
 ```sql
 create table if not exists PathOf (
