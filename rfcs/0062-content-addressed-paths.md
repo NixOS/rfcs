@@ -97,13 +97,13 @@ create table if not exists PathOf (
 )
 ```
 
-### Building a normal derivation
+### Building a non-ca derivation
 
 #### Resolved derivations
 
 We define a **resolved derivation** as a derivation whose only references are either:
 
-- Self references
+- Placeholders for the its own outputs (from the `placeholder` builtin)
 - References to the outputs of other (non content-addresed) resolved derivations
 - Existing store paths
 
