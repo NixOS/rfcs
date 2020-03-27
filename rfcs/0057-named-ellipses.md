@@ -1,5 +1,5 @@
 ---
-feature: Named Ellipses OR function argument consistency
+feature: Named Ellipses
 start-date: 2019-11-14
 author: deliciouslytyped
 co-authors: none
@@ -19,8 +19,10 @@ Nixpkgs often gets commits like https://github.com/NixOS/nixpkgs/commit/a5065329
 # Detailed design
 [design]: #detailed-design
 
-The intent of this syntax is for `{...@args}:` to behave as close to the current `{...} @ args:`
- as practical. As both `args @ {…}` and `{…} @ args` forms happen in Nixpkgs, both would be supported for named ellipses, too. As `args @ {args}: ` is an error in Nix because of duplicate argument names, so should be `{extra, ...@extra}: `. As `(a @ { ... }: a) {a=1;}` returns `{a=1;}`, so should `({ a @ ... }: a) {a=1;}`. ```
+The intent of this syntax is for `{...@args}:` to behave as consistent with `{...} @ args:`
+ as practical. As both `args @ {…}` and `{…} @ args` forms happen in Nixpkgs, both would be supported for named ellipses, too. 
+ 
+ As `args @ {args}: ` is an error in Nix because of duplicate argument names, so should be `{extra, ...@extra}: `. As `(a @ { ... }: a) {a=1;}` returns `{a=1;}`, so should `({ a @ ... }: a) {a=1;}`. ```
 
 TODO: consider what other languages like Haskell do
 
@@ -30,8 +32,4 @@ This increases the amount of syntax Nix has, thus creating some maintenance cost
 
 # Alternatives
 [alternatives]: #alternatives
-Not doing this would not have any major impact besides not making nix and nixpkgs nicer to use.
-
-# Unresolved questions
-[unresolved]: #unresolved-questions
-Should scope of this be expanded to binding any function argument to new names - for consistency, even though that might be considered redundant?
+Not doing this would not have any major impact besides not making Nix and nixpkgs nicer to use.
