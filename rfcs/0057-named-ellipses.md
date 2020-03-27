@@ -14,7 +14,7 @@ related-issues:
 
 It should be possible to bind a name to ellipses in a function definition like `{ a, ...@extra }: null`, and `{ a, extra@... }: null`. This makes intuitive sense, and could remove the need for a lot of uses of `removeAttrs` that really just want to refer to the contents of ellipses.
 
-TODO: The latter could be substantiated.
+Nixpkgs often gets commits like https://github.com/NixOS/nixpkgs/commit/a50653295df5e2565b4a6a316923f9e939f1945b with code that would be cleaner without the need for extra `removeAttrs`.
 
 # Detailed design
 [design]: #detailed-design
