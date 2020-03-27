@@ -25,7 +25,7 @@ TODO: consider what other languages like Haskell do
 
 # Drawbacks
 [drawbacks]: #drawbacks
-None? This implements syntax that would not have worked before and so in theory shouldn't cause breakage in the Nix ecosystem. [Citation Needed]
+This increases the amount of syntax Nix has, thus creating some maintenance cost both for Nix itself, and for tools intended to work with Nix syntax (from highlighting to hnix)
 
 # Alternatives
 [alternatives]: #alternatives
