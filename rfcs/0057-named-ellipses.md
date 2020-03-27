@@ -19,7 +19,8 @@ Nixpkgs often gets commits like https://github.com/NixOS/nixpkgs/commit/a5065329
 # Detailed design
 [design]: #detailed-design
 
-`{...@extraargs}: extraargs` should yield as an attrset the extra arguments "in" `...`.
+The intent of this syntax is for `{...@args}:` to behave as close to the current `{...} @ args:`
+ as practical. As both `args @ {…}` and `{…} @ args` forms happen in Nixpkgs, both would be supported for named ellipses, too. As `args @ {args}: ` is an error in Nix because of duplicate argument names, so should be `{extra, ...@extra}: `. As `(a @ { ... }: a) {a=1;}` returns `{a=1;}`, so should `({ a @ ... }: a) {a=1;}`. ```
 
 TODO: consider what other languages like Haskell do
 
