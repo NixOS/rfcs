@@ -169,7 +169,10 @@ repositories:
     };
 
     # An indirection through the flake registry.
-    inputs.nixpkgs.id = "nixpkgs";
+    inputs.nixpkgs = {
+      type = "indirect";
+      id = "nixpkgs";
+    };
 
 Each input is fetched, evaluated and passed to the `outputs` function
 as a set of attributes with the same name as the corresponding
