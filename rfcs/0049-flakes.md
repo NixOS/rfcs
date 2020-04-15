@@ -74,7 +74,7 @@ installable derivation) and a NixOS module.
       with nixpkgs.lib;
 
       stdenv.mkDerivation {
-        name = "dwarffs-0.1.${substring 0 8 self.lastModified}";
+        name = "dwarffs-0.1.${substring 0 8 self.lastModifiedDate}";
 
         buildInputs = [ fuse nix nlohmann_json boost ];
 
@@ -137,11 +137,14 @@ A flake has the following attributes:
     not available for `github` repositories (see below), since they're
     fetched as tarballs rather than as Git repositories.
 
-  * `lastModified`: The commit time of the revision `rev`, in the
+  * `lastModifiedDate`: The commit time of the revision `rev`, in the
     format `%Y%m%d%H%M%S` (e.g. `20181231100934`). Unlike `revCount`,
     this is available for both Git and GitHub repositories, so it's
     useful for generating (hopefully) monotonically increasing version
     strings.
+
+  * `lastModified`: The commit time of the revision `rev` as an integer
+    denoting the number of seconds since 1970.
 
   * `narHash`: The SHA-256 (in SRI format) of the NAR serialization of
     the flake's source tree.
