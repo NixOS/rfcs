@@ -4,6 +4,8 @@ start-date: 2018-08-26
 author: @dezgeg
 co-authors: TBD
 related-issues: https://github.com/dezgeg/nixpkgs/tree/better-run-phases
+shepherd-team: Samuel Dionne-Reil, John Ericson, Linus Heckemann
+shepherd-leader: Linus Heckemann
 ---
 
 # Summary
