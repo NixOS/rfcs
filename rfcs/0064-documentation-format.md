@@ -3,8 +3,8 @@ feature: documentation-format
 start-date: 2019-12-31
 author: Silvan Mosberger (infinisil)
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @domenkozar, @asymmetric, @alyssais, @jtojnar
+shepherd-leader: @domenkozar
 related-issues: (will contain links to implementation PRs)
 ---
 
