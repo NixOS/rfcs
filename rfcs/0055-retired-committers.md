@@ -52,7 +52,7 @@ to be more predictable for committers and reduce the evaluations from 12 times a
 For each committer from the [Nixpkgs Committers team](https://github.com/orgs/NixOS/teams/nixpkgs-committers), the number of commits
 in that time range is checked, and the committer is considered inactive if there are none.
 
-This process is repeated at the beginning of each new year.
+This process occurs once after the RFC is accepted, and is then repeated at the beginning of each new year.
 
 Previous committers are moved to a new Nixpkgs Committers Emeritus team, to honor their past contributions.
 Members of this team will remain in the GitHub organisation, and may regain push access at a later time.
