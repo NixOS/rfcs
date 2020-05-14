@@ -1,8 +1,8 @@
 ---
 feature: run-phase-changes-for-better-nix-shell-use
 start-date: 2018-08-26
-author: @dezgeg
-co-authors: TBD
+author: @globin
+co-authors: @dezgeg
 related-issues: https://github.com/dezgeg/nixpkgs/tree/better-run-phases
 shepherd-team: Samuel Dionne-Reil, John Ericson, Linus Heckemann
 shepherd-leader: Linus Heckemann
