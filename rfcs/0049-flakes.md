@@ -229,7 +229,7 @@ The following input types are specified at present:
 
 * `hg`: A Mercurial repository.
 
-Transivitive inputs can be overriden from a `flake.nix` file. For
+Transitive inputs can be overriden from a `flake.nix` file. For
 example, the following overrides the `nixpkgs` input of the `nixops`
 input:
 
