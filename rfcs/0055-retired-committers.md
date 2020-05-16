@@ -107,7 +107,7 @@ without being directly part of the work? -->
 - The threshold may need adjustment in the future.
 
 # Reference implementation
-[implementation] # reference-implementation
+[implementation]: #reference-implementation
 
 ```py
 #! /usr/bin/env nix-shell
