@@ -52,10 +52,26 @@ to be more predictable for committers and reduce the evaluations from 12 times a
 For each committer from the [Nixpkgs Committers team](https://github.com/orgs/NixOS/teams/nixpkgs-committers), the number of commits
 in that time range is checked, and the committer is considered inactive if there are none.
 
-This process occurs once after the RFC is accepted, and is then repeated at the beginning of each new year.
-
 Previous committers are moved to a new Nixpkgs Committers Emeritus team, to honor their past contributions.
 Members of this team will remain in the GitHub organisation, and may regain push access at a later time.
+
+The process consists of the following steps:
+
+- Running the [reference implementation][implementation] or a functionally equivalent application.
+- Checking the correctness of the script output by manually inspecting the recent git history of inactive committers.
+  This may be done by reviewing the activity page linked in the script output of the reference implementation.
+- Notification of the confirmed inactive committers, via a GitHub issue and an email to the committers address,
+  according to `<nixpkgs/maintainers/maintainer-list.nix>`. The text should include a notice on how to regain
+  commit permissions. The exact process of that is not part of this RFC, as the process of becoming a committer
+  in the first place is still not formalised.
+- Moving of the confirmed inactive committers from the [Nixpkgs Committers team](https://github.com/orgs/NixOS/teams/nixpkgs-committers) team
+  to the new Nixpkgs Committers Emeritus team, either directly if sufficient permissions are available,
+  or indirectly by notifying an organisation administrator.
+
+This process occurs once after the RFC is accepted, and is then repeated at the beginning of each new year.
+
+@Mic92 has committed to performing the yearly process, but any member of the NixOS organisation can execute the above
+steps if @Mic92 does not remember to do so in a reasonable amount of time after the beginning of the year.
 
 
 # Drawbacks
@@ -91,6 +107,7 @@ without being directly part of the work? -->
 - The threshold may need adjustment in the future.
 
 # Reference implementation
+[implementation] # reference-implementation
 
 ```py
 #! /usr/bin/env nix-shell
