@@ -46,7 +46,7 @@ The poll is of the following form:
 ## Requirements
 
 - Can be converted to HTML and man pages
-- Inter-file references for being able to link to options from anywhere
+- Cross-file references for being able to link to options from anywhere
 - Ability to create link anchors to most places such that we can link to e.g. paragraphs
 - Widespread editor integration featuring at least highlighting and preferably live-view
 - Good error detection in toolchain and editors, e.g. with a fast and good processor
