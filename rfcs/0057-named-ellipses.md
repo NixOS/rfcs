@@ -3,8 +3,8 @@ feature: Named Ellipses
 start-date: 2019-11-14
 author: deliciouslytyped
 co-authors: none
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: Eelco Dolstra, Michael Raskin, jD91mZM2
+shepherd-leader: Michael Raskin
 related-issues:
   Named Ellipses - https://github.com/NixOS/nix/issues/2998
 ---
