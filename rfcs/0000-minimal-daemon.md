@@ -18,7 +18,7 @@ related-issues: (will contain links to implementation PRs)
 
 With flakes and other development, we are moving towards a more "batteries included" Nix command line.
 We don't want any of those features in the daemon, however, because the daemon is a special trusted process that we should strive to keep as simple as possible.
-\[This is comparable to a compilation pipeline, with a concise intermediate representation nicer user-facing features "desugar" into.\]
+\[This is comparable to a compilation pipeline, with a concise intermediate representation that nicer user-facing features "desugar" into.\]
 
 There are many things we could do about this, but I mainly want to establish some rough consensus around the problem while taking a small step to signal that consensus.
 Originally, each Nix command was its own executable, but then we combined them into one executable.
@@ -30,7 +30,7 @@ I think this is fine for the main user-facing commands, but not good for the dae
 [design]: #detailed-design
 
 - `nix-daemon` will be a separate executable that only links the nix libraries it needs.
-  \[At this time, those libraries are `libnixutil`, `libnixutil`, and `libnixrust`, but this is subject to change.\]
+  \[At this time, those libraries are `libnixutil`, `libnixstore`, and `libnixrust`, but this is subject to change.\]
 
 - `nix-daemon` should never need to understand the expression language and depend  `libnixexpr`.
 
@@ -62,6 +62,6 @@ No known unknowns.
 # Future work
 [future]: #future-work
 
-There's lots of future work we could do in the vain of modularity.
+There's lots of future work we could do in the vein of modularity.
 But there's also different, conflicting directions we could go in.
 The point of this small step is to punt on all that for now.
