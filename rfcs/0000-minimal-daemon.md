@@ -1,7 +1,7 @@
 ---
-feature: (fill me in with a unique ident, my_awesome_feature)
-start-date: (fill me in with today's date, YYYY-MM-DD)
-author: (name of the main author)
+feature: minimal-daemon
+start-date: 2020-5-28
+author: John Ericson
 co-authors: (find a buddy later to help out with the RFC)
 shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
@@ -11,48 +11,57 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-One paragraph explanation of the feature.
+`nix-daemon` should be a separate executable.
 
 # Motivation
 [motivation]: #motivation
 
-Why are we doing this? What use cases does it support? What is the expected
-outcome?
+With flakes and other development, we are moving towards a more "batteries included" Nix command line.
+We don't want any of those features in the daemon, however, because the daemon is a special trusted process that we should strive to be as simple as possible.
+\[This is comparable to compilation pipeline, with a concise intermediate representation nicer user-facing features "desugar" into.\]
+
+There are many things we could do about this, but I mainly want to establish some rough consensus around the problem while taking a small step to signal that consensus.
+Originally, each Nix command was its own executable, but then we combined them into one executable.
+I think this is fine for the main user-facing
+
+\[This RFC is completely separate from the ongoing IPFS work.]
 
 # Detailed design
 [design]: #detailed-design
 
-This is the core, normative part of the RFC. Explain the design in enough
-detail for somebody familiar with the ecosystem to understand, and implement.
-This should get into specifics and corner-cases. Yet, this section should also
-be terse, avoiding redundancy even at the cost of clarity.
+- `nix-daemon` will be a separate executable that only links the nix libraries it needs.
+  \[At this time, those libraries are `libnixutil`, `libnixutil`, and `libnixrust`, but this is subject to change.\]
+
+- `nix-daemon` should never need to understand the expression language and depend  `libnixexpr`.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-This section illustrates the detailed design. This section should clarify all
-confusion the reader has from the previous sections. It is especially important
-to counterbalance the desired terseness of the detailed design; if you feel
-your detailed design is rudely short, consider making this section longer
-instead.
+I certainly hope there are no interactions!
+One of the bad things we should seek to prevent with this is the daemon unintentionally growing dependencies on more of the code base.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this?
+Not much.
+Build rules perhaps are slightly more complex as there are both separate and independent executables.
 
 # Alternatives
 [alternatives]: #alternatives
 
-What other designs have been considered? What is the impact of not doing this?
+ - Do nothing.
+
+ - Something more invasive.
+   But I much rather save that for later.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-What parts of the design are still TBD or unknowns?
+No known unknowns.
 
 # Future work
 [future]: #future-work
 
-What future work, if any, would be implied or impacted by this feature
-without being directly part of the work?
+There's lots of future work we could do in the vain of modality.
+But there's also different, conflicting directions we could go in.
+The point of this small step is to punt on all that for now.
