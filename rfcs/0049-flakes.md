@@ -277,7 +277,7 @@ For example, if `flake.nix` has the inputs in the example above, then
 the resulting lock file might be:
 ```
 {
-  "version": 5,
+  "version": 6,
   "root": "n1",
   "nodes": {
     "n1": {
@@ -288,16 +288,14 @@ the resulting lock file might be:
       }
     },
     "n2": {
-      "info": {
-        "lastModified": 1580555482,
-        "narHash": "sha256-OnpEWzNxF/AU4KlqBXM2s5PWvfI5/BS6xQrPvkF5tO8="
-      },
       "inputs": {},
       "locked": {
         "owner": "edolstra",
         "repo": "nixpkgs",
         "rev": "7f8d4b088e2df7fdb6b513bc2d6941f1d422a013",
-        "type": "github"
+        "type": "github",
+        "lastModified": 1580555482,
+        "narHash": "sha256-OnpEWzNxF/AU4KlqBXM2s5PWvfI5/BS6xQrPvkF5tO8="
       },
       "original": {
         "id": "nixpkgs",
@@ -305,16 +303,14 @@ the resulting lock file might be:
       }
     },
     "n3": {
-      "info": {
-        "lastModified": 1567183309,
-        "narHash": "sha256-wIXWOpX9rRjK5NDsL6WzuuBJl2R0kUCnlpZUrASykSc="
-      },
       "inputs": {},
       "locked": {
         "owner": "edolstra",
         "repo": "import-cargo",
         "rev": "8abf7b3a8cbe1c8a885391f826357a74d382a422",
-        "type": "github"
+        "type": "github",
+        "lastModified": 1567183309,
+        "narHash": "sha256-wIXWOpX9rRjK5NDsL6WzuuBJl2R0kUCnlpZUrASykSc="
       },
       "original": {
         "owner": "edolstra",
@@ -323,16 +319,14 @@ the resulting lock file might be:
       }
     },
     "n4": {
-      "info": {
-        "lastModified": 1580729070,
-        "narHash": "sha256-235uMxYlHxJ5y92EXZWAYEsEb6mm+b069GAd+BOIOxI="
-      },
       "inputs": {},
       "locked": {
         "owner": "mozilla",
         "repo": "grcov",
         "rev": "989a84bb29e95e392589c4e73c29189fd69a1d4e",
-        "type": "github"
+        "type": "github",
+        "lastModified": 1580729070,
+        "narHash": "sha256-235uMxYlHxJ5y92EXZWAYEsEb6mm+b069GAd+BOIOxI="
       },
       "original": {
         "owner": "mozilla",
@@ -350,14 +344,6 @@ nodes have arbitrary labels (e.g. `n1`). The label of the root node of
 the graph is specified by the `root` attribute. Nodes contain the
 following fields:
 
-* `info`: Metadata about the source tree. This always includes
-  `narHash`. It also includes input type-specific attributes such as
-  the `lastModified` or `revCount`. The main reason for these
-  attributes is to allow flake inputs to be substituted from a binary
-  cache: `narHash` allows the store path to be computed, while the
-  other attributes are necessary because they provide information not
-  stored in the store path.
-
 * `inputs`: The dependencies of this node, as a mapping from input
   names (e.g. `nixpkgs`) to node labels (e.g. `n2`).
 
@@ -370,14 +356,22 @@ following fields:
   `7f8d4b088e2df7fdb6b513bc2d6941f1d422a013` of the `edolstra/nixpkgs`
   repository on GitHub.
 
+  It also includes the attribute `narHash`, specifying the expected
+  contents of the tree in the Nix store (as computed by `nix
+  hash-path`), and may include input-type-specific attributes such as
+  the `lastModified` or `revCount`. The main reason for these
+  attributes is to allow flake inputs to be substituted from a binary
+  cache: `narHash` allows the store path to be computed, while the
+  other attributes are necessary because they provide information not
+  stored in the store path.
+
 * `flake`: A Boolean denoting whether this is a flake or non-flake
   dependency. Corresponds to the `flake` attribute in the `inputs`
   attribute in `flake.nix`.
 
-The `info`, `original` and `locked` attributes are omitted for the
-root node. This is because we cannot record the commit hash or content
-hash of the root flake, since modifying `flake.lock` will invalidate
-these.
+The `original` and `locked` attributes are omitted for the root
+node. This is because we cannot record the commit hash or content hash
+of the root flake, since modifying `flake.lock` will invalidate these.
 
 The graph representation of lock files allows circular dependencies
 between flakes. For example, here are two flakes that reference each
