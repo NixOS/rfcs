@@ -25,7 +25,7 @@ Originally, each Nix command was its own executable, but then we combined them i
 I think this is fine for the main user-facing commands, but not good for the daemon.
 
 Finally, it's probably best not to give the daemon---a long lived process running with elevated privileges---access to tons of dead code.
-C++ doesn't exactly prevent memory errors, and that dead code just more fodder to be used in some low-level attack.
+C++ doesn't exactly prevent memory errors, and that dead code is just more fodder to be used in some low-level attack.
 There are other solutions to this in the long term, but this is the easiest solution in the short term.
 
 \[This RFC is completely separate from the ongoing IPFS work.]
