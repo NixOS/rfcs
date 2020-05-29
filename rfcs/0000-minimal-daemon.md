@@ -62,6 +62,6 @@ No known unknowns.
 # Future work
 [future]: #future-work
 
-There's lots of future work we could do in the vain of modality.
+There's lots of future work we could do in the vain of modularity.
 But there's also different, conflicting directions we could go in.
 The point of this small step is to punt on all that for now.
