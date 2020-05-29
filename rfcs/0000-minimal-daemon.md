@@ -17,12 +17,12 @@ related-issues: (will contain links to implementation PRs)
 [motivation]: #motivation
 
 With flakes and other development, we are moving towards a more "batteries included" Nix command line.
-We don't want any of those features in the daemon, however, because the daemon is a special trusted process that we should strive to be as simple as possible.
-\[This is comparable to compilation pipeline, with a concise intermediate representation nicer user-facing features "desugar" into.\]
+We don't want any of those features in the daemon, however, because the daemon is a special trusted process that we should strive to keep as simple as possible.
+\[This is comparable to a compilation pipeline, with a concise intermediate representation nicer user-facing features "desugar" into.\]
 
 There are many things we could do about this, but I mainly want to establish some rough consensus around the problem while taking a small step to signal that consensus.
 Originally, each Nix command was its own executable, but then we combined them into one executable.
-I think this is fine for the main user-facing
+I think this is fine for the main user-facing commands, but not good for the daemon.
 
 \[This RFC is completely separate from the ongoing IPFS work.]
 
