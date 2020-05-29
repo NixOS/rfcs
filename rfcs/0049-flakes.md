@@ -161,7 +161,7 @@ A flake has the following attributes:
 The attribute `inputs` specifies the dependencies of a flake. These
 specify the location of the dependency, or a symbolic flake identifier
 that is looked up in a registry or in a command-line flag. For
-example, the following specifies a dependency on the Nixpkgs and Hydra
+example, the following specifies a dependency on the Nixpkgs and import-cargo
 repositories:
 
     # A GitHub repository.
