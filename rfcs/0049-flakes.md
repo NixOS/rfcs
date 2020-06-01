@@ -220,6 +220,8 @@ The following input types are specified at present:
   as tarballs. These have slightly different semantics from `git`
   (in particular, the `revCount` attribute is not available).
 
+* `gitlab`: Like `github`, but for Git repositories hosted on GitLab.
+
 * `tarball`: A `.tar.{gz,xz,bz2}` file.
 
 * `path`: A directory in the file system. This generally should be
