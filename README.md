@@ -1,4 +1,4 @@
-# Nix RFCs
+# Nix RFCs (request for comments)
 
 Many changes, including bug fixes and documentation improvements can be
 implemented and reviewed via the normal GitHub pull request workflow.
