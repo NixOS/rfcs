@@ -47,7 +47,7 @@ One of the bad things we should seek to prevent with this is the daemon unintent
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Not much.
+Installation is slightly bigger as the two binaries (`nix` and `nix-daemon`) have some redundancy.
 Build rules perhaps are slightly more complex as there are both separate and independent executables.
 
 # Alternatives
