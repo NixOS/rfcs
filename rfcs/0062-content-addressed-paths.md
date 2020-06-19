@@ -24,11 +24,11 @@ content-adressability.
 
 In particular, we restrict ourselves to paths that are:
 
-- without any non-textual self-reference (_i.e_ a self-reference hidden inside a zip file)
+- only include textual self-references (_e.g._ no self-reference hidden inside a zip file)
 - known to be deterministic (for caching reasons, see [caching]).
 
 That way we don't have to worry about the fact that hash-rewriting is only an
-approximation nor by the semantics of the distribution of non-deterministic
+approximation nor about the semantics of the distribution of non-deterministic
 paths.
 
 We also leave the option to lift these restrictions later.
@@ -44,13 +44,13 @@ Having a content-adressed store with Nix (aka the "Intensional store") is a
 long-time dream of the community − a design for that was already taking a whole
 chapter in [Eelco's PHD thesis][nixphd].
 
-This was never done because it represents a quite big change in Nix's model,
-with some non-totally-solved implications (regarding the trust model in
+This was never done because it represents quite a big change in Nix's model,
+with some non-trivial implications (regarding the trust model in
 particular).
 Even without going all the way down to a fully intensional model, we can
 make specific paths content-adressed, which can give some important benefits of
 the intensional store at a much lower price. In particular, setting some
-critical derivations as content-adressed can lead to some substancial build
+critical derivations as content-adressed can lead to some substantial build
 cutoffs.
 
 # Detailed design
@@ -60,12 +60,12 @@ cutoffs.
 The gist of the design is that:
 
 - Derivations can be marked as content-adressed (ca), in which case each
-  one of their output will be moved to content-addressed `ca` store path.
+  of their outputs will be moved to a CA store path.
   This extends the current notion of "fixed-output" derivations.
 - We introduce the notion of "resolving" a derivation, which extends to
   arbitrary `ca` derivations the current behavior of replacing fixed-outputs
   derivations by their output hash.
-- We refine the build process so that every derivation is first normalized
+- We refine the build process so that every derivation is normalized
   before being realized
 
 ## Nix-build process
@@ -78,7 +78,7 @@ the `input-addressed` model
 
 For each output `output` of a derivation `drv`, we define
 
-- its output id **DrvOutputId(drv, output)** as the tuple `(hash(drv), output, truster)`, where `truster` is a reserved field for future use and currently always set to `"world"`.
+- its `outputId` **DrvOutputId(drv, output)** as the tuple `(hash(drv), output, truster)`, where `truster` is a reserved field for future use and currently always set to `"world"`.
   This id uniquely identifies the output.
   We textually represent this as `hash(drv)!output[@truster]`.
 - its concrete path **PathOf(outputId)** as the path on which the output will be stored on disk.
@@ -86,7 +86,7 @@ For each output `output` of a derivation `drv`, we define
 > Unresolved: should we already include the `truster` field in `DrvOutputId`
 > even if it's not used atm? What would be the cost of adding it later?
 
-In a input-addressed-only world, the concrete path for a derivation output was a pure function of this output's id that could be computed at eval-time. However this won't be the case anymore once we allow content-addressed derivations, so we now need to store the results the `PathOf` function in the Nix database as a new table:
+In a input-addressed-only world, the concrete path for a derivation output was a pure function of this output's id that could be computed at eval-time. However this won't be the case anymore once we allow CA derivations, so we now need to store the results of the `PathOf` function in the Nix database as a new table:
 
 ```sql
 create table if not exists PathOf (
@@ -103,8 +103,8 @@ create table if not exists PathOf (
 
 We define a **resolved derivation** as a derivation whose only references are either:
 
-- Placeholders for the its own outputs (from the `placeholder` builtin)
-- References to the outputs of other (non content-addresed) resolved derivations
+- Placeholders for its own outputs (from the `placeholder` builtin)
+- References to the outputs of other (non CA) resolved derivations
 - Existing store paths
 
 For a derivation `drv` whose input derivations have all been realised, we define its **associated resolved derivation** `resolved(drv)` as `drv` in which we replace every input derivation `inDrv` of `drv` by `pathOf(inDrv)` (and update the output hash accordingly).
@@ -122,9 +122,9 @@ When asked to build a derivation `drv`, we instead:
    Possibly this is a no-op because it may be that `resolved(drv)` has already been built.
 3. Add a new mapping `pathOf(drv!${output}) == ${output}(resolved(drv))` for each output `output` of `drv`
 
-### Building a ca derivation
+### Building a CA derivation
 
-A **ca derivation** is a derivation with the `__contentAddressed` argument set
+A **CA derivation** is a derivation with the `__contentAddressed` argument set
 to `true` and the `outputHashAlgo` set to a value that is a valid hash name
 recognized by Nix (see the description for `outputHashAlgo` at
 <https://nixos.org/nix/manual/#sec-advanced-attributes> for the current allowed
@@ -215,7 +215,7 @@ We try to rebuild the new `transitivelyDependent`. What happens is the following
 
 [drawbacks]: #drawbacks
 
-- Obviously, this makes the Nix model more complicated than what it is now. In
+- Obviously, this makes the Nix model more complicated than it currently is. In
   particular, the caching model needs some modifications (see [caching]);
 
 - We specify that only a sub-category of derivations can safely be marked as
@@ -248,13 +248,13 @@ Eventually this RFC should be subsumed by RFC0017.
 [caching]: #caching
 
 The big unresolved question is about the caching of content-adressed paths.
-As [Eelco's phd thesis][nixphd] states it, caching ca paths raises a number of
+As [Eelco's phd thesis][nixphd] states, caching CA paths raises a number of
 questions when building that path is non-deterministic (because two different
 stores can have two different outputs for the same path, which might lead to
 some dependencies being duplicated in the closure of a dependency).
 There exist some solutions to this problem (including one presented in Eelco's
 thesis), but for the sake of simplicity, this RFC simply forbids to mark a
-derivation as ca if its build is not deterministic (although there's no real
+derivation as CA if its build is not deterministic (although there's no real
 way to check that so it's up to the author of the derivation to ensure that it
 is the case).
 
@@ -282,10 +282,10 @@ substitution in the future.
 
 ## Ensuring that no temporary output path leaks in the result
 
-One possible issue with the ca model is that the output paths get moved after being built, which breaks self-references. Hash rewriting solves this in most cases, but it is only heuristic and there is no way to truly ensure that we don't leak a self-reference (for example if a self-reference appears in a zipped file − like it's often the case for man pages or java jars, the hash-rewriting machinery won't detect it).
-Having leaking self-references is annoying since
+One possible issue with the CA model is that the output paths get moved after being built, which breaks self-references. Hash rewriting solves this in most cases, but it is only a heuristic and there is no way to truly ensure that we don't leak a self-reference (for example if a self-reference appears in a zipped file − like is often the case for man pages or Java jars, the hash-rewriting machinery won't detect it).
+Having leaking self-references is annoying since:
 
-- These self-references change each time the inputs of the derivation change, making ca useless (because the output will _always_ change when the input change)
+- These self-references change each time the inputs of the derivation change, making CA useless (because the output will _always_ change when the input change)
 - More annoyingly, these references become dangling and can cause runtime failures
 
 We however have a way to dectect these: If we have leaking self-references then the output will change if we artificially change its output path. This could be integrated in the `--check` option of `nix-store`.
@@ -299,9 +299,9 @@ ca paths with Nix, leaving as much room as possible for future extensions.
 In particular:
 
 - Add some path-rewriting to allow derivations with self-references to be built
-  as ca
+  as CA
 - Consolidate the caching model to allow non-deterministic derivations to be
-  built as ca
+  built as CA
 - (hopefully, one day) make the CA model the default one in Nix
 - Investigate the consequences in term of privileges requirements
 - Build a trust model on top of the content-adressed model to share store paths
