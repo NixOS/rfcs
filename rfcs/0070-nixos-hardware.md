@@ -11,13 +11,13 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-We are currently having a separate repository to providing NixOS profiles for hardware specific extensions at [nixos-hardware](https://github.com/NixOS/nixos-hardware). This RFC proposes to merge this repository (4000 LOCs/350 commits) and add support for detecting hardware in `nixos-config-generate`.
+We are currently having a separate repository to providing NixOS profiles for hardware specific extensions at [nixos-hardware](https://github.com/NixOS/nixos-hardware). This RFC proposes to merge this repository (4000 LOCs/350 commits) and add support for detecting hardware in `nixos-generate-config`.
 
 
 # Motivation
 [motivation]: #motivation
 
-[Nixos-hardware](https://github.com/NixOS/nixos-hardware) relies on specific packages/kernel versions being present in nixpkgs. There is currently no way of preventing nixos-hardware breakages when doing changes in nixpkgs itself. The current best practice is to make sure it does not break with nixpkgs master, which makes less usable for stable users/newcomers. Since it is in an external repository we also cannot integrate  it in [nixos-config-generate](https://github.com/NixOS/nixos-hardware/issues/49) like we do for some other environments like vm nixos profiles because this would require information from the very same repository.
+[Nixos-hardware](https://github.com/NixOS/nixos-hardware) relies on specific packages/kernel versions being present in nixpkgs. There is currently no way of preventing nixos-hardware breakages when doing changes in nixpkgs itself. The current best practice is to make sure it does not break with nixpkgs master, which makes less usable for stable users/newcomers. Since it is in an external repository we also cannot integrate  it in [nixos-generate-config](https://github.com/NixOS/nixos-hardware/issues/49) like we do for some other environments like vm nixos profiles because this would require information from the very same repository.
 
 Additionally, some support for hardware is already in nixpkgs (for example [for raspberrypi 3 and 4 images](https://github.com/NixOS/nixpkgs/issues/63720)), but we cannot move them nixos-hardware to not break existing users.
 
