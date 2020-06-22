@@ -115,8 +115,8 @@ way that restart or termination of either causes restart or termination of the
 other. Once both services shut down the private tmpfs disappears.
 
 The target service launches once the side-car service has been launched and
-singalled successful retrieval of secrets (via systemd-notify), the target
-service then joins the sida-cars namespace and is able to access the secrets
+signalled successful retrieval of secrets (via systemd-notify), the target
+service then joins the side-car's namespace and is able to access the secrets
 provided in the shared tmpfs in `/tmp` or via the environment. The service is
 now free to access the file in whichever way it wants - for instance just
 passing the path to the software to be launched as an argument.
