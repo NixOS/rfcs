@@ -25,10 +25,9 @@ Originally, each Nix command was its own executable, but then we combined them i
 I think this is fine for the main user-facing commands, but not good for the daemon.
 
 Finally, it's probably best not to give the daemon---a long lived process running with elevated privileges---access to tons of dead code.
+All of the other commands entry points and library functions they use, such as the Nix evaluator, are in the same process even though the daemon should never need to use them.
 C++ doesn't exactly prevent memory errors, and that dead code is just more fodder to be used in some low-level attack.
 There are other solutions to this in the long term, but this is the easiest solution in the short term.
-
-\[This RFC is completely separate from the ongoing IPFS work.]
 
 # Detailed design
 [design]: #detailed-design
@@ -55,8 +54,8 @@ Build rules perhaps are slightly more complex as there are both separate and ind
 
  - Do nothing.
 
- - Something more invasive.
-   But I much rather save that for later.
+ - Something more invasive, such as packaging the libraries and commands separately, or intending the libaries for widespread public consumption.
+   But I much rather save that for later, as such steps would be far more controversial.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
@@ -66,6 +65,6 @@ No known unknowns.
 # Future work
 [future]: #future-work
 
-There's lots of future work we could do in the vein of modularity.
-But there's also different, conflicting directions we could go in.
+I think most people for this will have future plans they wish to persue in the name of modularity.
+But I don't expect everyone to agree on waht exactl those plans should be.
 The point of this small step is to punt on all that for now.
