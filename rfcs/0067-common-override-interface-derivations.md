@@ -1,5 +1,5 @@
 ---
-feature: common-override-interface
+feature: common-override-interface-derivations
 start-date: 2020-03-17
 author: Frederik Rietdijk
 co-authors: (find a buddy later to help out with the RFC)
@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Define commonly used attributes for overriding in Nixpkgs.
+Define commonly used attributes for overriding of derivations in Nixpkgs.
 
 # Motivation
 [motivation]: #motivation
@@ -22,7 +22,13 @@ In Nixpkgs several methods exist to override functions calls. The primary ones a
 2. `.overrideAttrs` to override the call to `stdenv.mkDerivation`.
 3. `.overrideDerivation` to override the call to `derivation`.
 
-The first two are mainly used and are typically sufficient. However, how can we override generic package builders, such as `buildPythonPackage` and `buildGoPackage`? 
+Also used in several places but out of scope for this RFC because it is for
+overriding package sets is `lib.overrideScope'`.
+
+The first two are mainly used and are typically sufficient. The third one should
+typically be avoided and can be considered legacy.
+
+However, how can we override generic package builders, such as `buildPythonPackage` and `buildGoPackage`?
 
 For the `buildPythonPackage` function the `.overridePythonAttrs` was introduced that would override the call to `buildPythonPackage` because using `.overrideAttrs` would often not result in what the user expect would happen. In hindsight, it would have been better to attach a custom `.overrideAttrs` to `buildPythonPackage`.
 
