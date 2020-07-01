@@ -66,7 +66,27 @@ After invoking a generic builder it is no longer possible to override the call t
 # Alternatives
 [alternatives]: #alternatives
 
-An alternative would be to add a new method for overriding, `.overrideArgs`, thus allowing one to still call `.overrideAttrs` to override `stdenv.mkDerivation`.
+An alternative would be to let generic builders add their own methods, e.g.
+`overridePythonAtrrs`, `overrideGoAttrs`, and so on. While it may be clear which
+function it overrides, the user may not actually know what functions are called
+and thus may not know which override to use. From a UI point of view, they
+should probably not even need to know; all they should know is that there is a
+method which, when called, will apply what is expected.
+
+An alternative would be to add a new method for overriding of generic builders,
+`.overrideArgs`, thus allowing one to still call `.overrideAttrs` to override
+`stdenv.mkDerivation`. This is a new function users may need to be aware of.
+From a UI point of view, it could mean `stdenv.mkDerivation`, when not wrapped
+into a generic builder, may also need to offer `.overrideAttrs` for consistency.
+
+An alternative would be to have a generic override function that can override
+any function in the stack of function calls. E.g.
+- `.override` becomes `.overrideCall "callPackage" { ... }`
+- `.overrideAttrs becomes .overrideCall "mkDerivation" { ... }`
+- `.overridePythonAttrs becomes .overrideCall "buildPythonPackage" { ... }`
+- `.overrideDerivation becomes .overrideCall "derivation" { ... }`
+While this offers maximum precision when overriding, this does not solve the UI
+problem either.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
