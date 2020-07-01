@@ -11,7 +11,8 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Define commonly used attributes for overriding of derivations in Nixpkgs.
+Define commonly used attributes for overriding of derivations in Nixpkgs to
+improve overriding from a UI point of view.
 
 # Motivation
 [motivation]: #motivation
