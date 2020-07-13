@@ -144,6 +144,7 @@ for `tzdata`).
 [gatsby]: https://gatsbyjs.org
 [sphinx]: https://www.sphinx-doc.org
 [pandoc]: https://pandoc.org/
+[md2man]: https://github.com/cpuguy83/go-md2man
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
