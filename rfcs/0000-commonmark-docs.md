@@ -78,8 +78,8 @@ contributors. The *lingua franca* across subcommunities for both
 humans and their toolchains is Markdown. It's all the more easy to
 create good looking documentation with Markdown that the tools
 available to process it are plentiful and flexible (JavaScript
-converters with plugin support like [Remark][remark], static site
-generators by the dozen, [MDX][mdx] to extend CommonMark with
+converters with plugin support like [Remark][remark], [static site
+generators][staticgen] by the dozen, [MDX][mdx] to extend CommonMark with
 arbitrary React components, etc).
 
 [gatsby-docs]: https://www.gatsbyjs.org/docs/
@@ -91,6 +91,7 @@ arbitrary React components, etc).
 [vscode-docs]: https://code.visualstudio.com/docs
 [mdx]: https://github.com/mdx-js/mdx
 [remark]: https://remark.js.org/
+[staticgen]: https://www.staticgen.com/
 
 # Detailed design
 [design]: #detailed-design
