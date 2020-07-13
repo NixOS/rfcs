@@ -166,7 +166,7 @@ https://nixos-docs-mockup.netlify.app
 It features the following sections of the Nix manual:
 * introduction
 * quickstart and installation
-* the Nix experssions chapter
+* the Nix expressions chapter
 * advanced topics
 
 The content is the unedited output of running the Pandoc conversion,
