@@ -236,7 +236,7 @@ Pros:
 
 - reStructuredText (RST) has wider adoption than Asciidoc.
 - Most Python projects use it. The Python ecosystem is deep and wide.
-- Good and mature toolchains like Sphynx exist to process RST files.
+- Good and mature toolchains like Sphinx exist to process RST files.
 
 Cons:
 
