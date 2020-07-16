@@ -136,7 +136,7 @@ demo below, it was easy to fix 5 bugs already.
 We propose to keep the man pages as Docbook for now. They are
 self-contained documents, whose form is constrained by convention and
 the limits of the man page format. When the time comes to convert the
-man pages as well, we can turn here again to prior art. The Kurnetes
+man pages as well, we can turn here again to prior art. The Kubernetes
 project uses [md2man][md2man] to generate man pages from CommonMark.
 This is a small Go command with a 4.1MB closure size (including 2MB
 for `tzdata`).
