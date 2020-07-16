@@ -3,8 +3,8 @@ feature: nixos_hardware
 start-date: 2020-06-20
 author: Jörg Thalheim (@Mic92)
 co-authors: Profpatch (@Profpatsch)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @samueldr, @garbas, @edolstra, @Kloenk
+shepherd-leader: @Kloenk
 related-issues: (will contain links to implementation PRs)
 ---
 
