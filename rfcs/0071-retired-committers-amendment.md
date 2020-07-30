@@ -3,8 +3,8 @@ feature: retired-committers-amendment
 start-date: 2020-07-09
 author: worldofpeace
 co-authors: Graham Christensen (@grahamc), Jan Tojnar (@jtojnar)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @lheckemann, @tilpner, @alyssais
+shepherd-leader: @tilpner
 related-issues: 0055
 ---
 
