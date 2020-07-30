@@ -3,8 +3,8 @@ feature: config-option
 start-date: 2019-03-10
 author: Silvan Mosberger
 co-authors: (find a buddy later to help our with the RFC)
-shepherd-leader: Robin Gloster
-shepherd-team: Robin Gloster, Eelco Dolstra, Robert Helgesson, Franz Pletz
+shepherd-leader: Jörg Thalheim
+shepherd-team: Jörg Thalheim, Eelco Dolstra, Robert Helgesson, Franz Pletz
 related-issues: https://github.com/NixOS/nixpkgs/pull/65728, https://github.com/NixOS/nixpkgs/pull/70138, https://github.com/NixOS/nixpkgs/pull/75584, TBD
 ---
 
@@ -348,4 +348,3 @@ in {
   config.environment.etc."foo/config.json".text = lib.settings.genJSON fixedUpsettings;
 }
 ```
-
