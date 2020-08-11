@@ -28,10 +28,6 @@ the best [leverage](https://nav.al/least). We don't have:
   and _Coordination_.
 - Organizational Culture, that helps to overcome the complexity bias. ([KISS](https://en.wikipedia.org/wiki/KISS_principle))
 
-Analysis inspired by [New St.Gallen Managament Model].
-
-[New St.Gallen Managament Model]: https://cio-wiki.org/wiki/The_New_St._Gallen_Management_Model
-
 # Detailed design
 [design]: #detailed-design
 
@@ -62,8 +58,6 @@ Based on this review, we'll create a clean new repository at
 
 As a general guideline for this review, we'd acknowledge the success
 and impressive dynamics of the Kubernetes ecosystem.
-
-[viable system]: https://en.wikipedia.org/wiki/Viable_system_theory
 
 ## Brainstorm
 [brainstorm]: #brainstorm
@@ -148,3 +142,12 @@ the highest leverage over time?
   - UG Flakes
 
 (those might be way too many, of course)
+
+# Credits
+
+This analysis is somewhat inspired by the following schools of thought:
+
+- [New St.Gallen Managament Model](https://cio-wiki.org/wiki/The_New_St._Gallen_Management_Model)
+- [Viable System Theory](https://en.wikipedia.org/wiki/Viable_system_theory)
+- [Complexity and Self-organization](http://pcp.vub.ac.be/Papers/ELIS-complexity.pdf)
+
