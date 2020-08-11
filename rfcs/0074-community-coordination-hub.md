@@ -91,7 +91,7 @@ interactions that the NixOS community is known for.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-There _can_ be a better solution to the achieve _optimum levels of empowerment_
+There _can_ be a better solution to achieve _optimum levels of empowerment_
 for our community. We _could just **wait**_ for them to unveil themselves.
 
 # Alternatives
@@ -101,7 +101,7 @@ for our community. We _could just **wait**_ for them to unveil themselves.
 - Ephemeral Conversations (Discourse)
 
 The only current viable alternative for _coordination of resources and effort_
-are ephemeral conversations in Discourse. While, they lend meaning to the 
+are ephemeral conversations in Discourse. While they lend meaning to the 
 individual's interpretations and views onto the ecosystem, they lack important
 features such as:
 
