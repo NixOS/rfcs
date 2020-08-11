@@ -66,6 +66,14 @@ proof of concept, but as a very sucessfull and inspiring [viable system].
 
 [viable system]: https://en.wikipedia.org/wiki/Viable_system_theory
 
+## Brainstorm
+[brainstorm]: #brainstorm
+
+This section exposes loose ideas that have sparked interest of RFC commenters
+in their order of submission. They shall be considered _optional_ material
+during implementation, whereas implementors shall have the liberty to
+deliver a consistent experience as they see fit.
+
 # User Stories
 [user-stories]: #user-stories
 
