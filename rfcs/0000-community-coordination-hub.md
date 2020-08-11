@@ -2,7 +2,7 @@
 feature: community_coordination_hub
 start-date: 2020-07-30
 author: David Arnold <dar@xoe.solutions>
-co-authors: (find a buddy later to help out with the RFC)
+co-authors: Doron Behar <me@doronbehar.com>
 shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: (will contain links to implementation PRs)
