@@ -20,7 +20,7 @@ where it _does_ fit [us](https://nixos.org/).
 [motivation]: #motivation
 
 We lack an optimum level of _empowerment_ on distinct vital aspects for
-the best [leverage](https://nav.al/least) on the available resources:
+the best [leverage](https://nav.al/least). We don't have:
 
 - Efficient Management Processes, that bias the whole community towards 
   _coordinated and optimal Resource Employment_.
@@ -35,8 +35,8 @@ Analysis inspired by [New St.Gallen Managament Model].
 # Detailed design
 [design]: #detailed-design
 
-A repository shall exist, named `NixOS/community`, which acts as central hub
-for coordinating the community dynamics.
+A repository shall exist, named `NixOS/community`, which will act as central hub
+for coordinating the community's efforts.
 
 It shall comprehend, consolidate and showcase aspects of:
 
@@ -53,26 +53,23 @@ It shall comprehend, consolidate and showcase aspects of:
 It shall omit any technical subject about nix or code in general, other than
 repository tooling.
 
-To implement, a detailed review of https://github.com/kubernetes/community
-shall be conducted as joint effort between the interested parties and as 
-an Annex I to this RFC.
+To implement, myself, and anyone interested, will review https://github.com/kubernetes/community
+to the smallest details.
 
-Based on this review, a clean repository shall be enacted implementing
-such aspects considered worth porting to our community.
+Based on this review, we'll create a clean new repository at
+`NixOS/community`, with what we considered was worth porting from
+[Kubernetes' community portal](https://github.com/kubernetes/community).
 
-As a general guideline for this review, the vast success and impressive
-dynamics of the kubernetes ecosystem shall be acknowledged not only as a
-proof of concept, but as a very sucessfull and inspiring [viable system].
+As a general guideline for this review, we'd acknowledge the success
+and impressive dynamics of the Kubernetes ecosystem.
 
 [viable system]: https://en.wikipedia.org/wiki/Viable_system_theory
 
 ## Brainstorm
 [brainstorm]: #brainstorm
 
-This section exposes loose ideas that have sparked interest of RFC commenters
-in their order of submission. They shall be considered _optional_ material
-during implementation, whereas implementors shall have the liberty to
-deliver a consistent experience as they see fit.
+This section exposes loose ideas we might put into `NixOS/community` collected during
+this RFC's review process.
 
 - [Community Event Calender](https://github.com/kubernetes/community/tree/master/events)
 - Explain and Support an Efficient Code Review Process.
@@ -93,12 +90,9 @@ coordination. I can leverage my experience and skills more effectively
 for the benefit of the community.
 
 ## As a mentor
-As a mentor, I can _still_ \* maintain those high quality direct human
-interactions, while having full support of a
-_"[curriculum](https://en.wikipedia.org/wiki/Curriculum)-like"_ resource.
-
-\* _still_, as an aside, because nix community is known for it's great
-mentorship spirit.
+As a mentor, I can inform my efforts with a clear and consistent reference.
+It helps me to more effectively maintaining those high quality human 
+interactions that the NixOS community is known for.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -121,10 +115,11 @@ features such as:
 - Consolidation
 - Ability to act as _Reference_
 
-A portal page might at first sight seem like an alternative, especially for those
-features. But, _optimum empowerment_ requires low barriers to interaction and
-amendment. Hence a git repository. Repository tooling can complement this aspect
-and deploy a static page under the nixos.org for a design lift on the content.
+A portal page might at first sight seem like an alternative mean to establish
+a community coordination hub, especially for the above features. But, _optimum
+empowerment_ requires low barriers to interaction and amendment. Hence we suggest
+a git repository. Repository tooling can provide the means to make this body
+of resources available through a complementary portal page.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
@@ -152,4 +147,4 @@ the highest leverage over time?
   - UG NixOS
   - UG Flakes
 
-(those are way too many, of course)
+(those might be way too many, of course)
