@@ -75,6 +75,7 @@ during implementation, whereas implementors shall have the liberty to
 deliver a consistent experience as they see fit.
 
 - [Community Event Calender](https://github.com/kubernetes/community/tree/master/events)
+- Explain and Support an Efficient Code Review Process.
 
 # User Stories
 [user-stories]: #user-stories
