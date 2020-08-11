@@ -74,6 +74,8 @@ in their order of submission. They shall be considered _optional_ material
 during implementation, whereas implementors shall have the liberty to
 deliver a consistent experience as they see fit.
 
+- [Community Event Calender](https://github.com/kubernetes/community/tree/master/events)
+
 # User Stories
 [user-stories]: #user-stories
 
