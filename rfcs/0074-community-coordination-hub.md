@@ -116,9 +116,16 @@ are ephemeral conversations in Discourse. While they lend meaning to the
 individual's interpretations and views onto the ecosystem, they lack important
 features such as:
 
-- Structure
-- Consolidation
-- Ability to act as _Reference_
+- Structure<sup>[3](#structure)</sup>
+- Consolidation<sup>[4](#consolidation)</sup>
+- Ability to act as _Reference_<sup>[4](#reference)</sup>
+
+<sub><a name="structure">3</a>: Discourse does have inherent _structures_ that make people talk, it does 
+not have (optimal) inherent structures to make people act.</sub>
+<sub><a name="consolidation">4</a>:  In conversational style, a _conclusion_ lexically is nothing more than 
+another agent speaking: we cannot systematically _establish_ ("consolidate") conclusions.</sub>
+<sub><a name="reference">5</a>:  Lack of structure and consolitation make efforts of referencing arbitrary
+in contrast to a legtimate single source of truth.</sub>
 
 A portal page might at first sight seem like an alternative mean to establish
 a community coordination hub, especially for the above features. But, _optimum
