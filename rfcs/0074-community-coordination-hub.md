@@ -57,8 +57,11 @@ It shall comprehend, consolidate and showcase aspects of:
   - Code Contributions
   - Community Engagement
 
-It shall omit any technical subject about nix or code in general, other than
-repository tooling.
+It shall _not_:
+
+- treat any technical subject about nix or code in general, other than repository tooling.
+- act as discussion forum.
+- implement process execution.
 
 To implement, myself, and anyone interested, will review https://github.com/kubernetes/community
 to the smallest details.
