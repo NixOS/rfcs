@@ -19,14 +19,25 @@ where it _does_ fit [us](https://nixos.org/).
 # Motivation
 [motivation]: #motivation
 
-We lack an optimum level of _empowerment_ on distinct vital aspects for
-the best [leverage](https://nav.al/least). We don't have:
+We lack an optimum level of _empowerment_<sup>[1](#empowerment)</sup> on distinct vital aspects for
+the best [leverage](https://nav.al/least)<sup>[2](#leverage)</sup>. We don't have:
 
 - Efficient Management Processes, that bias the whole community towards 
   _coordinated and optimal Resource Employment_.
 - Organizational Structure, that enacts necesary degrees of _Division of Labor_ 
   and _Coordination_.
 - Organizational Culture, that helps to overcome the complexity bias. ([KISS](https://en.wikipedia.org/wiki/KISS_principle))
+
+<sub><a name="empowerment">1</a>: In the sphere of organizational theory, 
+"empowerment" often refers loosely to processes for giving members greater
+discretion and resources: distributing control in order to better serve 
+the organization (adapted from 
+[Wikipedia](https://en.wikipedia.org/wiki/Empowerment#In_management)).</sub>
+
+<sub><a name="leverage">2</a>: Increasing leverage is the act of scrutinizing every decision or choice
+as to potentialize it's desired outcome. You can be leveraged by code, community,
+media, capital, labor and other ways. We need to better leverage our community
+resources (tools, knowledge, people).</sub>
 
 # Detailed design
 [design]: #detailed-design
