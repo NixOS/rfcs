@@ -112,7 +112,7 @@ features such as:
 A portal page might at first sight seem like an alternative mean to establish
 a community coordination hub, especially for the above features. But, _optimum
 empowerment_ requires low barriers to interaction and amendment. Hence we suggest
-a git repository. Repository tooling can provide the means to make this body
+a GitHub repository. Repository tooling can provide the means to make this body
 of resources available through a complementary portal page.
 
 # Unresolved questions
@@ -150,4 +150,3 @@ This analysis is somewhat inspired by the following schools of thought:
 - [New St.Gallen Managament Model](https://cio-wiki.org/wiki/The_New_St._Gallen_Management_Model)
 - [Viable System Theory](https://en.wikipedia.org/wiki/Viable_system_theory)
 - [Complexity and Self-organization](http://pcp.vub.ac.be/Papers/ELIS-complexity.pdf)
-
