@@ -45,7 +45,14 @@ resources (tools, knowledge, people).</sub>
 A repository shall exist, named `NixOS/community`, which will act as central hub
 for coordinating the community's efforts.
 
-It shall comprehend, consolidate and showcase aspects of:
+It shall make it easy to mentally grasp how the community coordinates as a whole.
+Getting involved with the community should feel as natural as skimming through
+code on github (or on a local clone).
+
+It shall be a place where established truths or conclusions that (have) emerge
+from the communities conversations and decision making processes are recorded.
+
+Therefore it shall act as single source of truth for aspects of:
 
 - Communication
   - Channels
