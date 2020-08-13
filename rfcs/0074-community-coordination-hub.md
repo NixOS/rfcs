@@ -89,6 +89,8 @@ this RFC's review process.
 - [Community Event Calender](https://github.com/kubernetes/community/tree/master/events)
 - Explain and Support an Efficient Code Review Process.
 - Move non-technical aspects of nixpkgs' manual here
+- Record Meeting Minutes of working groups
+- Evolve Design Prototypes before moving to RFC with in special interest groups
 
 # User Stories
 [user-stories]: #user-stories
