@@ -2,6 +2,8 @@
 feature: commonmark-docs
 start-date: 2020-07-05
 author: mboes
+shepherd-team: Rok Garbas, zimbatm, Infinisil
+shepherd-leader: Infinisil
 ---
 
 # Summary
