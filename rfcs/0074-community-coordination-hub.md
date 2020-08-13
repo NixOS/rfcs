@@ -158,9 +158,21 @@ What can we do to prevent proliferation of unhelahty overahead
 that are a collateral of a person's or company's own need _must_
 not be discouraged.
 
+What process should constitute an acting body such as a special interest group,
+working group (or anything else)? - Should they be enacted through RFCs?
+Or should RFCs be reserved for technical progress and acting bodies
+constitute via a separate mechanism defined in `NixOS/community`?
+See [Future Work](#future).
+
 # Future work
 [future]: #future-work
 
+## Legitimize Acting Bodies
+
+We need to define by which process acting bodies can legitimately conform, 
+so they can rightfully excercise their entrusted authonomy.
+
+## Constitue Acting Bodies
 - Constitution of Woring Groups, such as (examplifications):
   - WG Contribution Workflows
   - WG Onboarding
