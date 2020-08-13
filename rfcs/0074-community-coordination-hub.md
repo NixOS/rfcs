@@ -151,6 +151,9 @@ Is this the right level of abstraction to act as an enabling RFC for future
 improvements and thereby resume the author's stance in a way that effects
 the highest leverage over time?
 
+What can we do to prevent proliferation of unhelahty overahead 
+("excessive talking about doing, instead of doing")?
+
 # Future work
 [future]: #future-work
 
