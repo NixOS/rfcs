@@ -67,8 +67,8 @@ Therefore it shall act as single source of truth for aspects of:
 It shall _not_:
 
 - document the standard library (or any other highly specific and established technical subject).
-- act as discussion forum (but dcument outcomes).
-- implement process execution (but coordinate their implementation).
+- act as discussion forum (but document outcomes).
+- implement code (but coordinate it's implementation).
 
 To implement, myself, and anyone interested, will review https://github.com/kubernetes/community
 to the smallest details.
