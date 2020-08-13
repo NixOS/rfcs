@@ -66,9 +66,9 @@ Therefore it shall act as single source of truth for aspects of:
 
 It shall _not_:
 
-- treat any technical subject about nix or code in general, other than repository tooling.
-- act as discussion forum.
-- implement process execution.
+- document the standard library (or any other highly specific and established technical subject).
+- act as discussion forum (but dcument outcomes).
+- implement process execution (but coordinate their implementation).
 
 To implement, myself, and anyone interested, will review https://github.com/kubernetes/community
 to the smallest details.
