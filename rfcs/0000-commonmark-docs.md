@@ -2,7 +2,7 @@
 feature: commonmark-docs
 start-date: 2020-07-05
 author: mboes
-shepherd-team: Rok Garbas, zimbatm, Infinisil
+shepherd-team: garbas, zimbatm, Kloenk
 shepherd-leader: Infinisil
 ---
 
