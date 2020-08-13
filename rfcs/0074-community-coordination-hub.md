@@ -154,7 +154,9 @@ improvements and thereby resume the author's stance in a way that effects
 the highest leverage over time?
 
 What can we do to prevent proliferation of unhelahty overahead 
-("excessive talking about doing, instead of doing")?
+("excessive talking about doing, instead of doing")? Contributions
+that are a collateral of a person's or company's own need _must_
+not be discouraged.
 
 # Future work
 [future]: #future-work
