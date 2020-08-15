@@ -128,8 +128,9 @@ for our community. We _could just **wait**_ for them to unveil themselves.
 
 - [Benevolent Dictatorship](https://discourse.nixos.org/t/what-would-you-do-if-you-were-the-bdfl-of-nix/6949)
 - Ephemeral Conversations (Discourse)
+- RFC process itself
 
-The only current viable alternative for _coordination of resources and effort_
+One currently viable alternative for _coordination of resources and effort_
 are ephemeral conversations in Discourse. While they lend meaning to the 
 individual's interpretations and views onto the ecosystem, they lack important
 features such as:
@@ -144,6 +145,20 @@ not have (optimal) inherent structures to make people act.</sub>
 another agent speaking: we cannot systematically _establish_ ("consolidate") conclusions.</sub>
 <sub><a name="reference">5</a>:  Lack of structure and consolitation make efforts of referencing arbitrary
 in contrast to a legtimate single source of truth.</sub>
+
+Another current viable alternative for _coordination of resources and effort_
+are RFCs, like this one. However the RFC process has a structure that is 
+biased towards (final) decision making, evidenced by the initial confusion
+about this very RFC and the fact that barely any commenter proposes ideas
+for the brainstorming section. This process, while stringent, well established
+and prestigious falls short when applied to the need for more lenient and
+ad hoc coordination. `NixOS/community` shall be, among others, a place
+where RFCs might incubate and ripen  within the limited scope of a special
+interest group or a working group or similar acting body.
+
+RFCs also aren't a good fit for effective, yet legitimate subordinate decision
+making. Therefore a framework for suboordinate, yet legitimate, decision making
+should be conceived that empowers the acting bodies.
 
 A portal page, like a repurposed [nix.wiki](https://nix.wiki) might at first
 sight seem like an alternative mean to establish a community coordination hub.
