@@ -96,6 +96,8 @@ this RFC's review process.
 - Governance/Structure/Acting Bodies: Evolve Design Prototypes before moving to RFC with in special interest groups
 - Governance/Processes: How does the Community make decisions (formal and informal)?
 - Governance/Processes: How disagreement are resolved (given consensus about a need is established)?
+- Onboarding/Code Contributions: How to quickstart and where to find detailed (authoritative resoures)?
+- Onboarding/Community Engagment: Don't be scared about asking stupid questions, unless you are aware they are stupid!
 
 # User Stories
 [user-stories]: #user-stories
