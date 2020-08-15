@@ -87,11 +87,15 @@ and impressive dynamics of the Kubernetes ecosystem.
 This section exposes loose ideas we might put into `NixOS/community` collected during
 this RFC's review process.
 
-- [Community Event Calender](https://github.com/kubernetes/community/tree/master/events)
-- Explain and Support an Efficient Code Review Process.
-- Move non-technical aspects of nixpkgs' manual here
-- Record Meeting Minutes of working groups
-- Evolve Design Prototypes before moving to RFC with in special interest groups
+- Commnication/Channels: [Community Event Calender](https://github.com/kubernetes/community/tree/master/events)
+- Governance/Processes: Community Event Planning
+- Onboarding/Code Contributions: Explain and Support an Efficient Code Review Process.
+- Onboarding/Community Engagement: Move non-technical aspects of nixpkgs' manual here
+- Governance/Processes/Transparency: Record Meeting Minutes of working groups
+- Governance/Structure: What are the structures about which the community behaves and coordinates?
+- Governance/Structure/Acting Bodies: Evolve Design Prototypes before moving to RFC with in special interest groups
+- Governance/Processes: How does the Community make decisions (formal and informal)?
+- Governance/Processes: How disagreement are resolved (given consensus about a need is established)?
 
 # User Stories
 [user-stories]: #user-stories
