@@ -145,11 +145,14 @@ another agent speaking: we cannot systematically _establish_ ("consolidate") con
 <sub><a name="reference">5</a>:  Lack of structure and consolitation make efforts of referencing arbitrary
 in contrast to a legtimate single source of truth.</sub>
 
-A portal page might at first sight seem like an alternative mean to establish
-a community coordination hub, especially for the above features. But, _optimum
-empowerment_ requires low barriers to interaction and amendment. Hence we suggest
-a GitHub repository. Repository tooling can provide the means to make this body
-of resources available through a complementary portal page.
+A portal page, like a repurposed [nix.wiki](https://nix.wiki) might at first
+sight seem like an alternative mean to establish a community coordination hub.
+But, _optimum empowerment_ requires low barriers to interaction and amendment.
+Hence we suggesta GitHub repository. Repository tooling can provide the means
+to make this body of resources available through a complementary portal page,
+like https://nix.wiki or https://nix.community. Discussion with @samueldr is
+expected to unfold with the aim to establish a join vision of this RFCs 
+motivation and the future of https://nix.wiki.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
