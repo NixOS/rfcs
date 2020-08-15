@@ -69,6 +69,7 @@ It shall _not_:
 - document the standard library (or any other highly specific and established technical subject).
 - act as discussion forum (but document outcomes).
 - implement code (but coordinate it's implementation).
+- exhibit established content that best fits into the manual (but call out to it and coordinate working drafts or ideas about it).
 
 To implement, myself, and anyone interested, will review https://github.com/kubernetes/community
 to the smallest details.
@@ -177,6 +178,7 @@ so they can rightfully excercise their entrusted authonomy.
   - WG Contribution Workflows
   - WG Onboarding
 - Constitution of Special Interest Groups (examplifications):
+  - SIG Manual
   - SIG Rust
   - SIG Security
   - SIG Golang
