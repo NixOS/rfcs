@@ -120,7 +120,7 @@ environment is used even by builders, not only user facing Python environments.
 `propagatedBuildInputs` and not regular `buildInputs`. I think this was done so
 in the past so it'd be easy to know how to wrap them? Declarative wrappers
 won't require runtime-env-requiring deps to be only in `propagatedBuildInputs`
-or `buildInputs` - it should pick such deps from both lists. Hence, I think it
+or `buildInputs` - it should pick such deps from both lists. Hence, (I think) it
 should be possible to make Python's static builds consistent with other
 ecosystems.
 
