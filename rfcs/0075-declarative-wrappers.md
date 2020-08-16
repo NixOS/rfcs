@@ -191,8 +191,8 @@ need feedback regarding whether `gdb` will play nice with this.
 This issue may not directly relate to declarative wrappers, and it is already
 addressed in @FRidh's [pull 95569](https://github.com/NixOS/nixpkgs/pull/95569), but perhaps
 both ideas could be integrated into an alternative, simpler creation method of
-binary wrappers. See
-[comment](https://github.com/NixOS/nixpkgs/pull/95569#issuecomment-674508806)
+binary wrappers. See [my
+comment](https://github.com/NixOS/nixpkgs/pull/95569#issuecomment-674508806).
 
 # Detailed design
 [design]: #detailed-design
@@ -200,13 +200,16 @@ binary wrappers. See
 The current design is roughly implemented at
 [pull 85103](https://github.com/NixOS/nixpkgs/pull/85103) .  
 
-The idea is to have a Nix function, called `wrapGeneric` with an interface
-similar to [`wrapMpv`](https://github.com/NixOS/nixpkgs/blob/a5985162e31587ae04ddc65c4e06146c2aff104c/pkgs/applications/video/mpv/wrapper.nix#L9-L23) and [`wrapNeovim`](https://github.com/NixOS/nixpkgs/blob/a5985162e31587ae04ddc65c4e06146c2aff104c/pkgs/applications/editors/neovim/wrapper.nix#L11-L24) which will accept a single derivation or
-an array of them and it'll wrap all of their executables with the proper
-environment, based on their inputs.
+The idea is to have a Nix function, let us call it `wrapGeneric`, with an
+interface similar to
+[`wrapMpv`](https://github.com/NixOS/nixpkgs/blob/a5985162e31587ae04ddc65c4e06146c2aff104c/pkgs/applications/video/mpv/wrapper.nix#L9-L23)
+and
+[`wrapNeovim`](https://github.com/NixOS/nixpkgs/blob/a5985162e31587ae04ddc65c4e06146c2aff104c/pkgs/applications/editors/neovim/wrapper.nix#L11-L24)
+which will accept a single derivation or an array of them and it'll wrap all of
+their executables with the proper environment, based on their inputs.
 
 `wrapGeneric` should iterate recursively all `buildInputs` and
-`propagatedBuildInputs` of the input derivations, and construct an attrset with
+`propagatedBuildInputs` of the input derivation(s), and construct an attrset with
 which it'll calculate the necessary environment of the executables. Then either
 via `wrapProgram` or a better method, it'll create the wrappers.
 
@@ -218,20 +221,16 @@ and with this information at hand, construct the necessary wrapper.
 
 In order for `wrapGenric` to know all of this information about our packaged
 libraries - the information about runtime env, we need to write in the
-`passthru`s of these libraries, what env vars they need.
-
-This Nix function, let us call it `wrapGeneric`, should iterate recursively all
-`buildInputs` and `propagatedBuildInputs` of a given derivation, and decide
-what environment this derivation will need to run. Such information was added
-in the [POC pull's
+`passthru`s of these libraries, what env vars they need. Such information was
+added in the POC pull at [commit
 @6283f15](https://github.com/NixOS/nixpkgs/pull/85103/commits/6283f15bb9b65af64571a78b039115807dcc2958).
 
 Additional features / improvements are [already
 available](https://github.com/NixOS/nixpkgs/pull/85103#issuecomment-614195666)
 in the POC pull. For example:
 
-- It should be impossible for multi-value env vars to have duplicates, as
-  that's guaranteed by Nix' behavior when constructing arrays.
+- It should be **impossible** for multi-value env vars to have duplicates, as
+  that's guaranteed by Nix' behavior when constructing arrays / attrsets.
 - Asking the wrapper creator to use more links and less colon-separated values
   in env vars - should help avoid what [pull
   84689](https://github.com/NixOS/nixpkgs/pull/84689) fixed.
@@ -242,7 +241,7 @@ in the POC pull. For example:
 All examples are copied from and based on the [POC
 pull](https://github.com/NixOS/nixpkgs/pull/85103).
 
-The new method of creating a python environment:
+Here's a new method of creating a python environment:
 
 ```nix
   my-python-env = wrapGeneric python3 {
