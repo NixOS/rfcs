@@ -329,19 +329,22 @@ comment](https://github.com/NixOS/nixpkgs/pull/88136#issuecomment-632674653).
 
 The POC implementation does 1 thing which I'm most sure could be done better,
 and that's iterating **recursively** all `buildInputs` and
-`propagatedBuildInputs` of the input derivations. This is currently implemented
-via a recursive (Nix) function, that's is prone to stack overflow due reach a
-state of infinite recursion. But this risk is currently mitigated using an
-array of packages we know don't need any env vars at runtime, and for sure are
-very much at the bottom of the list of very common inputs. This is implemented [here](https://github.com/NixOS/nixpkgs/pull/85103/files#diff-44c2102a355f50131eb8f69fb7e7c18bR75-R131).
+`propagatedBuildInputs` of the given derivations. This is currently implemented
+via a recursive (Nix) function, that's prone to reach a state of infinite
+recursion. But this risk is currently mitigated using an array of packages we
+know don't need any env vars at runtime, and for sure are very much at the
+bottom of the list of very common inputs. This is implemented
+[here](https://github.com/NixOS/nixpkgs/pull/85103/files#diff-44c2102a355f50131eb8f69fb7e7c18bR75-R131).
 
-There are other methods of doing this which might be better, but TBH I haven't
-yet investigated all of them. For reference and hopefully for an advice, this
-need was requested by others and discussed at:
+There are other methods of doing this recursive search, but TBH I haven't yet
+investigated all of them. For reference and hopefully for an advice, this need
+was requested by others and discussed at:
 
-- [nix issue](https://github.com/NixOS/nix/issues/1245).
-- [Interesting idea by @aszlig](https://github.com/NixOS/nix/issues/1245#issuecomment-401642781) I haven't tested.
-- [@nmattia's post](https://www.nmattia.com/posts/2019-10-08-runtime-dependencies.html).
+- [nix issue 1245](https://github.com/NixOS/nix/issues/1245).
+- [Interesting idea by @aszlig at nix issue
+  1245](https://github.com/NixOS/nix/issues/1245#issuecomment-401642781).
+- [@nmattia's
+  post](https://www.nmattia.com/posts/2019-10-08-runtime-dependencies.html).
 - [Discourse thread](https://discourse.nixos.org/t/any-way-to-get-a-derivations-inputdrvs-from-within-nix/7212/3).
 
 # Future work
