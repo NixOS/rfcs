@@ -12,19 +12,17 @@ related-issues: POC Implementation at [#85103](https://github.com/NixOS/nixpkgs/
 [summary]: #summary
 
 Manage the environment of wrappers declaratively and deprecate shell based
-methods for calculating runtime environment of packages.
+methods for calculating runtime environment of packages. Make wrappers a
+separate derivation so that mere changes to the environment will not trigger a
+rebuild. Make it easier to debug why env vars are added to an executable, by
+using Nix as the language to evaluate what env vars are needed, instead of not
+documented good enough and not easily debug-able shell hooks.
 
 # Motivation
 [motivation]: #motivation
 
-- Make wrappers a separate derivation to make mere changes to the environment
-  not trigger a heavy rebuild.
-- Make it easier to debug why env vars are added to an executable, by using Nix
-  as the language to evaluate what env vars are needed, instead of not
-  documented good enough and not easily debug-able shell hooks.
-
 We have numerous issues regarding wrappers and our wrapper shell hooks. Here's
-a list of them, sorted by categories.
+a list of them, sorted to categories.
 
 ## Closure related
 
