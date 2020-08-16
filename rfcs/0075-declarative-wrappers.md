@@ -176,6 +176,9 @@ $ nix why-depends -f. beets gobject-introspection.dev
 General, justified complain about wrappers.
 
 - https://github.com/NixOS/nixpkgs/issues/95027
+- https://github.com/NixOS/nixpkgs/issues/23018
+- https://github.com/NixOS/nixpkgs/issues/11133
+- https://github.com/NixOS/nixpkgs/pull/95569
 
 Since our wrappers are shell scripts, `gdb` can't run them. What if we had
 written a C based wrapper, that perhaps would read what environment it needs to
