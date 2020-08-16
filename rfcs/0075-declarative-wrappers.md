@@ -92,7 +92,8 @@ manual
 https://nixos.org/nixpkgs/manual/#ssec-gnome-common-issues-double-wrapped
 
 Declarative wrappers will deprecate the usage of our shell based hooks and will
-wrap all executables automatically according to their needs.
+wrap all executables automatically according to their needs, without requiring
+the contributor a lot of knowledge of the wrapping system.
 
 - [issue 86369](https://github.com/NixOS/nixpkgs/issues/86369) 
 
