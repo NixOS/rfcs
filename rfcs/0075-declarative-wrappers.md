@@ -106,7 +106,7 @@ of](https://github.com/NixOS/nixpkgs/pull/85103#issuecomment-614195666), I hope
 you'll see how declarative wrappers can solve this issue.
 
 
-## Other Issues _possibly_ fixable by declarative wrappers
+## Issues _possibly_ fixable by declarative wrappers (?)
 
 - [pull 61213](https://github.com/NixOS/nixpkgs/pull/61213) 
 
