@@ -106,7 +106,7 @@ of](https://github.com/NixOS/nixpkgs/pull/85103#issuecomment-614195666), I hope
 you'll see how declarative wrappers can solve this issue.
 
 
-## Other Issues only _possibly_ fixable by declarative wrappers
+## Other Issues _possibly_ fixable by declarative wrappers
 
 - [pull 61213](https://github.com/NixOS/nixpkgs/pull/61213) 
 
@@ -127,8 +127,8 @@ ecosystems.
 - [issue 86054](https://github.com/NixOS/nixpkgs/issues/86054)
 
 @ttuegel TBH I can't tell if declarative wrappers might help, but I'm linking
-this issue here as well because @worldofpeace wrote it might related to
-wrappers? Feel free to suggest removing this in the RFC review.
+this issue here because @worldofpeace wrote it might be related to wrappers?
+Feel free to suggest removing this in the RFC review.
 
 - [issue 49132](https://github.com/NixOS/nixpkgs/issues/49132)
 - [issue 54278](https://github.com/NixOS/nixpkgs/issues/54278)
@@ -138,6 +138,10 @@ wrappers? Feel free to suggest removing this in the RFC review.
 free @jtojnar to review me and tell me that declarative wrappers won't help.
 
 ## Unreported issues (AFAIK)
+
+Issues that bother me personally, but I haven't bothered to open an issue since
+I doubt it would be feasible to fix with our current wrapping ecosystem, excuse
+my pessimism `wrap{G,Qt}AppsHook` authors.
 
 `kdeconnect` has `kdoctools` in it's closure because it's wrapper has
 `kdoctools` due to it picked by `wrapQtAppsHook`:
