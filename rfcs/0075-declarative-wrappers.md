@@ -11,9 +11,8 @@ related-issues: POC Implementation at [#85103](https://github.com/NixOS/nixpkgs/
 # Summary
 [summary]: #summary
 
-Manage the environment of wrappers declaratively and reduce the usage and
-deprecate shell hooks such as `wrapGAppsHook` and `wrapQtAppsHook` in favor of
-a new method to add an environment to an executable.
+Manage the environment of wrappers declaratively and deprecate shell based
+methods for calculating runtime environment of packages.
 
 # Motivation
 [motivation]: #motivation
@@ -25,43 +24,163 @@ a new method to add an environment to an executable.
   documented good enough and not easily debug-able shell hooks.
 
 We have numerous issues regarding wrappers and our wrapper shell hooks. Here's
-a list of them:
+a list of them, sorted by categories.
 
-<!-- TODO: explain each one better or categorize them -->
+## Closure related
 
-- https://github.com/NixOS/nixpkgs/issues/32790 :: Only related - they talk about patching some packages to use GI_GIR_PATH
-- https://github.com/NixOS/nixpkgs/pull/83321
-- https://discourse.nixos.org/t/declarative-wrappers/1775/1
-- https://github.com/NixOS/nixpkgs/pull/53816 :: [RFC] Python library wrappers
-- https://github.com/NixOS/nixpkgs/pull/70691
-- https://github.com/NixOS/nixpkgs/pull/71089
-- https://discourse.nixos.org/t/wrapqtappshook-out-of-tree/5619/6
-- https://github.com/NixOS/nixpkgs/pull/83705
+- https://github.com/NixOS/nixpkgs/issues/95027
+
+@jtojnar & @yegortimoshenko How
+hard would it be to test all of our wrapped `gobject-introspection` using
+packages that the equivalent, `GI_GIR_PATH` environment should work? If our
+wrappers were declarative, and they were a separate derivation, at least we
+wouldn't have to rebuild tons of packages to do so - we'd have to rebuild only
+the wrappers. Plus, since all of the environment is available to us via
+`builtins.toJSON`, it should be possible to write a script that will compare
+the environments to make the transition easier to review.
+
+## Missing environment
+
+- https://github.com/NixOS/nixpkgs/pull/83321 and
+- https://github.com/NixOS/nixpkgs/pull/53816
+
+@rnhmjoj & @timokau How unfortunate it is that Python's `buildEnv` doesn't know
+to do anything besides setting `NIX_PYTHONPATH` - it knows nothing about other
+env vars, which is totally legitimate for dependencies of the environment to
+rely upon runtime.  Declarative wrappers don't care about the meaning of env
+vars - all of them are treated equally, considering all of the inputs of a
+derivation equally.
+
+- https://github.com/NixOS/nixpkgs/pull/75851
 - https://github.com/NixOS/nixpkgs/issues/87667
-- https://github.com/NixOS/nixpkgs/pull/89145 :: issue with luarocks generated luasockets vs when built with `buildLuaPackage`
-- https://github.com/NixOS/nixpkgs/issues/87883 :: gimp: No module named gtk / plugins do not work
-- https://github.com/NixOS/nixpkgs/pull/61213 :: scons: Fix a wrapping issue which overrides your PATH
-- https://github.com/NixOS/nixpkgs/pull/61553 :: cc-wrapper: add hook
-- https://github.com/NixOS/nixpkgs/pull/32552 :: makeWrapper: Use case not elif-chaining, and other cleanups
-- https://github.com/NixOS/nixpkgs/issues/78792 :: general idea regarding how to orchestrate wrap hooks
-- https://github.com/NixOS/nixpkgs/issues/83667 :: propagated-build-inputs in cross compilations
-- https://github.com/NixOS/nixpkgs/issues/85306 :: Just another unwrapped derivation living in the wild issue
-- https://github.com/NixOS/nixpkgs/pull/86166 :: an unclear fix to an issue with wrappings of stdenv tools
-- https://github.com/NixOS/nixpkgs/issues/53111 :: small issue regarding gnome apps using `gapplication launch` which may be solved nicely if wrapped
-- https://github.com/NixOS/nixpkgs/issues/86369 :: qt plugin path
-- https://github.com/NixOS/nixpkgs/issues/86054 :: qt translations not found
-- https://github.com/NixOS/nixpkgs/issues/86048 :: hplip unwrapped
-- https://github.com/NixOS/nixpkgs/issues/84308 :: gtk-doc cross references
-- https://github.com/NixOS/nixpkgs/issues/84249 :: git-remote-hg not wrapped correctly
-(unreported) kdoctools exports an XDG_DATA_DIRS file for kdeconnect
-(unreported) kconfigwidgets.dev is refernced by kdeconnect because of QT_PLUGIN_PATH
-(unreported) bin/ of gobject-introspection.dev is added to (e.g) beets
-- https://github.com/NixOS/nixpkgs/issues/87033 :: Something related to GDK_PIXBUF
-- https://github.com/NixOS/nixpkgs/issues/49132 :: GDK_PIXBUF compatibilities
-- https://github.com/NixOS/nixpkgs/issues/54278 :: GDK_PIXBUF compatibilities
-- https://github.com/NixOS/nixpkgs/issues/39493 :: no ability to wrapProgram every executable that depends on gdk-pixbuf
-- https://github.com/NixOS/nixpkgs/issues/60260 :: General complain about wrappers.
-- https://github.com/NixOS/nixpkgs/issues/87667 :: VLC and gtk path 
+
+Fixable with our current wrapping tools (I guess?) but it's unfortunate that we
+have to trigger a rebuild of VLC and potentially increase it's closure size,
+just because of a missing env var for some users. If only our wrapping
+requirements were accessible via Nix attrsets, we could have instructed our
+modules to consider this information when building the wrappers of the packages
+in `environment.systemPackages`.
+
+- https://github.com/NixOS/nixpkgs/issues/87883 (Fixed)
+
+@jtojnar wouldn't it be wonderful if the wrapper of gimp would have known
+exactly what `NIX_PYTHONPATH` to use when wrapping gimp, just because `pygtk`
+was in it's inputs? Declarative wrappers would also allow us to merge the
+wrappings of such derivation to reduce double wrappings, as currently done at
+[`wrapper.nix`](https://github.com/NixOS/nixpkgs/blob/b7be00ad5ed0cdbba73fa7fd7fadcb842831f137/pkgs/applications/graphics/gimp/wrapper.nix#L16-L28)
+and
+[`default.nix`](https://github.com/NixOS/nixpkgs/blob/b7be00ad5ed0cdbba73fa7fd7fadcb842831f137/pkgs/applications/graphics/gimp/default.nix#L142-L145).
+
+- https://github.com/NixOS/nixpkgs/issues/85306
+- https://github.com/NixOS/nixpkgs/issues/84249
+
+`git-remote-hg` and `qttools` are not wrapped properly.
+
+- https://github.com/NixOS/nixpkgs/issues/86048
+
+I guess we don't wrap HPLIP because not everybody want to use these binaries
+and hence want these GUI deps in their closure (if they were wrapped with a
+setup hook)? Declarative wrappers would allow some users to use the wrapped
+binaries and others not need it, via an override or a NixOS config flag,
+without triggering a rebuild of HPLIP itself.
+
+## Orchestrating wrapping hooks
+
+- https://github.com/NixOS/nixpkgs/issues/78792
+
+@worldofpeace you are correct. All of these setup-hooks are a mess, but at
+least we have documented, yet not totally implemented this section of the
+manual
+https://nixos.org/nixpkgs/manual/#ssec-gnome-common-issues-double-wrapped
+
+Declarative wrappers will deprecate the usage of our shell based hooks and will
+wrap all executables automatically according to their needs.
+
+- https://github.com/NixOS/nixpkgs/issues/86369 
+
+@ttuegel I get the sense [you support this
+idea](https://github.com/NixOS/nixpkgs/issues/86369#issuecomment-626732191).
+But for anyone else interested, the issue is a bit complex, so once you'll read
+the design of this RFC, and see examples of what the POC implementation of
+declarative wrappers [is capable
+of](https://github.com/NixOS/nixpkgs/pull/85103#issuecomment-614195666), I hope
+you'll see how declarative wrappers can solve this issue.
+
+
+## Other Issues only _possibly_ fixable by declarative wrappers
+
+- https://github.com/NixOS/nixpkgs/pull/61213 
+
+I'm not sure what's the issue there. But, I'm sure that a Nix based builder of
+a Python environment should make it easier to control and alter if needed, what
+environment is used even by builders, not only user facing Python environments.
+
+- https://github.com/NixOS/nixpkgs/issues/83667
+
+@FRidh I see no reason for Python deps of Python packages to need to be in
+`propagatedBuildInputs` and not regular `buildInputs`. I think this was done so
+in the past so it'd be easy to know how to wrap them? Declarative wrappers
+won't require runtime-env-requiring deps to be only in `propagatedBuildInputs`
+or `buildInputs` - it should pick such deps from both lists. Hence, I think it
+should be possible to make Python's static builds consistent with other
+ecosystems.
+
+- https://github.com/NixOS/nixpkgs/issues/86054
+
+@ttuegel TBH I can't tell if declarative wrappers might help, but I'm linking
+this issue here as well because @worldofpeace wrote it might related to
+wrappers? Feel free to suggest removing this in the RFC review.
+
+- https://github.com/NixOS/nixpkgs/issues/49132
+- https://github.com/NixOS/nixpkgs/issues/54278
+- https://github.com/NixOS/nixpkgs/issues/39493
+
+`GDK_PIXBUF` compatibilities? I haven't investigated them to the details, so feel
+free @jtojnar to review me and tell me that declarative wrappers won't help.
+
+## Unreported issues (AFAIK)
+
+`kdeconnect` has `kdoctools` in it's closure because it's wrapper has
+`kdoctools` due to it picked by `wrapQtAppsHook`:
+
+```
+$ nix why-depends -f. kdeconnect kdoctools
+/nix/store/sh42k6cz4j48br4cxi2qn173rys4japp-kdeconnect-1.3.5
+╚═══bin/kdeconnect-cli: …xport XDG_DATA_DIRS='/nix/store/m16681i5dhhkhszi9w42ir037jvbnab9-kdoctools-5.71.0/share'${XDG_DA…
+    => /nix/store/m16681i5dhhkhszi9w42ir037jvbnab9-kdoctools-5.71.0
+```
+
+A similar issue is with `kconfigwidgets.dev` and `kdeconnect`:
+
+```
+$ nix why-depends -f. kdeconnect kdeframeworks.kconfigwidgets.dev
+ /nix/store/sh42k6cz4j48br4cxi2qn173rys4japp-kdeconnect-1.3.5
+ ╚═══bin/kdeconnect-cli: …port QT_PLUGIN_PATH='/nix/store/qssjj6ki7jiskw2kfygvfiy8fxrclwrl-kconfigwidgets-5.71.0-dev/lib/q…
+     => /nix/store/qssjj6ki7jiskw2kfygvfiy8fxrclwrl-kconfigwidgets-5.71.0-dev
+```
+
+Also similar (but possibly fixable by moving `gobject-introspection` to a
+different inputs list?
+ 
+```
+$ nix why-depends -f. beets gobject-introspection.dev
+/nix/store/93lfrhm8vp17m8ziqi8vp6v4cff67wkb-beets-1.4.9
+╚═══bin/beet: …-expat-2.2.8-dev/bin:/nix/store/y3ym76wrak3300vsjyf3klr52cnzmxwd-gobject-introspection-1.64.1-de…
+    => /nix/store/y3ym76wrak3300vsjyf3klr52cnzmxwd-gobject-introspection-1.64.1-dev
+```
+
+## Other issues
+
+- https://github.com/NixOS/nixpkgs/issues/60260
+
+General, justified complain about wrappers.
+
+- https://github.com/NixOS/nixpkgs/issues/95027
+
+Since our wrappers are shell scripts, `gdb` can't run them. What if we had
+written a C based wrapper, that perhaps would read what environment it needs to
+set from a JSON file, and it will call the unwrapped original executable? I
+need feedback regarding whether `gdb` will play nice with this.
 
 # Detailed design [design]: #detailed-design
 
