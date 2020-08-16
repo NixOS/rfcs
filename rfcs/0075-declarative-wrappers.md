@@ -269,7 +269,7 @@ derivation. Meaning, say `all-packages.nix` has:
   my-awesome-pkg = wrapGeneric (callPackage ../applications/my-awesome-pkg { }) { };
 ```
 
-Assuming the user knows my-awesome-pkg is wrapped with wrapGeneric, they would
+Assuming the user knows `my-awesome-pkg` is wrapped with `wrapGeneric`, they would
 need to use an overlay like this, to override the unwrapped derivation:
 
 ```nix
@@ -286,7 +286,10 @@ self: super:
 } 
 ```
 
-And to override the wrapper derivation, it should be possible using:
+And to override the wrapper derivation, e.g to add new optional features not
+strictly necessary (as in [pull
+83482](https://github.com/NixOS/nixpkgs/pull/83482)), it should be possible
+using:
 
 ```nix
 self: super:
