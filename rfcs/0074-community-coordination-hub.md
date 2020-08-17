@@ -39,8 +39,8 @@ as to potentialize it's desired outcome. You can be leveraged by code, community
 media, capital, labor and other ways. We need to better leverage our community
 resources (tools, knowledge, people).</sub>
 
-# Detailed design
-[design]: #detailed-design
+# General Design
+[design]: #general-design
 
 A repository shall exist, named `NixOS/community`, which will act as central hub
 for coordinating the community's efforts.
@@ -99,25 +99,44 @@ this RFC's review process.
 - Onboarding/Code Contributions: How to quickstart and where to find detailed (authoritative resoures)?
 - Onboarding/Community Engagment: Don't be scared about asking stupid questions, unless you are aware they are stupid!
 
-# User Stories
+## User Stories
 [user-stories]: #user-stories
 
 If this RFC is implemented ...
 
-## As a newcomer
+### As a newcomer
 As a newcomer, I'd be able to quickly find my way around, and start beeing
 useful before beeing turned down by inconsistent and spread-out onboarding.
 
-## As a veteran
+### As a veteran
 As a veteran, I'd be able to promote some ideas, that I care about,
 towards completion while suffering from less friction and overly complex
 coordination. I can leverage my experience and skills more effectively
 for the benefit of the community.
 
-## As a mentor
+### As a mentor
 As a mentor, I can inform my efforts with a clear and consistent reference.
 It helps me to more effectively maintaining those high quality human 
 interactions that the NixOS community is known for.
+
+# Initial Repository Specification
+[initial-spec]: #initial-repository-specification
+
+After obtaining general consensus about the three items below,
+we shall amend this section with a detailed initial specification of the
+proposed repository based on the above mentioned detailed review
+of `kubernetes/community` and other feedback.
+
+The necesary consensus that unblocks to start work on this section is:
+
+- We agree that the motivation is valid and there is a problem.
+- We agree something ought to be done about it.
+- We agree the git repository is the right medium and should be
+  chosen as the implementation going forward?
+
+Consensus shall be polled through github reactions on the PR's discussion.
+
+This RFC can only be finally approved once this section is completed.
 
 # Drawbacks
 [drawbacks]: #drawbacks
