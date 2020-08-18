@@ -85,6 +85,12 @@ Based on this review, we'll create a clean new repository at
 As a general guideline for this review, we'd acknowledge the success
 and impressive dynamics of the Kubernetes ecosystem.
 
+We shall start out with a heavily reduced version, so as to fit the 
+different size and structure of the NixOS community compared to the
+kubernetes community. Maybe just start out with a 1-2 working groups
+and a couple of links + comments that guid people around quickly.
+Then we shall gather feedback, experiment and iterate as needed.
+
 ## Brainstorm
 [brainstorm]: #brainstorm
 
