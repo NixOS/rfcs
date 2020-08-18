@@ -196,6 +196,13 @@ like https://nix.wiki or https://nix.community. Discussion with @samueldr is
 expected to unfold with the aim to establish a join vision of this RFCs 
 motivation and the future of https://nix.wiki.
 
+Finally, we could resort to implementing eventually-deemed-useful artefacts
+of the proposed `kubernetes/community` template freely into whatever medium
+seems most fit for any given artefact. This, however, defies to address the
+problems outlined by the _Motivation_ section in a _central **hub**_. Any
+implementation, that does not exhibit a clear and central entrypoint is an
+essentially an "anti-implementation" of this RFC.
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
