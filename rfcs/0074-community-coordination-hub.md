@@ -91,6 +91,8 @@ kubernetes community. Maybe just start out with a 1-2 working groups
 and a couple of links + comments that guid people around quickly.
 Then we shall gather feedback, experiment and iterate as needed.
 
+Although deemed official, if it doesn't fly, it shall be taken down.
+
 ## Brainstorm
 [brainstorm]: #brainstorm
 
