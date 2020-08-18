@@ -39,6 +39,10 @@ as to potentialize it's desired outcome. You can be leveraged by code, community
 media, capital, labor and other ways. We need to better leverage our community
 resources (tools, knowledge, people).</sub>
 
+> Please express your approval/disapproval about this motivation in this poll: https://github.com/NixOS/rfcs/pull/74#issuecomment-675176621
+
+> Please express your opinion, if something needs to be done about in this poll: https://github.com/NixOS/rfcs/pull/74#issuecomment-675176805
+
 # General Design
 [design]: #general-design
 
@@ -118,6 +122,8 @@ for the benefit of the community.
 As a mentor, I can inform my efforts with a clear and consistent reference.
 It helps me to more effectively maintaining those high quality human 
 interactions that the NixOS community is known for.
+
+> Please express your approval/disapproval about this general design in this poll: https://github.com/NixOS/rfcs/pull/74#issuecomment-675177658
 
 # Initial Repository Specification
 [initial-spec]: #initial-repository-specification
