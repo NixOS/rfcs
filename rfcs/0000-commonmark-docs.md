@@ -81,8 +81,8 @@ humans and their toolchains is Markdown. It's all the more easy to
 create good looking documentation with Markdown that the tools
 available to process it are plentiful and flexible (JavaScript
 converters with plugin support like [Remark][remark], [static site
-generators][staticgen] by the dozen, [MDX][mdx] to extend CommonMark with
-arbitrary React components, etc).
+generators][staticgen] by the dozen, [MDX][mdx] to extend CommonMark
+with arbitrary React components, etc).
 
 [gatsby-docs]: https://www.gatsbyjs.org/docs/
 [gitstar-rankings]: https://gitstar-ranking.com/repositories
@@ -98,9 +98,11 @@ arbitrary React components, etc).
 # Detailed design
 [design]: #detailed-design
 
+## Documentation website requirements
+
 AsciiDoc, CommonMark and RST are all formats that support basic
 markup: emphasis, bold, (nested) (un)numbered lists, headings, inline
-and display code, tables (as HTML in the case of CommonMark), etc. The
+and display code, tables (using a CommonMark extension), etc. The
 requirements we set below pertain to the appearance of the
 documentation available on the website.
 
@@ -121,12 +123,36 @@ The key requirements we work towards are:
    a statement to newcomers that the community takes documentation
    seriously, with both good form and good content.
 
+## Choice of format
+
 Satisfying all requirements above is possible with a number of
 toolchains, including Asciidoc-specific or RST-specific toolchains
-(not just Markdown). We propose CommonMark as the documentation
-format. The choice of toolchain is left at the discretion of the
-implementers. We feature two demos below (one uses [Gatsby][gatsby]
-and another uses [Sphinx][sphinx]).
+(not just Markdown). We propose CommonMark plus a small number of
+extensions as the documentation format. The choice of toolchain is
+left at the discretion of the implementers. We feature two demos below
+(one uses [Gatsby][gatsby] and another uses [Sphinx][sphinx]).
+
+The choice of CommonMark extensions is also left to the implementors.
+However, this RFC stipulates the following guidelines:
+
+* The overall number of extensions should be kept small, to facilitate
+  interoperability. The goal is not perfect compliance with a standard
+  (i.e. pure CommonMark), but it should nonetheless remain easy to
+  switch from one toolchain to another for generating HTML from the
+  CommonMark source, with minimal manual work. For example,
+  * enabling an extension for tables is acceptable because few tables
+  appear in the documentation and converting them by hand to a new
+  format is not labour intensive;
+  * YAML frontmatter for metadata is also acceptable, because nearly
+    all toolchains support this.
+* It is acceptable to introduce a new extension only if this extension
+  is supported by three or more popular toolchains. Toolchain-specific
+  extensions should not be used.
+* CommonMark allows HTML span and block elements. These should be
+  avoided in documentation source, because this complicates targeting
+  multiple output formats (e.g. man pages, epub, etc).
+
+## Transition to CommonMark
 
 The one-time conversion from Docbook to CommonMark is lossy, because
 CommonMark has far less expressive markup. It is done using
@@ -135,13 +161,15 @@ a high-quality writer available for CommonMark. The Pandoc Docbook
 reader isn't perfect, but in the process of putting together the quick
 demo below, it was easy to fix 5 bugs already.
 
-We propose to keep the man pages as Docbook for now. They are
-self-contained documents, whose form is constrained by convention and
-the limits of the man page format. When the time comes to convert the
-man pages as well, we can turn here again to prior art. The Kubernetes
-project uses [md2man][md2man] to generate man pages from CommonMark.
-This is a small Go command with a 4.1MB closure size (including 2MB
-for `tzdata`).
+We propose to convert man pages to CommonMark as well. However, this
+transition need not happen concurrently to the format transition for
+the rest of the documentation. They are self-contained documents,
+whose form is constrained by convention and the limits of the man page
+format. When the time comes to convert the man pages as well, we can
+turn here again to prior art. The Kubernetes project uses
+[md2man][md2man] to generate man pages from CommonMark. This is
+a small Go command with a 4.1MB closure size (including 2MB for
+`tzdata`).
 
 [gatsby]: https://gatsbyjs.org
 [sphinx]: https://www.sphinx-doc.org
@@ -193,12 +221,12 @@ CommonMark as the input format doesn't force unreasonable compromises.
 The current DocBook format is semantically richer. There are specific
 tags for definitions, environment variables, user accounts, various
 types of callouts, etc. CommonMark's data model isn't nearly as rich,
-so in converting to CommonMark, some information is lost. However,
-experience in other very large ecosystems with many users tells us
-that authors are happy to make do with an inexpressive but familiar
-format, which in any case *can* be extended with the wise use of
-`<span>`-like HTML tags and custom tags that expand to HTML. That
-appears to be seldom necessary in practice (see e.g. the five
+so in converting to CommonMark, even with extensions, some information
+is lost. However, experience in other very large ecosystems with many
+users tells us that authors are happy to make do with an inexpressive
+but familiar format, which in any case *can* be extended with the wise
+use of `<span>`-like HTML tags and custom tags that expand to HTML.
+That appears to be seldom necessary in practice (see e.g. the five
 documentation examples in [Motivation][motivation]).
 
 # Alternatives
