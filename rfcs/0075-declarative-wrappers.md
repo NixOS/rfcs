@@ -21,6 +21,37 @@ documented good enough and not easily debug-able shell hooks.
 # Motivation
 [motivation]: #motivation
 
+Every Nix build produced is stored in a separate path in the store. For a
+build to find its runtime dependencies purely, they need to be hardcoded in
+the build. Thus, a complete dependency specification is needed.
+
+In case of compiled languages this process is already largely automated;
+absolute paths to shared libraries are encoded in the `rpath` of binaries.
+Executables that are invoked by binaries need to be dealt with manually,
+however. The preferred choice is here to manually patch the source so that
+binaries are invoked using absolute paths as well.
+
+This is not always trivial and thus a common work-around is to wrap executables,
+setting `$PATH` to include the locations of dependencies. This is a pragmatic
+solution that typically works fine, but it comes with a risk: *environment
+variables leak*. Executables that shell out may pass along the modified
+variables, causing at times unwanted behaviour.
+
+Programs written in interpreted languages tend to import their runtime
+dependencies using some kind of search path. E.g., in case of Python there is a
+process for building up the `sys.path` variable which is then considered when
+importing modules. Like with compiled languages, the preferred choice would also
+here be to embed the absolute paths in the code, which is often not done. Note
+that in case of Python this *is* done. Like with compiled languages, programs
+may shell out and likewise the preferred solution is to patch the invocations to
+use absolute paths. Similarly, in case a programs wants to `dlopen` a shared
+library this should be patched to include an absolute path, instead of using
+`LD_LIBRARY_PATH`.
+
+It is recognized that wrappers setting environment variables are typically not
+the preferred choice because of the above mentioned leakage risk, however, often
+there is simply not a better or reasonable alternative available.
+
 We have numerous issues regarding wrappers and our wrapper shell hooks. Here's
 a list of them, sorted to categories.
 
