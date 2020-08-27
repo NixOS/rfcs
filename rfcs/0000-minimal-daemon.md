@@ -3,8 +3,8 @@ feature: minimal-daemon
 start-date: 2020-5-28
 author: John Ericson
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: Eelco Dolstra, Théophane Hufschmitt, Finn Behrens
+shepherd-leader: Eelco Dolstra
 related-issues: (will contain links to implementation PRs)
 ---
 
