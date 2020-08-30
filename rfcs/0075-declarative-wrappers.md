@@ -225,6 +225,29 @@ both ideas could be integrated into an alternative, simpler creation method of
 binary wrappers. See [my
 comment](https://github.com/NixOS/nixpkgs/pull/95569#issuecomment-674508806).
 
+- `hardware.sane` module installs sane impurly
+- [issue 90201](https://github.com/NixOS/nixpkgs/issues/90201)
+- [issue 90184](https://github.com/NixOS/nixpkgs/issues/90184)
+
+The current way NixOS enables to configure access to scanner, is via the
+`hardware.sane` module, which interacts [just a
+bit](https://github.com/NixOS/nixpkgs/blob/5d8dd5c2598a74761411bc9bef7c9111d43d2429/nixos/modules/services/hardware/sane.nix#L34)
+wish `saned`, but mostly does nothing besides setting `SANE_CONFIG_DIR` and
+`LD_LIBRARY_PATH`. This is bad because:
+
+1. Running `nixos-rebuild` after a change to sane or it's configuration,
+   requires the user to logout and login, to see effects of the changes.  
+   
+2.
+[Apparently](https://github.com/NixOS/nixpkgs/issues/90201#issuecomment-683304279)
+`LD_LIBRARY_PATH` is cleared when an application runs with extra capabilities.
+This causes the current gnome-shell wayland wrapper to unset the
+`LD_LIBRARY_PATH` many scanner related programs now rely upon.
+
+Declarative wrappers should enable us to make such applications that use a
+`SANE_CONFIG_DIR` and `LD_LIBRARY_PATH` to be configured during the wrap phase,
+and get rid of these global environment variables.
+
 # Detailed design
 [design]: #detailed-design
 
