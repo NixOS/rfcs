@@ -397,9 +397,8 @@ was requested by others and discussed at:
 - [nix issue 1245](https://github.com/NixOS/nix/issues/1245).
 - [Interesting idea by @aszlig at nix issue
   1245](https://github.com/NixOS/nix/issues/1245#issuecomment-401642781).
-- ~~[@nmattia's
-  post](https://www.nmattia.com/posts/2019-10-08-runtime-dependencies.html)~~ -
-  Using it will require IFD.
+- [@nmattia's
+  post](https://www.nmattia.com/posts/2019-10-08-runtime-dependencies.html).
 - [Discourse thread](https://discourse.nixos.org/t/any-way-to-get-a-derivations-inputdrvs-from-within-nix/7212/3).
 
 # Future work
