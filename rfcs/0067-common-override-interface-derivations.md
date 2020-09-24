@@ -3,8 +3,8 @@ feature: common-override-interface-derivations
 start-date: 2020-03-17
 author: Frederik Rietdijk
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @Infinisil, @edolstra, @Taneb, @7c6f434c
+shepherd-leader: @Infinisil
 related-issues: (will contain links to implementation PRs)
 ---
 
