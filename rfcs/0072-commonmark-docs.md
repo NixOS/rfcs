@@ -9,7 +9,7 @@ shepherd-leader: Infinisil
 # Summary
 [summary]: #summary
 
-Nix, Nixpkgs and NixOS documentation is currently in Docbook format.
+Nixpkgs and NixOS documentation is currently in Docbook format.
 We propose to migrate all existing content to CommonMark, a flavour of
 Markdown.
 
@@ -28,7 +28,7 @@ looking, are welcoming to novice contributors and feel familiar.
 The motivation to switch away from Docbook is that it's unfamiliar.
 None of the [top 100 projects on Github][gitstar-rankings] use
 Docbook. The motivation to switch to CommonMark is that among these
-projects, since roughly 10 times more projects use Markdown (or some
+projects, roughly 10 times more projects use Markdown (or some
 variation thereof) than all other documentation formats combined, it
 can be considered the default. It's worth considering alternatives,
 but the burden ought to lie with the proponents of other format/tool
@@ -64,7 +64,7 @@ etc):
 - The [Rust book][rust-docs] (using mdBook)
 
 The goal of this RFC is to change the *form* of the current
-documentation for Nix, Nixpkgs and NixOS to look similar to any one of
+documentation for Nixpkgs and NixOS to look similar to any one of
 the above 5 projects (see requirements in the next section). We submit
 that the least effort route to do so is to use the same toolchain as
 they do (CommonMark or MDX input and one of Gatsby, Jekyll or Hugo to
@@ -145,9 +145,9 @@ However, this RFC stipulates the following guidelines:
   format is not labour intensive;
   * YAML frontmatter for metadata is also acceptable, because nearly
     all toolchains support this.
-* It is acceptable to introduce a new extension only if this extension
-  is supported by three or more popular toolchains. Toolchain-specific
-  extensions should not be used.
+* An extension for defining references between section should be
+  supported, since this is widely used in the current manuals and
+  essential for navigating around.
 * CommonMark allows HTML span and block elements. These should be
   avoided in documentation source, because this complicates targeting
   multiple output formats (e.g. man pages, epub, etc).
