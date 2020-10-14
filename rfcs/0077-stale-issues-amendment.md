@@ -84,6 +84,29 @@ With a renewed definition of the word _stale_ and removing an overly emotional
 meaning by virtue of this very PR, there is no reason to adversely interpret
 a bot spelling out the facts.
 
+One might think, that this increases the load of "spam" notifications on
+subscribers. However, the bot ifirst and foremost prompts and helps the author.
+Subscribers, most of the time, do not have the highest stakes in this interaction.
+
+At a closer look, increased notification is also a valuable _gain_ in information
+for those subscribers. Imagine:
+
+A topic went stale, then there where people moving things forward. Then it went
+stale _again_. If I'm subscribed to a topic of _interest_, a second stale promts
+me to consider taking action.
+
+
+Some data: As of now, there are roughly 1750 open issues marked as stale, and
+roughly 450 stale issues were marked as closed. Even older ones. By definition
+of the stalbot, this means the stalebot has not prompted any action on the
+vast majority of interactions. That means, the stalebot is pretty inefective
+(since ignored). The most plausible root cause is that the stale bot promted
+after an inhumanely long period of time in which the interest of the proponent
+might have shifted to such extend that they completely ignore the stalebot.
+Maybe they don't remember, maybe life has come into the way. In any case
+a shorter period ensures that the memories (and by extension) interestes are
+still fresh.
+
 # Alternatives
 [alternatives]: #alternatives
 
