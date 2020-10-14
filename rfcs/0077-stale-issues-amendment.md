@@ -98,14 +98,12 @@ to a more practical level.
 
 If this first interaction has triggered further action, then this further
 action might trigger a notification. Such notification will alsways be
-triggered by a human.
+triggered by a human. Consequetly any added notification over the the RFC
+state, is triggered by human intervention.
 
-Consequetly any added notification over the rpe RFC state, is triggered by
-human intervention.
-
-That is, unless the issue or PR goes stale _again_. But going _stale_, which
-means **impaired in vigor or effectiveness**, _again_ is by itself a valuable
-information that is beeing broadcasted implicitly by their notification.
+That is, unless the issue or PR goes stale _again_. But going stale _again_,
+which means **impaired in vigor or effectiveness _again_**, is by itself a
+valuable information that is beeing broadcasted by the notification.
 
 # Supporting Data
 [data]: #supporting-data
