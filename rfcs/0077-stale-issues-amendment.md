@@ -148,6 +148,35 @@ If we can &mdash; at the seame time &mdash; increase the share of useful
 output en reasonable terms, we probably should bias our workflows towards
 actionability, even if this is not 100% pareto-efficient.
 
+---
+
+This RFC proposes to adopt a common definition of the word stale and thereby
+forgoes a hard earned consensus about an alternative definition of RFC 51.
+
+This RFC's stance is that consenus was reached based on teleological
+reasoning rather than experiment (or even data). This RFC promotes experiment
+through the graduation period and would explicitly leave open the possibilty
+to wind back upon significant and otherwise non-remediable data of adverse
+efects. It also takes a stance to represent the (admittedly construed) needs
+and preference of a significant portion of casual contributors, that I
+assume to not have had their voice in RFC 51's discussion.
+
+The assumption is that casual (inexperienced) contributors would benefit
+even from the interaction with a bot. I can tell myself, that I have had
+positive experiences which made my own contributinos more apt for reviewi,
+inclusion and promotion in general.
+
+Unfortunately, those casual contributors are consistently under-represented
+across the current workflows of the Nix* community. But signs can be
+percieved throughout the ecosystem, that some actors would wish to make
+Nix* more atractive to new contributors and man power (see also this year's 
+nixCon talks). This RFC is just a tiny screw in the gears.
+
+Consensus about the _significance_ of this single screw is expected not o be
+reached. Therefore this RFC will fail. But I hope it leaves a thought legacy
+of furthering the intricacies of the mentioned umbrella topic of promoting
+Nix* adoption.
+
 # Alternatives
 [alternatives]: #alternatives
 
