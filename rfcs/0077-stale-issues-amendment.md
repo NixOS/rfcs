@@ -228,5 +228,10 @@ At the time of writing, no unresolved questions apear of relevance.
 # Future work
 [future]: #future-work
 
-Neutrally estimate the current share of instances where the drawback
-manifests based on observable data.
+A stale-bot interaction can be a good opportunity for doing nothing except
+enriching the issue's or PR's metadata through labelling.
+
+So in order to make the most out of a timely stalebot intervantion, we would
+have to combine it with a consistent and practical framework of labelling
+issues. This however, is subject of another RFC and cannot be addressd in this
+RFC.
