@@ -75,6 +75,12 @@ should be provided with an escape hatch that maintainers can activate.
 _Note: non-maintainers are sufficiently unlikely to open truely long-runnig or umbrella 
 issues without a maintainer stepping up to prevent them from getting marked as stale._
 
+Since reconfiguring would trigger an immediate burst in notifications, the shift
+needs to be done gradually over a period of time, for example reduce by 5 days every
+two weeks.
+
+This graduation period also allows us to collect data on any manifest adverse effects.
+
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
