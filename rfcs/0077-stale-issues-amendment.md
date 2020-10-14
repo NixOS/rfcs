@@ -23,6 +23,10 @@ This RFC proposes an alternative interpretation of "stale":
 
 _A stale issue (or PR) is an issue on which the discussion has went stale._
 
+_"Stale" in this context means (https://www.merriam-webster.com/dictionary/stale):_
+
+> impaired in vigor or effectiveness
+
 _Explicitly, it has no other semantic than this. It is a neutral 
 aggregated indicator of facts. It reflects the fact that 
 individuals did choose not to interact on a particular issue or PR
