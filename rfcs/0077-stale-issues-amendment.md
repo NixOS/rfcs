@@ -44,20 +44,24 @@ at bearably low levels, which everyone can live with._
 # Motivation
 [motivation]: #motivation
 
-Under the renewed definition of _stale_, people are betrayed. 
+Under the correct (as per Merriam Webster) definition of _stale_, people are betrayed. 
 
 They are not told the truth, though the facts are long evident.
 
 A majority of issues or PRs with no interaction for quite short period
 of times already (maybe 3-6 weeks) has a lesser change of "success".
 
-People with vested interest should see the _stale_ label and be prompted
-to think: "Oh, I need this, too. Damn, it's stale. Let's have a look
-and do something to help out."
+However we also want to avoid _false positives_, that is issues or PRs
+marked as **impareid in vigor or effectivenss**, even though they are not.
 
-An issue that hasn't been interacted with for 60 days or a PR for 90 days,
-in the vast majority of cases, deserves this hint out of fariness,
-honesty and transprency.
+This is a question of threshold and summary judgment. 60 days (2 months) for issues 
+and 90 (3 months) for PRs is probably a good enough improvmeent over the current 180 days.
+
+With shorter periods, people are also mor likely to still remember the relevant details, 
+so it gets easier for them to react in actionable ways to the bot's friendly reminder.
+
+Cases, where these dynamics, don't regularily aply (such as umbrell issues, etc.), 
+should be provided with an escape hatchi which maintainers can activate.
 
 # Detailed design
 [design]: #detailed-design
