@@ -33,7 +33,7 @@ and an issue goes stale after a 60 days period (vs previously 180 days)._
 [motivation]: #motivation
 
 Under the renewed definition of _stale_ under this PR but the currently
-applied time preiods, spectators based on their common understanding 
+applied time periods, spectators based on their common understanding 
 are not told about  aggregate choices as a fair proxy of chances of 
 success by means of the stale label.
 
@@ -42,7 +42,7 @@ that are visibly exhibiting lack of interaction, and there by reduced
 chances of (prompt) "success".
 
 An issue that hasn't been interacted with for 60 days or a PR for 90 days
-and in the vas majority of cases deserve an aggregate indication of
+and in the vast majority of cases deserve an aggregate indication of
 those individual preferences for the above reason.
 
 Honesty and transparency are better in informing an individual's action
