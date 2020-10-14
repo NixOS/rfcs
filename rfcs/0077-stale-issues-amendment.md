@@ -91,43 +91,44 @@ the following:
 Or any similar deminishing interpretations. Stale just means an aggregate
 indcator of individual's choices to not interact.
 
-# Drawbacks
-[drawbacks]: #drawbacks
+Please read carefully, this RFC does _not_ increase the **rate** of
+notifications by itslef. It just anticpiates the time to first interaction
+to a more practical level.
 
-With a renewed definition of the word _stale_ and removing an overly emotional
-meaning by virtue of this very PR, there is no reason to adversely interpret
-a bot spelling out the facts.
+If this first interaction has triggered further action, then this further
+action might trigger a notification. Such notification will alsways be
+triggered by a human.
 
-Regular subscriber might get notifications they do not find immediatly
-actionable for them personally. However, the bot is inteded to help authors,
-not (silent) subscribers. It is assumed that subscribers wisely choose
-and actively manage how they spread their limmited attention. At any rate,
-their interests should never outperform the interest of the auther (="owner").
+Consequetly any added notification over the rpe RFC state, is triggered by
+human intervention.
 
-At a closer look, increased notification is also a valuable _gain_ in information
-for those subscribers. Imagine: A topic went stale, then there where people moving
-things forward. Then it went stale _again_. If I'm subscribed to a topic of 
-_interest_, a second stale promts me to consider taking action.
+That is, unless the issue or PR goes stale _again_. But going _stale_, which
+means **impaired in vigor or effectiveness**, _again_ is by itself a valuable
+information that is beeing broadcasted implicitly by their notification.
 
-Some data: As of now, there are roughly 1750 open issues marked as stale, and
-roughly 450 stale issues were marked as closed. Even older ones. By definition
-of how the stale bot operates, this means the stale bot has failed in adequately
-prompting action. The data suggests, it is _not_ actionable.
+# Supporting Data
+[data]: #supporting-data
 
-There are a variety of possible reasons for this, but if we assume that the bot
-should have prompted the _author_ into "furthering the cause" (whatever that
-might be in a particular context), judging by the 1750 unattended interventions,
-it blatantly failed. Since any such furthering would have left traces the stalebot
-would have picked up in any way.
+As of now, there are roughly 1750 open issues marked as stale, and
+roughly 450 stale issues were marked as closeed.
 
-One reason for this might be that by the time the stale bot intervenes, the
-interest and memory has vanished to a point where even the friendly suggestions
-of the stalebot are completely ignored. This strongly supports reducing the
-inactivity period to _humanly bearable levels_ of an avearge person with an
-average memory.
+## Interpretation
 
-Another reason might be that the stalebot is not actionable, since too convoluted
-and wordy. So nobody reads it. Hence: https://github.com/NixOS/nixpkgs/pull/100462
+We can interpret this ratio of only 20% as a stalebot's failure to 
+effectively prompt action: The stalebot itself is stale, that is
+**impaired in vigor or effectiveness**. (your threshold of judgemnt may differ).
+
+To the author of this RFC, the most plausible reason is that by the time
+the stalbot interacts, levels of attentions and interest has vanished so
+might have memories or simpli life got into the way.
+
+At any rate, it is reasonable to assume, that this declining levels of attention
+iterest and memories put the very author into a position of beeing in a state
+that is **imparied in vigor and effectiveness**. So, you might have guessed it:
+the auther went stale. Dooms day! :wink:
+
+A reduction in the time to first interaction is likely a probate mean to prevent
+authors from going stale.
 
 # Alternatives
 [alternatives]: #alternatives
