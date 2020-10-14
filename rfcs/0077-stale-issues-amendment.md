@@ -17,36 +17,41 @@ RFC 51 implemented the stale bot with the following motivation:
 > 
 > By marking stale issues, we can more easily filter issues for ones that have at least one person interested in them.
 
-Under the interpretation of this motivation, the definition of stale was 
-settled at 180 days.
+Under this motivation, the inactivity period was chosen to be 180 days.
 
-This RFC modifies the motivation for marking issues as stale:
+This RFC proposes an alternative interpretation of "stale":
 
-_A stale issue (or PR) is an issue on which the discussion has went stale. It
-has no other semantic meaning than an aggregated indicator of individual
-preferences (to not interact on a particular issue or PR)._
+_A stale issue (or PR) is an issue on which the discussion has went stale._
 
-_Therefore, a PR goes stale after a 90 days period (vs previously 180 days)
-and an issue goes stale after a 60 days period (vs previously 180 days)._
+_Explicitly, it has no other semantic than this. It is a neutral 
+aggregated indicator of facts. It reflects the fact that 
+individuals did choose not to not interact on a particular issue or PR
+for an extended period of time._
+
+_180 days is too long of such extended period of time. People do relate
+"stale" with some shorter time frame. Therefore, a PR goes stale after
+a 90 days period (vs previously 180 days) and an issue goes stale after
+a 60 days period (vs previously 180 days)._
 
 # Motivation
 [motivation]: #motivation
 
-Under the renewed definition of _stale_ under this PR but the currently
-applied time periods, spectators based on their common understanding 
-are not told about  aggregate choices as a fair proxy of chances of 
-success by means of the stale label.
+Under the renewed definition of _stale_, people are betrayed. 
 
-This discourages spectators with vested interests from promoting issues,
-that are visibly exhibiting lack of interaction, and there by reduced
-chances of (prompt) "success".
+They are not told the truth, though the facts are long evident.
+
+A majority of issues or PRs with no interaction for quite short period
+of times already (maybe 3-6 weeks) has a lesser change of "success".
+
+People with vested interest should see the _stale_ label and be prompted
+to think: "Oh, I need this, too. Damn, it's stale. Let's have a look
+and do something to help out."
 
 An issue that hasn't been interacted with for 60 days or a PR for 90 days
-and in the vast majority of cases deserve an aggregate indication of
-those individual preferences for the above reason.
+and in the vast majority of cases deserves this hint out of fariness.
 
-Honesty and transparency are better in informing an individual's action
-than preceived political correctness (judging by the discussions on RFC 51).
+Honesty and transparency are by far more effective than any perceived
+political correctness (judging by the discussions on RFC 51).
 
 # Detailed design
 [design]: #detailed-design
