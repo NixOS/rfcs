@@ -88,28 +88,36 @@ With a renewed definition of the word _stale_ and removing an overly emotional
 meaning by virtue of this very PR, there is no reason to adversely interpret
 a bot spelling out the facts.
 
-One might think, that this increases the load of "spam" notifications on
-subscribers. However, the bot ifirst and foremost prompts and helps the author.
-Subscribers, most of the time, do not have the highest stakes in this interaction.
+Regular subscriber might get notiviations they do not find immediatly
+actionable for them personally. However, the bot is inteded to help authors,
+not (silent) subscribers. It is assumed that subscribers wisely choose
+and actively manage how they spread their limmited attention. At any rate,
+their interests should never outperform the interest of the auther (="owner").
 
 At a closer look, increased notification is also a valuable _gain_ in information
-for those subscribers. Imagine:
-
-A topic went stale, then there where people moving things forward. Then it went
-stale _again_. If I'm subscribed to a topic of _interest_, a second stale promts
-me to consider taking action.
-
+for those subscribers. Imagine: A topic went stale, then there where people moving
+things forward. Then it went stale _again_. If I'm subscribed to a topic of 
+_interest_, a second stale promts me to consider taking action.
 
 Some data: As of now, there are roughly 1750 open issues marked as stale, and
 roughly 450 stale issues were marked as closed. Even older ones. By definition
-of the stalbot, this means the stalebot has not prompted any action on the
-vast majority of interactions. That means, the stalebot is pretty inefective
-(since ignored). The most plausible root cause is that the stale bot promted
-after an inhumanely long period of time in which the interest of the proponent
-might have shifted to such extend that they completely ignore the stalebot.
-Maybe they don't remember, maybe life has come into the way. In any case
-a shorter period ensures that the memories (and by extension) interestes are
-still fresh.
+of how the stale bot operates, this means the stale bot has failed in adequately
+prompting action. The data suggests, it is _not_ actionable.
+
+There are a variety of possible reasons for this, but if we assume that the bot
+should have prompted the _author_ into "furthering the cause" (whatever that
+might be in a particular context), judging by the 1750 unattended interventions,
+it blatantly failed. Since any such furthering would have left traces the stalebot
+would have picked up in any way.
+
+One reason for this might be that by the time the stae bot intervenes, the
+interest and memory has vanished to a point where even the friendly suggestions
+of the stalebot are completely ignored. This strongly supports reducing the
+inactivity period to _humanly bearable levels_ of an avearge person with an
+average memory.
+
+Another reason might be that the stalebot is not actionable, since too convoluted
+and wordy. So nobody reads it. Hence: https://github.com/NixOS/nixpkgs/pull/100462
 
 # Alternatives
 [alternatives]: #alternatives
