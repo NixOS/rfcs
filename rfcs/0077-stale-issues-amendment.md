@@ -59,6 +59,7 @@ and 90 (3 months) for PRs is probably a good enough improvmeent over the current
 
 With shorter periods, people are also mor likely to still remember the relevant details, 
 so it gets easier for them to react in actionable ways to the bot's friendly reminder.
+Since PR are more involved, memories can be expected to be fresh a little longer. Hence: 90 days.
 
 Cases, where these dynamics, don't regularily aply (such as umbrell issues, etc.), 
 should be provided with an escape hatchi which maintainers can activate.
