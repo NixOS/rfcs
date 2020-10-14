@@ -118,16 +118,16 @@ effectively prompt action: The stalebot itself is stale, that is
 **impaired in vigor or effectiveness**. (your threshold of judgemnt may differ).
 
 To the author of this RFC, the most plausible reason is that by the time
-the stalbot interacts, levels of attentions and interest has vanished so
-might have memories or simpli life got into the way.
+the stalebot interacts, levels of attention and interest have vanished. So
+might have memories or simply the life got in the way.
 
-At any rate, it is reasonable to assume, that this declining levels of attention
-iterest and memories put the very author into a position of beeing in a state
-that is **imparied in vigor and effectiveness**. So, you might have guessed it:
-the auther went stale. Dooms day! :wink:
+At any rate, it is reasonable to assume, that this declining levels of attention,
+iterest and memories put the very author into a position of beeing 
+**imparied in vigor and effectiveness**. So, you might have guessed it:
+_the author went stale. Damn it!_ :wink:
 
-A reduction in the time to first interaction is likely a probate mean to prevent
-authors from going stale.
+A reduction in the time to first interaction is likely a probate mean to
+prevent authors from going stale.
 
 # Alternatives
 [alternatives]: #alternatives
