@@ -51,11 +51,9 @@ People with vested interest should see the _stale_ label and be prompted
 to think: "Oh, I need this, too. Damn, it's stale. Let's have a look
 and do something to help out."
 
-An issue that hasn't been interacted with for 60 days or a PR for 90 days
-and in the vast majority of cases deserves this hint out of fariness.
-
-Honesty and transparency are by far more effective than any perceived
-political correctness (judging by the discussions on RFC 51).
+An issue that hasn't been interacted with for 60 days or a PR for 90 days,
+in the vast majority of cases, deserves this hint out of fariness,
+honesty and transprency.
 
 # Detailed design
 [design]: #detailed-design
