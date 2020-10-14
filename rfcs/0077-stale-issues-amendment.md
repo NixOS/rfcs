@@ -129,6 +129,19 @@ _the author went stale. Damn it!_ :wink:
 A reduction in the time to first interaction is likely a probate mean to
 prevent authors from going stale.
 
+# Drawbacks
+[drawbacks]: #drawbacks
+
+A non-trivial share of issues get stale-bot request «what's the status», 
+then update from someone «checked, still happens».
+
+If the issue goes stale again after another 60 / 90 days, then the amount
+of unuseful traffic increases.
+
+If we can &mdash; at the seame time &mdash; increase the share of useful
+output en reasonable terms, we probably should bias our workflows towards
+actionability, even if this is not 100% pareto-efficient.
+
 # Alternatives
 [alternatives]: #alternatives
 
@@ -142,4 +155,5 @@ At the time of writing, no unresolved questions apear of relevance.
 # Future work
 [future]: #future-work
 
-No future work is required.
+Neutrally estimate the current share of instances where the drawback
+manifests based on observable data.
