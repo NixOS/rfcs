@@ -59,6 +59,10 @@ political correctness (judging by the discussions on RFC 51).
 - Mark PRs as stale after 90 days
 - Mark issues as stale after 60 days
 - Keep the policy of never closing either PRs or Issues.
+- Add `2.status: never-stale`, which maintainers can use on long running or umbrella issues.
+
+_Note: non-maintainers are sufficiently unlikely to open truely long-runnig or umbrella 
+issues without a maintainer stepping up to prevent them from getting marked as stale._
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
