@@ -88,7 +88,7 @@ With a renewed definition of the word _stale_ and removing an overly emotional
 meaning by virtue of this very PR, there is no reason to adversely interpret
 a bot spelling out the facts.
 
-Regular subscriber might get notiviations they do not find immediatly
+Regular subscriber might get notifications they do not find immediatly
 actionable for them personally. However, the bot is inteded to help authors,
 not (silent) subscribers. It is assumed that subscribers wisely choose
 and actively manage how they spread their limmited attention. At any rate,
@@ -110,7 +110,7 @@ might be in a particular context), judging by the 1750 unattended interventions,
 it blatantly failed. Since any such furthering would have left traces the stalebot
 would have picked up in any way.
 
-One reason for this might be that by the time the stae bot intervenes, the
+One reason for this might be that by the time the stale bot intervenes, the
 interest and memory has vanished to a point where even the friendly suggestions
 of the stalebot are completely ignored. This strongly supports reducing the
 inactivity period to _humanly bearable levels_ of an avearge person with an
