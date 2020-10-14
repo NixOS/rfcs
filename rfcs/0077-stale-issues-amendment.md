@@ -114,26 +114,64 @@ valuable information that is beeing broadcasted by the notification.
 # Supporting Data
 [data]: #supporting-data
 
-As of now, there are roughly 1750 open issues marked as stale, and
-roughly 450 stale issues were marked as closeed.
+As of now, the stale-bot has commented on roughly 2.2k open issues and
+roughly 500 closed issues (`is:issue commenter:app/stale`).
+
+Thereof, 1.7k are still `2.status: stale` and 400 are `2.status: stale`
+and closed.
+
+This gives us the following data:
+- 1.7k interactions did not trigger any action (effectively stale)
+- 400 interactions triggered an immediate close (stale label not removed)
+- 100 interactions are unkown, but the issue is closed now
+- 500 interactions did trigger any action so that the issue is not
+  `2. status: stale` ay more
+
+Since very old issues are likely to skew the data and the analysis,
+we limit the picture to issues created after 01.01.2019. Then, we get:
+
+The stalebot has commented on 1.1k open and 200 closed issues
+(`is:issue commenter:app/stale created:>2019-01-01`).
+
+Thereof 750 are open and labelled stale and 150 are closed and labelled stale.
+(`is:issue commenter:app/stale created:>2019-01-01 label:"2.status: stale"`)
+
+That means out of 1.3k interactions on relatively recent issues, 750 did 
+not trigger _any_ reaction. The sucess rate of stale-bot triggering action
+is thereby at 42% (37% all times).
+
+There is a portion of the 750 (1.7k) futile interactions, where spectators
+might have silently agreed the stale-bots assessment. So the following
+interpretation is not 100% accurate.
 
 ## Interpretation
 
-We can interpret this ratio of only 20% as a stalebot's failure to 
-effectively prompt action: The stalebot itself is stale, that is
-**impaired in vigor or effectiveness**. (your threshold of judgemnt may differ).
+We can interpret this ratio of 42% (37%) as a stalebot's moderate success.
+But it also can be interpreted as a relative failure, especially given
+the many instructions and tips the stale-bot puts at the hands
+of participants in its comments. In 58% (63%) of cases, the stalebot itself 
+is stale, that is **impaired in vigor or effectiveness**.
 
-To the author of this RFC, the most plausible reason is that by the time
-the stalebot interacts, levels of attention and interest have vanished. So
-might have memories or simply the life got in the way.
+To the author of this RFC, one aspect crutial aspect in open source low
+commitment environments is that by the time the stalebot interacts, levels
+of attention and interest have vanished. So might have memories or simply
+the life got in the way.
 
 At any rate, it is reasonable to assume, that this declining levels of attention,
 iterest and memories put the very author into a position of beeing 
 **imparied in vigor and effectiveness**. So, you might have guessed it:
 _the author went stale. Damn it!_ :wink:
 
+Author being stale, can be assumed for around 58% (63%) of total stalebot
+interactions or roughly 38% of total issues (1.7k out of 4.4k).
+
 A reduction in the time to first interaction is likely a probate mean to
 prevent authors from going stale.
+
+If we consider for a moment that 38% percent of issues have no care-taker
+and no real chance of getting promotion, this suggests, we need to increase
+our efforts to make our database more actionable and accurate. (closed does
+not mean deleted! _stale_ does not mean invalid!).
 
 # Drawbacks
 [drawbacks]: #drawbacks
