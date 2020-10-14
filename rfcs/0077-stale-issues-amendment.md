@@ -25,7 +25,7 @@ _A stale issue (or PR) is an issue on which the discussion has went stale._
 
 _Explicitly, it has no other semantic than this. It is a neutral 
 aggregated indicator of facts. It reflects the fact that 
-individuals did choose not to not interact on a particular issue or PR
+individuals did choose not to interact on a particular issue or PR
 for an extended period of time._
 
 _180 days is too long of such extended period of time. People do relate
@@ -64,7 +64,7 @@ political correctness (judging by the discussions on RFC 51).
 [examples-and-interactions]: #examples-and-interactions
 
 It should be noted under this section, that it only takes a comment
-to un-satale an issue or PR.
+to un-stale an issue or PR.
 
 It should be made clear, that stale does **not** mean either of
 the following:
