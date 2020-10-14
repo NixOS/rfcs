@@ -32,10 +32,14 @@ aggregated indicator of facts. It reflects the fact that
 individuals did choose not to interact on a particular issue or PR
 for an extended period of time._
 
-_180 days is too long of such extended period of time. People do relate
-"stale" with some shorter time frame. Therefore, a PR goes stale after
-a 90 days period (vs previously 180 days) and an issue goes stale after
-a 60 days period (vs previously 180 days)._
+_180 days is too long of such extended period of time. In a majority
+of cases, an issue or PR enter into a state where they are
+**impaired in vigor or effectiveness** far earlier._
+
+_While it is difficult to judge on the exact date when they enter this
+state seems safe to assume that for PR 90 days and issues 60 days does
+assess the majority of cases correctly while keeping false positives 
+at bearably low levels, which everyone can live with._
 
 # Motivation
 [motivation]: #motivation
