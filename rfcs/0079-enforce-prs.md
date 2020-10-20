@@ -18,9 +18,9 @@ This implements the four-eyes principle and allows easier change discussion, bot
 # Motivation
 [motivation]: #motivation
 
-In its current state every [Nixpkgs committer](https://github.com/orgs/NixOS/teams/nixpkgs-committers/members) is able to push arbitrary code to every branch, including master and all release branches.
+In its current state every [Nixpkgs committer](https://github.com/orgs/NixOS/teams/nixpkgs-committers/members) (139 people as of writing) is able to push arbitrary code to every branch, including master and all release branches.
 
-Pushing to critical branches branches of a software development project is not a good practice in more-than-one-contributor environments.
+Pushing to critical branches of a software development project is not a good practice in more-than-one-contributor environments.
 Security vulnerabilities, breaking changes which are not tested, and regressions are easily introduced this way.
 Those issues can been prevented by a proper workflow and tooling that comes with the workflow.
 
@@ -40,11 +40,9 @@ By changing our branching workflow to a no-push-to-master workflow, we can achie
 # Detailed design
 [design]: #detailed-design
 
-In GitHubs [branch protection](https://github.com/NixOS/nixpkgs/settings/branch_protection_rules) rules, branch protection rules which require pull request reviews, include administrators, forbid force pushes and branch deletions must be created.
+In GitHub's [branch protection](https://github.com/NixOS/nixpkgs/settings/branch_protection_rules) rules, branch protection rules which require pull request reviews, include administrators, forbid force pushes and branch deletions must be created.
 There must be rules for:
 - master
-- nixos-*
-- nixpkgs-*
 - release-*
 
 # Examples and Interactions
@@ -58,13 +56,13 @@ When pushing to a protected branch directly, they get the same message as everyo
 
 It might break the workflow of some committers which are only a small portion of the community.
 
-Also, Pull Requests might take a bit of time before they are approved by somebody else, which should't matter too much since the trust in committers is already very high and their Pull Requests are likely to be merged fast.
+Also, Pull Requests might take a bit of time before they are approved by somebody else, which shouldn't matter too much since the trust in committers is already very high and their Pull Requests are likely to be merged fast.
 
 # Alternatives
 [alternatives]: #alternatives
 
 Do nothing.
-This has the downsides mentioned in the motivation and weakens the percieved trust in the project.
+This has the downsides mentioned in the motivation and weakens the perceived trust in the project.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
