@@ -32,6 +32,7 @@ By using content hashes instead of output hashes, we can:
 - make the Nix store network-writeable and world-shareable
 - predefine mappings from output to content hash without building
 - store paths can be verified without access to the Nix Store DB
+- public trust mappings allow detecting non-reproducible builds
 
 Additionally, this is an opportunity to move the Nix store to a filesystem location supported by most non-NixOS systems, namely `/var/lib/nix`.
 
@@ -175,7 +176,7 @@ To make sure only the build's own references need rewriting, it is recommended t
 
 After the build, its `$cas` is calculated and any occurences of the build path are replaced with `/var/lib/nix/$cas`.
 
-If there undetected build path references, they might cause the finished entry to work incorrectly, and they will cause `$cas` to differ on every build of `$out`. This must be handled on a case-by-case basis.
+If there undetected build path references, they might cause the finished entry to work incorrectly, and they will cause `$cas` to differ on every build of `$out`. This must be handled on a case-by-case basis. Perhaps we'll need pluggable hash rewriters.
 
 The build can happen by a sandboxing build daemon like `nix-build`, but that is not a requirement.
 
