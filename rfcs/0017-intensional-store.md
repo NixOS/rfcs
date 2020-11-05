@@ -8,105 +8,270 @@ shepherd-leader: Shea Levy
 related-issues: (will contain links to implementation PRs)
 ---
 
-# Summary
-[summary]: #summary
+# Intensional Store
 
-One paragraph explanation of the feature.
+## TODO / to explain
 
-# Motivation
-[motivation]: #motivation
+- flesh out Trust DB locations and updating/querying/merging multiple
+- query service
+- efficient distribution of mappings
+- explain the benefits of late binding and how it improves installs on low-power systems
+- script that uses nix make-content-addressable in /var/lib/nix to generate a store
+- how binary caches provide \$cas and mappings
 
-* Better re-use of inputs between compiles
-* Faster updates via nix-channel
-* Less compiling
-* More benefit from reproducible compiles, so more reason to work on that
+## Overview
 
-# Detailed design
-[design]: #detailed-design
+This RFC builds on the implementation of RFC 62 to maximize its benefits. The store becomes decoupled from the metadata.
 
-Terms used:
-* derivation: a `nix-build` output product depending on some inputs and resulting in a file or directory under `/nix/store`
-* dependent derivation: a derivation built using the currently considered derivation
-* `$out`: name of the location where a derivation is installed first, e.g., `zyb6qaasr5yhh2r4484x01cy87xzddn7-unit-script-1.12`
-  * calculated based on the hashes of all the inputs, including build tools
-* `$cas`: output hash, the total hash of all the files under $out, with the derivation name appended, e.g., `qqzyb6bsr5yhh2r5624x01cy87xzn7aa-unit-script-1.12`
+### Benefits
 
-## Concept
+By using content hashes instead of output hashes, we can:
 
-The basic concept is aliasing equivalent input derivations in such a way that dependent derivations won't need to change if only `$out` changes but not the input derivation contents.
+- optimize resource usage
+- reduce binary substitution trust to a single lookup
+- make the Nix store network-writeable and world-shareable
+- predefine mappings from output to content hash without building
+- store paths can be verified without access to the Nix Store DB
 
-After building a derivation, `$cas` is calculated, and `$out` is renamed to `$cas`. Then, if another build requires the input `$out`, it gets `$cas` instead, and all references to that build input will be `$cas` instead of `$out`. That dependent derivation will also have its input hash calculated with the `$cas` instead of the `$out`.
+Additionally, this is an opportunity to move the Nix store to a filesystem location supported by most non-NixOS systems, namely `/var/lib/nix`.
 
-This means that if 2 different derivations of the same input have a different `$out` but the same `$cas`, any dependent builds will not need to rebuild due to the inputs being different. For example, the 12MB input `poppler-data` is often the same across multiple different input derivations, so many `$out`s for `poppler-data` all result in the same `$cas`. Similarly, a compiler flag change might leave most derivations unchanged.
+By "cleaning up" the filesystem state of Nix, a host of possibilities emerge:
 
-In order to know which `$out`s refer to a particular `$cas`, symlinks can be used (`$out` pointing to `$cas`), or that data can be stored in the store database. The database can help with doing reverse lookups from `$cas` to all the `$out`s. Using symlinks will have a benefit of handling the case when self-references that are not discoverable via grep (e.g. filtered by ```xxd(1)```).
+- Boot a cloud VM to a specific system by passing a `$cas` name for stage2. The stage1 will auto-download the stage2 if it's missing and switch to it.
+- Cross-compiling can generate `$cas` entries that are reused for native compiles via `$out` mapping. This is useful on low-resource platforms.
+- The Nix store doesn't require any support or metadata. On embedded systems, all management of the store can be performed outside the system.
+- References to `$cas` entries, such as profiles, are no longer tied to a single system.
+- A FUSE filesystem could auto-install `$cas` entries as they are referenced, hanging the I/O until the entry is downloaded and verified.
+- You can copy a store from some other install, and immediately use profiles without having their metadata.
+- Different Nix tooling and metadata implementations can use the same store
 
-## Calculating `$cas`
+…and so on. Decouplying systems brings exponential possibilities.
 
-There is one important corner case that needs special handling: if a derivation refers to itself, it will be referring to `$out`, because `$cas` is not known at the time of the build. This means that each `$out` of a furthermore equivalent build would have a different hash, due to the different `$out`s.
+### Drawbacks
 
-To fix this, the `$cas` calculation has to replace all occurrences of `$out` with an equal-length string of (for example) NULL bytes. After that, `$out` is renamed to `$cas` and all occurrences of `$out` are replaced with `$cas`.
+There are some small drawbacks:
 
-This also means that `$out` and `$cas` should have the same length. The easiest way to achieve that is to use the same hash function for the output hash as used for the input hashes.
+- we have to assume that a `$cas` collision is impossible in practice
+- by removing the derivation name from the store paths, the store becomes more opaque and requires good tooling for manual management
+- garbage collection is more complex when the store is shared between hosts
+- `$cas` entries without metadata are opaque, and might contain malware or illegal content. If nothing references it, there is no problem with the content. Garbage collection takes care of unused entries.
+- A hash collision would allow inserting malware into a widely used `$cas`. This is already possible without `$cas`, but trusting the hashes may lead to wider cache use. Remedies include using secure hashes, scanning for malware, using multiple hashes and comparing between binary caches, …
+- An attacker can provide malicious `$out` => `$cas` mappings. This is already somewhat possible via binary caches. To remedy, trust mappings might be signed by a trusted key.
 
-To calculate `$cas` we need to include all the data that uniquely defines a derivation: the file contents, case-sensitive names, and the permission bits, traversed in a fixed order, no matter what the filesystem or platform. Not to be included are the owning `uid` of the store and timestamps.
+### Terminology
 
-## Distributing derivations
+We assume the following process when wanting to install a given package attribute `$attr`:
 
-Since `$cas` is only known when `$out` is built, binary caches would need to retain that information. When you look up `$out` to see if it was built already, the response should be _"Yes, this is available as `$cas`"_.
+- Nix evaluates the desired expressions and determines that a certain output hash `$out` is required
+- `$out` is looked up in the Trust DB, to possibly yield `$cas`, its Content Addressable Storage hash
+- if `$cas` is known:
+  - if `$cas` is present in the store, `$attr` is already installed; Done.
+  - if `$cas` is present on a binary cache, it is downloaded to the store; Done.
+- `$out` is built using the normal mechanisms (see RFC 62 for more details)
+- its `$cas` is calculated (see RFC 62 for more details)
+- the generated metadata is stored in the Trust DB; Done.
 
-## Maintaining the Nix store
+### A note on reproducibility
 
-When garbage collecting, the Nix store should also remove `$out` references (be they symlinks or db entries) when removing a `$cas`.
+There is no need for a given `$out` to always generate the same `$cas`. It allows better resource use, but doesn't change anything about this RFC. There is no obligation that a single `$out` only stores a single `$cas` entry.
 
-## Micro-optimizations not worth considering
+## Nix Store
 
-* By stripping the version from `$cas`, it could be the same for multiple versions of the same derivation.
-  * However, increased version numbers mean the derivation actually changed, so there is no point in doing that.
-* By stripping the name and the version from `$cas`, it could be the same for multiple different derivations.
-  * However, this makes it hard to find out what derivation a certain `$cas` is
-  * Furthermore, different inputs with the same contents are very unlikely, and there is no reduction in builds that need to be done.
+## FHS compatibility
 
-Finally, `nix-store` supports hardlinking duplicate files, so the above optimizations are superfluous.
+Since we're working on the store layer, we have the opportunity to split up the current `/nix` directory and make it FHS compliant. This makes it easier to use Nixpkgs where creating `/nix` is not possible.
 
-# Drawbacks
-[drawbacks]: #drawbacks
+An [informal discussion](https://discourse.nixos.org/t/nix-var-nix-opt-nix-usr-local-nix/7101) concluded that the Store should be located at `/var/lib/nix` for maximum compatibility.
 
-* Extra code to maintain
-* Slightly more processing after a build
+As for the contents of `/nix/var`:
 
-# Alternatives
-[alternatives]: #alternatives
+- `/nix/var/log` should go under central or per-user log.
+- `/nix/var/nix`:
+  - `db`: Store database. Its contents will be spread across Trust DBs.
+  - `daemon-socket`: Builder service. Should move to appropriate location for service sockets, like `/run`
+  - `gc`: See the Garbage Collection section
+  - `profiles`: Are now maintained per user/system
+    - User profiles, channels etc go under `$NIX_CONF_DIR/{profiles,channels,auto_roots}` per user
+    - System profiles, default user profile, channels etc go under `/nix/var/nix-profiles/{system,user,channels,auto_roots}`
+  - `temproots`, `userpool`: Builder service. Should move to appropriate locations for services, like `/var/tmp` and `/var/lib`
 
-* No change: This is only an optimization, it won't change the fundamental working of Nix in any way
+### Contents
 
-# Unresolved questions
-[unresolved]: #unresolved-questions
+The Store should be verifiable, and only contain verifiable paths. However, to allow atomic installation over the network, there should be a directory for staging an installation. Some other operations also need supporting directories.
 
-* Whether to store mappings as symlinks or db entries
-* Exactly how the Hydra protocol needs to be changed
+For cosmetics and wildcard expansion, we hide supporting directories from regular view.
 
-# Future work
-[future]: #future-work
+Therefore, these are the Store contents, all part of the same mount point to ensure atomic semantics:
 
-## Input-agnostic derivations
+- `$cas`: a self-validating derivation. Any path matching the proper hash length is subject to verification at any time, and is be moved to `.quarantaine` if verification fails
+- `.prepare`: this directory can be used by anyone to prepare a derivation before adding it to the Store, by picking a non-conflicting subpath
+- `.stage`: after preparing, the derivation is moved here
+- `.daemon`: if there is a store daemon, it might use this path to prepare installation
+- `.quarantaine`: whenever a non-compliant path is encountered, it is moved here
+- `.links`: used to hard-link identical store files
+- `.gc`: used to communicate about garbage collection
+- anything else doesn't belong in the Store and should be removed
 
-If a derivation with a new input is the same except that it has a changed reference to that input (e.g., a script referring to its interpreter, or a binary using a new library version), we call this an input-agnostic derivation for those two input versions (old and new input).
+The timestamps of files/directories are kept 0, and the user and group ownership are recommended to be a single user, for example `root:root` or `store:store`.
+Note that for a shared store, two systems might see different ownership values; this is acceptable.
 
-  * To detect this, calculate the hash over the derivation, replacing *all* input references with NULL bytes. If that resulting hash is the same as a previous derivation, it is input-agnostic for those versions.
-  * This means that instead of downloading for installing it, it could be patched together from the previous version, by patching the old input `$cas`s with the new `$cas`s.
-  * This could keep storage and network traffic for Hydra down, by storing the previous `$cas` and the strings that need to be patched.
+### Metadata
 
-### …and beyond:
+For a given store path, there is no objective metadata other than the path itself. Required dependencies, name, output hash and so on are trusted data, and as such should be stored in the Trust DB.
 
-Knowing this also could enable a building shortcut: If a dependent derivation needs rebuilding, and a previous version is available depending on an input-agnostic derivation, it could be generated by patching in the new `$cas`.
+It could be said that the required dependencies are somewhat objective, but one build may decide that a certain runtime dependency is necessary while another may not. Other than that, it's also inconvenient to have to pass metadata out-of-band.
 
-This will not always work, i.e., when the input-agnostic derivation is used to copy data from the input it is agnostic over, it results in a change besides the input reference.
+However, having the list of dependencies can be useful, and therefore we make it optional. If a `$cas` entry is a directory and contains the file `nix-dependencies` as a direct child, this file can contain `$cas` names (without path), separated by newlines. Whenever processing dependencies, these entries are considered. Out-of-band metadata can note extra dependencies, but can't strike a dependency.
 
-Therefore, this optimization should be optional, defaulting to off.
+One use case for in-band dependencies is a self-installing application, where all you need is a `$cas` to get the entire application.
 
-## Reproducible builds
+It is up to the build to decide when to include `nix-dependencies` and if it should include transitive dependencies.
 
-If two derivations are the same except for some irrelevant build-environment changes, they won't get the same `$cas`. Since this impacts rebuilds, there is more incentive to have fully reproducible builds.
+The name `nix-dependencies` is chosen because it's unlikely to clash with package files. Furthermore, it is only valid if it contains nothing but `$cas` names separated by single newlines.
 
-Hopefully this means we'll have it at some point, so we can crowd-source `$out` to `$cas` mappings by trusting many systems that get the same result.
+### Trust DB
+
+Here is a selection of metadata generated when building a given output:
+
+- `$name` (can include version number and output name)
+- inputs / dependencies (including runtime)
+- size
+- build time and duration
+- description (from derivation)
+
+For installation and searching, these are relevant for each store path `$cas`:
+
+- list of `$out` that are known to result in `$cas`
+- `$cas` of all dependencies
+- `$name`
+- description
+- size
+
+These have to be consulted for any installation request, and therefore they should be easy to retrieve. Build hosts can provide a log of new and changed entries, enabling differential updates. Binary caches could provide a query service (both for "what does `$out` map to and "what is `$cas`").
+
+### Sharing the Nix Store
+
+Since the Nix Store (minus supporting directories) contains only self-validating paths, it can be shared "infinitely", only limited by:
+
+- disk space
+- network performance
+- confidence around hash collision attacks
+- confidence around writers corrupting paths without detection
+
+The installation step only involves moving a proposed path from `.prepare` to `.stage`, so no further communcation is necessary with the Store daemon.
+
+For single-user installs, the Store can trivially be maintained by the Nix tools, and converting to multi-user is only a matter of changing the permissions.
+
+It would even be possible to use FUSE to automatically download any paths that are referenced in the Store, hanging the I/O request while it's being downloaded.
+
+### Store Daemon
+
+Optionally, a daemon can maintain the Store. In this case, it is recommended be the only user with write access. It performs installations and verifications, described below.
+
+### Preparing
+
+`$cas` entries are prepared by building them in a path that has the same total length as its final `$cas` entry. This means they can be built practically anywhere, in `/tmp`, in a home directory, in the `.prepare` directory in the Store, etc. It is recommended to make a part of the path a unique-per-build string.
+To make sure only the build's own references need rewriting, it is recommended to build using only `$cas` entries as dependencies, instead of relying on rewriting paths.
+
+After the build, its `$cas` is calculated and any occurences of the build path are replaced with `/var/lib/nix/$cas`.
+
+If there undetected build path references, they might cause the finished entry to work incorrectly, and they will cause `$cas` to differ on every build of `$out`. This must be handled on a case-by-case basis.
+
+The build can happen by a sandboxing build daemon like `nix-build`, but that is not a requirement.
+
+After preparing, the metadata for the build is added to the user's Trust DB.
+
+### Installation
+
+We use rename semantics to provide atomic installations. Prepared `$cas` entries are moved to their final location with a `rename` call, which is atomic but requires the path to be on the same filesystem.
+
+Atomicity is important to ensure that `$cas` entries are always valid. If they are copied instead, they don't self-validate during the copy.
+
+#### with Store Daemon
+
+Any user with write access to `/var/lib/nix/.prepare` and `/var/lib/nix/.stage` can ask for entries to be installed. To do so:
+
+1. They prepare entries to be stored in `/var/lib/nix/.prepare`, renaming each entry to its `$cas`.
+1. They atomically move prepared paths to `/var/lib/nix/.stage`, in reverse dependency order, meaning dependencies of an entry are moved first.
+
+When the Store daemon discovers a new `$cas` entry under `.stage`:
+
+1. If the Store already contains this `$cas` entry, it removes this new one, perhaps first verifying the Store copy.
+1. It recursively changes ownership of the path to itself and timestamps to 0, making sure that write permission is removed for everybody, and read permission is added for anybody.
+   If it has no permissions to do this, it instead copies the path into `/var/lib/nix/.daemon`, and another process will need to keep `.stage` clean.
+1. The daemon verifies the hash. If the hash doesn't match, it removes the path.
+1. If the path is a directory and there is a `nix-dependencies` file as a direct child, it checks that all dependencies are already present in the Store. If not, the path is held for a while and deleted if the dependencies don't appear in time (configurable).
+1. It atomically moves the path into `/var/lib/nix`.
+
+Note that to ensure atomicity, `.prepare` and `.stage` need to be on the same filesystem, and either `.stage` or `.daemon` need so be on the same filesystem as the Store.
+
+#### without Store Daemon
+
+Any user with write access to `/var/lib/nix/.stage` and `/var/lib/nix` can install entries. To do so:
+
+1. They prepare entries to be stored in `/var/lib/nix/.stage`, renaming each entry to its `$cas`.
+1. They atomically move prepared entries to `/var/lib/nix`, in reverse dependency order, meaning dependencies of an entry are moved first.
+
+Note that to ensure atomicity, `.stage` needs to be on the same filesystem as the Store.
+
+Note that when two writers are trying to install the same path, one of them might get an error, but the end result will be the same. (As long as the `$cas` is self-valid)
+
+### Verification
+
+A path in the Store is verified by calculating its `$cas`. If the `$cas` doesn't match, the path is moved to `/var/lib/nix/.quarantaine`, where a sysadmin has to investigate.
+
+Any process with write access to `/var/lib/nix` and `/var/lib/nix/.quarantaine` can do this, for example the Store daemon.
+
+### Garbage collection
+
+Garbage collection needs to identify store paths that are not used by anything on any of the systems sharing the same store. Here we propose a simple mechanism for coordination, but any mechanism is acceptable.
+
+- a host with store write access decides to run garbage collection
+- it checks that `.gc/running_gc` does not exist or contains a very old timestamp, and writes a unique number to `.gc/will_gc`
+- after waiting long enough to prevent collisions (for example 10 seconds), it reads `.gc/will_gc` and verifies it contains the unique number it wrote
+- then it clears out `.gc` except for the files `.gc/will_gc` and adds the file `.gc/running_gc` containing the current timestamp
+- each host's store daemon monitors `.gc/running_gc` at some interval, for example 1 minute
+- while this file exists, the daemon must record its required `$cas` entries, by creating a 0-length file, named `.gc/$cas`
+  - entries that are referenced in `nix-dependencies` don't have to be marked
+- the writer waits long enough for all the hosts to record their GC roots, for example 10 minutes
+- after the wait period expired, the writer host scans for store paths that are not marked and not part of a marked entry's `nix-dependencies`. Each path is atomically moved to `.gc` and deleted
+- finally, the writer host empties the `.gc` directory, leaving the `running_gc` file for last
+
+For a single-user installation or a non-shared Nix store, none of this is necessary, and the GC process remains unchanged, except for the new locations to search for GC roots. See next section.
+
+## Profiles
+
+A profile is a named reference to a `$cas` store path, to be used in arbitrary ways. To allow GC, the Store must know about all profiles, so they should be available at predictable paths.
+
+The current versioning system is reused: A profile with the name `$profile` is a symlink which points to `$profile-$v-link`, which is a symlink that points to the absolute path of the `$cas` entry. Tools like `nix-env` and `home-manager` can maintain the set of links for a profile.
+
+Since a profile points to an immutable `$cas` path, it is the same across systems and can therefore be part of a network-mounted home directory.
+
+However, a profile link itself is trusted information, and should be shared between users and systems only when they trust each other.
+
+Known paths that can contain profiles:
+
+- `$NIX_CONF_DIR/profiles`: per-user profiles and auto roots
+- `/var/lib/nix-profiles`: NixOS system and shared profiles, and auto roots, maintained by the `root` user
+
+Other paths can of course be used, but the GC won't know about them, so a link should be maintained in one of the directories above.
+
+Example: This creates or updates the user-specific profile "vscode", adding Python 3:
+
+```sh
+nix-env -p ~/.config/nix/profiles/vscode -i python3
+```
+
+## Migration
+
+There is no real need for migrating stores, since `/nix` and `/var/lib/nix` can coexist and the tooling either uses one or the other. However, it is convenient to migrate built artifacts for implementing this RFC.
+
+To migrate an existing output from `/nix/store/$out-$name` to `/var/lib/nix/$cas`, the following approach will work most of the time:
+
+- migrate all its dependencies using the below steps
+- for all files of `$out-$name`, replace all strings of the form `/nix/store/$out-$name` with `/var/lib/nix/$filler/$cas`. `$cas` has the same length as `$out` and the minimum length of `$name` is 1, so there is always room for the full `$cas`. The `$filler` is a string with length `l = length($name) - 1` of the form `./././/`, that is, repeat `./` `floor(l/2)` times and append `/` if `l` is odd.
+- do the same with symlinks, but consider relative paths as well
+- self-references must be updated after `$cas` is known, their contents must be skipped while calculating `$cas`, as described elsewhere
+- once `$cas` is determined, the patched derivation can be placed in `/var/lib/nix/$cas` and the metadata recorded in the Trust DB
+
+This process will fail if the derivation refers to the Store in ways that aren't visible, like different string encoding and calculated paths.
