@@ -19,9 +19,15 @@ related-issues: (will contain links to implementation PRs)
 - script that uses nix make-content-addressable in /var/lib/nix to generate a store
 - how binary caches provide \$cas and mappings
 
-## Overview
+## Summary
 
-This RFC builds on the implementation of RFC 62 to maximize its benefits. The store becomes decoupled from the metadata.
+This RFC builds on the implementation of RFC 62 to maximize its benefits.
+
+- Decouple metadata (Trust DB) from the Store, keep per-user
+- Move the Store to `/var/lib/nix`
+- Store can be shared read-write on a network share
+- `nix-daemon` becomes optional
+- Store paths optionally provide dependency list in-band
 
 ### Benefits
 
@@ -33,6 +39,7 @@ By using content hashes instead of output hashes, we can:
 - predefine mappings from output to content hash without building
 - store paths can be verified without access to the Nix Store DB
 - public trust mappings allow detecting non-reproducible builds
+- easily switch between single- and multi-user setup
 
 Additionally, this is an opportunity to move the Nix store to a filesystem location supported by most non-NixOS systems, namely `/var/lib/nix`.
 
@@ -46,18 +53,19 @@ By "cleaning up" the filesystem state of Nix, a host of possibilities emerge:
 - You can copy a store from some other install, and immediately use profiles without having their metadata.
 - Different Nix tooling and metadata implementations can use the same store
 
-…and so on. Decouplying systems brings exponential possibilities.
+… and so on. Decouplying systems brings exponential possibilities.
 
 ### Drawbacks
 
 There are some small drawbacks:
 
-- we have to assume that a `$cas` collision is impossible in practice
-- by removing the derivation name from the store paths, the store becomes more opaque and requires good tooling for manual management
-- garbage collection is more complex when the store is shared between hosts
+- We have to assume that we can always create a working `$cas` derivation, even if the build stores the build path in an opaque way. Otherwise, their build path would have to be a symlink to the `$cas` entry.
+- By removing the derivation name from the store paths, the store becomes more opaque and requires good tooling for manual management.
+- Garbage collection is more complex when the store is shared between hosts.
+- An attacker can provide malicious `$out` => `$cas` mappings. This is already somewhat possible via binary caches. To remedy, trust mappings might be signed by a trusted key.
+- We have to assume that a `$cas` collision is impossible in practice.
 - `$cas` entries without metadata are opaque, and might contain malware or illegal content. If nothing references it, there is no problem with the content. Garbage collection takes care of unused entries.
 - A hash collision would allow inserting malware into a widely used `$cas`. This is already possible without `$cas`, but trusting the hashes may lead to wider cache use. Remedies include using secure hashes, scanning for malware, using multiple hashes and comparing between binary caches, …
-- An attacker can provide malicious `$out` => `$cas` mappings. This is already somewhat possible via binary caches. To remedy, trust mappings might be signed by a trusted key.
 
 ### Terminology
 
@@ -84,7 +92,7 @@ Since we're working on the store layer, we have the opportunity to split up the 
 
 An [informal discussion](https://discourse.nixos.org/t/nix-var-nix-opt-nix-usr-local-nix/7101) concluded that the Store should be located at `/var/lib/nix` for maximum compatibility.
 
-As for the contents of `/nix/var`:
+As for the contents of `/nix/var`, all of it can go elsewhere:
 
 - `/nix/var/log` should go under central or per-user log.
 - `/nix/var/nix`:
@@ -167,7 +175,7 @@ It would even be possible to use FUSE to automatically download any paths that a
 
 ### Store Daemon
 
-Optionally, a daemon can maintain the Store. In this case, it is recommended be the only user with write access. It performs installations and verifications, described below.
+Optionally, a daemon can maintain the Store. In this case, it is recommended be the only user with write access. It performs installations, verifications and garbage collection, described below.
 
 ### Preparing
 
@@ -215,7 +223,7 @@ Any user with write access to `/var/lib/nix/.stage` and `/var/lib/nix` can insta
 
 Note that to ensure atomicity, `.stage` needs to be on the same filesystem as the Store.
 
-Note that when two writers are trying to install the same path, one of them might get an error, but the end result will be the same. (As long as the `$cas` is self-valid)
+Note that when two writers are trying to install the same path, one of them might get an error, but the end result will be the same (as long as the `$cas` is self-valid). So multiple writers can also be on separate hosts, in a trusted setting.
 
 ### Verification
 
@@ -232,7 +240,7 @@ Garbage collection needs to identify store paths that are not used by anything o
 - after waiting long enough to prevent collisions (for example 10 seconds), it reads `.gc/will_gc` and verifies it contains the unique number it wrote
 - then it clears out `.gc` except for the files `.gc/will_gc` and adds the file `.gc/running_gc` containing the current timestamp
 - each host's store daemon monitors `.gc/running_gc` at some interval, for example 1 minute
-- while this file exists, the daemon must record its required `$cas` entries, by creating a 0-length file, named `.gc/$cas`
+- while this file exists, the daemon must record its required `$cas` entries, by creating 0-length files named `.gc/$cas`
   - entries that are referenced in `nix-dependencies` don't have to be marked
 - the writer waits long enough for all the hosts to record their GC roots, for example 10 minutes
 - after the wait period expired, the writer host scans for store paths that are not marked and not part of a marked entry's `nix-dependencies`. Each path is atomically moved to `.gc` and deleted
@@ -263,7 +271,9 @@ Example: This creates or updates the user-specific profile "vscode", adding Pyth
 nix-env -p ~/.config/nix/profiles/vscode -i python3
 ```
 
-## Migration
+## Administration Tasks
+
+### Migration
 
 There is no real need for migrating stores, since `/nix` and `/var/lib/nix` can coexist and the tooling either uses one or the other. However, it is convenient to migrate built artifacts for implementing this RFC.
 
@@ -276,3 +286,45 @@ To migrate an existing output from `/nix/store/$out-$name` to `/var/lib/nix/$cas
 - once `$cas` is determined, the patched derivation can be placed in `/var/lib/nix/$cas` and the metadata recorded in the Trust DB
 
 This process will fail if the derivation refers to the Store in ways that aren't visible, like different string encoding and calculated paths.
+
+### Adding a Store Daemon
+
+To begin managing an existing Store with a Store Daemon, these steps are performed:
+
+- Change permissions on the Store root so only the daemon has write access.
+- Ensure `.prepare`, `.stage` and `.quarantaine` with desired permissions.
+- For each Store entry
+  - Recursively adjust permissions and timestamps
+  - Verify entry
+    - If invalid, move to `.quarantaine` and try to download replacement from known caches
+
+### Removing a Store Daemon
+
+- Wait for pending installs to complete.
+- Stop Store Daemon.
+- Change permissions on the Store as desired.
+
+## Implementation
+
+- NixPkgs needs to be audited to remove hard-coded `/nix` names, replacing it with the store path variable (TODO look up name).
+- The Nix tools and Hydra need to be be branched to support the new location and store semantics. The tools either use the old location and semantics, or the new one.
+- The binary cache server needs to serve `$cas` as compressed files and trust mappings in an incremental way
+
+## Alternative options
+
+There are a few choices made in this RFC, here we describe alternatives and why they were not picked.
+
+### Keep store at `/nix/store`
+
+Since the names are always different, the `$cas` entries could stay in `/nix/store`. The benefit would be that NixPkgs doesn't have to be audited for hardcoded `/nix` paths.
+
+However, this keeps the problem of some installations not having permission to create a `/nix` directory, and makes it much harder to share the store between hosts (as long as non-`$cas` entries are present).
+
+### Always store dependency list in `$cas` entry
+
+This would require single-file entries to be a directory instead, and then for symmetry and simplicity the directory entries would require the same.
+So a path `/var/lib/nix/$cas` becomes for example `/var/lib/nix/$cas/_` (short non-descript name to keep references short), and the dependencies would be at `/var/lib/nix/$cas/deps`.
+This allows adding other objective metadata, like late binding information, and other information that might be desired in the future.
+Another benefit would be that root entries would be enough to know what paths to keep during garbage collection.
+
+However, this increases storage somewhat.
