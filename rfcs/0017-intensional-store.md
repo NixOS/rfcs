@@ -376,3 +376,16 @@ There are a few choices made in this RFC, here we describe alternatives and why 
 Since the names are always different, the `$cas` entries and `$cas.m` files could stay in `/nix/store`. The benefit would be that NixPkgs doesn't have to be audited for hardcoded `/nix` paths.
 
 However, this keeps the problem of some installations not having permission to create a `/nix` directory, and makes it much harder to share the store between hosts (as long as non-`$cas` entries are present).
+
+### No metadata
+
+Not keeping metadata in the Store means that the Store by itself doesn't have enough information to do garbage collection, nor to let a system boot from a given `$cas`
+
+### Keep metadata in directory with Store entry
+
+Since the Store entries can be files or directories, that means that files would have to be put in a directory, for example `$cas` becomes `$cas/_`.
+Then directory entries would have to do the same for symmetry. This requires many code changes and requires extra storage, even if an entry doesn't have any runtime dependencies.
+
+### Add name to metadata
+
+The name and version are subjective data. Adding it to metadata would cause `$cas` to change and increases storage. The only consumer of this data is the end user, who should also have the data available in their Trust DB.
