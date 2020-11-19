@@ -3,7 +3,7 @@ feature: Declarative Wrappers
 start-date: (fill me in with today's date, YYYY-MM-DD)
 author: Doron Behar <me@doronbehar.com>
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
+shepherd-team: @FRidh, @lheckemann, @edolstra
 shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: POC Implementation at [#85103](https://github.com/NixOS/nixpkgs/pull/85103).
 ---
