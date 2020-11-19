@@ -170,9 +170,7 @@ Not doing this RFC at all would also be an option, given that the issue being fi
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-This needs some testing to see if this works with the ancient Darwin Bash.
-
-Some people might object to the 'grep function's source to see if it uses `commonPhaseImpl`' which will need another less magical approach if so.
+All resolved.
 
 # Future work
 [future]: #future-work
