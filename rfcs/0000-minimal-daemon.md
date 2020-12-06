@@ -66,5 +66,5 @@ No known unknowns.
 [future]: #future-work
 
 I think most people for this will have future plans they wish to persue in the name of modularity.
-But I don't expect everyone to agree on waht exactl those plans should be.
+But I don't expect everyone to agree on what exactly those plans should be.
 The point of this small step is to punt on all that for now.
