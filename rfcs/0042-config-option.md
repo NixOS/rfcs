@@ -2,7 +2,7 @@
 feature: config-option
 start-date: 2019-03-10
 author: Silvan Mosberger
-co-authors: (find a buddy later to help our with the RFC)
+co-authors:
 shepherd-leader: Jörg Thalheim
 shepherd-team: Jörg Thalheim, Eelco Dolstra, Robert Helgesson, Franz Pletz
 related-issues: https://github.com/NixOS/nixpkgs/pull/65728, https://github.com/NixOS/nixpkgs/pull/70138, https://github.com/NixOS/nixpkgs/pull/75584, TBD
@@ -14,7 +14,7 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/65728, https://github.com/
 ## Part 1: Structural `settings` instead of stringly `extraConfig`
 [part1]: #part-1-structural-settings-instead-of-stringly-extraconfig
 
-NixOS modules often use stringly-typed options like `extraConfig` to allow specifying extra settings in addition to the default ones. This has multiple disadvantages: The defaults can't be changed, multiple values might not get merged properly, inspection of it is almost impossible because it's an opaque string and more. The first part of this RFC aims to discourage such options and proposes generic `settings` options instead, which can encode the modules configuration file as a structural Nix value. Here is an example showcasing some advantages:
+NixOS modules often use stringly-typed options like `extraConfig` to allow specifying extra settings in addition to the default ones. This has multiple disadvantages: The defaults can't be changed, multiple values might not get merged properly, inspection of it is almost impossible because it's an opaque string and more. The first part of this RFC aims to discourage such options and encourage people to use the `settings` pattern instead, which can encode the modules configuration file as a structural Nix value. Here is an example showcasing some advantages:
 
 ```nix
 {
@@ -40,9 +40,7 @@ NixOS modules often use stringly-typed options like `extraConfig` to allow speci
 }
 ```
 
-See [here](#an-example) for an example for how a NixOS module will look like.
-
-Jump to the [detailed design][part1-design] of part 1
+Jump to the [detailed design][part1-design] of part 1, which also shows how a module implementing the `settings` approach might look like.
 
 ## Part 2: Balancing module option count
 [part2]: #part-2-balancing-module-option-count
@@ -101,92 +99,81 @@ These are only examples of where people *found* problems and fixed them. The num
 ## [Part 1][part1]
 [part1-design]: #part-1-1
 
-### Configuration format types
+It's already possible to write generic `settings` options today, using PR's introducing [`pkgs.formats`](https://github.com/NixOS/nixpkgs/pull/75584) and [freeform modules](https://github.com/NixOS/nixpkgs/pull/82743) when needed. Documentation for these features and how to use them for declaring `settings` options already exists in the manual: [Options for Program Settings](https://nixos.org/manual/nixos/stable/index.html#sec-settings-options) and [Freeform Modules](https://nixos.org/manual/nixos/stable/index.html#sec-freeform-modules).
 
-In order for a structural `settings` to enforce a valid value and work correctly with merging and priorities, it needs to have a type that corresponds to its configuration format, `types.attrs` won't do. In [PR 75584](https://github.com/NixOS/nixpkgs/pull/75584) fully specified types for JSON, INI, YAML and TOML are implemented in `lib.formats.{json,ini,yaml,toml}.type`.
-
-Sometimes programs have their own configuration formats which are specific to them, in which case the type should be specified in that programs module directly instead of going in `lib.types.settings`.
-
-### Configuration format generators
-
-In order for the final value of `settings` to be turned into a string, an accompanying set of config format generators is available under `lib.formats.{json,ini,yaml,toml}.generate`. These writers will have to have support all of their accompanying type's values. As with the type, if the program has its own configuration format, the writer should be implemented in its module directly.
-
-### Additions to the NixOS documentation
-
-The following sections should be added to the NixOS documentation (not verbatim however).
-
-#### Writing options for program configuration
-
-Whether having a structural `settings` option for a module makes sense depends on whether the program's configuration format has an obvious mapping from Nix. This includes formats like JSON, YAML, INI and similar ones. Examples of unsuitable configuration formats are Haskell, Lisp, Lua or other generic programming languages. If you need to ask yourself "Does it make sense to use Nix for this configuration format", then the answer is probably No, and you should not use this approach. This RFC does not specify anything for unsuitable configuration formats, but there is [an addendum on that][unsuitable] regarding this.
-
-The two main ingredients for writing a `settings` option is to define its type as the one corresponding to the programs configuration format (e.g. `lib.formats.json.type`), and to convert that options value to a string with the corresponding generator function (e.g. `lib.formats.json.generate`). Since these options won't include documentation for all supported values, upstream docs should be linked in the description.
-
-#### Default values
-
-Ideally modules should work by just setting `enable = true`, which often requires setting some default settings. These should get specified in the `config` section of the module by assigning the values to the `settings` option directly. Depending on how default settings matter, we need to set them differently and for different reasons:
-
-| Reason | How to assign | Needs to track upstream | Examples | Note |
-| --- | --- | --- | --- | --- |
-| Program would fail otherwise | `mkDefault` | No | `bootstrap_ip = "172.22.68.74"` | Equivalent to a starter configuration |
-| Needed for the module to work, NixOS specifics | **Without** `mkDefault` | No | `logger = "systemd"` `data_dir = "/var/lib/foo"` | Requires the user to use `mkForce` for overriding this, hinting that they leave supported territory |
-| Module needs value to influence other options | `mkDefault` | Yes | `port = 456` (influences `allowedTCPPorts`) | |
-
-#### Additional options for single settings
-
-One can easily add additional options that correspond to single configuration settings. This is done by defining an option as usual, then applying it to `settings` with a `mkDefault`. This approach allows users to set the value either through the specialized option or `settings`, which also means that new options can be added without having to worry about backwards-compatibility.
-
-#### An example
-
-Putting it all together, here is an example of a NixOS module that uses such an approach:
+Using these features, a module supporting `settings` might look like
 
 ```nix
-{ config, lib, pkgs, ... }:
+{ options, config, lib, pkgs, ... }:
 let
   cfg = config.services.foo;
-  format = lib.formats.json;
+  # Define the settings format used for this program
+  settingsFormat = pkgs.formats.json {};
 in {
 
   options.services.foo = {
     enable = lib.mkEnableOption "foo service";
 
     settings = lib.mkOption {
-      type = format.type;
+      type = lib.types.submodule {
+
+        # Declare that the settings option supports arbitrary format values, json here
+        freeformType = settingsFormat.type;
+
+        # Declare an option for the port such that the type is checked and this option
+        # is shown in the manual.
+        options.port = lib.mkOption {
+          type = lib.types.port;
+          default = 8080;
+          description = ''
+            Which port this service should listen on.
+          '';
+        };
+
+      };
       default = {};
+      # Add upstream documentation to the settings description
       description = ''
-        Configuration for foo, see <link xlink:href="https://example.com/docs/foo"/>
+        Configuration for Foo, see
+        <link xlink:href="https://example.com/docs/foo"/>
         for supported values.
       '';
-    };
-
-    # An additional option for a setting so we have an eval error if this is missing
-    domain = lib.mkOption {
-      type = lib.types.str;
-      description = "Domain this service operates on.";
     };
   };
 
   config = lib.mkIf cfg.enable {
+    # We can assign some default settings here to make the service work by just
+    # enabling it. We use `mkDefault` for values that can be changed without
+    # problems
     services.foo.settings = {
       # Fails at runtime without any value set
       log_level = lib.mkDefault "WARN";
 
-      # We use systemd's `StateDirectory`, so we require this (no mkDefault)
+      # We assume systemd's `StateDirectory` is used, so this value is required
+      # therefore no mkDefault, forcing the user to use mkForce to override it
       data_path = "/var/lib/foo";
 
-      # We use this to open the firewall, so we need to know about the default at eval time
-      port = lib.mkDefault 2546;
-
-      # Apply our specialized setting.
-      domain = lib.mkDefault cfg.domain;
+      # Since we use this to create a user we need to know the default value at
+      # eval time
+      user = lib.mkDefault "foo";
     };
 
-    environment.etc."foo-config".source = format.generate pkgs "foo-config.json" cfg.settings;
+    environment.etc."foo.json".source =
+      # The formats generator function takes a filename and the Nix value
+      # representing the format value and produces a filepath with that value
+      # rendered in the format
+      settingsFormat.generate "foo-config.json" cfg.settings;
 
-    networking.firewall.allowedTCPPorts = [ cfg.settings.port ];
+    # We know that the `user` attribute exists because we set a default value
+    # for it above, allowing us to use it without worries here
+    users.users.${cfg.settings.user} = {};
+
     # ...
   };
 }
 ```
+
+This RFC proposes to agree upon making this the standard way to specify configuration when this approach is feasible. Notably infeasible for this approach are configuration file formats that can't be directly mapped to Nix, such as bash, python, and others.
 
 ## [Part 2][part2]
 [part2-design]: #part-2-1
@@ -201,19 +188,17 @@ The second part of this RFC aims to encourage people to write better NixOS modul
 | Mandatory user-specific values | Reminds the user that they have to set this in order for the program to work, an evaluation error will catch a missing value early | [`services.hydra.hydraURL`](https://nixos.org/nixos/manual/options.html#opt-services.hydra.hydraURL), [`services.davmail.url`](https://nixos.org/nixos/manual/options.html#opt-services.davmail.url) | |
 | Sensitive data, passwords | To avoid those ending in the Nix store, ideally an option like `passwordFile` should replace a password placeholder in the configuration file at runtime | | This is specifically about configuration files that have a `password`-like setting |
 
-This should be described in the NixOS manual.
-
 ## Backwards compatibility with existing modules
 
-This RFC has to be thought of as a basis for *new* modules first and foremost. By using this approach we can provide a good basis for a new module, with great flexibility for future changes.
+This RFC has to be thought of as a basis for *new* modules first and foremost. By using this approach we can provide a good basis for new modules, with great flexibility for future changes.
 
-A lot of already existing NixOS modules provide a mix of options for single settings and `extraConfig`-style options, which as explained in the [Motivation](#motivation) section leads to problems. In general it is not easy or even impossible to convert such a module to the style described in this RFC in a backwards-compatible way without any workarounds. One workaround is to add an option `useLegacyConfig` or `declarative` which determines the modules behavior in regards to old options.
+For existing modules, it is often not possible to use this `settings` style without breaking backwards compatibility. How this is handled is left up to the module authors. A workaround that could be employed is to define options `useLegacyConfig` or `declarative` which determin  the modules behavior in regards to old options.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 For [Part 2][part2]:
-- The less encoded options there are, the less checks are happening at evaluation time, and by default this means more runtime failures for initial runs, which isn't as bad as it sounds. If available, [configuration checking tools](#configuration-checking-tools) can be used to have build-time failures instead, or alternatively [assertions][assertions] can be used to have additional evaluation-time checks.
+- The less encoded options there are, the less checks are happening at evaluation time, and by default this means more runtime failures for initial runs, which isn't as bad as it sounds. If available, configuration checking tools can be used to have build-time failures instead, or alternatively assertions can be used to have additional evaluation-time checks.
 - Only options that are specified will appear in the central NixOS option listings. This means with fewer options there are, the more often upstream documentation is needed. Since the NixOS documentation might be very outdated and incomplete however, this can often be a good thing.
 
 # Alternatives
@@ -228,123 +213,30 @@ The trivial alternative of not doing that, see [Motivation](#motivation)
 [future]: #future-work
 
 ## Documentation defaults
-When defaults for NixOS options are set *outside* the options definition such as `config.services.foo.settings.log_level = lib.mkDefault "WARN"` above, it's currently not possible to see these default values in the manual. This could be improved by having the manual not only look at the option definitions `default` attribute for determining the default, but also evaluate the options values with a minimal configuration to get the actual default value. This might be pretty hard to achieve, because oftentimes those defaults are only even assigned if `cfg.enable = true` which won't be the case for a minimal configuration. The real solution might be to specify defaults even when the module is disabled, but this would need a rewrite of almost every module, which is impractical.
+When defaults for NixOS options are set *outside* the options definition such as `config.services.foo.settings.log_level = lib.mkDefault "WARN"` above, these values don't show up in the documentation as the options defaults. Using the options `default` value would show up in the manual, but unfortunately that doesn't do merging correctly with `settings` options since the value is set with `mkOptionDefault`. To fix this, an option attribute like `recursiveDefault` could be implemented, which recursively sets `mkOptionDefault` on its value instead.
+
+# Addendums
 
 ## Command line interfaces
 Sometimes programs use command arguments for configuration. Since [PR 75539](https://github.com/NixOS/nixpkgs/pull/75539) there is `lib.encodeGNUCommandLine` to convert a Nix value to an argument string. With compatible programs this brings all the above-mentioned benefits to those programs as well.
 
-# Addendums
-
-## Previous implementations
+## Modules that use the `settings` style
 
 This idea has been implemented already in some places:
-- [#45470](https://github.com/NixOS/nixpkgs/pull/45470)
-- [#52096](https://github.com/NixOS/nixpkgs/pull/52096)
+- [nixos/znc](https://github.com/NixOS/nixpkgs/tree/master/nixos/modules/services/networking/znc)
+- [nixos/davmail](https://github.com/nixos/nixpkgs/blob/master/nixos/modules/services/mail/davmail.nix)
 - [My Murmur module](https://github.com/Infinisil/system/blob/45c3ea36651a2f4328c8a7474148f1c5ecb18e0a/config/new-modules/murmur.nix)
-- [#55413](https://github.com/NixOS/nixpkgs/pull/55413)
+- [nixos/bitwarden\_rs](https://github.com/nixos/nixpkgs/blob/master/nixos/modules/services/security/bitwarden_rs/default.nix)
+- [nixos/hercules-ci-agent](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/continuous-integration/hercules-ci-agent/common.nix)
+- [nixos/blackfire](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/development/blackfire.nix)
+- [nixos/biboumi](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/networking/biboumi.nix)
+- [nixos/mackerel-agent](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/monitoring/mackerel-agent.nix)
+- [nixos/epgstation](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/video/epgstation/default.nix)
+- [nixos/klipper](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/misc/klipper.nix)
+- [nixos/redmine](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/services/misc/redmine.nix)
+- [nixos/nfs](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/tasks/filesystems/nfs.nix)
 
 ## Previous discussions
 
 - https://github.com/NixOS/nixpkgs/pull/44923#issuecomment-412393196
 - https://github.com/NixOS/nixpkgs/pull/55957#issuecomment-464561483 -> https://github.com/NixOS/nixpkgs/pull/57716
-
-## `configFile`
-
-TODO
-
-## Unsuitable configuration formats
-[unsuitable]: #unsuitable-configuration-formats
-
-For unsuitable formats it is left up to the module author to decide the best set of NixOS options. Sometimes it might make sense to have both a specialized set of options for single settings (e.g. `programs.bash.environment`) and a flexible option of type `types.lines` (such as `programs.bash.promptInit`). Alternatively it might be reasonable to only provide a `config`/`configFile` option of type `types.str`/`types.path`, such as for XMonad's Haskell configuration file. And for programs that use a general purpose language even though their configuration can be represented in key-value style (such as [Roundcube's PHP configuration](https://github.com/NixOS/nixpkgs/blob/e03966a60f517700f5fee5182a5a798f8d0709df/nixos/modules/services/mail/roundcube.nix#L86-L93) of the form `$config['key'] = 'value';`), a `config` option as described in this RFC could be used as well as a `configFile` option for more flexibility if needed.
-
-## Configuration checking
-
-One downside of using `settings` instead of having a dedicated NixOS option is that values can't easily be checked to have the correct key and type at evaluation time. Instead the default mode of operation will be to fail at runtime when the program reads the configuration initially. There are ways this can be improved however.
-
-### Configuration checking tools
-
-Sometimes programs have tools for checking their configuration without the need to start the program itself. We can use this to verify the configuration at build time by running the tool during a derivation build. These tools are generally more thorough than the module system and can integrate tightly with the program itself, which can greatly improve error reporting. A good side effect of this approach is that less RAM is needed for evaluation. The following illustrates an example of how this might look like:
-
-TODO: Rewrite in terms of `configFile`
-```nix
-{ config, lib, pkgs, ... }:
-let
-  cfg = config.services.foo;
-  
-  checkedConfig = pkgs.runCommandNoCC "foo-config.json" {
-    # Because this program will be run at build time, we need `nativeBuildInputs`
-    nativeBuildInputs = [ pkgs.foo-checker ];
-    
-    config = lib.settings.genJSON cfg.settings;
-    passAsFile = [ "config" ];
-  } ''
-    foo-checker "$configPath"
-    cp "$configPath" "$out"
-  '';
-
-in {
-  options = { /* ... */ };
-  config = lib.mkIf cfg.enable {
-  
-    environment.etc."foo/config.json".source = checkedConfig;
-    
-    # ...
-  };
-}
-```
-
-TODO: Explain how `options.services.foo.config.files` can be used to give a better indication of where a failure occurs.
-
-### Ad-hoc checks with assertions
-[assertions]: #ad-hoc-checks-with-assertions
-
-While not as good as a configuration checker tool, assertions can be used to add flexible ad-hoc checks for type or other properties at evaluation time. It should only be used to ensure important properties that break the service in ways that are otherwise hard or slow to detect (and easy to detect for the module system), not for things that make the service fail to start anyways (unless there's a good reason for it). The following example only demonstrates how assertions can be used for checks, but any reasonable program should bail out early in such cases, which would make these assertions redundant, and only add more coupling to upstream, which we're trying to avoid in the first place.
-
-```nix
-{ config, lib, ... }: {
-  # ...
-  config = lib.mkIf cfg.enable {
-    # Examples only for demonstration purposes, don't actually add assertions for such properties
-    assertions = [
-      {
-        assertion = cfg.settings.enableLogging or true -> cfg.settings ? logLevel;
-        message = "You also need to set `services.foo.settings.logLevel` if `services.foo.settings.enableLogging` is turned on.";
-      }
-      {
-        assertion = cfg.settings ? port -> lib.types.port.check cfg.settings.port;
-        message = "${toString cfg.settings.port} is not a valid port number for `services.foo.settings.port`.";
-      }
-    ];
-  };
-}
-```
-
-TODO: Are there any good examples of using assertions for configuration checks at all?
-
-## Backwards compatibility for configuration settings
-
-By shifting values from a specific NixOS option to the general `settings` one, guarding against upstream changes will have to be done differently. Due to the structural nature of `settings` options, it's possible to deeply inspect and rewrite them however needed before converting them to a string. If the need arises, convenience library functions can be written for such transformations. This might look as follows:
-
-```nix
-{ config, lib, ... }:
-let
-  cfg = config.services.foo;
-  
-  fixedUpSettings =
-    let
-      renamedKeys = builtins.intersectAttrs cfg.settings {
-        # foo has been renamed to bar
-        foo = "bar";
-      };
-      conflicts = lib.filter (from: cfg.settings ? ${renamedKeys.${from}}) (lib.attrNames renamedKeys);
-    in if conflicts == [] then lib.mapAttrs' (from: to:
-      lib.nameValuePair to cfg.settings.${from}
-    ) renamedKeys // builtins.removeAttrs cfg.settings (lib.attrNames renamedKeys)
-    else throw (lib.concatMapStringsSep "," (from:
-      "Can't mix the deprecated setting \"${from}\" with its replacement \"${renamedKeys.${from}}\""
-    ) conflicts);
-  
-in {
-  config.environment.etc."foo/config.json".text = lib.settings.genJSON fixedUpsettings;
-}
-```
