@@ -39,8 +39,10 @@ following properties:
 
 We aim to reduce duplication of effort and code while also having a high level
 of inspection and tweaking possibilities without needing to patch module
-source. At the same time we aim to minimise the amount of code in the NixOS
-subtree that cannot be tested on NixOS.
+source. An additional goal is to move the more package-like configuration file
+generation code closer to the Nixpkgs model with scope/visibility rules. At
+the same time we aim to avoid or minimise code in the NixOS subtree that
+cannot be tested on NixOS.
 
 # Detailed design
 [design]: #detailed-design
@@ -125,6 +127,13 @@ Same, but put configuration generators closer to packages. This would mean
 widespread use of the module system inside `pkgs/`. There is also no guarantee
 that all the configuration files describing interaction of multiple software
 packages will have a clear choice of reference package.
+
+Introduce a guideline on making configuration files available to the module
+system after generation (i.e. avoidance of only putting them in a `let` to add
+a path reference inside some string; maybe with best practices on naming the
+corresponding options). Does not help with scoping, still needs a non-trivial
+amount of refactoring. Might make other desirable refactorings such as
+multiple instances of a module marginally harder.
 
 A complete or partial merge of the module collections of the major currently
 existing module system based code bases, with internal options for platform
