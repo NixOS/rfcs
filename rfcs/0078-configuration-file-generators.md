@@ -39,7 +39,8 @@ following properties:
 
 We aim to reduce duplication of effort and code while also having a high level
 of inspection and tweaking possibilities without needing to patch module
-source.
+source. At the same time we aim to minimise the amount of code in the NixOS
+subtree that cannot be tested on NixOS.
 
 # Detailed design
 [design]: #detailed-design
@@ -59,6 +60,8 @@ settings abstraction and serialiser.
 
 The function is provided as a member of an attribute set, which also contains
 the corresponding type specifications for input and output modules are defined.
+The specifications for the input should be suitable for importing as a part of
+the NixOS service module options.
 
 In some cases we only provide low-level overridable default configuration. In
 this case the input may have the type that is always an empty attribute set,
@@ -123,7 +126,15 @@ widespread use of the module system inside `pkgs/`. There is also no guarantee
 that all the configuration files describing interaction of multiple software
 packages will have a clear choice of reference package.
 
-There also have been many solutions proposed based on a significant rework of the module system.
+A complete or partial merge of the module collections of the major currently
+existing module system based code bases, with internal options for platform
+specific implementation details. Unfortunately, this would force more coupling
+of the development cycle for the platform-specific parts. It also does not
+create a clean inspection/override point, and mixes the code with different
+platform requirements for testing.
+
+There also have been many solutions proposed based on a significant rework of
+the module system.
 
 Abstract generation of configuration files with package-like flat arguments and
 plain text file outputs. This approach will need less code as long as it we do
@@ -135,7 +146,7 @@ assumptions.
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-Currently none.
+Full proof-of-concept implementation for some module.
 
 # Future work
 [future]: #future-work
