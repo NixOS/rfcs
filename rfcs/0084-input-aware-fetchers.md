@@ -86,12 +86,11 @@ However it doesn't have to be this way!
 
 This problem can be solved relatively easily by realizing that Nix not only uses the output hash of derivations to check whether they need to be built, but the _full_ store path, which notably also includes the _derivation name_. Thus, by ensuring that the derivation name changes if (and only if) relevant inputs change, we can force Nix to rebuild a derivation even if the output hash stays the same, therefore fixing above problem.
 
-This RFC therefore proposes to use a hash of all relevant derivation inputs as the name of fixed-output derivations. The hash should be computed using `sha256`, and encoded using the [url-safe base64](https://tools.ietf.org/html/rfc4648#section-5), without any leading `=`, leading to a character count of 43. For reference, this hash can be computed in `nix-shell -p openssl` with
+This RFC therefore proposes to use a hash of all relevant derivation inputs as the default name of fixed-output derivations. The hash should be computed using `sha256`, and encoded using the [url-safe base64](https://tools.ietf.org/html/rfc4648#section-5), without any leading `=`, leading to a character count of 43. For reference, this hash can be computed in `nix-shell -p openssl` with
 ```
 [nix-shell:~]$ echo -n 'example string' | openssl dgst -sha256 -binary | openssl base64 -A | cut -b1-42 | tr +/ -_
 rt-5KzBTohoRT08wGgKjxq1d_1BNEk3CzuYRdiPuxw
 ```
-
 
 The following describes exactly which string should be used as the hash input for each of the fetcher types. This is necessary since there are multiple ways to fetch the same resources, e.g. with the builtin `fetchTarball` and nixpkgs' `fetchzip`. In order for them to be able to reuse the same store path, they should use the same derivation name.
 
