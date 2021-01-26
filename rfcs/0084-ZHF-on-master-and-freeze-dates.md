@@ -16,6 +16,21 @@ instead of the release branch, thus avoiding the need to backport every pull
 request, and take advantage of the stabilization that unstable normally
 receives.
 
+# Definitions
+[definitions]: #definition
+
+- "Freezing" a branch or package.
+  - Disallow breaking changes to branch or package. In SemVer terminology, disallow major version bumps.
+  - A release branch can be thought of being permanently "frozen" in this regard. Stable may be a better term, but it's already overloaded with a previous release branch or channel.
+- "Unfreezing" a branch or package.
+  - Allow for breaking changes to be made to branch or package.
+- "Critical packages"
+  - Important packages which have many dimensions of build or runtime behavior.
+  - Generally these will be packages which are a part of `stdenv`, or bootstrapping a system (e.g. systemd).
+  - Initially these will be: `stdenv.cc`,`binutils`, and `systemd` for this RFC.
+- ZHF: Zero Hydra Failures
+  - Period in which packages are stabilized in preparation of a release.
+
 # Motivation
 [motivation]: #motivation
 
