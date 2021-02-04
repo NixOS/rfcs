@@ -3,7 +3,7 @@ feature: show unmaintained packages
 start-date: 2020-12-10
 author: lassulus
 co-authors: Mic92
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
+shepherd-team: Silvan Mosberger, Rok Garbas, Finn Behrens
 shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: (will contain links to implementation PRs)
 ---
