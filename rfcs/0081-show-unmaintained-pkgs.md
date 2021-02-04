@@ -4,7 +4,7 @@ start-date: 2020-12-10
 author: lassulus
 co-authors: Mic92
 shepherd-team: Silvan Mosberger, Rok Garbas, Finn Behrens
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-leader: Rok Garbas
 related-issues: (will contain links to implementation PRs)
 ---
 
