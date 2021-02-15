@@ -133,13 +133,6 @@ but a more general `nixos` command as proposed in
 Though @edolstra [said it would be okay for now](https://github.com/NixOS/nixpkgs/issues/105910#issuecomment-754036275).
 
 
-## nixos-version
-
-Changing `nixos-version` so that a mistyped parameter throws an error improves
-error detection, but is a potentially breaking change, if there were scripts
-relying on mistyped flags. Though my opinion is, that it is better to throw
-meaningful errors instead of just doing something.
-
 # Alternatives
 [alternatives]: #alternatives
 
