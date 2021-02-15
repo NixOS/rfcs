@@ -179,9 +179,6 @@ scripts? (probably unnecessary, since usage in scripts probably limited)
 - Use `pager` to avoid spamming terminal?
 - Is the order fine?
 
-## nixos-version
-- Only accept known parameters (i.e. throw error on `nixos-version this --is $RANDOM`)?
-
 # Future work
 [future]: #future-work
 
