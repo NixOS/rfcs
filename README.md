@@ -1,15 +1,10 @@
-# Nix RFCs
+# Nix RFCs (Request For Comments)
 
 Many changes, including bug fixes and documentation improvements can be
 implemented and reviewed via the normal GitHub pull request workflow.
 
 Some changes though are "substantial", and we ask that these be put through a
 bit of a design process and produce a consensus among the Nix community.
-
-This is the bulk of the RFC. Explain the design in enough detail for somebody
-familiar with the ecosystem to understand, and implement.  This should get
-into specifics and corner-cases, and include examples of how the feature is
-used.
 
 ## When this process is followed
 
@@ -83,7 +78,7 @@ after the FCP.
 
 *In short, to get a major change included in Nix or Nixpkgs, one must
 first get the RFC merged into the RFC repository as a markdown file under the
-`accepted` directory. At that point the RFC is accepted and may be implemented
+`rfcs` directory. At that point the RFC is accepted and may be implemented
 with the goal of eventual inclusion into Nix or Nixpkgs.*
 
 0. Have a cool idea!
@@ -146,8 +141,8 @@ with the goal of eventual inclusion into Nix or Nixpkgs.*
 11. In most cases, the FCP period is quiet, and the RFC is either merged or
     closed. However, sometimes substantial new arguments or ideas are raised,
     the FCP is canceled, and the RFC goes back into development mode.
-12. In case of acceptance, the RFC Steering Committee merges the PR into the
-    `accepted` directory. Otherwise the RFC's pull request is closed. If no
+12. In case of acceptance, the RFC Steering Committee merges the PR.
+    Otherwise the RFC's pull request is closed. If no
     consensus can be reached on the RFC but the idea in general is accepted, it
     gets closed, too. A note is added that is should be proposed again, when the
     circumstances, that are stopping the discussion to come to another decision,
@@ -190,13 +185,7 @@ be decided in cooperation with the RFC Steering Committee.
 
 ## Members of the RFC Steering Committee
 
-The current members of the RFC Steering Committee are:
-
- - Eelco Dolstra (edolstra, niksnut)
- - Shea Levy (shlevy)
- - Domen Kožar (domenkozar)
- - Jörg Thalheim (Mic92)
- - Robin Gloster (globin)
+The current members of the RFC Steering Committee can be seen at the [NixOS/rfc-steering-committee](https://github.com/NixOS/rfc-steering-committee#workflow-for-rfc-steering-committee) repository.
 
 
 ## License
