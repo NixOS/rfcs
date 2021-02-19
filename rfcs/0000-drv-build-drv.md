@@ -1,5 +1,5 @@
 ---
-feature: ret-cont-recursive-nix
+feature: drv-build-drv
 start-date: 2019-02-01
 author: John Ericson (@Ericson2314)
 co-authors: (find a buddy later to help our with the RFC)
