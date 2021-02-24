@@ -106,8 +106,8 @@ easily satisfied.
 - [issue 78792](https://github.com/NixOS/nixpkgs/issues/78792)
 
 @worldofpeace you are correct. All of these setup-hooks are a mess. At least we
-have documented, (yet not totally implemented) this section of the manual
-https://nixos.org/nixpkgs/manual/#ssec-gnome-common-issues-double-wrapped
+have documented, (yet not totally implemented) [this section of the
+manual](https://github.com/NixOS/nixpkgs/blob/2df97e4b0ab73f0087af2e6f33e694140150db1b/doc/languages-frameworks/gnome.section.md#L120-L166)
 
 Declarative wrappers will deprecate the usage of our shell based hooks and will
 wrap all executables automatically according to their needs, without requiring
