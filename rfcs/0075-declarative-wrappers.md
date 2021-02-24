@@ -12,11 +12,12 @@ related-issues: POC Implementation at [#85103](https://github.com/NixOS/nixpkgs/
 [summary]: #summary
 
 Manage the environment of wrappers declaratively and deprecate shell based
-methods for calculating runtime environment of packages. Make wrappers a
-separate derivation so that mere changes to the environment will not trigger a
-rebuild. Make it easier to debug why env vars are added to an executable, by
-using Nix as the language to evaluate what env vars are needed, instead of not
-documented good enough and not easily debug-able shell hooks.
+methods for calculating runtime environment of packages. Make it easier to
+debug why env vars are added to an executable, by storing this information
+inside `/nix/store/.../nix-support/` of the dependencies that using them
+requires require runtime environment. Create a new `makeWrapperAuto` hook that
+will make the `fixupPhase` read all of the deps environment that's needed and
+automatically wrap the executables with the proper environment.
 
 # Motivation
 [motivation]: #motivation
@@ -218,120 +219,132 @@ and get rid of these global environment variables.
 # Detailed design
 [design]: #detailed-design
 
-The current design is roughly implemented at
-[pull 85103](https://github.com/NixOS/nixpkgs/pull/85103) .  
+The end goal is to make the experience of getting a derivation wrapped as
+automatic as possible. A derivation that needs a certain environment to run,
+will put the dependency that is linked to this environment variable in
+`envInputs` and `mkDerivation`'s standard `fixupPhase`. As a start, we'll (me
+probably) will introduce a new `makeWrapperAuto` setup hook that will take care
+in the way described as follows.
 
-The idea is to have a Nix function, let us call it `wrapGeneric`, with an
-interface similar to
-[`wrapMpv`](https://github.com/NixOS/nixpkgs/blob/a5985162e31587ae04ddc65c4e06146c2aff104c/pkgs/applications/video/mpv/wrapper.nix#L9-L23)
-and
-[`wrapNeovim`](https://github.com/NixOS/nixpkgs/blob/a5985162e31587ae04ddc65c4e06146c2aff104c/pkgs/applications/editors/neovim/wrapper.nix#L11-L24)
-which will accept a single derivation or an array of them and will wrap all of
-their executables with the proper environment, based on their inputs.
+As a start, we'll need to think about all packages in Nixpkgs that using them
+requires some environment variables to be set. Every such package will put in
+`$dev/nix-support/wrappers.json` a list of environment variables that are
+"linked" to this package. "linked" means that using this package requires these
+environment variables to be set in runtime.
 
-`wrapGeneric` should iterate recursively all `buildInputs` and
-`propagatedBuildInputs` of the input derivation(s), and construct an attrset with
-which it'll calculate the necessary environment of the executables. Then either
-via `wrapProgram` or a better method, it'll create the wrappers.
+`makeWrapperAuto` will traverse all `buildInputs` and `propagatedBuildInputs`
+of a derivation, and look for a `wrappers.json` file in these inputs. It will
+collect all the environment variables that need to be set in the resulting
+executables, by merging all of the values of the environment variables in all
+of the inputs' `wrappers.json` files. `wrappers.json` might look like this for
+a given package:
 
-A contributor using `wrapGeneric` shouldn't _care_ what type of wrapping needs
-to be performed on his derivation's executables - whether these are Qt related
-wrappings or a Gtk / gobject related. `wrapGeneric` should know all there is to
-know about environment variables every library / input may need during runtime,
-and with this information at hand, construct the necessary wrapper.
+```json
+{
+  "GI_TYPELIB_PATH": [
+    "/nix/...gobject-introspection.../...",
+    "/nix/...librsvg.../...",
+  ],
+  "GIO_EXTRA_MODULES": [
+    "/nix/...dconf.../lib/gio/modules"
+  ],
+  "XDG_DATA_DIRS": [
+    "/nix/...gtk+3.../...",
+    "/nix/...gsettings-desktop-schemas.../..."
+  ],
+  "GDK_PIXBUF_MODULE_FILE": "/nix/...librsvg.../lib/gdk.../loaders.cache",
+}
+```
 
-In order for `wrapGenric` to know all of this information about our packaged
-libraries - the information about runtime env, we need to write in the
-`passthru`s of these libraries, what env vars they need. Such information was
-added in the POC pull at [commit
-@6283f15](https://github.com/NixOS/nixpkgs/pull/85103/commits/6283f15bb9b65af64571a78b039115807dcc2958).
+The information found inside an input's `wrappers.json` will include all the
+information about wrappers found in the input's inputs, and so on. Thus in
+contrast to the [POC Nixpkgs PR](https://github.com/NixOS/nixpkgs/pull/85103)
+and the [original design of the
+RFC](https://github.com/doronbehar/rfcs/blob/60d3825fdd4e6574b7e5d70264445d1c801368c6/rfcs/0075-declarative-wrappers.md#L251),
+prior to [the 1st
+meeting](https://github.com/NixOS/rfcs/pull/75#issuecomment-760942876),
+traversing all the inputs and the inputs' inputs, will not happen during eval
+time and only partly, during build time - every package already built will be
+able to give another package all the information there needs to know about the
+related environment variables.
 
-Additional features / improvements are [already
-available](https://github.com/NixOS/nixpkgs/pull/85103#issuecomment-614195666)
-in the POC pull. For example:
+Most of the work to do will be:
 
-- It should be **impossible** for multi-value env vars to have duplicates, as
-  that's guaranteed by Nix' behavior when constructing arrays / attrsets.
-- Asking the wrapper creator to use more links and less colon-separated values
-  in env vars - should help avoid what [pull
-  84689](https://github.com/NixOS/nixpkgs/pull/84689) fixed.
+1. Gather information about what environment variables are "linked" to each
+   package, and edit these derivations to include a `wrappers.json`, with
+   `makeWrapperAuto`.
+2. Design the `makeWrapperAuto` shell hook:
+  - It should introduce a shell function (to be called `wrappersInfo`) that
+    will allow piping a JSON string from `builtins.toJSON` and spit a
+    `wrappers.json` that will include both what was piped into it, and the
+    content from the package's inputs' `wrappers.json`.
+  - It should make the executables in `$out/bin/` get wrapped according to
+    what's currently in this package's `wrappers.json`, during `fixupPhase`.
+  - The above should be also possible to do manually for executables outside
+    `$out/bin/` with say adding to a derivation a Nix variable:
+
+```nix
+  wrapExtraPrograms = [ "/libexec/" "/share/scripts" ];
+```
+
+3. Most of the packages with linked environment variables, have lots of reverse
+   dependencies, so once `makeWrapperAuto` is ready, it'd nice to have a hydra
+   job that will build all of these packages with the `wrappers.json` file in
+   them. For instance these packages include:
+   - `gdk-pixbuf`
+   - `gsettings-desktop-schemas`
+   - `pango`
+   - `gtk3`
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-All examples are copied from and based on the [POC
-pull](https://github.com/NixOS/nixpkgs/pull/85103).
+When switching to `makeWrapperAuto` from `makeWrapper` there shouldn't be
+manual usage of `wrapProgram` for most cases. A package that uses `wrapProgram`
+should be able to switch to `wrappersInfo` and declare any nontrivial
+environment variables with it to get propagated to reverse dependencies and to
+it's executables automatically.
 
-Here's a new method of creating a python environment:
+Currently I imagine the usage of `wrappersInfo` (the name can be debated) as
+so:
 
 ```nix
-  my-python-env = wrapGeneric python3 {
-    linkByEnv = {
-      # you can use "link" here and that will link only the necessary files
-      # to the runtime environment.
-      PYTHONPATH = "linkPkg";
-    };
-    extraPkgs = with python3.pkgs; [
-      matplotlib
-    ];
-    wrapOut = {
-      # tells wrapGeneric to add to the wrappers this value for PYTHONPATH.
-      # Naturally, this should play along with the values given in
-      # linkByEnv.PYTHONPATH.
-      PYTHONPATH = "$out/${python3.sitePackages}";
-    };
-  };
+  # Propagate GST plugins' path
+  postInstall = ''
+    echo "${builtins.toJSON {
+      GST_PLUGIN_SYSTEM_PATH_1_0 = [
+        # @out@ should be expanded by `wrappersInfo` to what's in `$out`, see:
+        # https://github.com/NixOS/nixpkgs/pull/85103#issuecomment-613071343
+        "@out@/lib/gstreamer-1.0"
+      ];
+    }}" | wrappersInfo
+  '';
 ```
 
-Consider a package is wrapped without directly making accessible the unwrapped
-derivation. Meaning, say `all-packages.nix` has:
+`wrapQtAppsHook` and `wrapGAppsHook` should be replaced with `makeWrapperAuto`
+while enable derivations to get rid of well known workarounds such as:
 
 ```nix
-  my-awesome-pkg = wrapGeneric (callPackage ../applications/my-awesome-pkg { }) { };
+  # hook for gobject-introspection doesn't like strictDeps
+  # https://github.com/NixOS/nixpkgs/issues/56943
+  strictDeps = false;
 ```
 
-Assuming the user knows `my-awesome-pkg` is wrapped with `wrapGeneric`, they would
-need to use an overlay like this, to override the unwrapped derivation:
+And:
 
 ```nix
-self: super:
-
-{
-  my-awesome-pkg = super.wrapGeneric (
-    super.my-awesome-pkg.unwrapped.overrideAttrs(oldAttrs: {
-      preFixup = ''
-        overriding preFixup from an overlay!!
-      '';
-    })
-  ) {};
-} 
-```
-
-And to override the wrapper derivation, e.g to add new optional features not
-strictly necessary (as in [pull
-83482](https://github.com/NixOS/nixpkgs/pull/83482)), it should be possible
-using:
-
-```nix
-self: super:
-
-{
-  my-awesome-pkg = super.wrapGeneric super.my-awesome-pkg.unwrapped {
-    extraPkgs = [
-      super.qt5.certain-qt-plugin
-    ];
-  };
-}
+  preFixup = ''
+    makeWrapperArgs+=("''${qtWrapperArgs[@]}")
+  '';
 ```
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-The current design is heavily based on Nix, and knowing how to write and debug
-Nix expressions is a skill not everyone are akin to learn. Also, overriding a
-wrapped derivation is somewhat more awkward, due to this. Perhaps this
-interface could be improved, and for sure proper documentation written should
-help.
+Using `wrapProgram` will be simpler then using `wrappersInfo` and it might be
+hard to explain why is there no `wrapProgramAuto`. However, this interface
+might get improved in design through this RFC or in the future and in any case
+proper documentation should help. 
 
 # Alternatives
 [alternatives]: #alternatives
@@ -339,36 +352,15 @@ help.
 Perhaps our shell hooks _can_ be fixed / improved, and we could help make it
 easier to debug them via `NIX_DEBUG`. Then it might help us track down e.g why
 environment variables are added twice etc. Still though, this wouldn't solve
-half of the other issues presented here. Most importantly, the shell hooks rely
-upon being in the inputs during build of the original derivation. Hence, mere
-requests for changes to an environment a wrapper sets, trigger rebuilds that
-take a lot of time and resources from average users. See [this
-comment](https://github.com/NixOS/nixpkgs/pull/88136#issuecomment-632674653).
+many issues presented above.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-The POC implementation does 1 thing which I'm most sure could be done better,
-and that's iterating **recursively** all `buildInputs` and
-`propagatedBuildInputs` of the given derivations. This is currently implemented
-with a recursive (Nix) function, prone to reach a state of infinite recursion.
-This risk is currently mitigated using an array of packages we know don't need
-any env vars at runtime, and for sure are very much at the bottom of the list
-of all Nixpkgs' dependency graph. This part is implemented
-[here](https://github.com/NixOS/nixpkgs/pull/85103/files#diff-44c2102a355f50131eb8f69fb7e7c18bR75-R131).
-
-There are other methods of doing this recursive search, but I haven't yet
-investigated all of them. For reference and hopefully for an advice, this need
-was requested by others and discussed at:
-
-- [nix issue 1245](https://github.com/NixOS/nix/issues/1245).
-- [Interesting idea by @aszlig at nix issue
-  1245](https://github.com/NixOS/nix/issues/1245#issuecomment-401642781).
-- [@nmattia's
-  post](https://www.nmattia.com/posts/2019-10-08-runtime-dependencies.html).
-- [Discourse thread](https://discourse.nixos.org/t/any-way-to-get-a-derivations-inputdrvs-from-within-nix/7212/3).
+Discussing the design I guess, here or in the Nixpkgs PR that will follow this
+RFC.
 
 # Future work
 [future]: #future-work
 
-Not that I can think of.
+Fix all wrapper related issues declaratively!
