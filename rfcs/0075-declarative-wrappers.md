@@ -128,22 +128,6 @@ I'm not sure what's the issue there. But, I'm sure that a declarative, Nix
 based builder of a Python environment, even if this environment is used only
 for a build, should make it easier to control and alter it's e.g `$PATH`.
 
-- [issue 83667](https://github.com/NixOS/nixpkgs/issues/83667)
-
-@FRidh I see no reason for Python deps of Python packages to need to be in
-`propagatedBuildInputs` and not regular `buildInputs` but please correct me if
-I'm wrong. I think this was done so in the past so it'd be easy to know how to
-wrap them? Declarative wrappers won't require runtime-env-requiring deps to be
-only in `propagatedBuildInputs` or `buildInputs` - it should pick such deps
-from both lists. Hence, (I think) it should be possible to make Python's static
-builds consistent with other ecosystems.
-
-- [issue 86054](https://github.com/NixOS/nixpkgs/issues/86054)
-
-@ttuegel TBH I can't tell if declarative wrappers might help, but I'm linking
-this issue here because @worldofpeace wrote it might be related to wrappers?
-Feel free to suggest removing this in the RFC review.
-
 - [issue 49132](https://github.com/NixOS/nixpkgs/issues/49132)
 - [issue 54278](https://github.com/NixOS/nixpkgs/issues/54278)
 - [issue 39493](https://github.com/NixOS/nixpkgs/issues/39493)
