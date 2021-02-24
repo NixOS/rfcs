@@ -92,6 +92,7 @@ and
 `git-remote-hg` and `qttools` are not wrapped properly.
 
 - [issue 86048](https://github.com/NixOS/nixpkgs/issues/86048)
+- [issue 114051](https://github.com/NixOS/nixpkgs/issues/114051)
 
 I guess we don't wrap HPLIP because not everybody want to use these binaries
 and hence want these GUI deps in their closure (if they were wrapped with a
