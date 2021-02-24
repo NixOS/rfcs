@@ -55,19 +55,6 @@ there is simply not a better or reasonable alternative available.
 We have numerous issues regarding wrappers and our wrapper shell hooks. Here's
 a list of them, sorted to categories.
 
-## Closure related
-
-- [issue 95027](https://github.com/NixOS/nixpkgs/issues/95027)
-
-@jtojnar & @yegortimoshenko How
-hard would it be to test all of our wrapped `gobject-introspection` using
-packages that the equivalent, `GI_GIR_PATH` environment should work? If our
-wrappers were declarative, and they were a separate derivation, at least we
-wouldn't have to rebuild tons of packages to do so - we'd have to rebuild only
-the wrappers. Plus, since all of the environment is available to us via
-`builtins.toJSON`, it should be possible to write a script that will compare
-the environments to make the transition easier to review.
-
 ## Missing environment
 
 - [pull 83321](https://github.com/NixOS/nixpkgs/pull/83321)
