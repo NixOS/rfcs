@@ -1,6 +1,6 @@
 ---
 feature: Declarative Wrappers
-start-date: (fill me in with today's date, YYYY-MM-DD)
+start-date: 2020-08-16
 author: Doron Behar <me@doronbehar.com>
 co-authors: (find a buddy later to help out with the RFC)
 shepherd-team: @FRidh, @lheckemann, @edolstra
