@@ -116,14 +116,9 @@ wrappings will become a problem of the past.
 
 - [issue 86369](https://github.com/NixOS/nixpkgs/issues/86369) 
 
-@ttuegel I get the sense [you support this idea of declarative
-wrappers](https://github.com/NixOS/nixpkgs/issues/86369#issuecomment-626732191).
-For anyone else interested in a summary, the issue is a bit complex, so once
-you'll read the design of this RFC, and see examples of what the POC
-implementation of declarative wrappers [is capable
-of](https://github.com/NixOS/nixpkgs/pull/85103#issuecomment-614195666), I hope
-you'll see how declarative wrappers will solve this issue.
-
+@ttuegel with declarative wrappers, we can symlink all qt plugins into 1
+directory and wrap the executable with only 1 `QT_PLUGIN_PATH` in their
+environment, which should decrease the plugin load of every qt package.
 
 ## Issues _possibly_ fixable by declarative wrappers (?)
 
