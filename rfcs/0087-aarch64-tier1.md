@@ -55,11 +55,11 @@ In [nixos/release-combined.nix](https://github.com/NixOS/nixpkgs/blob/master/nix
 `aarch64-linux` will be moved to `supportedSystems`, enabling NixOS tests
 to block channel advances in case of failures.
 
-Merging this RFC should happen simultaneously with the merging of documentation and perhaps
-a NixOS module for configuring qemu-binfmt as an aarch64 builder on x86_64 machines.
-
-(**To clarify**: should we add additional documentation around `boot.binfmt.emulatedSystems`
-to increase its visibility?)
+Merging this RFC should happen simultaneously with the merging of documentation
+around configuring qemu-binfmt as a fallback method for building aarch64 packages on
+x86_64 machines. Additionally, a sub-project that's out-of-scope for this RFC may be
+established to catch build failures (of which sightings were reported) when using
+emulation.
 
 The list of NixOS AMIs on NixOS.org will also be extended to include aarch64 images.
 
@@ -81,4 +81,6 @@ Do we have enough machines to handle aarch64 builds without delaying `x86_64-lin
 # Future work
 [future]: #future-work
 
-TBA
+Track down build failures when using `boot.binfmt.emulatedSystems` and qemu-binfmt to build
+aarch64 packages on `x86_64-linux` machines (e.g. by building a minimal closure fully without
+binary caches and emulation).
