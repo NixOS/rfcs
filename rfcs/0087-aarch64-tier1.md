@@ -36,6 +36,11 @@ to block channel advances. Hydra will start building aarch64 packages and run
 aarch64-based tests as part of stable and unstable channels, including them in
 the binary cache, increasing its coverage as a result.
 
+It is possible that the availability of aarch64 builders from Equinix Metal will at times be
+reduced, causing delays in aarch64 build capacity. We will extend the
+nixos-org-configurations implementation of hydra-provisioner to dynamically allocate
+aarch64 builders on AWS during these capacity shortfalls.
+
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
