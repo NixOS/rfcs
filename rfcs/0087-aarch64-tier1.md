@@ -28,6 +28,13 @@ builds sharing a channel.
 as an additional result of channel bumps waiting for aarch64 builds to finish,
 saving on build times for end users.
 
+## Prior art
+There were prior attempts at the same feat, but they failed due to technical
+limitations of Hydra:
+ - NixOS/nixpkgs@74c4e30 - disabled in 2017 because of memory issues
+ - NixOS/nixpkgs#52534, NixOS/nixpkgs@36a0c13 - re-enabled in 2018 to pre-build important outputs
+ - NixOS/nixpkgs@1bfe8f1 - disabled again due to hydra-evaluator issues
+
 # Detailed design
 [design]: #detailed-design
 
