@@ -65,7 +65,7 @@ Some build failures could unneccesarily delay channel advances, delaying critica
 # Alternatives
 [alternatives]: #alternatives
 
-Create an aarch64-focused channel that would build same things current `unstable` does, but for aarch64 only.
+Create an aarch64-focused channel that would build same things current `unstable` does, but for aarch64 only. This has a significant drawback: it is possible for the x86_64 channel and the aarch64 channels to never pass on the same commit, making deployment to a heterogeneous cluster of x86_64 and aarch64 machines very challenging.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
