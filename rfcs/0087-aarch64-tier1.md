@@ -24,8 +24,9 @@ to upgrade their systems, and will help in keeping software versions in
 sync between several architectures due to `x86_64-linux` and `aarch64-linux`
 builds sharing a channel.
 
-`aarch64-linux` will benefit from increased binary cache coverage as an
-additional result, saving on build times for end users.
+`aarch64-linux` will benefit from increased percieved binary cache coverage
+as an additional result of channel bumps waiting for aarch64 builds to finish,
+saving on build times for end users.
 
 # Detailed design
 [design]: #detailed-design
