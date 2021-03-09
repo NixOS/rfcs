@@ -24,11 +24,17 @@ to upgrade their systems, and will help in keeping software versions in
 sync between several architectures due to `x86_64-linux` and `aarch64-linux`
 builds sharing a channel.
 
+`aarch64-linux` will benefit from increased binary cache coverage as an
+additional result, saving on build times for end users.
+
 # Detailed design
 [design]: #detailed-design
 
-`aarch64-linux` builds will be added to stable and unstable channels' `tested`
-aggregate jobs on Hydra, giving them ability to block channel advances.
+If this RFC is accepted, `aarch64-linux` builds will be added to stable
+and unstable channels' `tested` aggregate jobs on Hydra, giving them ability
+to block channel advances. Hydra will start building aarch64 packages and run
+aarch64-based tests as part of stable and unstable channels, including them in
+the binary cache, increasing its coverage as a result.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -58,7 +64,7 @@ Create an aarch64-focused channel that would build same things current `unstable
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-TBA
+Do we have enough machines to handle aarch64 builds without delaying `x86_64-linux` builds?
 
 # Future work
 [future]: #future-work
