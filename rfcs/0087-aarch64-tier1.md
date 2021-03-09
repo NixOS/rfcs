@@ -35,6 +35,9 @@ limitations of Hydra:
  - NixOS/nixpkgs#52534, NixOS/nixpkgs@36a0c13 - re-enabled in 2018 to pre-build important outputs
  - NixOS/nixpkgs@1bfe8f1 - disabled again due to hydra-evaluator issues
 
+Since then, hydra-evaluator has been rewritten, which probably will make
+these concerns obsolete.
+
 # Detailed design
 [design]: #detailed-design
 
