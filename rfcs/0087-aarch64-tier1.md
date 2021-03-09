@@ -33,7 +33,11 @@ There were prior attempts at the same feat, but they failed due to technical
 limitations of Hydra:
  - NixOS/nixpkgs@74c4e30 - disabled in 2017 because of memory issues
  - NixOS/nixpkgs#52534, NixOS/nixpkgs@36a0c13 - re-enabled in 2018 to pre-build important outputs
- - NixOS/nixpkgs@1bfe8f1 - disabled again due to hydra-evaluator issues
+ - NixOS/nixpkgs@1bfe8f1 - demoted to partial support due to hydra-evaluator issues
+
+As a result, since NixOS/nixpkgs@1bfe8f1, in late 2018 NixOS already is
+blocking channel releases on the base system closure required to produce the
+installer image.
 
 Since then, hydra-evaluator has been rewritten, which probably will make
 these concerns obsolete.
