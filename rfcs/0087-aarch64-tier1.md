@@ -24,7 +24,7 @@ to upgrade their systems, and will help in keeping software versions in
 sync between several architectures due to `x86_64-linux` and `aarch64-linux`
 builds sharing a channel.
 
-`aarch64-linux` will benefit from increased percieved binary cache coverage
+`aarch64-linux` will benefit from increased perceived binary cache coverage
 as an additional result of channel bumps waiting for aarch64 builds to finish,
 saving on build times for end users.
 
@@ -47,8 +47,8 @@ to block channel advances. Hydra will start building aarch64 packages and run
 aarch64-based tests as part of stable and unstable channels, including them in
 the binary cache, increasing its coverage as a result.
 
-It is possible that the availability of aarch64 builders from Equinix Metal will at times be
-reduced, causing delays in aarch64 build capacity. We will extend the
+It is possible that the availability of aarch64 builders from Equinix Metal will
+at times be reduced, causing delays in aarch64 build capacity. We will extend the
 nixos-org-configurations implementation of hydra-provisioner to dynamically allocate
 aarch64 builders on AWS during these capacity shortfalls.
 
@@ -81,7 +81,16 @@ Some build failures could unneccesarily delay channel advances, delaying critica
 # Alternatives
 [alternatives]: #alternatives
 
-Create an aarch64-focused channel that would build same things current `unstable` does, but for aarch64 only. This has a significant drawback: it is possible for the x86_64 channel and the aarch64 channels to never pass on the same commit, making deployment to a heterogeneous cluster of x86_64 and aarch64 machines very challenging.
+## Create a separate channel
+Create an aarch64-focused channel that would build same things current `unstable` does,
+but for aarch64 only. This has a significant drawback: it is possible for the x86_64
+channel and the aarch64 channels to never pass on the same commit, making deployment
+to a heterogeneous cluster of x86_64 and aarch64 machines very challenging.
+
+### Use a separate channel as a stepping stone
+Elaborating on the previous alternative, create an aarch64-focused channel. Show
+there are enough resources and commitment to keep it green for half a year to a year.
+Carry on with the RFC topic once this is the case.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
