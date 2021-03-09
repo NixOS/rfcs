@@ -1,0 +1,66 @@
+---
+feature: aarch64-tier1
+start-date: 2021-03-09
+author: Vika Shleina
+co-authors: TBD
+shepherd-team: TBD
+shepherd-leader: TBD
+related-issues: TBD
+---
+
+# Summary
+[summary]: #summary
+
+Move `aarch64-linux` from a Tier 2 platform to Tier 1, as described in [RFC 0046](/rfcs/0046-platform-support-tiers.md)
+
+# Motivation
+[motivation]: #motivation
+
+`aarch64-linux` support in Nixpkgs and NixOS matures over time and becomes
+more and more stable, and more devices appear having NixOS on ARM support.
+Moving it to a Tier 1 platform will allow us to block release channels on
+aarch64-related build failures, making it easier and safer for ARM users
+to upgrade their systems, and will help in keeping software versions in
+sync between several architectures due to `x86_64-linux` and `aarch64-linux`
+builds sharing a channel.
+
+# Detailed design
+[design]: #detailed-design
+
+`aarch64-linux` builds will be added to stable and unstable channels' `tested`
+aggregate jobs on Hydra, giving them ability to block channel advances.
+
+# Examples and Interactions
+[examples-and-interactions]: #examples-and-interactions
+
+<!-- This section illustrates the detailed design. This section should clarify all
+confusion the reader has from the previous sections. It is especially important
+to counterbalance the desired terseness of the detailed design; if you feel
+your detailed design is rudely short, consider making this section longer
+instead. -->
+
+In [nixos/release-combined.nix](https://github.com/NixOS/nixpkgs/blob/master/nixos/release-combined.nix)
+`aarch64-linux` will be moved to `supportedSystems`, enabling NixOS tests
+to block channel advances in case of failures.
+
+(maybe something more? IDK for now)
+
+# Drawbacks
+[drawbacks]: #drawbacks
+
+Some build failures could unneccesarily delay channel advances, delaying critical updates.
+
+# Alternatives
+[alternatives]: #alternatives
+
+Create an aarch64-focused channel that would build same things current `unstable` does, but for aarch64 only.
+
+# Unresolved questions
+[unresolved]: #unresolved-questions
+
+TBA
+
+# Future work
+[future]: #future-work
+
+TBA
