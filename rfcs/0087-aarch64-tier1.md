@@ -102,7 +102,7 @@ Carry on with the RFC topic once this is the case.
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-~~Do we have enough machines to handle aarch64 builds without delaying `x86_64-linux` builds?~~ (see [Dealing with Capacity Issues](#design-capacity))
+~~Do we have enough machines to handle aarch64 builds without delaying `x86_64-linux` builds?~~ (see [Dealing with Capacity Issues](#dealing-with-capacity-issues))
 
 # Future work
 [future]: #future-work
