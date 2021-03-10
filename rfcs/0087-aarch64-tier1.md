@@ -51,6 +51,9 @@ to block channel advances. Hydra will start building aarch64 packages and run
 aarch64-based tests as part of stable and unstable channels, including them in
 the binary cache, increasing its coverage as a result.
 
+## Dealing with Capacity Issues
+[design-capacity]: #design-capacity
+
 It is possible that the availability of aarch64 builders from Equinix Metal will
 at times be reduced, causing delays in aarch64 build capacity. We will extend the
 nixos-org-configurations implementation of hydra-provisioner to dynamically allocate
@@ -99,7 +102,7 @@ Carry on with the RFC topic once this is the case.
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-Do we have enough machines to handle aarch64 builds without delaying `x86_64-linux` builds?
+~~Do we have enough machines to handle aarch64 builds without delaying `x86_64-linux` builds?~~ (see [Dealing with Capacity Issues](#design-capacity))
 
 # Future work
 [future]: #future-work
