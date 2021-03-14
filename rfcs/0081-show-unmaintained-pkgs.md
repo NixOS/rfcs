@@ -24,6 +24,7 @@ Get all commonly used packages maintained. Get more maintainers, encourage users
 [design]: #detailed-design
 
 When evaluating a package a check would test `meta.maintainers` and raise a warning if it is empty. Add an option to disable it to speedup evaluation again.
+By default we assume it's slow and should be opt-in (maybe a flag to nixos-rebuild). At a later point we can make it opt-out if impact on eval time isn't too big.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
