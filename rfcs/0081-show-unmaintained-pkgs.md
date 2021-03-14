@@ -52,5 +52,4 @@ What parts of the design are still TBD or unknowns?
 
 # Future work
 [future]: #future-work
-
-Implement the feature :)
+In the future, when packages usually have maintainers, we can think about enforcing packages to have a maintainer. So removing them if the only maintainer steps down and another doesn't show up.
