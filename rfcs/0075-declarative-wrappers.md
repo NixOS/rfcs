@@ -220,11 +220,11 @@ and get rid of these global environment variables.
 [design]: #detailed-design
 
 The end goal is to make the experience of getting a derivation wrapped as
-automatic as possible. A derivation that needs a certain environment to run,
-will put the dependency that is linked to this environment variable in
-`envInputs` and `mkDerivation`'s standard `fixupPhase`. As a start, we'll (me
-probably) will introduce a new `makeWrapperAuto` setup hook that will take care
-in the way described as follows.
+automatic as possible. A derivation that needs some environment variables in
+order to work will get these environment variables set in the wrapper by
+`mkDerivation`'s standard `fixupPhase`.  As a start, we'll (me probably) will
+introduce a new `makeWrapperAuto` setup hook that will take care of this in the
+way described as follows.
 
 As a start, we'll need to think about all packages in Nixpkgs that using them
 requires some environment variables to be set. Every such package will put in
@@ -264,20 +264,21 @@ RFC](https://github.com/doronbehar/rfcs/blob/60d3825fdd4e6574b7e5d70264445d1c801
 prior to [the 1st
 meeting](https://github.com/NixOS/rfcs/pull/75#issuecomment-760942876),
 traversing all the inputs and the inputs' inputs, will not happen during eval
-time and only partly, during build time - every package already built will be
-able to give another package all the information there needs to know about the
-related environment variables.
+time and only partly, during build time - every package already built will
+provide it's reverse dependencies all the information they need about
+environment variables of itself and of all of it's inputs and it's inputs'
+inputs.
 
 Most of the work to do will be:
 
 1. Gather information about what environment variables are "linked" to each
-   package, and edit these derivations to include a `wrappers.json`, with
-   `makeWrapperAuto`.
+   package, and edit these derivations to include a `wrappers.json` in them.
+   This should be done with `makeWrapperAuto` as well, see (2).
 2. Design the `makeWrapperAuto` shell hook:
   - It should introduce a shell function (to be called `wrappersInfo`) that
     will allow piping a JSON string from `builtins.toJSON` and spit a
     `wrappers.json` that will include both what was piped into it, and the
-    content from the package's inputs' `wrappers.json`.
+    content from the package's various inputs' `wrappers.json` files.
   - It should make the executables in `$out/bin/` get wrapped according to
     what's currently in this package's `wrappers.json`, during `fixupPhase`.
   - The above should be also possible to do manually for executables outside
@@ -330,7 +331,7 @@ while enable derivations to get rid of well known workarounds such as:
   strictDeps = false;
 ```
 
-And:
+And often seen in Python + Qt programs:
 
 ```nix
   preFixup = ''
@@ -344,7 +345,7 @@ And:
 Using `wrapProgram` will be simpler then using `wrappersInfo` and it might be
 hard to explain why is there no `wrapProgramAuto`. However, this interface
 might get improved in design through this RFC or in the future and in any case
-proper documentation should help. 
+proper documentation should help.
 
 # Alternatives
 [alternatives]: #alternatives
