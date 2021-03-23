@@ -49,7 +49,7 @@ on unstable before being included in a release.
 # Definitions
 [definitions]: #definition
 - Breaking change
-  - A changes that is likely to break downstream.
+  - A change that is likely to break downstream.
   - For projects following Semantic Versioning, disallow major version bumps.
 - Restricted
   - Breaking changes are disallowed.
