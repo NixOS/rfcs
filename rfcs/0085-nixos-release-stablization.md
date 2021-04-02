@@ -50,7 +50,7 @@ on unstable before being included in a release.
 [definitions]: #definition
 - Breaking change
   - A change that is likely to break downstream.
-  - For projects following Semantic Versioning, disallow major version bumps.
+  - For projects following Semantic Versioning, major version bumps indicate breaking changes.
 - Restricted
   - Breaking changes are disallowed.
   - Breaking changes for security or critical bugs are allowed. (Patching is preferred over updates.)
