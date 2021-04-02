@@ -20,7 +20,7 @@ the `release` branch to the `master` branch to reduce backports.
 [motivation]: #motivation
 
 We want to release on time without herculian efforts. Limited
-restrictions to merging breaking changes should avoid the common
+restrictions to merging breaking changes to `staging` should avoid the common
 practice of forcing many, largely-untested, commits into master before
 branch-off.
 
@@ -87,10 +87,10 @@ will be communicated on Discourse.
 | -8 Weeks | | Gnome and Plasma(YY.11) packaging begins |
 | -6 Weeks | `staging-next`, `staging` | Restrict breaking changes to Release Critical Packages |
 | -4 Weeks | `staging-next`, `staging` | Restrict all breaking changes: allow only non-breaking updates and Desktop Manager changes |
-| -3 Weeks | `master` | (Day before ZHF) merge in `staging-next`, prep for ZHF |
+| -3 Weeks | `master` | (Day before ZHF) merge `staging-next` into `master`, prep for ZHF |
 | -3 Weeks | `master` | Begin ZHF |
-| -3 Weeks | `master` | Focus on minimizing regressions in PRs |
-| -2 Weeks | `master` | Merge first `staging-next` fixes; begin second `staging-next` fix cycle |
+| -3 Weeks | `master` | Focus on minimizing regressions in PRs targeting `master` |
+| -2 Weeks | `master` | Merge first `staging-next` fixes into `master`; begin second `staging-next` cycle |
 | -2 Weeks | `staging` | Unrestrict all breaking changes; new changes will not be present in `master` before branch-off |
 | -1 Weeks | `master` | Merge second `staging-next` fix cycle |
 | -1 Weeks | `staging-next` | Unrestrict all breaking changes; new changes will not be present in `master` before branch-off |
