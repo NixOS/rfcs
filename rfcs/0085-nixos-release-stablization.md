@@ -105,12 +105,13 @@ will be communicated on Discourse.
 
 Breaking changes to Release Critical Packages will have to wait a
 maximum of 4 weeks to be merged into `staging`. Other breaking changes
-will have to wait a maximum of 2 weeks to be merged into
-`staging`. Staging development will have to follow a faster paced
+targeting `staging` will have to wait a maximum of 2 weeks to be merged.
+Staging-next iterations will follow a 1 week
 development cycle during the release timeline. Breaking changes to
-Release Critical Packages cannot be merged into `master` for 8 weeks,
-but this typically isn't done anyway, so typical `master` development
-will be uninterrupted.
+Release Critical Packages will not appear in `master` for around 7 weeks
+(4 weeks being disallowed to be merged to staging, 1 week for last
+`staging-next` during ZHF, ~2 weeks average in `staging-next`).
+Pull requests which are able to target master will not be interrupted during a release.
 
 # Alternatives
 [alternatives]: #alternatives
