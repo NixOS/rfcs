@@ -65,14 +65,16 @@ on unstable before being included in a release.
 
 ## Release Critical Packages
 
-A list of Release Critical Packages will be maintained in the nixpkgs
-manual.  Release Critical Packages are important packages which have
+A list of Release Critical Packages will be maintained in the 
+[release wiki](https://github.com/NixOS/release-wiki).
+manual. Release Critical Packages are important packages which have
 many dimensions of build or runtime behavior. Generally these will be
 packages which are a part of `stdenv`, or bootstrapping a system
-(e.g. systemd). The Release Managers are empowered to decide which
-packages are Release Critical Packages without additional RFCs.
+(e.g. systemd).
 
-Initially these will be `stdenv.cc`,`binutils`, and `systemd`.
+Changes to the list will not require additional RFCs, and will occur
+through the release team. Likely through a release retrospective
+and/or pull request process to the release wiki.
 
 ## Restriction Timeline
 
