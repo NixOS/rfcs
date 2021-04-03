@@ -66,8 +66,8 @@ on unstable before being included in a release.
 ## Release Critical Packages
 
 A list of Release Critical Packages will be maintained in the 
-[release wiki](https://github.com/NixOS/release-wiki).
-manual. Release Critical Packages are important packages which have
+[release wiki](https://nixos.github.io/release-wiki/).
+Release Critical Packages are important packages which have
 many dimensions of build or runtime behavior. Generally these will be
 packages which are a part of `stdenv`, or bootstrapping a system
 (e.g. systemd).
