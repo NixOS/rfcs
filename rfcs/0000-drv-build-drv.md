@@ -2,22 +2,156 @@
 feature: drv-build-drv
 start-date: 2019-02-01
 author: John Ericson (@Ericson2314)
-co-authors: (find a buddy later to help our with the RFC)
-shepherd-leader: Franz Pletz
-shepherd-team: Franz Pletz, Eelco Dolstra, Shea Levy, Daniel Peebles
+co-authors: (find a buddy later to help out with the RFC)
+shepherd-team: (names, to be nominated and accepted by RFC steering committee)
+shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: (will contain links to implementation PRs)
 ---
 
 # Summary
 [summary]: #summary
 
-"Ret-cont" recursive Nix is a restricted form of recursive Nix, where one builds a derivations instead of executing builds during the builds.
-This avoids some platform-specific contortions relating to nested sandboxing.
-More importantly, it prevents imperative and overly linear direct-style build scripts;
-easy to write but throwing away the benefits of Nix.
+Allow derivations to build derivations, and extend our notion of derivation dependencies to include built and not just pre-existing derivations.
+This provides an alternative to "import from derivation" and recursive Nix that avoids many of their drawbacks.
 
 # Motivation
 [motivation]: #motivation
+
+Nix's design encourages a separation of build *planning* from build *execution*:
+evaluation of the Nix language produces derivations, and then then those derivations are built.
+This usually a great thing.
+It's enforced the separation of the more complex Nix expression language from the simpler derivation language.
+It's also encouraged Nixpkgs to take the "birds eye" view and successful grapple a ton of complexity that would have overwhelmed a more traditional package repository.
+
+However, there are sometimes situations where planning and execution has to be intermixed.
+Often this is in the converting of other build systems to Nix derivations, with `cabal2nix`, `crate2nix`, etc.
+Other times this is with extracting dependency information from the source itself, like C++20 modules or, hopefully someday, Haskell modules.
+While it's possible to do all this in one big expensive planning phase, it's much better to start with a courser dependency graph and then refine it.
+
+The two tools we have today for this, "import from derivation" and (still unstable) recursive have serious drawbacks.
+Import from derivation builds imported derivations one at a time due to the design of evaluator.
+Even if that were fixed (and it should be!), it more fundamentally flawed because it requires the evaluation heap/interpreter process to still persist until all the imported derivations are built.
+That makes it is a bad architecture for fine-grained, resumable work.
+
+The other, recursive Nix, has similar issues.
+With `nix-build` in `nix-build`, we again, we have an outer step that blocks awkwardly while the inner one continues.
+And whereas at least evaluation state is a known-entity that could be persisted or garbage collected, the output process tree and other state is a truly inscrutable black box.
+At the very least, all this breaks `--dry-run`.
+
+There's also a social argument.
+"`nix-build` in `nix-build`"is an extremely crude cudgel.
+As I wrote above, it's very good that we push people towards separating planning and building.
+"`nix-build` in `nix-build`" is just too mindlessly imperative, and I fear as Nix grows more popular it could be the vuvuzela of an External September.
+It's very important that people only use dynamism as a last resort, and it's properly functional, and as powerful and flexible as possible.
+
+Note that none of this applies to "`nix-instantiate` in `nix-build`".
+The limited form of recursive Nix that just allows adding data to the store is fine with me, and I will use it in conjunction with this
+Morally, it's just an implementation of derivation producing store path graphs that have dynamic shape, instead of multiple outputs static shape.
+That's a great feature.
+
+Derivation that build derivations is just that.
+It's quote simple to imagine each step: once a derivation is built it's treated like any other.
+And now that we have content-addressed derivation outputs (since the derivations themselves must be content address, built or otherwise) we've done all the hard parts!
+Yet, this one small feature makes the derivation language fully higher order and capable of embedding e.g. the lambda calculus.
+That's awesome, in both the positive and terrifying senses.
+
+# Detailed design
+[design]: #detailed-design
+
+We can break this down nicely into steps
+
+#. Derivation outputs can be valid derivations:
+
+   #. Allow derivation outputs to be content addressed with the "text hashing" scheme.
+
+   #. Lift the restriction barring derivations output paths from ending in `.drv` if they are so content-addressed
+
+#. Extend the CLI to take advantage of such derivations:
+
+   We hopefully will soon allow CLI "installable" args in the form
+   ```
+   single-installable ::= <path> ! <output-name>
+   ```
+   where the first path is a derivation, and the second is the output we want to build.
+
+   We should generalize the grammar like so:
+   ```
+   single-installable ::= <single-installable> ! <output-name>
+                       |  <path>
+
+   multi-installable  ::= <single-installable>
+                       |  <single-installable> ! *
+   ```
+
+   Now that we have `path` vs `path!*`, we also don't need `---derivation` as a disambiguator, and so that should be removed along with all the complexity that goes with it.
+   (`toBuildables` in the the nix commands should always be pure functions and not consult the store.)
+
+#. Extend the scheduler and derivation dependencies similarly:
+
+   #. Extend data structures.
+
+     The `DerivationGoal` keys are currently a derivation path and a set up output names, with an empty set denoting "all outputs".
+     We should generalize the derivation path to be as powerful as our new `<single-installable>`.
+     Thus, we'll have a vector of output names "between" the root drv path, and the final set of output names.
+
+     The type of `inputDrvs` is conceptually `Set<SingleInstallable>`, but actually a map from drv paths to outputs.
+     It should stay conceptually `Set<SingleInstallable>`, but perhaps to keep the map structure we will do some fancy recursive thing for its concrete implementation.
+
+   #. Derivation goals working from a built derivation during the derivation loading step will instead spawn a subgoal for the derivation goal bilding the derivation.
+      Inductively we eventually reach the base case of static derivation, and those are built just like today.
+
+# Examples and Interactions
+[examples-and-interactions]: #examples-and-interactions
+
+I'll make Haskell and cabal2nix my running example.
+
+`cabal2nix` today is used something like:
+```nix
+haskellPackages.callPackage "something" (runCommand {} "cabal2nix ${mySrc} > $out") {}
+```
+This is pretty good, except for the issues given in the motivation section.
+
+With "`nix-build` in `nix-build`" it's would be something like:
+```nix
+runCommand "something" {} ''
+  cabal2nix ${mySrc} > default.nix
+  nix-build -E '(import ${pkgs.path} {}).haskellPackages.callPackage ./. {};'
+''
+```
+This is terrible.
+In addition to the problems given inn the motivation section, we redo the `cabal2nix` whenever *anything at all* changes in the Nixpkgs source.
+That's a lot of unnecessary rebuilds.
+```nix
+runCommand "something-continued" {} ''
+  nix-build -E '(import ${pkgs.path} {}).haskellPackages.callPackage \
+    ${runCommand "something-continued" {} "cabal2nix ${mySrc} > $out"} \
+    {};'
+''
+```
+This solves that additional problem, but is quite a mouthful.
+Do we really think people are going to write this without lineters nagging?
+The ease of use is trap that will lead people to think this about Nix "simple things work bad, and things that work well are ugly".
+And even after all that, the motivation section problems still remain.
+
+The new way is
+```nix
+runCommand "something.drv" {} "cabal2drv ${mySrc} > $out"
+```
+if we want to bypass the Nix language entirely.
+
+If we don't, there is:
+```nix
+runCommand "something-evaluated" {} ''
+  nix-instantiate -E '(import ${pkgs.path} {}).haskellPackages.callPackage \
+    ${runCommand "something" {} "cabal2nix ${mySrc} > $out"} \
+    {};'
+''
+```
+Yes, this is the same ugliness as before.
+However, there's at least no temptation to write any more commands after the `nix-instantiate`, since we must finish the derivation to build what we've instantiated.
+That will compel people to have fine grained derivations with a single `nix-instantiate` each.
+Also, I hope we could in fact auto-generate this from import-from-derivations, which remains the nicest interface.
+
 
 The benefits of recursive Nix have been described in many places.
 One main reason is if we want Nix to function as a build system and package manager, we need upstream packages to use Nix too without duplicating their build systems in Nixpkgs.
@@ -121,104 +255,6 @@ stdenv.mkDerivation {
 ```
 This further simplifies the implementation.
 Derivations remain built exactly as today, with only logic *between* building steps that is entirely platform-agnostic changing.
-
-# Detailed design
-[design]: #detailed-design
-
-Derivations today build outputs, and are associated to those outputs.
-We extend the derivation language by allowing a derivation to indicate their output is more derivations, and ultimately be associated with one of *those* derivations's associated outputs.
-Derivations that do so indicate this with some special attribute, say `__recursive`.
-Such derivations must have two outputs, `store` and `drv`.
-`store` would be a local Nix store limited to just drvs and fixed output builds.
-`drv` would contain a symlink to one of the derivations in the store, the root.
-After the build completes, Nix verifies all the drv files and fixed outputs are valid (contents match hashes, etc.) and merges the built store into the ambient store.
-Finally, any uses of the original derivation can be substituted to instead use the symlinked derivation.
-
-To faux-formalize everything in the vein of a small-step semantics:
-```
-∀<d : immediatelyDependsOn(drv, -)>
-  isValue(d)
-drv ? __recursive == false
-drv ? outputHash == false
--------------------------------------------------- normalized
-isValue(drv)
-```
-```
-∀<d : immediatelyDependsOn(drv, -)>
-  isValue(d)
--------------------------------------------------- build-readiness
-isReadyToBuild(drv)
-```
-```
-drv0 : Drv
-∀<o : outputs(drv0)> build_o : StorePath
-∀<o : outputs(drv0)> build(drv0) = { ${o} = build_o; }
-isReadyToBuild(drv0)
--------------------------------------------------- simple-build
-∀<o : outputs(drv0)> assoc(drv0, o, build_o)
-```
-```
-drv : Drv
-drv.outputs = { "out" = ...; }
-drv ? outputHash == true
--------------------------------------------------- immediate-reduction-fixed-output
-reducesTo(drv0, stubDrv(drv.outputHash))
-```
-```
-drv0, drv1 : Drv
-drv1path : RelativePath
-drv0.outputs = { "store" = ...; "drv" = ...; }
-∀<o : outputs(drv0)> build0_o : StorePath
-∀<o : outputs(drv0)> assoc(drv0, o, build0_o)
-drv0 ? __recursive == true
-isTrustlessStore(build0_store)
-drv1 = read(build0_store + drv1path)
-readlink(build0_drv) = build0.store + drv1path
--------------------------------------------------- immediate-reduction-drv-deligation
-reducesTo(drv0, drv1)
-```
-```
-drv0, drv1, drv2 : Drv
-reducesTo(drv1, drv2)
-immediatelyDependsOn(drv0, drv1)
--------------------------------------------------- transitive-reduction
-reducesTo(drv0, drv0[drv2/drv1])
-```
-```
-drv0, drv1 : Drv
-reducesTo(drv0, drv1)
-∀<o : outputs(drv0)> build0_o : StorePath
-∀<o : outputs(drv0)> assoc(drv0, o, build0_o)
--------------------------------------------------- delegative-build
-∀<o : outputs(drv0)> assoc(drv1, o, build1_o)
-```
-
-## Design Notes
-
-There's a few things we can call out from the faux-formalization.
-
- - When we build a derivation, we don't want it's associated build.
-   This is because it may not exist if it is not in normal form, and may be an intermediate result if the derivation is recursive.
-   Instead, we we want the associated build of the *evaluation* of the given derivation.
-
- - `isTrustlessStore` is called that because the restricted on the contents—fixed output builds / plain data and drvs—is fully and cheaply verifiabled.
-   This is in contrast to normal builds,
-   where the relationship between the derivation and build can only be verified by redoing the build,
-   and where even then there's no way to know whether to blame the output for being actually malicious, or the derivation for merely being non-deterministic.
-
- - The substitution of drvs in a downstream derivation is very realted to the substitution of drvs for content hashes with the intensional store.
-   I included the normalization of content adressible stores, today done with `hashDerivationModulo` to to help make that clear, and show that we already normalize derivations.
-   I hope to eventually share a formalism for this and RFC #62.
-
- - The *building* itself of derivations is unchanged.
-   All the magic happens through the `reducesTo` relation.
-
- - Because drvs can produce plans of drvs producing more drvs ad-infinitum, it's possible to never terminate (no `reducesTo` from a derivation to an `isReadyToBuild` derivation) but that's the user's fault.
-   We can detect simple cycles analogous to black holes in thunks: if a derivation produces a redirected derivation depending on the original, a cycle is effectively recreated even though we don't have a hash fixed point.
-   Nix should raise an error rather than looping, but either behavior is permissible.
-
-# Examples
-[examples]: #examples
 
 As a running example, I'll use @matthewbauer's [Reproducible résumé].
 (Do steal the method; don't steal Matt; he works with me!)
