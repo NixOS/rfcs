@@ -87,7 +87,7 @@ will be communicated on Discourse.
 | Weeks from Release | Branches Affected | Events |
 | --- | --- | --- |
 | -8 Weeks | | Gnome and Plasma(YY.11) packaging begins |
-| -6 Weeks | `staging-next`, `staging` | Restrict breaking changes to Release Critical Packages |
+| -6 Weeks | `staging-next`, `staging` | Release Critical Packages are Restricted |
 | -4 Weeks | `staging-next`, `staging` | Restrict all breaking changes: allow only non-breaking updates and Desktop Manager changes |
 | -3 Weeks | `master` | (Day before ZHF) merge `staging-next` into `master`, prep for ZHF |
 | -3 Weeks | `master` | Begin ZHF |
