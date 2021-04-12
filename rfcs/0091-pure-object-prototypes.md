@@ -11,6 +11,7 @@ related-issues: [lib.experimental](https://github.com/NixOS/rfcs/pull/82)
 # Summary
 [summary]: #summary
 
+In this [RFC 0091](https://github.com/fare-patches/rfcs/blob/pop/rfcs/0091-pure-object-prototypes.md)
 We propose to add Pure Object Prototypes, or POP, an object system, to the nixpkgs library.
 POP improves upon current Nix extension systems
 by supporting multiple inheritance and default values.
@@ -39,7 +40,7 @@ I'm told they also include a more elaborate variant in the same family.
 
 This maze of mostly similar yet subtly different yet incompatible constructs
 raises the barrier to entry to learning and using Nix.
-Therefore, to end this anarchy... let's create another extension system!
+Therefore, to end this fragmentation... let's create another extension system!
 But this time, to ensure that it's for good,
 let's make it noticeably better than the previous ones.
 
@@ -83,8 +84,8 @@ defeating the purpose.
 The current "solution" is therefore that the author of `x` must expose `x` and not just `zx`,
 and that the combining user must explicitly `composeManyExtensions [z x y]`.
 
-But in practice, users may want to choose many optional extension in a large set,
-each with its own list of direct dependencies, each of which may have more dependencies.
+But in practice, users may want to choose many optional extension out of a large set,
+each with its own list of direct dependencies, each of which may have more indirect dependencies.
 Then, it can become a great pain for the user to manually maintain
 this *precedence list* of extensions, such that each is applied once and only once
 in a topologically sorted dependency order.
@@ -123,7 +124,7 @@ each extension's author must keep track not just of their direct dependencies,
 but all their transitive indirect dependencies, with a proper ordering.
 Moreover, any change they make, they must not only propagate to their own extensions,
 but also to all extensions that depend on theirs;
-they must thus somehow fix other people's code,
+they must somehow fix other people's code,
 or notify the authors of these downstream extensions that depend on theirs,
 and wait for these authors to propagate the change.
 
@@ -163,9 +164,11 @@ initially introduced [in Dylan](https://citeseerx.ist.psu.edu/viewdoc/summary?do
 
 ## A Real Use Case
 
-Over the last year, I have been using Nix to build and deploy the language Glow,
-itself written on top of Gerbil Scheme, that itself compiles to Gambit Scheme,
-that itself compiles to C, itself compiled via GCC.
+Over the last year, I have been using Nix to build and deploy
+the language [Glow](https://gitlab.com/mukn/glow),
+itself written on top of [Gerbil Scheme](https://cons.io),
+that itself compiles to [Gambit Scheme](https://www.iro.umontreal.ca/~gambit/doc/gambit.html),
+that itself compiles to C, itself compiled via [GCC](https://gcc.gnu.org/).
 I have been maintaining Gerbil and Gambit in nixpkgs, and recently added Glow
 to the many Gerbil libraries included in nixpkgs.
 
@@ -257,6 +260,7 @@ Let's imagine support for writing applications in Common Lisp.
 We'd define a POP with suitable defaults, say,
 using sbcl as the implementation, a debug level of 2,
 and no extra systems to load into the application.
+Note that unlike the `extension` field, the `defaults` field takes no `self: super:` arguments.
 In practice, there would be many other fields, but let's omit them for now.
 The base object for CL applications would be:
 ```
@@ -364,6 +368,17 @@ but we avoided using them for the sake of this example.
   That said, the same "computation" would have to be done by hand
   by users who would want to achieve the same effect without automation,
   so it's not really a drawback *given the desired effect*.
+  On the other other hand, manual handling “only” needs to be done
+  once a few months, when dependencies change,
+  with the result of the reevaluation “cached” in the form of an expression,
+  whereas the automatic handling is done at every evaluation,
+  so the cost structure is quite different.
+
+- Microeconomics: automating the management of dependencies between extensions
+  will likely lead to users creating larger dependency graphs than they do today,
+  introducing a performance issue, until the homeostasy of psychological costs is maintained.
+  In particular, it is possible that those larger graphs will become an active performance hindrance
+  until the object system is made part of the language itself.
 
 - Missing features? Previous extension systems may have important features
   that I have neglected so far, and that would need to be implemented
@@ -395,6 +410,15 @@ we don't deep magic to fix or extend the object system.
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
+## Interaction with modules
+
+NixOS has a notion of modules that has its own extensibility mechanism
+well distinct from the regular extension system.
+Someone ought to learn enough of both POP and modules to tell how it might be possible (or not)
+to have a unified mechanism that can handle modules as well as regular scopes, etc.
+
+## Backward compatibility wrappers
+
 If we could agree on what "the" default prototype representation were for Nix,
 or autodetect which it is, we could likewise automatically wrap a traditional extension into a POP.
 Actually, we could probably autodetect whether an attrset has some `__unfix__`, `extend`
@@ -403,16 +427,16 @@ if it returns an attrset make that the attrset-to-merge, and if it returns anoth
 pass it the super and use the result as the attrset-to-merge.
 I'm not sure if backward-compatibility automagic is an asset or a liability,
 so I left it out for now. But if at some point the goal is to replace the existing zoo
-with a single improved solution, then we will want explicit conversion,
+with a single improved solution, then we will want at least explicit conversion wrappers,
 if not implicit conversion.
 
 # Future work
 [future]: #future-work
 
-- Use and enjoy POP in more subsystems of nixpkgs than Gerbil.
+- Use and enjoy POP in more subsystems of nixpkgs than Gerbil packages.
 - See how POP, with or without further improvements,
   can or cannot fully replace other Nix extension systems.
 - In particular, see how POP, with or without further improvements,
-  may improve the situation for modules.
-- Update [release wiki to reflect changes](https://github.com/NixOS/release-wiki)
+  may or may not improve the situation for modules.
+- Update [release wiki to reflect changes](https://github.com/NixOS/release-wiki).
 - Inform community about changes (Discourse).
