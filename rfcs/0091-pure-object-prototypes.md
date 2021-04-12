@@ -77,7 +77,7 @@ manually do the composition every time they use `x`.
 However, if, independently, the author of extension `y` also depends on `z`,
 and also defines `zy = composeExtensions z y`,
 and if some later poor user wants to use both `zx` and `zy`,
-he can use `composeExtensions zx zy`, because `z` is then applied twice,
+he can't use `composeExtensions zx zy`, because `z` is then applied twice,
 which in general will redo some changes in `z` and/or undo some of the changes in `x`,
 defeating the purpose.
 The current "solution" is therefore that the author of `x` must expose `x` and not just `zx`,
