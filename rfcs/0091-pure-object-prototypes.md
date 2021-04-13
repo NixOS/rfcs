@@ -22,7 +22,6 @@ local changes to some packages, by multiple people, with dependencies between ch
 POP can be also made to interoperate both ways with existing extension systems,
 with simple adapters.
 
-
 # Motivation
 [motivation]: #motivation
 
@@ -405,10 +404,23 @@ We can invent an even better object system and still include this one in nixpkgs
 We can make objects part of the language at a deeper level, as in Jsonnet,
 for better performance and/or better error messages.
 But if we can afford a user-level implementation, that is more flexible, and
-we don't deep magic to fix or extend the object system.
+then we don't need deep magic to fix or extend the object system.
+Maybe we can identify a few performance-critical primitives
+that are better interned in the implementation while leaving most of the system in userland:
+see below in unresolved questions.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
+
+## Missing Primitives for Performance
+
+Currently, we don't detect cycles, because of the performance issues:
+detecting cycles efficiently would basically require to have sets of objects as comparable by equality,
+but using `==` is quadratic (or worse, if `==` does deep comparisons, maybe non-terminating ones?),
+and there is no way to expose an "object ID" without exposing a side-effect in generating those IDs.
+
+Or maybe the effect can be hidden in some kind of monad
+from which you can only extract a deterministic output?
 
 ## Interaction with modules
 
