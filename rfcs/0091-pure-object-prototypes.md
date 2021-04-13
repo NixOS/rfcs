@@ -422,6 +422,11 @@ and there is no way to expose an "object ID" without exposing a side-effect in g
 Or maybe the effect can be hidden in some kind of monad
 from which you can only extract a deterministic output?
 
+Another option would be to allow users to define human-readable error contexts
+using some dynamic binding (reader monad), but in a way that is only observable in case of error,
+at which point we don't care as much about determinism and we do appreciate
+extra debugging information.
+
 ## Interaction with modules
 
 NixOS has a notion of modules that has its own extensibility mechanism
