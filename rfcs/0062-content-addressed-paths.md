@@ -3,8 +3,8 @@ feature: Simple content-adressed store paths
 start-date: 2019-08-14
 author: Théophane Hufschmitt
 co-authors: (find a buddy later to help our with the RFC)
-shepherd-team: @layus, @edolstra and @Ericson2314
-shepherd-leader: @edolstra
+shepherd-team: "@layus, @edolstra and @Ericson2314"
+shepherd-leader: "@edolstra"
 related-issues: (will contain links to implementation PRs)
 ---
 
