@@ -33,8 +33,8 @@ paths.
 
 We also leave the option to lift these restrictions later.
 
-This RFC already has a (somewhat working) POC at
-<https://github.com/NixOS/nix/pull/3262>.
+The implementation of this RFC is already partially integrated into Nix, behind
+the `ca-derivation` experimental flag.
 
 # Motivation
 
@@ -78,22 +78,20 @@ the `input-addressed` model
 
 For each output `output` of a derivation `drv`, we define
 
-- its `outputId` **DrvOutputId(drv, output)** as the tuple `(hash(drv), output, truster)`, where `truster` is a reserved field for future use and currently always set to `"world"`.
+- its **Output Id** `DrvOutput(drv, output)` as the tuple `(hashModulo(drv), output)`.
   This id uniquely identifies the output.
-  We textually represent this as `hash(drv)!output[@truster]`.
-- its concrete path **PathOf(outputId)** as the path on which the output will be stored on disk.
+  We textually represent this as `hashModulo(drv)!output`.
+- its **realisation** `Realisation(outputId)` containing
+  1. The path `path` at which this output is stored (either content-defined or input-defined depending on the type of derivation)
+  2. An optional set `signatures` of signatures certifying the above
 
-> Unresolved: should we already include the `truster` field in `DrvOutputId`
-> even if it's not used atm? What would be the cost of adding it later?
-
-In a input-addressed-only world, the concrete path for a derivation output was a pure function of this output's id that could be computed at eval-time. However this won't be the case anymore once we allow CA derivations, so we now need to store the results of the `PathOf` function in the Nix database as a new table:
+In a input-addressed-only world, the concrete path for a derivation output was a pure function of this output's id that could be computed at eval-time. However this won't be the case anymore once we allow CA derivations, so we now need to store the results of the `Realisation` function in the Nix database as a new table:
 
 ```sql
-create table if not exists PathOf (
-    drv integer not null,
-    output text not null,
-    truster integer not null,
-    path integer not null,
+create table if not exists Realisation (
+    drvHash integer not null,
+    outputName text not null,
+    outputPath integer not null,
 )
 ```
 
@@ -101,15 +99,12 @@ create table if not exists PathOf (
 
 #### Resolved derivations
 
-We define a **resolved derivation** as a derivation whose only references are either:
+As it is already internally the case in Nix, we define a **basic derivation** as a derivation that doesn't depend on any derivation output (except its own). Said otherwise, a basic derivation is a derivation whose only inputs are either
 
 - Placeholders for its own outputs (from the `placeholder` builtin)
-- References to the outputs of other (non CA) resolved derivations
 - Existing store paths
 
-For a derivation `drv` whose input derivations have all been realised, we define its **associated resolved derivation** `resolved(drv)` as `drv` in which we replace every input derivation `inDrv` of `drv` by `pathOf(inDrv)` (and update the output hash accordingly).
-
-> This doesn't have the property that for a derivation that doesn't depend on any CA derivation `resolved(drv) == drv`. I think that this is a rather big issue so we'll have to find a way to get this property back (but feel free to correct me if you think that it isn't a big deal)
+For a derivation `drv` whose input derivations have all been realised, we define its **associated resolved derivation** `resolved(drv)` as `drv` in which we replace every input derivation `inDrv` of `drv` by `Realisation(inDrv).path`, and update the output hash accordingly.
 
 `resolved` is (intentionally) not injective: If `drv` and `drv'` only differ because one depends on `dep` and the other on `dep'`, but `dep` and `dep'` are content-addressed and have the same output hash, then `resolved(drv)` and `resolved(drv')` will be equal.
 
@@ -120,7 +115,7 @@ When asked to build a derivation `drv`, we instead:
 1. Compute `resolved(drv)`
 2. Substitute and build `resolved(drv)` like a normal derivation.
    Possibly this is a no-op because it may be that `resolved(drv)` has already been built.
-3. Add a new mapping `pathOf(drv!${output}) == ${output}(resolved(drv))` for each output `output` of `drv`
+3. Add a new mapping `Realisation(drv!${output}) == ${output}(resolved(drv))` for each output `output` of `drv` (signing the mapping if needs be)
 
 ### Building a CA derivation
 
@@ -136,7 +131,7 @@ The process for building a content-adressed derivation `drv` is the following:
   For each output `$outputId` of the derivation, this gives us a (temporary) output path `$out`.
   - We compute a cryptographic hash `$chash` of `$out`[^modulo-hashing]
   - We move `$out` to `/nix/store/$chash-$name`
-  - We store the mapping `PathOf($outputId) == "/nix/store/$chash-$name"`
+  - We store the mapping `Realisation($outputId) == "/nix/store/$chash-$name"`
 
 [^modulo-hashing]:
 
@@ -171,7 +166,7 @@ rec {
 Suppose that we want to build `transitivelyDependent`.
 What will happen is the following
 
-1. We instantiate the Nix expression, this gives us three drv files:
+1. We instantiate the Nix expression. This gives us three derivations:
    `contentAddressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
 2. We build `contentAddressed.drv`.
    - We first compute `resolved(contentAddressed.drv)`.
@@ -180,32 +175,32 @@ What will happen is the following
    - We move `out(resolved(contentAddressed.drv))` to its content-adressed path
      `ca(contentAddressed.drv)` which derives from
      `sha256(out(resolved(contentAddressed.drv)))`
-   - We register in the db that `pathOf(contentAddressed.drv!out) == ca(contentAddressed.drv)`
+   - We register in the db that `Realisation(contentAddressed.drv!out) == { .path = ca(contentAddressed.drv) }`
 3. We build `dependent.drv`
    - We first compute `resolved(dependent.drv)`.
-     This gives us a new derivation identical to `dependent.drv`, except that `contentAddressed.drv!out` is replaced by `pathOf(contentAddressed.drv!out) == ca(contentAddressed.drv)`
+     This gives us a new derivation identical to `dependent.drv`, except that `contentAddressed.drv!out` is replaced by `Realisation(contentAddressed.drv!out).path == ca(contentAddressed.drv)`
    - We realise `resolved(dependent.drv)`. This gives us an output path
      `out(resolved(dependent.drv))`
-   - We register in the db that `pathOf(dependent.drv!out) == out(resolved(dependent.drv))` We build `transitivelyDependent.drv`
+   - We register in the db that `Realisation(dependent.drv!out) == { .path = out(resolved(dependent.drv)) }`
 4. We build `transitivelyDependent.drv`
    - We first compute `resolved(transitivelyDependent.drv)`
-     This gives us a new derivation identical to `transitivelyDependent.drv`, except that `dependent.drv!out` is replaced by `pathOf(dependent.drv!out) == out(resolved(dependent.drv))`
+     This gives us a new derivation identical to `transitivelyDependent.drv`, except that `dependent.drv!out` is replaced by `Realisation(dependent.drv!out).path == out(resolved(dependent.drv))`
    - We realise `resolved(transitivelyDependent.drv)`. This gives us an output path `out(resolved(transitivelyDependent.drv))`
-   - We register in the db that `pathOf(transitivelyDependent.drv!out) == out(resolved(transitivelyDependent.drv))`
+   - We register in the db that `Realisation(transitivelyDependent.drv!out) == { .path = out(resolved(transitivelyDependent.drv)) }`
 
 Now suppose that we replace `contentAddressed` by `contentAddressed'`, which evaluates to a new derivation `contentAddressed'.drv` such that the output of `contentAddressed'.drv` is the same as the output of `contentAddressed.drv` (say we change a comment in a source file of `contentAddressed`).
 We try to rebuild the new `transitivelyDependent`. What happens is the following:
 
-1. We instantiate the Nix expression, this gives us three new drv files:
+1. We instantiate the Nix expression. This gives us three new derivations:
    `contentAddressed'.drv`, `dependent'.drv` and `transitivelyDependent'.drv`
 2. We build `contentAddressed'.drv`.
    - We first compute `resolved(contentAddressed'.drv)`
    - We realise `resolved(contentAddressed'.drv)`. This gives us an output path `out(resolved(contentAddressed'.drv))`
    - We compute `ca(contentAddressed'.drv)` and notice that the path already exists (since it's the same as the one we built previously), so we discard the result.
-   - We register in the db that `pathOf(contentAddressed.drv'!out) == ca(contentAddressed'.drv)` ( also equals to `ca(contentAddressed.drv)`)
+   - We register in the db that `Realisation(contentAddressed.drv'!out) == { .path = ca(contentAddressed'.drv) }` ( also equals to `Realisation(contentAddressed.drv!out)`)
 3. We build `dependent'.drv`
    - We first compute `resolved(dependent'.drv)`.
-     This gives us a new derivation identical to `dependent'.drv`, except that `contentAddressed'.drv!out` is replaced by `pathOf(contentAddressed'.drv!out) == ca(contentAddressed'.drv)`
+     This gives us a new derivation identical to `dependent'.drv`, except that `contentAddressed'.drv!out` is replaced by `Realisation(contentAddressed'.drv!out).path == ca(contentAddressed'.drv)`
    - We notice that `resolved(dependent'.drv) == resolved(dependent.drv)` (since `ca(contentAddressed'.drv) == ca(contentAddressed.drv)`), so we just return the already existing path
 4. We build `transitivelyDependent'.drv`
    - We first compute `resolved(transitivelyDependent'.drv)`
