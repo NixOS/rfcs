@@ -155,7 +155,7 @@ The process for building a content-adressed derivation `drv` is the following:
   computing the hash and rewrite them when moving the path to handle paths with
   self-references, but this isn't strictly required for a first iteration
 
-## Example
+### Example
 
 In this example, we have the following Nix expression:
 
@@ -222,6 +222,27 @@ We try to rebuild the new `transitivelyDependent`. What happens is the following
    - We first compute `resolved(transitivelyDependent'.drv)`
    - Here again, we notice that `resolved(transitivelyDependent'.drv)` is the same as `resolved(transitivelyDependent.drv)`, so we don't build anything
 
+## Remote caching
+
+A consequence of this change is that a store path is now just a meaningless
+blob of data if it doesn't have its associated `realisation` metadata −
+besides, Nix can't know the output path of a content-addressed derivation
+before building it anymore, so it can't ask the remote store for it.
+
+As a consequence, the remote cache protocols is extended to not simply
+work on store paths, but rather at the realisation level:
+
+- The store interface now specifies a new method
+  ```
+  queryRealisation : DrvOutput -> Maybe Realisation
+  ```
+- The substitution loop in Nix fist calls this method to ask the remote for the
+  realisation of the current derivation output.
+  If this first call succeeds, then it fetches the corresponding output path
+  like before. Then, it registers the realisation in the database.
+- The binary caches now have a new toplevel folder `/realisations` storing
+  these realisations
+
 # Drawbacks
 
 [drawbacks]: #drawbacks
@@ -254,52 +275,54 @@ Eventually this RFC should be subsumed by RFC0017.
 
 [unresolved]: #unresolved-questions
 
-## Caching
+## Caching of non-deterministic paths
 
 [caching]: #caching
 
-The big unresolved question is about the caching of content-adressed paths.
+A big question is about mixing remote-caching and non-determinism.
 As [Eelco's phd thesis][nixphd] states, caching CA paths raises a number of
 questions when building that path is non-deterministic (because two different
 stores can have two different outputs for the same path, which might lead to
 some dependencies being duplicated in the closure of a dependency).
-There exist some solutions to this problem (including one presented in Eelco's
-thesis), but for the sake of simplicity, this RFC simply forbids to mark a
-derivation as CA if its build is not deterministic (although there's no real
-way to check that so it's up to the author of the derivation to ensure that it
-is the case).
 
-## Client support
+The current implementation has a naive approach that just forbids fetching a
+path if the local system has a different realisation for the same drv output.
+This approach is simple and correct, but it's possible that it might not be
+good-enough in practice as it can result in a totally useless binary cache in
+some pathological cases.
 
-The bulk of the job here is done by the Nix daemon.
-
-Depending on the details of the current Nix implementation, there might or
-might not be a need for the client to also support it (which would require the
-daemon and the client to be updated in synchronously)
-
-## Old Nix versions and caching
-
-What happens (and should happen) if a Nix not supporting the cas model queries
-a cache with cas paths in it is not clear yet.
+There exist some better solutions to this problem (including one presented in
+Eelco's thesis), but there are much more complex, so it's probably not worth
+investing in them until we're sure that they are needed.
 
 ## Garbage collection
 
-Another major open issue is garbage collection of the aliases table. It's not
-clear when entries should be deleted. The paths in the domain are "fake" so we
-can't use them for expiration. The paths in the codomain could be used (i.e. if
-a path is GC'ed, we delete the alias entries that map to it) but it's not clear
-whether that's desirable since you may want to bring back the path via
+Another major open issue is garbage collection of the realisations table. It's
+not clear when entries should be deleted. The paths in the domain are "fake" so
+we can't use them for expiration. The paths in the codomain could be used (i.e.
+if a path is GC'ed, we delete the alias entries that map to it) but it's not
+clear whether that's desirable since you may want to bring back the path via
 substitution in the future.
 
 ## Ensuring that no temporary output path leaks in the result
 
-One possible issue with the CA model is that the output paths get moved after being built, which breaks self-references. Hash rewriting solves this in most cases, but it is only a heuristic and there is no way to truly ensure that we don't leak a self-reference (for example if a self-reference appears in a zipped file − like is often the case for man pages or Java jars, the hash-rewriting machinery won't detect it).
-Having leaking self-references is annoying since:
+One possible issue with the CA model is that the output paths get moved after
+being built, which breaks self-references. Hash rewriting solves this in most
+cases, but it is only a heuristic and there is no way to truly ensure that we
+don't leak a self-reference (for example if a self-reference appears in a
+zipped file − like is often the case for man pages or Java jars, the
+hash-rewriting machinery won't detect it).  Having leaking self-references is
+annoying since:
 
-- These self-references change each time the inputs of the derivation change, making CA useless (because the output will _always_ change when the input change)
-- More annoyingly, these references become dangling and can cause runtime failures
+- These self-references change each time the inputs of the derivation change,
+  making CA useless (because the output will _always_ change when the input
+  change)
+- More annoyingly, these references become dangling and can cause runtime
+  failures
 
-We however have a way to dectect these: If we have leaking self-references then the output will change if we artificially change its output path. This could be integrated in the `--check` option of `nix-store`.
+We however have a way to dectect these: If we have leaking self-references then
+the output will change if we artificially change its output path. This could be
+integrated in the `--check` option of `nix-store`.
 
 # Future work
 
@@ -309,10 +332,8 @@ This RFC tries as much as possible to provide a solid foundation for building
 ca paths with Nix, leaving as much room as possible for future extensions.
 In particular:
 
-- Add some path-rewriting to allow derivations with self-references to be built
-  as CA
-- Consolidate the caching model to allow non-deterministic derivations to be
-  built as CA
+- Consolidate the caching model to make it more efficient in presence of
+  non-deterministic derivations
 - (hopefully, one day) make the CA model the default one in Nix
 - Investigate the consequences in term of privileges requirements
 - Build a trust model on top of the content-adressed model to share store paths
