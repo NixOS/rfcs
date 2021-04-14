@@ -57,16 +57,32 @@ cutoffs.
 
 [design]: #detailed-design
 
-The gist of the design is that:
+When it comes to computing the output paths of a derivation, the current Nix
+model, known as the “input-addressd” model (also sometimes referred to as the
+“extensional” model) works (roughly) as follows:
 
-- Derivations can be marked as content-adressed (ca), in which case each
-  of their outputs will be moved to a CA store path.
-  This extends the current notion of "fixed-output" derivations.
-- We introduce the notion of "resolving" a derivation, which extends to
-  arbitrary `ca` derivations the current behavior of replacing fixed-outputs
-  derivations by their output hash.
-- We refine the build process so that every derivation is normalized
-  before being realized
+- A Derivation is a data-structure that specifies how to build a package.
+  Derivations can refer to other derivations
+- All these derivations have a “hash-modulo” associated to them, which is defined by:
+  - Some derivations known as “fixed-output” have a known result (for example
+    because they fetch a tarball from the internet, and we assume that this
+    tarball will stay immutable).
+    These have their output hash manually defined (and this hash will be
+    checked against the actual hash of their output when they get built)
+  - All the others have a hash that's recursively computed by the following algorithm:
+    - If a derivation doesn't depend on any other derivation, then we just hash its representation,
+    - Otherwise, we substitute each occurence of a dependency by its hash modulo and hash the result.
+- For each output of a derivation, we compute the associated output path by
+  hashing the hash modulo of the derivation and the output name.
+
+This proposal adds a new kind of derivation: “floating content-addressed
+derivations”, which are similar to fixed-output derivations in that they are
+stored in a content-addressed path, but don't have this output hash specified
+ahead of time.
+
+For this to work properly, we need to extend the current build process, as well
+as the caching and remote building systems so that they are able to take into
+account the specificies of these new derivations.
 
 ## Nix-build process
 
