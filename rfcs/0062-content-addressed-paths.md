@@ -22,14 +22,11 @@ By making this opt-in, we can impose arbitrary limitations to the paths that
 are allowed to be ca to avoid some tricky issues that can arise with
 content-adressability.
 
-In particular, we restrict ourselves to paths that are:
-
-- only include textual self-references (_e.g._ no self-reference hidden inside a zip file)
-- known to be deterministic (for caching reasons, see [caching]).
+In particular, we restrict ourselves to paths that only include textual
+self-references (_e.g._ no self-reference hidden inside a zip file).
 
 That way we don't have to worry about the fact that hash-rewriting is only an
-approximation nor about the semantics of the distribution of non-deterministic
-paths.
+approximation
 
 We also leave the option to lift these restrictions later.
 
