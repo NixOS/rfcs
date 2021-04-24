@@ -76,18 +76,11 @@ In the following section the design of a replacement is proposed with these goal
 
 ## Bootstrapping
 
-### NixOS container from scratch
+To be fully consistent with upstream `systemd`, the template unit
+[`systemd-nspawn@.service`](https://github.com/systemd/systemd/blob/v247/units/systemd-nspawn@.service.in) will be used.
 
-<!-- erste Stichpunkte können raus, da nicht relevant -->
-
-To start a `systemd-nspawn` machine, a so-called image is required which is located at
-its state directory, `/var/lib/machines`. Theoretically it's possible to use e.g. tarballs
-of a `rootfs` or any kind of Linux distribution. For instance, an environment of another
-`nspawn`-container exported with `machinectl export-tar`.
-
-However, it is also possible to create an image "from scratch" which is for now the only supported
-mode - just like it's the case in the current implementation. Basically the following
-things need to happen:
+The approach how a container is bootstrapped won't change and will thus consist of the
+following steps (executed via a custom `ExecStartPre=`-script):
 
 * Create an empty directory in `/var/lib/machines` named like the container-name.
 * `systemd-nspawn` only expects `/etc/os-release`, `/etc/machine-id` and `/var` to exist
@@ -97,23 +90,18 @@ things need to happen:
   the [stage-2 script](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/system/boot/stage-2-init.sh)
   must be started which eventually `exec(2)`s into `systemd` and ensures that everything
   is correctly set up.
+* The option `boot.isContainer = true;` will be automatically set for new containers as well.
+  This is necessary to
+  * avoid bogus `modprobe` calls since `nspawn` doesn't have its own kernel.
+  * as option to skip building a `stage-1` boot script when building a NixOS system for
+    the container.
+* For now, `networking.useHostResolvConf` will be necessary as well. Further details are
+  explain in the [DNS](#dns)-section.
 
 This init-script can be built by evaluating a NixOS config against `<nixpkgs/nixos/lib/eval-config.nix>`.
 
-<!--
-unnötig
-
-### Isolated installation
-
-One of the reasons why NixOS containers are currently missing isolation is that the full host-setup
-of Nix (i.e. store and daemon) need to be mounted into the container. An experimental and alternative
-approach is to only mount store-paths that are actually needed into the container.
-
-This is feature is opt-in and implemented by analyzing which store paths are needed inside
-the container using [`pkgs.closureInfo`](https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/closure-info.nix).
-
-For each store-path a `BindReadOnly=`-entry will be added to the `.nspawn`-unit. (NOTE: this
-is experimental and actual performance implications aren't tested yet).-->
+Support for existing tarballs to be imported with `machinectl pull-tar` is explicitly out of
+scope in this RFC.
 
 ## Network
 
@@ -129,25 +117,23 @@ otherwise the container will run in its own namespace.
 
 ### Default Mode
 
-By default, `nspawn` containers have their own private network. This is implemented with either
-a [`veth`](https://man7.org/linux/man-pages/man4/veth.4.html) pair or virtual zones.
-Both provide a virtual link between the host's and the container's network
-namespace. The only difference is that a virtual zone can be used to manage multiple containers
-in a single virtual ethernet on the host.
+If nothing else is specified, the [default settings of `systemd-nspawn`](https://github.com/systemd/systemd/blob/v247/network/80-container-ve.network) will
+be used for networking. To briefly summarize, this means:
 
-<!-- details, das meiste ist eher systemd doku und kann raus :) -->
-[By default](https://github.com/systemd/systemd/blob/main/network/80-container-ve.network), both
-assign `0.0.0.0/2{4,8}` to the interface. This is a way to tell `networkd` to assign
-a private subnet (by default something from `192.168.0.0/16` or another free slot from e.g.
-`10.0.0.0/8`). Via its own DHCP server, addresses can be assigned to containers dynamically.
-On the container-side the `host0` interface will be used to communicate with the host.
+* A [`veth`](https://man7.org/linux/man-pages/man4/veth.4.html) interface-pair will be created,
+  one "host-side" interface and a container interface inside its own namespace.
+* A dynamically allocated prefix of `0.0.0.0/28` (or `0.0.0.0/24` for virtual zones) will be used
+  as address pool to distribute IPv4 addresses via DHCP to containers.
 
-Unfortunately this approach lacks IPv6 support. For that, our implementation should also
-provide [RFC4862 SLAAC](https://tools.ietf.org/html/rfc4862) via [radvd](https://github.com/radvd-project/radvd), a simple implementation of that.
+Additionally, basic IPv6 support was implemented:
 
-Each virtual ethernet interface on the host-side will have `::/64` as additional address. `networkd`
-will automatically assign a free [RFC4193 ULA prefix](https://tools.ietf.org/html/rfc4193) to
-the interface and `radvd` will inform the containers of this prefix so they can assign themselves addresses within it.
+* By specifying `::/64`, a [RFC4193 ULA prefix](https://tools.ietf.org/html/rfc4193) will be
+  allocated to the host-side interface.
+* With [`radvd`](https://github.com/radvd-project/radvd), containers can assign themselves addresses from this address prefix by utilizing
+  [RFC4862 SLAAC](https://tools.ietf.org/html/rfc4862)
+
+This is necessary since `systemd-networkd` doesn't support router advertisements with
+dynamically allocated prefixes.
 
 Hosts will be available on the current system via the
 [`mymachines`-feature of `nss`](https://www.freedesktop.org/software/systemd/man/nss-myhostname.html)
@@ -168,39 +154,44 @@ which is already taken care of by `systemd-networkd`.
 * Imperative Container
 * Ephemeral, unprivileged
 * ve-, vz-, MACVLAN
-* radvd gegen fehlendes IPv6/Minimalsetup
 
-This is the core, normative part of the RFC. Explain the design in enough
-detail for somebody familiar with the ecosystem to understand, and implement.
-This should get into specifics and corner-cases. Yet, this section should also
-be terse, avoiding redundancy even at the cost of clarity.
+## Config activation
+
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-This section illustrates the detailed design. This section should clarify all
-confusion the reader has from the previous sections. It is especially important
-to counterbalance the desired terseness of the detailed design; if you feel
-your detailed design is rudely short, consider making this section longer
-instead.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 * Explicit dependency on `networkd` (`networking.useNetworkd = true;`) on both the
   host-side and container-side.
+  * Since there's a movement to make `systemd-networkd` the default on NixOS, this
+    is from the author's PoV not a big problem.
 
-* Need to migrate from existing containers at the moment.
+* Need to migrate from existing containers.
+  * As demonstrated in [*Migration plan*](#migration-plan), a sane path exists.
+  * With a long deprecation time, a rush to migrate can be avoided.
 
 # Alternatives
 [alternatives]: #alternatives
 
 
-* Implement this feature in e.g. its own (optionally community-maintained) [flake](https://www.tweag.io/blog/2020-05-25-flakes/):
+* Implement this feature in e.g. its own (optionally community-maintained) repository:
+  * This is problematic due to the changes for [Config activation](#config-activation) that
+    required changes in `switch-to-configuration.pl`.
 * Keep both the proposed feature and the existing `nixos-container` subsystem in NixOS. In contrast
   to `systemd-nspawn@`, the current container subsystem uses `/var/lib/containers` as state-directory,
-  so clashes shouldn't happen.
+  so clashes shouldn't happen:
+  * The main concern is increased maintenance workload. Also, with the rather prominent
+    name `nixos-container` we shouldn't advertise the old, problematic implementation.
 * Do nothing.
+  * As shown above, this change leverages the full featureset of `systemd-nspawn` and also
+    solves a few existing problems, that are non-trivial to solve when keeping the old
+    implementation.
+  * Since it's planned to move to `networkd` in the longterm anyways, fundamental changes
+    in the container subsystem will be mandatory anyways.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
