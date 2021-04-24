@@ -141,6 +141,11 @@ which is already taken care of by `systemd-networkd`.
 
 ### Static networking
 
+It's also possible to assign an arbitrary number of IPv4 and IPv6 addresses statically. This
+is internally implemented by using the `Address=` setting of [`systemd.network(5)`](https://www.freedesktop.org/software/systemd/man/systemd.network.html).
+
+An example of how this can be done is shown in the [next chapter](#examples-and-interactions).
+
 ### DNS
 
 ## Migration plan
