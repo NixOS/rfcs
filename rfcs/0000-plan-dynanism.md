@@ -28,8 +28,8 @@ Nixpkgs, along with every other distro, also faces a looming crisis: new open so
 Many languages now support very large library ecosystems, with dependencies expressed in a language-specific package manager.
 To this new generation of developers, the distro (or homebrew) is a crufty relic from an earlier age to bootstrap modernity, and then be forgotten about.
 
-Right now, to deal with these packages, we either convert by hand, or commit lots generated code into Nixpkgs.
-But it's don't think it's either of those is healthy or sustainable.
+Right now, to deal with these packages, we either convert by hand, or commit lots of generated code into Nixpkgs.
+But I don't think either of those options are healthy or sustainable.
 The problem with the first is sheer effort; we'll never be able to keep up.
 The problem with the second is bloating Nixpkgs but more importantly reproducability: If someone wants to update that generated code it is unclear how.
 All these mean that potential users coming from this new model of development find Nix / Nixpkgs cumbersome and unsuited to their needs.
@@ -112,7 +112,7 @@ It's semantics are as follows:
    builtins.assumeDerivation e ⇓ e'
    ```
 
-- If the underlying expression cannot evaluate (shallowly) without building on or more paths, defer evaluation into a derivation-producing-derivation, and take it's output with `builtins.outputOf`:
+- If the underlying expression cannot evaluate (shallowly) without building one or more paths, defer evaluation into a derivation-producing-derivation, and take it's output with `builtins.outputOf`:
   ```
   e gets stuck on builds
   defer = derivation {
@@ -200,7 +200,7 @@ The above is no doubt hard to read -- I am sorry about that --- but here are a f
 # Drawbacks
 [drawbacks]: #drawbacks
 
-The main drawback is that the *only* the stub expressions are "pure" derivation.
+The main drawback is that the stub expressions are *only* "pure" derivations.
 For other sort of values, we have no choice but wait.
 That means we cannot defer the `pname` `meta` etc. fields: either make do with the bare string `builtins.outputOf` provides, or *statically* add a fake `name` and `meta` etc. that must be manually synced with the deferred eval derivation if it is to match.
 
