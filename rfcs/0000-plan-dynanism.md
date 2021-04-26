@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-We need build plan dynamism -- interleved building and planning -- to cope with the every growing world of language-specific package managers.
+We need build plan dynamism -- interleaved building and planning -- to cope with the ever-growing world of language-specific package managers.
 Propose to allow derivations to build derivations, and depend on those built derivations, as the core primitive for this.
 Additionally, introduce a new primop to leverage this in making IFD, still the gold standard for ease of use, more efficient and compatible with `hydra.nixos.org`'s queue runner.
 
