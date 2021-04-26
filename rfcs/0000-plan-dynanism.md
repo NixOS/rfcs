@@ -120,7 +120,7 @@ It's semantics are as follows:
     buildCommand = "nix-instantiate ${reified e} > $out"
   }
   ------
-  builtins.assumeDerivation e ⇓ builtins.outputOf e "out"
+  builtins.assumeDerivation e ⇓ builtins.outputOf defer "out"
   ```
 
 This allows downstream non-dynamic derivations to be evaluated without getting stuck on their dynamic upstream ones.
