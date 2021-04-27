@@ -99,7 +99,7 @@ We can break this down nicely into steps.
    > ```
    > would obtain the `out` output of whatever derivation `/nix/store/…foo.drv!out` produces.
 
-   Now that we have `path` vs `path!*`, we also don't need `---derivation` as a disambiguator, and so that should be removed along with all the complexity that goes with it.
+   Now that we have `path` vs `path!*`, we also don't need `--derivation` as a disambiguator, and so that should be removed along with all the complexity that goes with it.
    (`toDerivedPathsWithHints` in the the nix commands should always be pure functions and not consult the store.)
 
 3. Extend the scheduler and derivation dependencies similarly:
