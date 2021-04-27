@@ -84,7 +84,7 @@ We can break this down nicely into steps.
    ```
 
    Now that we have `path` vs `path!*`, we also don't need `---derivation` as a disambiguator, and so that should be removed along with all the complexity that goes with it.
-   (`toBuildables` in the the nix commands should always be pure functions and not consult the store.)
+   (`toDerivedPathsWithHints` in the the nix commands should always be pure functions and not consult the store.)
 
 3. Extend the scheduler and derivation dependencies similarly:
 
