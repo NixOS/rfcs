@@ -83,6 +83,22 @@ We can break this down nicely into steps.
                        |  <single-installable> ! *
    ```
 
+   Plain paths just mean that path itself is the goal, while `!` indexing indicates one more outputs of the derivation to the left of the `!` is the goal.
+
+   > For example,
+   > ```
+   > nix build /nix/store/…foo.drv
+   > ```
+   > would just obtain `/nix/store/…foo.drv` and not build it, while
+   > ```
+   > nix build /nix/store/…foo.drv!*
+   > ```
+   > would obtain (by building or substituting) all its outputs.
+   > ```
+   > nix build /nix/store/…foo.drv!out!out
+   > ```
+   > would obtain the `out` output of whatever derivation `/nix/store/…foo.drv!out` produces.
+
    Now that we have `path` vs `path!*`, we also don't need `---derivation` as a disambiguator, and so that should be removed along with all the complexity that goes with it.
    (`toDerivedPathsWithHints` in the the nix commands should always be pure functions and not consult the store.)
 
