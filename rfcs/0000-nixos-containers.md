@@ -5,7 +5,7 @@ author: Maximilian Bosch <maximilian@mbosch.me>
 co-authors: n/a
 shepherd-team: n/a
 shepherd-leader: n/a
-related-issues: #69414, #67265
+related-issues: #69414, #67265, #67232, #67336
 ---
 
 # Summary
@@ -95,8 +95,6 @@ following steps (executed via a custom `ExecStartPre=`-script):
   * avoid bogus `modprobe` calls since `nspawn` doesn't have its own kernel.
   * as option to skip building a `stage-1` boot script when building a NixOS system for
     the container.
-* For now, `networking.useHostResolvConf` will be necessary as well. Further details are
-  explain in the [DNS](#dns)-section.
 
 This init-script can be built by evaluating a NixOS config against `<nixpkgs/nixos/lib/eval-config.nix>`.
 
@@ -148,9 +146,39 @@ An example of how this can be done is shown in the [next chapter](#examples-and-
 
 ### DNS
 
+The current implementation uses [`networking.useHostResolvConf`](https://search.nixos.org/options?channel=20.09&show=networking.useHostResolvConf&from=0&size=50&sort=relevance&query=networking.useHostResolvConf)
+to configure DNS via `/etc/resolv.conf` in the container. This option will be **deprecated** as
+`systemd` can take care of it:
+
+* If `networkd` is enabled via NixOS, [`systemd-resolved`](https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html) is enabled as well.
+  * By default, DNS for `resolved` will be configured via DHCP which is enabled in the [Default Mode](#default-mode) by default.
+  * With only [Static networking](#static-networking) enabled it is necessary to configure
+    configure DNS servers for resolved statically which can be done by setting e.g. DNS
+    servers via a `.network`-unit for the `host0` interface.
+* The behavior of `networking.useHostResolvConf` can be implemented with pure `systemd`
+  by setting the `ResolvConf`-setting for the container's `.nspawn`-unit.
+
 ## Migration plan
 
-## Advanced Features
+All features from the old implementation are still supported, however several abstractions
+(such as `networking.useHostResolvConf` or `containers.<name>.macvlans`) are dropped and have
+to be implemented by specifying unit options for `systemd` in the NixOS module system.
+
+The state-directory in `/var/lib/containers/<name>` are also usable by `systemd-nspawn` directly.
+Thus, the following steps are necessary:
+
+* Port existing container options to the new module (documentation describing how this can be
+  done for each feature **has** to be written before this is considered ready).
+* Most of the NixOS configuration can be easily reused except for the following differences:
+  * `networkd` is used inside the container rather than scripted networking. This means that
+    NixOS's networking configuration may require adjustment. However the basic `networking.interfaces` API
+    is also supported by the `networkd` stack. More notable is that `eth0` inside the container is
+    named `host0` by default.
+  * As soon as the config is ready to deploy, the state-directory in `/var/lib/containers` has to
+    be copied to `/var/lib/machines`.
+  * Deploy & reboot.
+  * *TODO*: Parallelbetrieb von alter und neuer Implementierung testen für "inkrementelle" Migration
+    & https://github.com/Ma27/nixpkgs/blob/networkd-containers/nixos/tests/container-migration.nix verlinken.
 
 ## Imperative management
 
@@ -162,10 +190,29 @@ An example of how this can be done is shown in the [next chapter](#examples-and-
 
 ## Config activation
 
+By default, NixOS has to decide how to activate configuration changes for a container to avoid
+e.g. unnecessary reboots, but `reload`s aren't necessarily sufficient either because e.g.
+new bind mounts require a reboot. The host's `switch-to-configuration.pl` implements it like
+this:
+
+* `systemctl reload systemd-nspawn@container-name.service` runs `switch-to-configuration test`
+  inside the container `container-name` using `nsenter`.
+* When activating a new config on the host, the following things happen:
+  * If the setting `Parameter=` in the container's `.nspawn`-unit is the only thing that has changed,
+    a `reload` will be done. This parameter contains the `init`-script for the container's NixOS
+    and only changes if the container's NixOS config changes.
+  * If anything else changes, `systemd-nspawn@container-name.service` will be scheduled for a restart
+    which effectively reboots the container.
+* This behavior can be turned off completely which means that the container where this is turned
+  off won't be touched at all on `switch-to-configuration`. Additionally, it's possible to always
+  force a `reload` or `restart`. See [Examples & Interactions](#examples-and-interactions) for
+  details.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
+Netz, Basic
+Advanced Features (MACVLAN, demo)
 
 # Drawbacks
 [drawbacks]: #drawbacks
