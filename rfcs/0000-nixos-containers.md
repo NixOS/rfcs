@@ -182,11 +182,12 @@ Thus, the following steps are necessary:
 
 ## Imperative management
 
-* Netzwerk
-* Migration
-* Imperative Container
-* Ephemeral, unprivileged
-* ve-, vz-, MACVLAN
+`systemd` differentiates between "privileged" & "unprivileged" settings. Each privileged (also
+called "trusted") `nspawn` unit lives in `/etc/systemd/nspawn`. Since unprivileged container's
+don't allow bind-mounts, these will be out of scope. Additionally, this means that
+`/etc/systemd/nspawn` has to be writable for administrative users.
+
+*TODO:* polkit; unprivileged; tooling
 
 ## Config activation
 
@@ -211,8 +212,136 @@ this:
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-Netz, Basic
-Advanced Features (MACVLAN, demo)
+### Basics
+
+A container with a private IPv4 & IPv6 address can be configured like this:
+
+``` nix
+{
+  nixos.containers.instances.demo = {
+    network = {};
+    config = { pkgs, ... }: {
+      environment.etc."foo".text = "bar";
+    };
+  };
+}
+```
+
+It's reachable from locally like this thanks to the `mymachines`-feature of NSS:
+
+```
+[root@server:~]# ping demo -c1
+PING demo(fdd1:98a7:f71:61f0:900e:81ff:fe78:e9d6 (fdd1:98a7:f71:61f0:900e:81ff:fe78:e9d6)) 56 data bytes
+64 bytes from fdd1:98a7:f71:61f0:900e:81ff:fe78:e9d6 (fdd1:98a7:f71:61f0:900e:81ff:fe78:e9d6): icmp_seq=1 ttl=64 time=0.292 ms
+
+--- demo ping statistics ---
+1 packets transmitted, 1 received, 0% packet loss, time 0ms
+rtt min/avg/max/mdev = 0.214/0.214/0.214/0.000 ms
+```
+
+The container can be entirely controlled via `machinectl`:
+
+```
+$ machinectl reboot demo
+$ machinectl shell demo
+demo$ ...
+```
+
+Optionally, containers can be grouped into a networking zone. Instead of a `veth`-pair for each
+container, all containers will live in an interface named `vz-<zone>`:
+
+``` nix
+{
+  nixos.containers.zones.demo = {};
+  nixos.containers.instances = {
+    test1.network.zone = "demo";
+    test2.network.zone = "demo";
+  };
+}
+```
+
+IP addresses can be statically assigned to a container as well:
+
+``` nix
+{
+  nixos.containers.instances.static = {
+    network = {
+      v4.static.containerPool = [ "10.237.1.3/16" ];
+      v6.static.containerPool = [ "2a01:4f9:4b:1659:3aa3:cafe::3/96" ];
+    };
+    config = {};
+  };
+}
+```
+
+With this change, the containers live in the given subnets and both on the host- and container-side
+the network will be properly configured accordingly.
+
+### Advanced Features
+
+An example for how every unit setting from `networkd` and `nspawn` can be used, are MACVLANs.
+These are helpful to assign multiple virtual interfaces with a distinct MAC to a single
+physical NIC.
+
+A sub-interface which is actually part of the physical one can be moved into the container's
+namespace then:
+
+``` nix
+{
+  # Config for the physical interface itself with DHCP enabled and associated to a MACVLAN.
+  systemd.network.networks."40-eth1" = {
+    matchConfig.Name = "eth1";
+    networkConfig.DHCP = "yes";
+    dhcpConfig.UseDNS = "no";
+    networkConfig.MACVLAN = "mv-eth1-host";
+    linkConfig.RequiredForOnline = "no";
+    address = lib.mkForce [];
+    addresses = lib.mkForce [];
+  };
+
+  # The host-side sub-interface of the MACVLAN. This means that the host is reachable
+  # within the (internal) network at `192.168.2.2`.
+  systemd.network.networks."20-mv-eth1-host" = {
+    matchConfig.Name = "mv-eth1-host";
+    networkConfig.IPForward = "yes";
+    dhcpV4Config.ClientIdentifier = "mac";
+    address = lib.mkForce [
+      "192.168.2.2/24"
+    ];
+  };
+  systemd.network.netdevs."20-mv-eth1-host" = {
+    netdevConfig = {
+      Name = "mv-eth1-host";
+      Kind = "macvlan";
+    };
+    extraConfig = ''
+      [MACVLAN]
+      Mode=bridge
+    '';
+  };
+
+  # Assign a MACVLAN to a container. This is done by pure nspawn.
+  systemd.nspawn.vlandemo.networkConfig.MACVLAN = "eth1";
+  nixos.containers = {
+    instances.vlandemo.config = {
+      systemd.network = {
+        networks."10-mv-eth1" = {
+          matchConfig.Name = "mv-eth1";
+          address = [ "192.168.2.5/24" ];
+        };
+        netdevs."10-mv-eth1" = {
+          netdevConfig.Name = "mv-eth1";
+          netdevConfig.Kind = "veth";
+        };
+      };
+    };
+  };
+}
+```
+
+### Imperative containers
+
+TODO
 
 # Drawbacks
 [drawbacks]: #drawbacks
