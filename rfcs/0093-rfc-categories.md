@@ -22,30 +22,30 @@ improve the overall outcome of the process.
 
 There is no appropriate venue for it. When reading the current RFC process, it becomes
 clear that it was made primarily with purely technical decisions in mind. It might only
-be a peception, but this perception systemically skews what's being discussed and what
+be a perception, but this perception systemically skews what's being discussed and what
 not.
 
-It is my perception that important topics are not adressed and settled by the community
-at large in a standardized procedure.
+As a result, important topics are not adressed and settled by the community at large
+in a generally accepted procedure.
 
 Specifically, it is hard to propose a well coordinated experiment across the community,
 document and acknowledge design issues, record proof-generated insight, but also to
 amend the RFC process itself, the forum rules, the code of conduct or propose any other 
-other binding changes to community workflows or infrastructure.
+binding changes to community workflows or infrastructure.
 
 ## Some issues are not addressed by the appropriate angle
 
 Even if, in the past, people might have used the RFC Process to gather broader consensus
 around some of the hard-to-propose topics exemplified in the previous paragraph, the
-ensuing discussion still might have been framed in a non-suited way.
+ensuing discussion still might have been framed in a way that is not best suited.
 
-By explicitly categorizing RFCs into one of the proposed categories, it will be immediatly
-evident for participants that those RFCs are a) legitimate and b) require an evaluation
-within the sensible boundaries of their categories. For example, it is hard to imagine,
-that a proof-generated insight being recorded as an _Informational RFC_ would receive a
-request for an actual proposal to improve the situation. In this example, gathering
-broad consensus about acknowledgement becomes easier. It is hard to imagine, how such
-an attempt would go smoothly within the current framing.
+By explicitly categorizing RFCs, it will be immediatly evident for participants that
+those RFCs are a) legitimate and b) require an evaluation within the sensible boundaries
+of their categories. For example, it is hard to imagine, that a proof-generated insight
+being recorded as an _Informational RFC_ would receive a request for an actual proposal
+to improve the situation. In this example, gathering broad consensus about acknowledgement
+becomes easier. It is hard to imagine, how such an attempt would go smoothly within the
+current framing.
 
 # Detailed design
 [design]: #detailed-design
@@ -72,11 +72,11 @@ Before this RFC reaches FCP, the RFC template is amended accordingly through thi
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-This section illustrates the detailed design. This section should clarify all
-confusion the reader has from the previous sections. It is especially important
-to counterbalance the desired terseness of the detailed design; if you feel
-your detailed design is rudely short, consider making this section longer
-instead.
+The relevant examples and interactions are already exposed in the motivation section.
+The detailed design does not require further exemplification, since it is intended to be
+an authors personal best judgment without significant backlash on the categorization
+that drives the categorization, not a specific set of criteria. I don't think its 
+feasible to develop such fixed set of creteria herin in a meaningful way.
 
 # Drawbacks
 [drawbacks]: #drawbacks
