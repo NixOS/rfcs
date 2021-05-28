@@ -94,7 +94,9 @@ point.
 This delays the merge of “core” derivations as the author needs to wait for
 sub-packages to be tested and possibly fixed up to the 7 day threshold.
 
-# Alternatives ## Shorter grace period
+# Alternatives
+
+## Shorter grace period
 
 A shorter grace period allows maintainers to move more quickly but requires
 maintainers of defendant derivations to jump to action quickly which is not
