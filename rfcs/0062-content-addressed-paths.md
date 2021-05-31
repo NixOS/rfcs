@@ -12,11 +12,11 @@ related-issues: (will contain links to implementation PRs)
 
 [summary]: #summary
 
-Add some basic but simple support for content-adressed store paths to Nix.
+Add some basic but simple support for content-addressed store paths to Nix.
 
 We plan here to give the possibility to mark certain store paths as
 content-adressed (ca), while keeping the other input-adressed as they are
-now (modulo some mandatory drv rewriting before the build, see below)
+now (modulo some mandatory drv rewriting before the build, see below).
 
 By making this opt-in, we can impose arbitrary limitations to the paths that
 are allowed to be ca to avoid some tricky issues that can arise with
@@ -26,7 +26,7 @@ In particular, we restrict ourselves to paths that only include textual
 self-references (_e.g._ no self-reference hidden inside a zip file).
 
 That way we don't have to worry about the fact that hash-rewriting is only an
-approximation
+approximation.
 
 We also leave the option to lift these restrictions later.
 
