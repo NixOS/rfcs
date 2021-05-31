@@ -55,7 +55,7 @@ cutoffs.
 [design]: #detailed-design
 
 When it comes to computing the output paths of a derivation, the current Nix
-model, known as the “input-addressd” model (also sometimes referred to as the
+model, known as the “input-addressed” model (also sometimes referred to as the
 “extensional” model) works (roughly) as follows:
 
 - A Derivation is a data-structure that specifies how to build a package.
