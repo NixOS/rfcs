@@ -256,7 +256,7 @@ def build_derivation(derivation : Derivation, outputsToBuild: [str]) -> Map[DrvO
         runBuildScript(derivationToBuild)
         # If the derivation isn’t content-addressed, then it already knows its
         # own output paths
-        return derivationToBuild.outputs()
+        return derivationToBuild.outputs
 ```
 
 For backwards-compatibility, we must change the algorithm a bit further: Resolving an input-addressed derivation changes its input derivation and input path sets (it replaces every input derivation by the corresponding store paths).
@@ -283,7 +283,7 @@ def build_derivation(derivation : Derivation, outputsToBuild: [str]) -> Map[DrvO
         runBuildScript(derivationToBuild)
         # If the derivation isn’t content-addressed, then it already knows its
         # own output paths
-        return derivationToBuild.outputs()
+        return derivationToBuild.outputs
 ```
 
 ### Remote caching
@@ -312,7 +312,7 @@ work on store paths, but rather at the realisation level:
   ```python
   def substitute_realisation(substituter : Store, wantedOutput : DrvOutput) -> Maybe Realisation:
       maybeRealisation = substituter.queryRealisation(wantedOutput)
-      if not maybeRealisation:
+      if maybeRealisation is None:
           return None
       substitute_path(substituter, maybeRealisation.outputPath)
       return maybeRealisation
@@ -358,13 +358,13 @@ To fix this, we must extend a bit the notion of realisation, to keep track of it
       maybeLocalRealisation = localStore.queryRealisation(drvOutput)
       if (maybeLocalRealisation and maybeLocalRealisation.outputPath != expectedStorePath):
           warn(f"The substituter {substituter} has an incompatible realisation for {dependentDrvOutput}")
-          return true
-      return false
+          return True
+      return False
 
 
   def substitute_realisation(substituter : Store, wantedOutput : DrvOutput) -> Maybe Realisation:
       maybeRealisation = substituter.queryRealisation(wantedOutput)
-      if not maybeRealisation:
+      if maybeRealisation is None:
           return None
 
       # Try substituting the derivations we depend on
