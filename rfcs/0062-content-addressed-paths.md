@@ -54,38 +54,71 @@ cutoffs.
 
 [design]: #detailed-design
 
+*In everything that follows, most algorithms and data-structures will be expressed as pseudo-python snippets*
+
 When it comes to computing the output paths of a derivation, the current Nix
 model, known as the “input-addressed” model (also sometimes referred to as the
 “extensional” model) works (roughly) as follows:
 
-- A Derivation is a data-structure that specifies how to build a package.
-  Derivations can refer to other derivations
-- All these derivations have a “hash-modulo” associated to them, which is defined by:
-  - Some derivations known as “fixed-output” have a known result (for example
-    because they fetch a tarball from the internet, and we assume that this
-    tarball will stay immutable).
-    These have their output hash manually defined (and this hash will be
-    checked against the actual hash of their output when they get built)
-  - All the others have a hash that's recursively computed by the following algorithm:
-    - If a derivation doesn't depend on any other derivation, then we just hash its representation,
-    - Otherwise, we substitute each occurence of a dependency by its hash modulo and hash the result.
-- For each output of a derivation, we compute the associated output path by
-  hashing the hash modulo of the derivation and the output name.
+1. A Nix language expression gets evaluated to a `derivation`
+2. This `derivation` is a data-structure describing how to build a package. In particular it contains
+  1. A set of derivation outputs which will be used as input for the build
+  2. A set of store paths that will be used as input for the build
+  3. The build recipe proper (a script to run, with a set of environment
+     variables). This recipe can refer input paths or derivations by
+     interpolating their store path.
+  4. The output paths into which the derivation will be installed.
+    These are computed from a hash of the other elements of the derivation.
 
-This proposal adds a new kind of derivation: “floating content-addressed
-derivations”, which are similar to fixed-output derivations in that they are
-stored in a content-addressed path, but don't have this output hash specified
-ahead of time.
+The “input-addressed” designation comes from the way the output paths are
+computed: They derive from the derivation data-structure, which is the input of
+the build.
 
-For this to work properly, we need to extend the current build process, as well
-as the caching and remote building systems so that they are able to take into
-account the specificies of these new derivations.
+The idea behind the “content-addressed” model is that rather than deriving
+these output paths from the inputs of the build, we derive them from the output
+(the produced store path).
 
-## Nix-build process
+Nix already supports a special-case of content-addressed derivations with the
+so-called “fixed-output” derivations.  These are derivations that are
+content-addressed, but whose output hash has to be specified in advance, and
+are used in particular to fetch data from the internet (as the constraint that
+the hash has to be specified in advance means that we can relax the sandbox for
+these derivations).
 
-For the sake of clarity, we will refer to the current model (where the
-derivations are indexed by their inputs, also sometimes called "extensional") as
-the `input-addressed` model
+To fully support this content-addressed model, we need to extend the current
+build process, as well as the caching and remote building systems so that they
+are able to take into account the specificies of these new derivations.
+
+Fully supporting content-addressed derivations requires some deep changes to the Nix model.
+For the sake of readability, we’ll first present a simplistic model that support them in a very basic way, and then extend this model in several different ways to improve the support.
+
+## Basic support
+
+The input-addressed build process is roughly the following:
+
+```python
+def nix_build(expr : NixExpr) -> [StorePath] :
+    resulting_derivation = eval(expr)
+    build_derivation(
+        resulting_derivation,
+        resulting_derivation.all_outputs(),
+    )
+    return resulting_derivation.all_output_paths()
+
+def build_derivation(derivation : Derivation, outputsToBuild: [str]) -> ():
+    # Build all the inputs
+    for (inputDrv, requiredOutputs) in derivation.inputDrvs:
+        build_derivation(inputDrv, requiredOutputs)
+    # Run the build script, now that all the inputs are here
+    runBuildScript(derivation)
+```
+
+The main change required by the content-addressed model is that we can’t know
+the output paths of a derivation before building it.
+
+This means that the Derivations as they are produced by the evaluator can’t
+either know their output path, nor explicitely refer to their dependencies by
+their output path.
 
 ### Output mappings
 
@@ -94,11 +127,26 @@ For each output `output` of a derivation `drv`, we define
 - its **Output Id** `DrvOutput(drv, output)` as the tuple `(hashModulo(drv), output)`.
   This id uniquely identifies the output.
   We textually represent this as `hashModulo(drv)!output`.
-- its **realisation** `Realisation(outputId)` containing
-  1. The path `path` at which this output is stored (either content-defined or input-defined depending on the type of derivation)
-  2. An optional set `signatures` of signatures certifying the above
+- its **realisation** `Realisation(outputId)` containing the path `outputPath` at which this output is stored (either content-defined or input-defined depending on the type of derivation)
 
-In a input-addressed-only world, the concrete path for a derivation output was a pure function of this output's id that could be computed at eval-time. However this won't be the case anymore once we allow CA derivations, so we now need to store the results of the `Realisation` function in the Nix database as a new table:
+```python
+class DrvOutput:
+    derivationHash : Hash
+    outputName : str
+
+class Realisation:
+    id : DrvOutput
+    outputPath : StorePath
+```
+
+In a input-addressed-only world, the concrete path for a derivation output was a pure function of this output's id that could be computed at eval-time. However this won't be the case anymore once we allow CA derivations, so we now need a way to register this information in the store:
+
+```python
+def registerRealisation(store : Store, realisation : Realisation):
+    ...
+```
+
+For the local store, this function will store the realisation information in the Nix database as a new table:
 
 ```sql
 create table if not exists Realisation (
@@ -108,118 +156,139 @@ create table if not exists Realisation (
 )
 ```
 
-### Building a non-ca derivation
-
-#### Resolved derivations
+### Resolved derivations
 
 As it is already internally the case in Nix, we define a **basic derivation** as a derivation that doesn't depend on any derivation output (except its own). Said otherwise, a basic derivation is a derivation whose only inputs are either
 
 - Placeholders for its own outputs (from the `placeholder` builtin)
 - Existing store paths
 
-For a derivation `drv` whose input derivations have all been realised, we define its **associated resolved derivation** `resolved(drv)` as `drv` in which we replace every input derivation `inDrv` of `drv` by `Realisation(inDrv).path`, and update the output hash accordingly.
+For a derivation `drv` whose input derivations have all been realised, we define its **associated resolved derivation** `resolved(drv)` as `drv` in which
+we replace every input derivation `inDrv` of `drv` by `Realisation(inDrv).path`.
 
 `resolved` is (intentionally) not injective: If `drv` and `drv'` only differ because one depends on `dep` and the other on `dep'`, but `dep` and `dep'` are content-addressed and have the same output hash, then `resolved(drv)` and `resolved(drv')` will be equal.
 
-#### Build process
+### content-addressed build process
 
-When asked to build a derivation `drv`, we instead:
+We now need to update the build process as:
 
-1. Compute `resolved(drv)`
-2. Substitute and build `resolved(drv)` like a normal derivation.
-   Possibly this is a no-op because it may be that `resolved(drv)` has already been built.
-3. Add a new mapping `Realisation(drv!${output}) == ${output}(resolved(drv))` for each output `output` of `drv` (signing the mapping if needs be)
+```python
+def build_derivation(derivation : Derivation, outputsToBuild: [str]) -> Map[DrvOutput, Realisation]:
+    inputRealisations : Map[DrvOutput, Realisation] = {}
+    # Build all the inputs, and store the newly built realisations
+    for (inputDrv, requiredOutputs) in derivation.inputDrvs:
+        inputRealisations += build_derivation(inputDrv, requiredOutputs)
 
-### Building a CA derivation
+    # We now need to “resolve” our realisation to replace all the symbolic
+    # references to its inputs by their actual store path
+    derivationToBuild : BasicDerivation = resolved(inputDrv, inputRealisations)
 
-A **CA derivation** is a derivation with the `__contentAddressed` argument set
-to `true` and the `outputHashAlgo` set to a value that is a valid hash name
-recognized by Nix (see the description for `outputHashAlgo` at
-<https://nixos.org/nix/manual/#sec-advanced-attributes> for the current allowed
-values).
+    # At that point, we might realise that the resolved derivation is actually
+    # something that we have already built. In that case we just return
+    # the existing result.
+    if (isBuilt(derivationToBuild)):
+        return queryOutputs(derivationToBuild, outputsToBuild)
 
-The process for building a content-adressed derivation `drv` is the following:
+    # The build script needs to know where to install stuff (so that for
+    # example `make install` can work properly).
+    # We obviously don’t know the final path yet, but we can assign some
+    # temporary output paths to the derivation that will be used during the
+    # build.
+    assignScratchOutputPaths(derivationToBuild)
 
-- We build it like a normal derivation (see above).
-  For each output `$outputId` of the derivation, this gives us a (temporary) output path `$out`.
-  - We compute a cryptographic hash `$chash` of `$out`[^modulo-hashing]
-  - We move `$out` to `/nix/store/$chash-$name`
-  - We store the mapping `Realisation($outputId) == "/nix/store/$chash-$name"`
+    # Run the build script on the new resolved derivation
+    runBuildScript(derivationToBuild)
 
-[^modulo-hashing]:
-
-  We can possibly normalize all the self-references before
-  computing the hash and rewrite them when moving the path to handle paths with
-  self-references, but this isn't strictly required for a first iteration
-
-### Example
-
-In this example, we have the following Nix expression:
-
-```nix
-rec {
-  contentAddressed = mkDerivation {
-    name = "contentAddressed";
-    __contentAddressed = true;
-    … # Some extra arguments
-  };
-  dependent = mkDerivation {
-    name = "dependent";
-    buildInputs = [ contentAddressed ];
-    … # Some extra arguments
-  };
-  transitivelyDependent = mkDerivation {
-    name = "transitivelyDependent";
-    buildInputs = [ dependent ];
-    … # Some extra arguments
-  };
-}
+    # Move the newly built outputs to their final (content-addressed) paths,
+    # and return the corresponding realisations.
+    return moveToCAPaths(derivationToBuild.outputs)
 ```
 
-Suppose that we want to build `transitivelyDependent`.
-What will happen is the following
+## Extensions
 
-1. We instantiate the Nix expression. This gives us three derivations:
-   `contentAddressed.drv`, `dependent.drv` and `transitivelyDependent.drv`
-2. We build `contentAddressed.drv`.
-   - We first compute `resolved(contentAddressed.drv)`.
-   - We realise `resolved(contentAddressed.drv)`. This gives us an output path
-     `out(resolved(contentAddressed.drv))`
-   - We move `out(resolved(contentAddressed.drv))` to its content-adressed path
-     `ca(contentAddressed.drv)` which derives from
-     `sha256(out(resolved(contentAddressed.drv)))`
-   - We register in the db that `Realisation(contentAddressed.drv!out) == { .path = ca(contentAddressed.drv) }`
-3. We build `dependent.drv`
-   - We first compute `resolved(dependent.drv)`.
-     This gives us a new derivation identical to `dependent.drv`, except that `contentAddressed.drv!out` is replaced by `Realisation(contentAddressed.drv!out).path == ca(contentAddressed.drv)`
-   - We realise `resolved(dependent.drv)`. This gives us an output path
-     `out(resolved(dependent.drv))`
-   - We register in the db that `Realisation(dependent.drv!out) == { .path = out(resolved(dependent.drv)) }`
-4. We build `transitivelyDependent.drv`
-   - We first compute `resolved(transitivelyDependent.drv)`
-     This gives us a new derivation identical to `transitivelyDependent.drv`, except that `dependent.drv!out` is replaced by `Realisation(dependent.drv!out).path == out(resolved(dependent.drv))`
-   - We realise `resolved(transitivelyDependent.drv)`. This gives us an output path `out(resolved(transitivelyDependent.drv))`
-   - We register in the db that `Realisation(transitivelyDependent.drv!out) == { .path = out(resolved(transitivelyDependent.drv)) }`
+### Self-references
 
-Now suppose that we replace `contentAddressed` by `contentAddressed'`, which evaluates to a new derivation `contentAddressed'.drv` such that the output of `contentAddressed'.drv` is the same as the output of `contentAddressed.drv` (say we change a comment in a source file of `contentAddressed`).
-We try to rebuild the new `transitivelyDependent`. What happens is the following:
+A store path `/nix/store/abc-foo` is said to be **self-referential** if the
+content of the path mentions the path `/nix/store/abc-foo` itself (and this
+mention of the store path is called a **self-reference**).
 
-1. We instantiate the Nix expression. This gives us three new derivations:
-   `contentAddressed'.drv`, `dependent'.drv` and `transitivelyDependent'.drv`
-2. We build `contentAddressed'.drv`.
-   - We first compute `resolved(contentAddressed'.drv)`
-   - We realise `resolved(contentAddressed'.drv)`. This gives us an output path `out(resolved(contentAddressed'.drv))`
-   - We compute `ca(contentAddressed'.drv)` and notice that the path already exists (since it's the same as the one we built previously), so we discard the result.
-   - We register in the db that `Realisation(contentAddressed.drv'!out) == { .path = ca(contentAddressed'.drv) }` ( also equals to `Realisation(contentAddressed.drv!out)`)
-3. We build `dependent'.drv`
-   - We first compute `resolved(dependent'.drv)`.
-     This gives us a new derivation identical to `dependent'.drv`, except that `contentAddressed'.drv!out` is replaced by `Realisation(contentAddressed'.drv!out).path == ca(contentAddressed'.drv)`
-   - We notice that `resolved(dependent'.drv) == resolved(dependent.drv)` (since `ca(contentAddressed'.drv) == ca(contentAddressed.drv)`), so we just return the already existing path
-4. We build `transitivelyDependent'.drv`
-   - We first compute `resolved(transitivelyDependent'.drv)`
-   - Here again, we notice that `resolved(transitivelyDependent'.drv)` is the same as `resolved(transitivelyDependent.drv)`, so we don't build anything
+A lot of store paths happen to be self-referential (for example a path that contains both an dynamic library and an executable using that library will likely have the `rpath` of the exectuable mention the absolute path to the library).
 
-## Remote caching
+It happens that these are problematic with content-addressed derivations, because
+1. A self-reference means that the output path depends on the temporary path that has been used during the build (potentially breaking reproducibility as there’s no guaranty for this path to be stable),
+2. More annoyingly, a self-reference means that the path can’t be moved freely (otherwise the self-reference would become dangling).
+
+However, under the assumption that self-references only appear textually in the output (*i.e* running strings on a file that contains self-references will print all the self-references out), we can:
+
+- Build the derivation on a temporary directory (`/nix/store/someArbitraryHash-foo`, the path provided by the function `assignScratchOutputPaths` above)
+- Replace all the occurences of `someArbitraryHash` by a fixed magic value
+- Compute the hash of the resulting path to determine the final path
+- Replace the occurences of the magic value by the final path hash
+- Move the result to the final path.
+
+This is obviously a hack, however it seems to work very well in practice, due to the fact that:
+- The string that we search for is a cryptographic hash that’s unlikely to occur by accident in the output path,
+- Very few programs store self-references in a non-purely textual way
+
+In addition, it is possible to detect the cases where this hash-rewriting isn’t total (see [the corresponding future work](#ensuring-that-no-temporary-output-path-leaks-in-the-result)).
+
+### Mixing CA and non-CA derivations
+
+The model so far assumes that the whole world switches to content-addressed derivations.
+It’s however possible to freely mix content- and input-addressed derivations in the same Nix store, and even in the same closure:
+
+The algorithm for building content-addressed derivations extends the algorithm for building input-addressed derivations in two ways:
+1. Before running the build script, it resolves the derivation
+2. When running the build script, it uses some temporary outputs, and moves them to their final location afterwards.
+
+Only the second part assumes that the derivation is content-addressed, and we can use two-different code-paths for the build-step:
+
+```python
+def build_derivation(derivation : Derivation, outputsToBuild: [str]) -> Map[DrvOutput, Realisation]:
+    # Build the dependencies and resolve the derivation like before
+    derivationToBuild = ...
+
+    if (derivationToBuild.isContentAddressed()):
+        assignScratchOutputPaths(derivationToBuild)
+        runBuildScript(derivationToBuild)
+        return moveToCAPaths(derivationToBuild.outputs)
+    else:
+        runBuildScript(derivationToBuild)
+        # If the derivation isn’t content-addressed, then it already knows its
+        # own output paths
+        return derivationToBuild.outputs()
+```
+
+For backwards-compatibility, we must change the algorithm a bit further: Resolving an input-addressed derivation changes its input derivation and input path sets (it replaces every input derivation by the corresponding store paths).
+This means that it also has to change the output paths (as these depend on the inputs of the derivation).
+
+That’s something that we don’t want for the derivations that are already valid today, so we must bypass the resolving step for these derivations (which is okay as these derivations don’t need to be resolved).
+
+```python
+def build_derivation(derivation : Derivation, outputsToBuild: [str]) -> Map[DrvOutput, Realisation]:
+    inputRealisations : Map[DrvOutput, Realisation] = {}
+    # Build all the inputs, and store the newly built realisations
+    for (inputDrv, requiredOutputs) in derivation.inputDrvs:
+        inputRealisations += build_derivation(inputDrv, requiredOutputs)
+
+    derivationToBuild =
+        derivation if derivation.isStrictlyInputAddressed()
+        else resolved(derivation, inputRealisations)
+
+    if (derivationToBuild.isContentAddressed()):
+        assignScratchOutputPaths(derivationToBuild)
+        runBuildScript(derivationToBuild)
+        return moveToCAPaths(derivationToBuild.outputs)
+    else:
+        runBuildScript(derivationToBuild)
+        # If the derivation isn’t content-addressed, then it already knows its
+        # own output paths
+        return derivationToBuild.outputs()
+```
+
+### Remote caching
+
+#### Basic principles
 
 A consequence of this change is that a store path is now just a meaningless
 blob of data if it doesn't have its associated `realisation` metadata −
@@ -230,15 +299,106 @@ As a consequence, the remote cache protocols is extended to not simply
 work on store paths, but rather at the realisation level:
 
 - The store interface now specifies a new method
+  ```python
+  def queryRealisation(output : DrvOutput) -> Maybe Realisation
   ```
-  queryRealisation : DrvOutput -> Maybe Realisation
-  ```
+
+  If the store knows about the given derivation output, it will return the associated realisation, otherwise it will return `None`.
 - The substitution loop in Nix fist calls this method to ask the remote for the
   realisation of the current derivation output.
   If this first call succeeds, then it fetches the corresponding output path
-  like before. Then, it registers the realisation in the database.
-- The binary caches now have a new toplevel folder `/realisations` storing
-  these realisations
+  like before. Then, it registers the realisation in the database:
+
+  ```python
+  def substitute_realisation(substituter : Store, wantedOutput : DrvOutput) -> Maybe Realisation:
+      maybeRealisation = substituter.queryRealisation(wantedOutput)
+      if not maybeRealisation:
+          return None
+      substitute_path(substituter, maybeRealisation.outputPath)
+      return maybeRealisation
+  ```
+
+On the binary cache side, they now have a new toplevel folder `/realisation` to store these realisations.
+This folder contains a set of files of the form `{drvOutput}.doi`, each of them containing a Json serialisation of the realisation corresponding to the given `drvOutput`.
+
+#### The “two-glibc” issue
+
+As stated in [Eelco’s thesis][nixphd], remote caching of content-addressed derivations can be problematic in conjonction with non-determinism:
+
+A typical scenario where this can happen is:
+
+- Alice has `glibc` and `libfoo` built on her local store (with `libfoo` depending on `glibc`)
+- She wants to build `firefox`, which depends on `libfoo` and `libbar`
+- It happens that Bob-the-binary-cache contains `libbar`. `libbar` depends on `glibc`, but because the build of `glibc` isn’t deterministic, Bob actually has a different `glibc` (living in a different store path) than Alice.
+- Alice fetches `libbar` from Bob. She also fetches Bob’s `glibc` as it’s a dependency of `libbar`
+- Now alice uses `libfoo` and `libbar` to build `firefox`. But that means that `firefox` has both Alice’s `glibc` and Bob’s `glibc` in his closure (despite having only one specified in the derivation). After five hours of building, she starts `firefox` and it crashes with a cryptic “duplicated symbol” error. Now Alice is angry because Nix didn’t deliver on its promise of reproducibility and reliability.
+
+The easiest way out of here is to make sure that Alice can’t have two different outputs for the same `glibc` dependency locally. So in the present case, she can’t use the `libfoo` that Bob offers as it wouldn’t be compatible.
+
+The first step to that end, is to enforce the fact that a store can’t have more than one realisation for each derivation output. So it’s illegal to register the realisation for Alice’s `glibc` and Bob’s `glibc` at the same time.
+We must also extend the notion of Realisation to keep track of their dependencies: In the example above, when the substitution mechanism will try to substitute a realisation for `libfoo` from Bob it, it will query Bob for the realisation, see that its output path is `/nix/store/abc-libfoo` and substitute this path (with its dependencies, so including `/nix/store/123-glibc`). But it will never try to register a realisation for Glibc.
+
+To fix this, we must extend a bit the notion of realisation, to keep track of its dependencies: On Bob’s store, `libfoo` is realised as `/nix/store/abc-libfoo`, but this realisation depends on the fact that `glibc` is realised as `/nix/store/123-glibc`.
+
+- Realisations now contain a `dependencies` field, which is a map from `DrvOutput` to `StorePath`:
+
+    ```python
+    class Realisation:
+        id : DrvOutput
+        outputPath : StorePath
+        dependencies : Map[DrvOutput, StorePath]
+    ```
+- We add the constraint that realisations should form a closure in a store, meaning that if a store has the realisation for `foo!out` with a dependency on `bar!out->/nix/store/bar`, then the store must also have a realisation for `bar!out` whose output path is `/nix/store/bar`
+- The realisation loop now keep tracks of these realisations to enforce this closure invariant:
+  ```python
+  # Returns true (and warns) iff we already have a realisation for the given
+  # derivation output, and that realisation has a different output path
+  # than the expected one.
+  def is_incompatible(drvOutput, expectedStorePath):
+      maybeLocalRealisation = localStore.queryRealisation(drvOutput)
+      if (maybeLocalRealisation and maybeLocalRealisation.outputPath != expectedStorePath):
+          warn(f"The substituter {substituter} has an incompatible realisation for {dependentDrvOutput}")
+          return true
+      return false
+
+
+  def substitute_realisation(substituter : Store, wantedOutput : DrvOutput) -> Maybe Realisation:
+      maybeRealisation = substituter.queryRealisation(wantedOutput)
+      if not maybeRealisation:
+          return None
+
+      # Try substituting the derivations we depend on
+      for (dependentDrvOutput, expectedStorePath) in maybeRealisation.dependencies:
+          if is_incompatible(dependentDrvOutput, expectedStorePath)
+              return None
+          else:
+              substitute_realisation(substituter, wantedOutput)
+
+      # Finally substitute the store path itself
+      substitute_path(substituter, maybeRealisation.outputPath)
+      return maybeRealisation
+  ```
+
+### Signatures
+
+Input-addressed paths need to be signed because there’s no way to verify their content (short of rebuilding them and praying that the build is deterministic of course): If `/nix/store/123-foo` is input-addressed, then there’s no direct relation between the hash `123` and the content of the store path.
+
+Content-addressed paths on the other hand don’t need a signature: If `/nix/store/123-foo` is content-addressed, then `123` is supposed to be a hash of the content of the path, and that can be easily checked.
+However, content-addressed realisations must be signed as there’s no simple deterministic relation between a derivation and its output paths. To that end, we extend the `Realisation` type to also include a set of signatures.
+
+```python
+class Realisation:
+    ...
+
+    signatures : Set[str]
+
+    def sign(key : PrivateKey):
+        ...
+    def verify_signature(key : PublicKey):
+        ...
+```
+
+We also update `registerRealisation` for the local store to check these signatures before actually registering anything in the database.
 
 # Drawbacks
 
@@ -251,8 +411,8 @@ work on store paths, but rather at the realisation level:
   `contentAddressed`, but there's no way to enforce these restricitions;
 
 - This will probably be a breaking-change for some tooling since the output path
-  that's stored in the `.drv` files doesn't correspond to an actual on-disk
-  path.
+  that's available at eval-time and stored in the `.drv` files doesn't
+  correspond to an actual on-disk path.
 
 # Alternatives
 
@@ -292,14 +452,13 @@ There exist some better solutions to this problem (including one presented in
 Eelco's thesis), but there are much more complex, so it's probably not worth
 investing in them until we're sure that they are needed.
 
-## Garbage collection
+# Future work
 
-Another major open issue is garbage collection of the realisations table. It's
-not clear when entries should be deleted. The paths in the domain are "fake" so
-we can't use them for expiration. The paths in the codomain could be used (i.e.
-if a path is GC'ed, we delete the alias entries that map to it) but it's not
-clear whether that's desirable since you may want to bring back the path via
-substitution in the future.
+[future]: #future-work
+
+This RFC tries as much as possible to provide a solid foundation for building
+ca paths with Nix, leaving as much room as possible for future extensions.
+In particular:
 
 ## Ensuring that no temporary output path leaks in the result
 
@@ -321,19 +480,15 @@ We however have a way to dectect these: If we have leaking self-references then
 the output will change if we artificially change its output path. This could be
 integrated in the `--check` option of `nix-store`.
 
-# Future work
+## Make content-addressed derivations compatible with other Nix features
 
-[future]: #future-work
+As presented here, content-addressed derivations are incompatible with a few Nix features (in particular import from derivation and recursive Nix).
 
-This RFC tries as much as possible to provide a solid foundation for building
-ca paths with Nix, leaving as much room as possible for future extensions.
-In particular:
+## Enabling a truly multi-user trust-model
 
-- Consolidate the caching model to make it more efficient in presence of
-  non-deterministic derivations
-- (hopefully, one day) make the CA model the default one in Nix
-- Investigate the consequences in term of privileges requirements
-- Build a trust model on top of the content-adressed model to share store paths
+One of the theoretical advantages of the content-addressed model is that it separates the trust (materialised by the realisations) and the storage (the store paths), meaning that several users can share the same Nix store, but have each a different trust relation to it.
+
+This means that each user could be a “trusted-user” for its own view of the store, without affecting the others.
 
 [rfc 0017]: https://github.com/NixOS/rfcs/pull/17
 [nixphd]: https://nixos.org/~eelco/pubs/phd-thesis.pdf
