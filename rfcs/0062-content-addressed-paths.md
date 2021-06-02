@@ -116,9 +116,11 @@ def build_derivation(derivation : Derivation, outputsToBuild: [str]) -> ():
 The main change required by the content-addressed model is that we can’t know
 the output paths of a derivation before building it.
 
-This means that the Derivations as they are produced by the evaluator can’t
-either know their output path, nor explicitely refer to their dependencies by
-their output path.
+This means that the Nix evaluator doesn’t know the output paths of the
+dependencies it manipulates (it *could* know them if they are already built, but
+that would be a blatant purity hole), so these derivations can’t neither embed
+their own output path, nor explicitely refer to their dependencies by their
+output path.
 
 ### Output mappings
 
