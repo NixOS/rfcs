@@ -54,7 +54,7 @@ cutoffs.
 
 [design]: #detailed-design
 
-*In everything that follows, most algorithms and data-structures will be expressed as pseudo-python snippets*
+_In everything that follows, most algorithms and data-structures will be expressed as pseudo-python snippets_
 
 When it comes to computing the output paths of a derivation, the current Nix
 model, known as the “input-addressed” model (also sometimes referred to as the
@@ -62,13 +62,13 @@ model, known as the “input-addressed” model (also sometimes referred to as t
 
 1. A Nix language expression gets evaluated to a `derivation`
 2. This `derivation` is a data-structure describing how to build a package. In particular it contains
-  1. A set of derivation outputs which will be used as input for the build
-  2. A set of store paths that will be used as input for the build
-  3. The build recipe proper (a script to run, with a set of environment
-     variables). This recipe can refer input paths or derivations by
-     interpolating their store path.
-  4. The output paths into which the derivation will be installed.
-    These are computed from a hash of the other elements of the derivation.
+   1. A set of derivation outputs which will be used as input for the build
+   2. A set of store paths that will be used as input for the build
+   3. The build recipe proper (a script to run, with a set of environment
+      variables). This recipe can refer input paths or derivations by
+      interpolating their store path.
+   4. The output paths into which the derivation will be installed.
+      These are computed from a hash of the other elements of the derivation.
 
 The “input-addressed” designation comes from the way the output paths are
 computed: They derive from the derivation data-structure, which is the input of
@@ -79,7 +79,7 @@ these output paths from the inputs of the build, we derive them from the output
 (the produced store path).
 
 Nix already supports a special-case of content-addressed derivations with the
-so-called “fixed-output” derivations.  These are derivations that are
+so-called “fixed-output” derivations. These are derivations that are
 content-addressed, but whose output hash has to be specified in advance, and
 are used in particular to fetch data from the internet (as the constraint that
 the hash has to be specified in advance means that we can relax the sandbox for
@@ -117,7 +117,7 @@ The main change required by the content-addressed model is that we can’t know
 the output paths of a derivation before building it.
 
 This means that the Nix evaluator doesn’t know the output paths of the
-dependencies it manipulates (it *could* know them if they are already built, but
+dependencies it manipulates (it _could_ know them if they are already built, but
 that would be a blatant purity hole), so these derivations can’t neither embed
 their own output path, nor explicitely refer to their dependencies by their
 output path.
@@ -217,10 +217,11 @@ mention of the store path is called a **self-reference**).
 A lot of store paths happen to be self-referential (for example a path that contains both an dynamic library and an executable using that library will likely have the `rpath` of the exectuable mention the absolute path to the library).
 
 It happens that these are problematic with content-addressed derivations, because
+
 1. A self-reference means that the output path depends on the temporary path that has been used during the build (potentially breaking reproducibility as there’s no guaranty for this path to be stable),
 2. More annoyingly, a self-reference means that the path can’t be moved freely (otherwise the self-reference would become dangling).
 
-However, under the assumption that self-references only appear textually in the output (*i.e* running strings on a file that contains self-references will print all the self-references out), we can:
+However, under the assumption that self-references only appear textually in the output (_i.e_ running strings on a file that contains self-references will print all the self-references out), we can:
 
 - Build the derivation on a temporary directory (`/nix/store/someArbitraryHash-foo`, the path provided by the function `assignScratchOutputPaths` above)
 - Replace all the occurences of `someArbitraryHash` by a fixed magic value
@@ -229,6 +230,7 @@ However, under the assumption that self-references only appear textually in the 
 - Move the result to the final path.
 
 This is obviously a hack, however it seems to work very well in practice, due to the fact that:
+
 - The string that we search for is a cryptographic hash that’s unlikely to occur by accident in the output path,
 - Very few programs store self-references in a non-purely textual way
 
@@ -240,6 +242,7 @@ The model so far assumes that the whole world switches to content-addressed deri
 It’s however possible to freely mix content- and input-addressed derivations in the same Nix store, and even in the same closure:
 
 The algorithm for building content-addressed derivations extends the algorithm for building input-addressed derivations in two ways:
+
 1. Before running the build script, it resolves the derivation
 2. When running the build script, it uses some temporary outputs, and moves them to their final location afterwards.
 
@@ -301,11 +304,13 @@ As a consequence, the remote cache protocols is extended to not simply
 work on store paths, but rather at the realisation level:
 
 - The store interface now specifies a new method
+
   ```python
   def queryRealisation(output : DrvOutput) -> Maybe Realisation
   ```
 
   If the store knows about the given derivation output, it will return the associated realisation, otherwise it will return `None`.
+
 - The substitution loop in Nix fist calls this method to ask the remote for the
   realisation of the current derivation output.
   If this first call succeeds, then it fetches the corresponding output path
@@ -344,14 +349,16 @@ To fix this, we must extend a bit the notion of realisation, to keep track of it
 
 - Realisations now contain a `dependencies` field, which is a map from `DrvOutput` to `StorePath`:
 
-    ```python
-    class Realisation:
-        id : DrvOutput
-        outputPath : StorePath
-        dependencies : Map[DrvOutput, StorePath]
-    ```
+  ```python
+  class Realisation:
+      id : DrvOutput
+      outputPath : StorePath
+      dependencies : Map[DrvOutput, StorePath]
+  ```
+
 - We add the constraint that realisations should form a closure in a store, meaning that if a store has the realisation for `foo!out` with a dependency on `bar!out->/nix/store/bar`, then the store must also have a realisation for `bar!out` whose output path is `/nix/store/bar`
 - The realisation loop now keep tracks of these realisations to enforce this closure invariant:
+
   ```python
   # Returns true (and warns) iff we already have a realisation for the given
   # derivation output, and that realisation has a different output path
@@ -469,7 +476,7 @@ being built, which breaks self-references. Hash rewriting solves this in most
 cases, but it is only a heuristic and there is no way to truly ensure that we
 don't leak a self-reference (for example if a self-reference appears in a
 zipped file − like is often the case for man pages or Java jars, the
-hash-rewriting machinery won't detect it).  Having leaking self-references is
+hash-rewriting machinery won't detect it). Having leaking self-references is
 annoying since:
 
 - These self-references change each time the inputs of the derivation change,
