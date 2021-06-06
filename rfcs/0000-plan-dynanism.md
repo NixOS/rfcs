@@ -29,7 +29,7 @@ Many languages now support very large library ecosystems, with dependencies expr
 To this new generation of developers, the distro (or homebrew) is a crufty relic from an earlier age to bootstrap modernity, and then be forgotten about.
 
 Right now, to deal with these packages, we either convert by hand, or commit lots of generated code into Nixpkgs.
-But I don't think either of those options are healthy or sustainable.
+But I don't think either of those options is healthy or sustainable.
 The problem with the first is sheer effort; we'll never be able to keep up.
 The problem with the second is bloating Nixpkgs but more importantly reproducability: If someone wants to update that generated code it is unclear how.
 All these mean that potential users coming from this new model of development find Nix / Nixpkgs cumbersome and unsuited to their needs.
@@ -225,14 +225,15 @@ The above is no doubt hard to read -- I am sorry about that --- but here are a f
 # Drawbacks
 [drawbacks]: #drawbacks
 
-The main drawback is that the stub expressions are *only* "pure" derivations.
+The main drawback is that these stub expressions are *only* "pure" derivations --- placeholder strings (with the proper string context) and not attrsets with all the niceties we are used to getting from `mkDerivation`.
+This is true even when the deferred evaluation in fact *does* use `mkDerivation` and would provide those niceties.
 For other sort of values, we have no choice but wait.
 That means we cannot defer the `pname` `meta` etc. fields: either make do with the bare string `builtins.outputOf` provides, or *statically* add a fake `name` and `meta` etc. that must be manually synced with the deferred eval derivation if it is to match.
 
 # Alternatives
 [alternatives]: #alternatives
 
- - Do nothing, and continue to have no good answer for language-specific package mangers.
+ - Do nothing, and continue to have no good answer for language-specific package managers.
  
  - Instead of deferring only certain portions of the evaluation with `builtins.asssumeDerivation`, simply restart the entire eval.
    Quite simple, and no existing IFD code today needs to change.
