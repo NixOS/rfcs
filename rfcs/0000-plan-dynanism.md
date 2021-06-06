@@ -13,7 +13,7 @@ related-issues: (will contain links to implementation PRs)
 
 We need build plan dynamism -- interleaved building and planning -- to cope with the ever-growing world of language-specific package managers.
 Propose to allow derivations to build derivations, and depend on those built derivations, as the core primitive for this.
-Additionally, introduce a new primop to leverage this in making IFD, still the gold standard for ease of use, more efficient and compatible with `hydra.nixos.org`'s queue runner.
+Additionally, introduce a new primop to leverage this in making "import from derivation" (IFD), still the gold standard for ease of use, more efficient and compatible with `hydra.nixos.org`'s queue runner.
 
 # Motivation
 [motivation]: #motivation
@@ -42,6 +42,9 @@ It's very efficient, because it doesn't obligate the use of the Nix expression l
 Finally, it's quite compatible with `--dry-run`.
 
 However, "import from derivation" is still far and away the easiest method to use, and the one that existing tools to convert to Nix use.
+\[Actually it's not just `import` which is notable, one can `builtins.readFile` a not-yet-buit path and it will also block today, and probably other such primops.
+The exact primop doesn't matter --- all are noticeably more ergonomic than alternatives, and our proposal here is agnostic to the prim-op which would trigger the blocking.
+I will continue to use "IFD" as an umbrella acronym despite its deficiencies because it is best known.\]
 We should continue to support it, finding a way for `hydra.nixos.org` to allow it, so those tools with IFD can be used in Nixpkgs and become first-class members of the Nix ecosystem.
 We have a fairly straightforward mechanism, only slightly more cumbersome than IFD today, to allow evaluation to be deferred after imported things are built.
 This frees up the Hydra evaluator to finish before building, and also meshes well with any plan to build more than one eval-realized path at a time.
@@ -60,12 +63,15 @@ We can break this down nicely into steps.
 
 *This is implemented in https://github.com/NixOS/nix/pull/4628.*
 
-1. Derivation outputs can be valid derivations:
+1. Derivation outputs can be valid derivations.
+   \[If one tries to output a drv file today, they will find Nix doesn't accept the output as such because these small paper cuts.
+   This list item and its children should be thought of as "lifting artificial restrictions".\]
 
    1. Allow derivation outputs to be content addressed in the same manner as drv files.
       (The little-exposed name for this is "text" content addressing).
 
-   2. Lift the restriction barring derivations output paths from ending in `.drv` if they are so content-addressed
+   2. Lift the (perhaps not yet documented) restriction barring derivations output paths from ending in `.drv`, but only for derivation outputs that are so content-addressed.
+      \[There are probably other ways to make store paths that end in `.drv` that aren't valid derivations, so we could make the simpler change of lifting this restriction entirely without breaking invariants. But I'm fine keeping it for the wrong sorts of derivations as a useful guard rail.\]
 
 2. Extend the CLI to take advantage of such derivations:
 
@@ -105,8 +111,8 @@ We can break this down nicely into steps.
 
 3. Extend the scheduler and derivation dependencies similarly:
 
-  - Derivations can depended on the outputs of derivations that are themselves derivation outputs.
-    The schedule will substitute derivations to simplify dependencies as computed derivations are built, just like how floating content addressed derivations are realized.
+  - Derivations can depend on the outputs of derivations that are themselves derivation outputs.
+    The scheduler will substitute derivations to simplify dependencies as computed derivations are built, just like how floating content addressed derivations are realized.
 
   - Missing derivations get their own full fledged goals so they can be built, not just fetched from substituters.
 
@@ -114,7 +120,9 @@ We can break this down nicely into steps.
 
    `builtins.outputOf drv outputName` produces a placeholder string with the appropriate string context to access the output of that name produced by that derivation.
    The placeholder string is quite analogous to that used for floating content addressed derivation outputs.
-   This isn't needed today when we statically know the derivation and thus it's outputs to make attributes for them, but it is needed for built derivations because we don't know either the final derivation or its output names in advanced.
+   \[With just floating content-addressed derivations but no computed derivations, derivations are always known statically but their outputs aren't.
+   With this RFC, since derivations themselves can floating CA derivation outputs, we also might not know them statically, so we need "deep" placeholders to account for arbitrary layers of dynamism.
+   This also corresponds to the use of arbitrary many `!` in the CLI.\]
 
 ## Deferred import from derivation.
 
