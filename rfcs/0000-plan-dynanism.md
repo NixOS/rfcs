@@ -163,7 +163,7 @@ mkScope (self: {
   bar = builtins.assumeDerivation (self.callCabal2nix "bar" ./bar);
 })
 ```
-We get something like the following derivations with dependencies
+After some evaluation, we get something like the following derivations with dependencies:
 ```
 (cabal2nix foo)!out ----> deFoo = deferred eval (fooNix: self.callPackage fooNix)
 (cabal2nix bar)!out ----> deBar = deferred eval (barNix: self.callPackage barNix)
