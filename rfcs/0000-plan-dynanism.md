@@ -62,7 +62,8 @@ We can break this down nicely into steps.
 
 1. Derivation outputs can be valid derivations:
 
-   1. Allow derivation outputs to be content addressed with the "text hashing" scheme.
+   1. Allow derivation outputs to be content addressed in the same manner as drv files.
+      (The little-exposed name for this is "text" content addressing).
 
    2. Lift the restriction barring derivations output paths from ending in `.drv` if they are so content-addressed
 
