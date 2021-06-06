@@ -227,8 +227,8 @@ The above is no doubt hard to read -- I am sorry about that --- but here are a f
 
 The main drawback is that these stub expressions are *only* "pure" derivations --- placeholder strings (with the proper string context) and not attrsets with all the niceties we are used to getting from `mkDerivation`.
 This is true even when the deferred evaluation in fact *does* use `mkDerivation` and would provide those niceties.
-For other sort of values, we have no choice but wait.
-That means we cannot defer the `pname` `meta` etc. fields: either make do with the bare string `builtins.outputOf` provides, or *statically* add a fake `name` and `meta` etc. that must be manually synced with the deferred eval derivation if it is to match.
+For other sort of values, we have no choice but wait; that would require a fully incremental / deferral evaluation which is a completely separate feature not an extension of this.
+Concretely, our design means we cannot defer the `pname` `meta` etc. fields: either make do with the bare string `builtins.outputOf` provides, or *statically* add a fake `name` and `meta` etc. that must be manually synced with the deferred eval derivation if it is to match.
 
 # Alternatives
 [alternatives]: #alternatives
