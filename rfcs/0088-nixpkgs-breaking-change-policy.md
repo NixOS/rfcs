@@ -1,9 +1,11 @@
-# nixpkgs Breaking Change Policy
-
-| feature          | start-date | author    | co-authors                                    | shepherd-team                                                   | shepherd-leader                                  | related-issues                             |
-| ---------------- | ---------- | --------- | --------------------------------------------- | --------------------------------------------------------------- | ------------------------------------------------ | ------------------------------------------ |
-| breaking_changes | 2020-09-24 | Kevin Cox | (find a buddy later to help out with the RFC) | (names, to be nominated and accepted by RFC steering committee) | (name to be appointed by RFC steering committee) | (will contain links to implementation PRs) |
-
+---
+feature: nixpkgs-breaking-change-policy
+start-date: 2020-09-24
+author: Kevin Cox
+co-authors: (TBD)
+shepherd-team: (TBD)
+related-issues: (TBD)
+---
 
 # Summary
 
