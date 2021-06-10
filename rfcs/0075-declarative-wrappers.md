@@ -4,7 +4,7 @@ start-date: 2020-08-16
 author: Doron Behar <me@doronbehar.com>
 co-authors: (find a buddy later to help out with the RFC)
 shepherd-team: @FRidh, @lheckemann, @edolstra
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-leader: @FRidh
 related-issues: POC Implementation at [#85103](https://github.com/NixOS/nixpkgs/pull/85103).
 ---
 
