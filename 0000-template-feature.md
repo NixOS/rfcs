@@ -8,51 +8,57 @@ shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: (will contain links to implementation PRs)
 ---
 
+<!--
+If you are proposing a feature to Nix, Nixpkgs, Hydra or any other
+software developped by the nix community, this is the template
+you want to use.
+-->
+
 # Summary
 [summary]: #summary
 
-One paragraph explanation of the feature.
+<!-- One paragraph explanation of the feature. -->
 
 # Motivation
 [motivation]: #motivation
 
-Why are we doing this? What use cases does it support? What is the expected
-outcome?
+<!-- Why are we doing this? What use cases does it support? What is the expected
+outcome? -->
 
 # Detailed design
 [design]: #detailed-design
 
-This is the core, normative part of the RFC. Explain the design in enough
+<!-- This is the core, normative part of the RFC. Explain the design in enough
 detail for somebody familiar with the ecosystem to understand, and implement.
 This should get into specifics and corner-cases. Yet, this section should also
-be terse, avoiding redundancy even at the cost of clarity.
+be terse, avoiding redundancy even at the cost of clarity. -->
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-This section illustrates the detailed design. This section should clarify all
+<!-- This section illustrates the detailed design. This section should clarify all
 confusion the reader has from the previous sections. It is especially important
 to counterbalance the desired terseness of the detailed design; if you feel
 your detailed design is rudely short, consider making this section longer
-instead.
+instead. -->
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this?
+<!-- Why should we *not* do this? -->
 
 # Alternatives
 [alternatives]: #alternatives
 
-What other designs have been considered? What is the impact of not doing this?
+<!-- What other designs have been considered? What is the impact of not doing this? -->
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-What parts of the design are still TBD or unknowns?
+<!-- What parts of the design are still TBD or unknowns? -->
 
 # Future work
 [future]: #future-work
 
-What future work, if any, would be implied or impacted by this feature
-without being directly part of the work?
+<!-- What future work, if any, would be implied or impacted by this feature
+without being directly part of the work? -->
