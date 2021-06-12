@@ -33,26 +33,24 @@ document and acknowledge design issues, record proof-generated insight, but also
 amend the RFC process itself, the forum rules, the code of conduct or propose any other 
 binding changes to community workflows or infrastructure.
 
-## Some issues are not addressed by the appropriate angle
+## Some issues are not addressed from the appropriate angle
 
 Even if, in the past, people might have used the RFC Process to gather broader consensus
-around some of the hard-to-propose topics exemplified in the previous paragraph, the
-ensuing discussion still might have been framed in a way that is not best suited.
+around some of those hard-to-propose topics, the ensuing discussion still might have been
+framed in a way that is not best suited. This actually starts with the sctructure of the
+template.
 
 By explicitly categorizing RFCs, it will be immediatly evident for participants that
-those RFCs are a) legitimate and b) require an evaluation within the sensible boundaries
-of their categories. For example, it is hard to imagine, that a proof-generated insight
-being recorded as an _Informational RFC_ would receive a request for an actual proposal
-to improve the situation. In this example, gathering broad consensus about acknowledgement
-becomes easier. It is hard to imagine, how such an attempt would go smoothly within the
-current framing.
+those RFCs are a) legitimate and b) require an evaluation within the fair boundaries
+of their categories.
 
 # Detailed design
 [design]: #detailed-design
 
 Every RFC that is eligible for the RFC process is classified by its author into the
-_information_, _process_ or _feature_ category. How those categories are defined in every
-detail can remain subjective, but the following should give a sufficient idea:
+_information_, _process_ or _feature_ category. For each category a different template
+is made available. How those categories are defined in every detail can remain
+subjective, but the following should give a sufficient idea:
 
 - Informational RFCs
   - Start a talk, meetup, or social networking account that will be expected to officially “represent nix”
@@ -67,7 +65,8 @@ detail can remain subjective, but the following should give a sufficient idea:
   - Anything that is currently covered by the RFC process and does not better fit into
     any of the other two categories.
 
-Before this RFC reaches FCP, the RFC template is amended accordingly through this PR.
+This RFC is accompanied by commits that implement it. Please refer to them for the detailed
+design.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
