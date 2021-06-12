@@ -10,7 +10,7 @@ related-issues: (will contain links to implementation PRs)
 
 <!--
 If you are proposing a feature to Nix, Nixpkgs, Hydra or any other
-software developped by the nix community, this is the template
+software developed by the nix community, this is the template
 you want to use.
 -->
 
