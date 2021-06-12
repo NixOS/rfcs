@@ -85,21 +85,21 @@ after the FCP.
 
 ##### RFC Categories
 In order to do do justice to the different aspects of documents that merit
-generation of broad community consensus via the RFC process, we cassify each
+generation of broad community consensus via the RFC process, we classify each
 RFC into _feature_, _process_ and _informational_ RFCs. All follow the same
 high-level process as described above, but each category requires a different
-"mode of discussion", templates, critarias and judgment that it is benefical
+"mode of discussion", templates, criteria and judgment that it is beneficial
 to the overall RFC process to identify those categories explicitly.
 
 
 ## Process from Creation to Merge
 
-*In short, to get a major change included in Nix, Nixpkgs or the Ecosystem, one must
+*In short, to get a major change included in Nix, Nixpkgs or the ecosystem, one must
 first get the RFC merged into the RFC repository as a markdown file under the
 corresponding directory. At that point the RFC is accepted and may be implemented
-with the goal of eventual inclusion into Nix, Nixpkgs or the Ecosystem.*
+with the goal of eventual inclusion into Nix, Nixpkgs or the Ecosystem.
 
-0. Have a cool idea r an important information!
+0. Have a cool idea or an important information!
 1. Identify its category: _feature_, _process_ or _informational_.
 2. Start with the correct template and follow the instructions and comments.
 3. Submit a pull request. As a pull request the RFC will receive design feedback

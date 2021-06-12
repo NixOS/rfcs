@@ -75,7 +75,7 @@ The relevant examples and interactions are already exposed in the motivation sec
 The detailed design does not require further exemplification, since it is intended to be
 an authors personal best judgment without significant backlash on the categorization
 that drives the categorization, not a specific set of criteria. I don't think its 
-feasible to develop such fixed set of creteria herin in a meaningful way.
+feasible to develop such fixed set of criteria herein in a meaningful way.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -114,7 +114,7 @@ Once we have some experiences with those categories, we might also decide to:
   1. Initial Comment Period
   1. Implement Prototype, request infrastructure for prototype
   1. Generate data & insights from Prototype and record them in the RFC
-  1. Proceed to Final COmment Period
+  1. Proceed to Final Comment Period
   1. Fully implement in production after RFC acceptation.
 
 # Prior Art
