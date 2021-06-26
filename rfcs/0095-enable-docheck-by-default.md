@@ -40,7 +40,7 @@ Instead of boolean it should accept these values:
   valuable if it has a comment or actual reason why the test fails. For example
   "Requires X11 server" or "Requires network access".
 
-** Non-reproducible tests prevention:**
+**Non-reproducible tests prevention:**
 There are multiple options. Here I am going to list a few:
 1. `chmod a-w -R /build`
 2. [User namespaces](https://lwn.net/Articles/532593/)
