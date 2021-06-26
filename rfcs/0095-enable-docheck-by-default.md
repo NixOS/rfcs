@@ -18,7 +18,7 @@ Enable `doCheck` by default when using `stdenv.mkDerivation` function.
 
 I believe that an additional quality gate would be beneficial to the derivations build process.
 
-Resolution of this RFC is expected to remove [these comments](https://github.com/NixOS/nixpkgs/blob/master/pkgs/stdenv/generic/make-derivation.nix#L61-L67)
+Resolution of this RFC is expected to remove [these comments](https://github.com/NixOS/nixpkgs/blob/8c563eaf7049d82fbe95b0847ac5ae6e5554e2fa/pkgs/stdenv/generic/make-derivation.nix#L61-L67)
 either by enabling checkPhase by default or rejecting this RFC.
 
 # Detailed design
@@ -66,4 +66,3 @@ The impact of avoiding this is a lack of assurance of delivered package quality.
 "Non-reproducible tests prevention" implementation is to be decided. I feel
 like `du -s` is the right way to go about it since it is simple/fast and I
 expect it to be quite reliable.
-
