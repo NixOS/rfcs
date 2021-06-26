@@ -32,10 +32,10 @@ The basic idea is quite simple
 
 **New doCheck semantics:**
 Instead of boolean it should accept these values:
-- true - Run both `checkPhase` and `installCheckPhase`.
-- false - Do not execute `checkPhase` nor `installCheckPhase`.
-- "checkPhase" - Execute `checkPhase` only.
-- "installCheckPhase" - Execute `installCheckPhase` only.
+- `true` - Run both `checkPhase` and `installCheckPhase`.
+- `false` - Do not execute `checkPhase` nor `installCheckPhase`.
+- `"checkPhase"` - Execute `checkPhase` only.
+- `"installCheckPhase"` - Execute `installCheckPhase` only.
 - _Anything else_ - Same as `false` but also adds some verbosity which makes it
   valuable if it has a comment or actual reason why the test fails. For example
   "Requires X11 server" or "Requires network access".
