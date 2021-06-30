@@ -25,20 +25,16 @@ either by enabling `checkPhase` by default or rejecting this RFC.
 [design]: #detailed-design
 
 The basic idea is quite simple
-- New `doCheck` semantic should be implemented.
+- New `doCheck`/`doInstallCheck` semantic should be implemented.
 - By default `doCheck` option should be enabled as long as `stdenv.hostPlatform == stdenv.buildPlatform`.
 - Non-reproducible test prevention should be implemented.
 - All failing packages should be fixed or updated with `doCheck = false;`
 
-**New doCheck semantics:**
-Instead of boolean it should accept these values:
-- `true` - Run both `checkPhase` and `installCheckPhase`.
-- `false` - Do not execute `checkPhase` nor `installCheckPhase`.
-- `"checkPhase"` - Execute `checkPhase` only.
-- `"installCheckPhase"` - Execute `installCheckPhase` only.
-- _Anything else_ - Same as `false` but also adds some verbosity which makes it
-  valuable if it has a comment or actual reason why the test fails. For example
-  "Requires X11 server" or "Requires network access".
+**New `doCheck`/`doInstallCheck` semantics:**
+In addition to booleans, `doCheck`/`doInstallCheck` should also accept strings.
+- String value should be considered as `false`
+- It should be used as a place for comment on why the check is disabled. For
+  example: "Requires X11 server" or "Requires network access".
 
 **Non-reproducible tests prevention:**
 There are multiple options. Here I am going to list a few:
