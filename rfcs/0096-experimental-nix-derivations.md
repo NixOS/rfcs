@@ -30,11 +30,14 @@ Expected outcome:
 # Detailed design
 [design]: #detailed-design
 
-Additional derivations `nixExperimentalFlakes` and `nixExperimentalAll`. (Possibly more if necessary)
+`nixUnstable` derivation definitions should be updated in such a way so end users would be able to overwrite features with something along the lines of this:
+```nix
+nixUnstable.override { experimentalFeatures = ["flakes"]; }
+```
 
-What's so special about these derivations:
-- Experimental features enabled by default. Much like [this](https://github.com/NixOS/nixpkgs/pull/120141) PR.
-- When using these derivations it shows a warning.
+What's so special about this override:
+- Makes specified experimental features enabled by default. (A little similar to [this](https://github.com/NixOS/nixpkgs/pull/120141) PR)
+- When using these overwritten derivations warning should be shown.
 
 
 Warning expected to look something like this:
@@ -70,9 +73,9 @@ Not doing this would preserve a lack of visibility. Especially when using projec
 [unresolved]: #unresolved-questions
 
 How exactly warning should look like?
+How exactly `experimentalFeatures` feature flag should be implemented? (Via CLI argument? Env variable? Dynamically generated patch/sed?)
 
 # Future work
 [future]: #future-work
 
 Removal/Deprecation of Nix experimental packages on a per case basis.
-
