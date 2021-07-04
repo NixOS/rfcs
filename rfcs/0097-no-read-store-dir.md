@@ -44,6 +44,9 @@ in [nix/src/libstore/build/local-derivation-goal.cc](https://github.com/NixOS/ni
 in [nix/src/libstore/local-store.cc](https://github.com/NixOS/nix/blob/0a535dd5ac93576f7152d786464e330ae3d46b50/src/libstore/local-store.cc#L181)
 to 1771.
 
+Nothing else has to be done likely, since setting the store permissions to `1771` manually doesn't break
+anything other than what is mentioned in this document (though it is undone if you run a `nix` command).
+
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
@@ -51,7 +54,7 @@ Losing the read (r) bit means that you can't list the files inside the store.
 The execute (x) bit allows us to `cd` to it and also access paths inside the store.
 
 E.g. `ls "$(readlink /nix/var/nix/profiles/system)"` will still work, since this is a directory
-inside the store, and not the store itself, but you can't without sudo do `ls /nix/store` to find your system configuration.
+inside the store, and not the store itself, but an unprivileged user can't `ls /nix/store` to find the system configuration.
 
 Note: A program could still have some idea of how the host machine is used by checking each store path that Hydra has ever built,
 then it could estimate whether the host machine has e.g. Tor on it.
