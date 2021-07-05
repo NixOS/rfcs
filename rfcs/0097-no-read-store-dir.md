@@ -53,7 +53,9 @@ to 1771.
 /nix/store/trash and /nix/store/.links will also have to have their read bit removed, resulting in 0751.
 
 Currently, /proc/cmdline provides the path to the current system configuration, which is counter-productive in this case.
-This would have to be fixed, by e.g. either embedding the path into the initrd or using the generation number instead of the full path.
+This would be fixed by simply setting the permissions to 0440, since the permissions are universal to all pid namespaces.
+Fixing the permissions for other files in /proc would likely also be a good idea, regardless of this RFC and regardless
+of sandboxing, e.g. it doesn't make sense to expose /proc/config.gz to the entire world even if it doesn't expose any secrets.
 
 Nothing else has to be done likely, since setting the store permissions to `1771` manually doesn't break
 anything other than what is mentioned in this document (though it is undone if you run a `nix` command).
