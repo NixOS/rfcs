@@ -55,7 +55,7 @@ to 1771.
 
 `/nix/store/trash` and `/nix/store/.links` will also have to have their read bit removed, resulting in 0751.
 
-Various other parts of NixOS also ought have their permissions fixed, which is beneficial with and without this change.
+Various parts of NixOS also ought have their permissions fixed, which is beneficial with and without this change.
 Specifically, the permissions for these things ought to be looked at again:
 - `/proc/cmdline`
 - `/proc/sys`
@@ -116,7 +116,7 @@ do it themselves by simply putting this into their configuration.nix:
 ```
 
 Traditional sandboxing could be seen as an alternative to this, however, they are not mutually exclusive,
-since this change is fundamentally just changing some permissions in NixOS.
+since this change is fundamentally just changing some permissions.
 Improving the permissions for /nix/store will not decrease security for traditional sandboxes.
 
 # Unresolved questions
