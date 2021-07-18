@@ -56,6 +56,12 @@ there is simply not a better or reasonable alternative available.
 We have numerous issues regarding wrappers and our wrapper shell hooks. Here's
 a list of them, sorted to categories.
 
+* [Missing environment variables](#missing-environment)
+* [Orchestrating wrapping hooks](#orchestrating-wrapping-hooks)
+* [Issues _Possibly_ fixable by declarative wrappers](#issues-possibly-fixable-by-declarative-wrappers-)
+* [Unreported Issues](#unreported-issues-afaik)
+* [Other Issues](#other-issues)
+
 ## Missing environment
 
 - [pull 83321](https://github.com/NixOS/nixpkgs/pull/83321)
