@@ -256,8 +256,8 @@ a given package:
 }
 ```
 
-The information found inside an input's `wrappers.json` will include all the
-information about wrappers found in the input's inputs, and so on. Thus in
+The information found inside an input's `wrappers.json` will specify the
+wrapper information not only for itself, but for all its dependencies (including transitives) as well. Thus, in
 contrast to the [POC Nixpkgs PR](https://github.com/NixOS/nixpkgs/pull/85103)
 and the [original design of the
 RFC](https://github.com/doronbehar/rfcs/blob/60d3825fdd4e6574b7e5d70264445d1c801368c6/rfcs/0075-declarative-wrappers.md#L251),
@@ -265,9 +265,8 @@ prior to [the 1st
 meeting](https://github.com/NixOS/rfcs/pull/75#issuecomment-760942876),
 traversing all the inputs and the inputs' inputs, will not happen during eval
 time and only partly, during build time - every package already built will
-provide it's reverse dependencies all the information they need about
-environment variables of itself and of all of it's inputs and it's inputs'
-inputs.
+provide its reverse dependencies all the information they need about
+environment variables.
 
 Most of the work to do will be:
 
@@ -279,10 +278,10 @@ Most of the work to do will be:
     will allow piping a JSON string from `builtins.toJSON` and spit a
     `wrappers.json` that will include both what was piped into it, and the
     content from the package's various inputs' `wrappers.json` files.
-  - It should make the executables in `$out/bin/` get wrapped according to
+  - It should wrap the executables in `$out/bin/` according to
     what's currently in this package's `wrappers.json`, during `fixupPhase`.
   - The above should be also possible to do manually for executables outside
-    `$out/bin/` with say adding to a derivation a Nix variable:
+    `$out/bin/` by setting `wrapExtraPrograms` on the derivation:
 
 ```nix
   wrapExtraPrograms = [ "/libexec/" "/share/scripts" ];
