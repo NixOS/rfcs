@@ -274,7 +274,7 @@ Most of the work to do will be:
    package, and edit these derivations to include a `wrappers.json` in them.
    This should be done with `makeWrapperAuto` as well, see (2).
 2. Design the `makeWrapperAuto` shell hook:
-  - It should introduce a shell function (to be called `wrappersInfo`) that
+  - It should introduce a shell function (to be called `combineWrappersInfo`) that
     will allow piping a JSON string from `builtins.toJSON` and spit a
     `wrappers.json` that will include both what was piped into it, and the
     content from the package's various inputs' `wrappers.json` files.
@@ -301,11 +301,11 @@ Most of the work to do will be:
 
 When switching to `makeWrapperAuto` from `makeWrapper` there shouldn't be
 manual usage of `wrapProgram` for most cases. A package that uses `wrapProgram`
-should be able to switch to `wrappersInfo` and declare any nontrivial
+should be able to switch to `combineWrappersInfo` and declare any nontrivial
 environment variables with it to get propagated to reverse dependencies and to
 it's executables automatically.
 
-Currently I imagine the usage of `wrappersInfo` (the name can be debated) as
+Currently I imagine the usage of `combineWrappersInfo` (the name can be debated) as
 so:
 
 ```nix
@@ -313,11 +313,11 @@ so:
   postInstall = ''
     echo "${builtins.toJSON {
       GST_PLUGIN_SYSTEM_PATH_1_0 = [
-        # @out@ should be expanded by `wrappersInfo` to what's in `$out`, see:
+        # @out@ should be expanded by `combineWrappersInfo` to what's in `$out`, see:
         # https://github.com/NixOS/nixpkgs/pull/85103#issuecomment-613071343
         "@out@/lib/gstreamer-1.0"
       ];
-    }}" | wrappersInfo
+    }}" | combineWrappersInfo
   '';
 ```
 
@@ -341,7 +341,7 @@ And often seen in Python + Qt programs:
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Using `wrapProgram` will be simpler then using `wrappersInfo` and it might be
+Using `wrapProgram` will be simpler then using `combineWrappersInfo` and it might be
 hard to explain why is there no `wrapProgramAuto`. However, this interface
 might get improved in design through this RFC or in the future and in any case
 proper documentation should help.
