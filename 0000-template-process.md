@@ -89,7 +89,7 @@ Typical stakeholders involve: maintainers, end users, corporate users
 # Conclusion
 [conclusion]: #conclusion
 
-<!-- In the greater scheme of things, to wat degree does your proposal
+<!-- In the greater scheme of things, to what degree does your proposal
 satisfy the motivation. Is it meaningful? Is it important? Is it urgent? -->
 
 # Updates
