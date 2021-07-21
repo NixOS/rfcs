@@ -121,7 +121,7 @@ We can break this down nicely into steps.
    `builtins.outputOf drv outputName` produces a placeholder string with the appropriate string context to access the output of that name produced by that derivation.
    The placeholder string is quite analogous to that used for floating content addressed derivation outputs.
    \[With just floating content-addressed derivations but no computed derivations, derivations are always known statically but their outputs aren't.
-   With this RFC, since derivations themselves can floating CA derivation outputs, we also might not know them statically, so we need "deep" placeholders to account for arbitrary layers of dynamism.
+   With this RFC, since drv files themselves can be floating CA derivation outputs, we also might not know the derivations statically, so we need "deep" placeholders to account for arbitrary layers of dynamism.
    This also corresponds to the use of arbitrary many `!` in the CLI.\]
 
 ## Deferred import from derivation.
