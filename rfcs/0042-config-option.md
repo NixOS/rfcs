@@ -6,6 +6,7 @@ co-authors:
 shepherd-leader: Jörg Thalheim
 shepherd-team: Jörg Thalheim, Eelco Dolstra, Robert Helgesson
 related-issues: https://github.com/NixOS/nixpkgs/pull/65728, https://github.com/NixOS/nixpkgs/pull/70138, https://github.com/NixOS/nixpkgs/pull/75584, TBD
+category: feature
 ---
 
 # Summary

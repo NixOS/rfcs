@@ -6,6 +6,7 @@ co-authors:
 shepherd-team: @ryantm, @garbas, @Mic92
 shepherd-leader: @ryantm
 related-issues: [NixOS release schedule](https://github.com/NixOS/rfcs/pull/80)
+category: informational
 ---
 
 # Summary

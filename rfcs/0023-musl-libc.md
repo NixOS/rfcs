@@ -4,6 +4,7 @@ start-date: 2018-02-19
 author: Will Dietz (@dtzWill)
 co-authors: Shea Levy (@shlevy)
 related-issues: 34645, 6221, ...
+category: feature
 ---
 
 

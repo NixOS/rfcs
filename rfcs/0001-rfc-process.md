@@ -4,6 +4,7 @@ start-date: 2017-02-12
 author: zimbatm
 co-authors: teh, MoreTea
 related-issues: https://github.com/zimbatm/rfcs/pull/2
+category: process
 ---
 
 # Summary

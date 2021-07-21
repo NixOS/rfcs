@@ -4,6 +4,7 @@ start-date: 2019-04-25
 author: Shea Levy
 co-authors:
 related-issues: NixOS/rfcs#25
+category: process
 ---
 
 # Summary

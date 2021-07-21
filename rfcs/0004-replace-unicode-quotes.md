@@ -7,6 +7,7 @@ related-issues:
     - https://github.com/NixOS/nix/pull/1140
     - https://github.com/NixOS/nix/issues/915
     - https://github.com/NixOS/nix/pull/910
+category: feature
 ---
 
 # Summary

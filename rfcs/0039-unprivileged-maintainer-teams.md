@@ -4,6 +4,7 @@ start-date: 2019-01-16
 author: Graham Christensen <graham@grahamc.com>
 co-authors: zimbatm <zimbatm@zimbatm.com>
 related-issues: https://github.com/NixOS/ofborg/pull/303
+category: process
 ---
 
 # Summary

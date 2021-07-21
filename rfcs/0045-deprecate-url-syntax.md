@@ -5,7 +5,8 @@ author: Michael Raskin
 co-authors: 
 shepherd-leader: Eelco Dolstra
 shepherd-team: Eelco Dolstra, zimbatm, Silvan Mosberger
-related-issues: 
+related-issues:
+category: feature
 ---
 
 # Summary

@@ -6,6 +6,7 @@ co-authors: Graham Christensen (@grahamc), Jan Tojnar (@jtojnar)
 shepherd-team: @lheckemann, @tilpner, @alyssais
 shepherd-leader: @tilpner
 related-issues: 0055
+category: process
 ---
 
 # Summary

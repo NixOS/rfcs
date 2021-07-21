@@ -4,6 +4,7 @@ start-date: 2017-07-18
 author: Robin Gloster (@globin)
 co-authors: Franz Pletz (@fpletz)
 related-issues: --
+category: process
 ---
 
 # Summary

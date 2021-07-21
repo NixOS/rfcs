@@ -6,6 +6,7 @@ co-authors: @dezgeg
 related-issues: https://github.com/dezgeg/nixpkgs/tree/better-run-phases
 shepherd-team: Samuel Dionne-Reil, John Ericson, Linus Heckemann
 shepherd-leader: Linus Heckemann
+category: feature
 ---
 
 # Summary

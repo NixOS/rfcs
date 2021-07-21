@@ -5,6 +5,7 @@ end-date: 2019-04-25
 author: Graham Christensen
 co-authors: Daniel Peebles, Eelco Dolstra, Peter Simons, Shea Levy, Vladimír Čunát
 related-issues: #44 (disbands the team)
+category: process
 ---
 
 # Superseded!

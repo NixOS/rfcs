@@ -6,6 +6,7 @@ co-authors: (find a buddy later to help our with the RFC)
 shepherd-team: @globin, @grahamc, and @peti
 shepherd-leader: @peti
 related-issues: (will contain links to implementation PRs)
+category: process
 ---
 
 # Summary

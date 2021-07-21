@@ -6,6 +6,7 @@ co-authors:
 shepherd-team: Arian van Putten, asymmetric, Eelco Dolstra, Jörg Thalheim, Ryan Mulligan
 shepherd-leader: Ryan Mulligan
 related-issues: https://github.com/NixOS/nixpkgs/pull/65698, https://github.com/NixOS/nixpkgs/pull/71055
+category: feature
 ---
 
 # Summary

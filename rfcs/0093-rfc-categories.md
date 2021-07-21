@@ -6,6 +6,7 @@ co-authors: (find a buddy later to help out with the RFC)
 shepherd-team: @kevnicox, @Mic92, @gytis-ivaskevicius
 shepherd-leader: @kevincox
 related-issues:
+category: process
 ---
 
 # Summary

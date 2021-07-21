@@ -4,6 +4,7 @@ start-date: 2020-07-05
 author: mboes
 shepherd-team: garbas, zimbatm, Kloenk
 shepherd-leader: Infinisil
+category: feature
 ---
 
 # Summary

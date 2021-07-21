@@ -5,6 +5,7 @@ author: Jonathan Ringer (@jonringer)
 co-authors: Frederik Rietdijk (@FRidh)
 shepherd-team: @ryantm, @domenkozar and @garbas
 related-issues:
+category: informational
 ---
 
 # Summary
