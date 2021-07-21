@@ -164,7 +164,7 @@ with the goal of eventual inclusion into Nix, Nixpkgs or the Ecosystem.
 
 ### Tips
 
-###### Create Prototypes
+#### Create Prototypes
 In case your RFC is a technical proposal, you might want to prepare a
 prototype of your idea to firstly make yourself aware of potential pitfalls
 and also help reviewers understand the RFC. Code may be able to explain some
