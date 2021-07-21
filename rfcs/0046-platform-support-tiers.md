@@ -6,7 +6,7 @@ shepherd-team: Ryan Mulligan, Jonas Pfenniger, Graham Christensen, John Ericson
 shepherd-leader: John Ericson
 co-authors: Matthew Bauer
 related-issues:
-category: feature
+category: informational
 ---
 
 # Summary
