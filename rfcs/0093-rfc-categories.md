@@ -100,11 +100,10 @@ design.
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-The relevant examples and interactions are already exposed in the motivation section.
+The relevant examples and interactions are exposed in the motivation section.
 The detailed design does not require further exemplification, since it is intended to be
-an authors personal best judgment without significant backlash on the categorization
-that drives the categorization, not a specific set of criteria. I don't think its 
-feasible to develop such fixed set of criteria herein in a meaningful way.
+an authors personal best judgment that drives the categorization, not a specific set of criteria.
+I don't think its feasible to develop such fixed set of criteria herein in a meaningful way.
 
 # Drawbacks
 [drawbacks]: #drawbacks
