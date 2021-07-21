@@ -7,6 +7,7 @@ shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
 modifies:
  - [RFC 0000 my_old_process]()
+category: process
 ---
 
 <!--
@@ -61,12 +62,18 @@ Make use of BPMN 2.0 notation, if you'd find that useful. -->
 
 # Roles & Stakeholders
 
-<!-- Describe in abstract terms the roles involved in this process
+<!-- 
+Stakeholders are people who have an interest in the outcome of this RFC.
+
+Please describe in abstract terms the roles involved in this process
 and how they are affected by this process change. Plotting estimated
 / abstract time requirements of _as-is_ against _to-be_ is a plus.
 The idea is to get a better sense of the stakeholders of this process
 and their respective interestes and estimate the associated total
-costs imposed (mostly in time, can be negative) to the community.-->
+costs imposed (mostly in time, can be negative) to the community.
+
+Typical stakeholders involve: maintainers, end users, corporate users
+-->
 
 # Pros & Cons
 [evaluation]: #pros-and-cons

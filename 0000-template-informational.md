@@ -7,6 +7,7 @@ shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
 relates-to:
  - [RFC 0000 my_other_information]()
+category: informational
 ---
 
 <!--
