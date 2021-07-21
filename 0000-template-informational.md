@@ -33,4 +33,4 @@ In order to address "X", I/we propose to "Y".
 # My Structure
 
 <!-- This template does not have a recommended structure, please use your best
-judgment for your particular case. -->
+judgement for your particular case. -->
