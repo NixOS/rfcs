@@ -3,8 +3,8 @@ feature: experimental-nix-derivations
 start-date: 2021-06-25
 author: gytis-ivaskevicius
 co-authors:
-shepherd-team:
-shepherd-leader:
+shepherd-team: niksnut, blaggacao, maljub01, nrdxp
+shepherd-leader: niksnut
 related-issues:
 ---
 
