@@ -86,7 +86,7 @@ after the FCP.
 ##### RFC Categories
 In order to do do justice to the different aspects of documents that merit
 generation of broad community consensus via the RFC process, we classify each
-RFC into _feature_, _process_ and _informational_ RFCs. All follow the same
+RFC as _feature_, _process_ or _informational_. All follow the same
 high-level process as described above, but each category requires a different
 "mode of discussion", templates, criteria and judgment that it is beneficial
 to the overall RFC process to identify those categories explicitly.
