@@ -195,7 +195,7 @@ completion: authors should not expect that other project developers will take on
 responsibility for implementing their accepted feature.
 
 Minor modifications to accepted RFCs can be done in follow-up pull requests. We
-strive to write each RFC in a manner that it will  reflect the final state of
+strive to write each RFC in a manner that it will reflect the final state of
 the world; but the nature of the process means that we cannot expect every
 merged RFC to actually reflect what the end result will be after implementation.
 
