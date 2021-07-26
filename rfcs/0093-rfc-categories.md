@@ -22,7 +22,7 @@ improve the overall outcome of the process.
 ## Some issues are not addressed by the community
 
 There is no appropriate venue for it. When reading the current RFC process, it becomes
-clear that it was made primarily with purely technical decisions in mind. It might only
+clear that it was made primarily for technical decisions. It might only
 be a perception, but this perception systemically skews what's being discussed and what
 not.
 
