@@ -38,7 +38,7 @@ binding changes to community workflows or infrastructure.
 considered a failed RFC process, might have benefited from a framework to transition into
 a general experiment in the form of an _informational_ RFC as soon as it had become
 clear that it won't be accepted as a _feature_ RFC. Its subsequent closure has rendered
-the entire flake experiment to a largely undocumented, unstructured, and intransparent
+the entire flake experiment to a largely undocumented, unstructured, and opaque
 process that still elicites strong opinions within the community. Clarity over RFC options
 and venues _might_ have helped mitigate this situation.
 
