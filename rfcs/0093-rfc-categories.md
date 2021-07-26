@@ -13,7 +13,7 @@ category: process
 [summary]: #summary
 
 The RFC process is amended with means to categorize RFCs into one of: _feature_, 
-_information_ or _process_, where each category sets different accents that
+_information_ or _process_, where each category sets different expectations for reviewers that
 improve the overall outcome of the process.
 
 # Motivation
