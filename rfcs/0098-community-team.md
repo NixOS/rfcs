@@ -115,7 +115,7 @@ Team members will have the authority to ban community members from any community
 
 Team members will manage their own access control lists, adding and removing each other on Discourse, GitHub, Mjolnir (the Matrix bot), and anywhere else that's necessary.
 
-Community social spaces include Disourse, GitHub, and Matrix, as well as any analogous spaces which may exist in the future. It is expected that team members will not act alone when implementing bans, except in situations which are both urgent and exceptional. Like all moderation actions, bans will be publicly disclosed to the community, and explained. Banning somebody from participation on GitHub does prevent them from submitting pull requests; it is thus equivalent to full expulsion from the technical effort which the community is dedicated to.
+Community social spaces include Discourse, GitHub, and Matrix, as well as any analogous spaces which may exist in the future. It is expected that team members will not act alone when implementing bans, except in situations which are both urgent and exceptional. Like all moderation actions, bans will be publicly disclosed to the community, and explained. Banning somebody from participation on GitHub does prevent them from submitting pull requests; it is thus equivalent to full expulsion from the technical effort which the community is dedicated to.
 
 It is necessary for the team to have the authority to ban, as it is the basis of all the soft power the team wields. However, the team should prefer to use bans only as a last resort. When somebody is excluded from a community, the community has no further power to change their heart, help them grow, or otherwise influence them. Bans should not be performed vindictively or as punishments, but only as necessary actions for the well being of the remaining community members. A ban is a sad occasion, no matter how necessary it may be.
 
@@ -132,7 +132,7 @@ Following the adoption of this RFC, the code of conduct and statement of values 
 
 The Nix community recognizes that its members come from many walks of life, and that it is natural for us to disagree on some things. Nonetheless, we are all committed to certain values, to allow us to work together and build awesome technologies.
 
-Community members are expected to follow these values in their interactions in all official Nix social spaces, including websites, chat rooms, bug threads, and conferences. We have a community team who will set and enforce social norms, to make that easier for everyone. faCommunity members are expected to follow the community team's requests.
+Community members are expected to follow these values in their interactions in all official Nix social spaces, including websites, chat rooms, bug threads, and conferences. We have a community team who will set and enforce social norms, to make that easier for everyone. Community members are expected to follow the community team's requests.
 
 If you have opinions on the community team's work, get involved! It's a rotating team, and we want to develop the leadership potential in all community members.
 
