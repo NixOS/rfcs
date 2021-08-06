@@ -284,13 +284,15 @@ Most of the work to do will be:
     will allow piping a JSON string from `builtins.toJSON` and spit a
     `wrappers.json` that will include both what was piped into it, and the
     content from the package's various inputs' `wrappers.json` files.
-  - It should wrap the executables in `$out/bin/` according to
-    what's currently in this package's `wrappers.json`, during `fixupPhase`.
-  - The above should be also possible to do manually for executables outside
-    `$out/bin/` by setting `wrapExtraPrograms` on the derivation:
+  - It should wrap a list of executables according to a list of glob patterns,
+    defaulting to `["$outputBin/bin/*" "$outputLib/libexec/**/*"]`, according
+    to what's currently in this package's `wrappers.json`, during `fixupPhase`.
+  - It should be possible to override this list of glob patterns, and specify a
+    new list instead of it. The other list can include glob patterns as well,
+    or specific executables instead. For example:
 
 ```nix
-  wrapExtraPrograms = [ "/libexec/" "/share/scripts" ];
+  wrapPrograms = [ "$outputLib/libexec/${pname}/run-server" "$out/share/scripts/*" ];
 ```
 
 3. Most of the packages with linked environment variables, have lots of reverse
