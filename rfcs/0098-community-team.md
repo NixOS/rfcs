@@ -25,7 +25,7 @@ There is not currently any official mechanism for moderation action. It's not su
 * Mediate disputes when doing so is beneficial to the community
 * Respect the privacy of community members
 * Foster newcomers and develop their leadership potential
-* Moderate all places where community members interact, including Discourse, Matrix, and GitHub
+* Moderate all official spaces where community members interact, including Discourse, Matrix, GitHub, and NixCon
 * Ensure that collaboration on shared technical goals is possible
 * Ensure that the Nix community is a welcoming space for people from marginalized backgrounds
 * Do not allow the Nix community to be a place for spreading ideas rooted in fascism or bigotry
@@ -115,7 +115,9 @@ Team members will have the authority to ban community members from any community
 
 Team members will manage their own access control lists, adding and removing each other on Discourse, GitHub, Mjolnir (the Matrix bot), and anywhere else that's necessary.
 
-Community social spaces include Discourse, GitHub, and Matrix, as well as any analogous spaces which may exist in the future. It is expected that team members will not act alone when implementing bans, except in situations which are both urgent and exceptional. Like all moderation actions, bans will be publicly disclosed to the community, and explained. Banning somebody from participation on GitHub does prevent them from submitting pull requests; it is thus equivalent to full expulsion from the technical effort which the community is dedicated to.
+Official community social spaces include Discourse, GitHub, Matrix, and NixCon, as well as any analogous spaces which may exist in the future. The community team does not hold authority in unofficial spaces, but unofficial spaces are invited to officially endorse the statement of values if they decide it's right for them. The community team will be available, at its discretion, for consultation with people running unofficial communities.
+
+It is expected that team members will not act alone when implementing bans, except in situations which are both urgent and exceptional. Like all moderation actions, bans will be publicly disclosed to the community, and explained. Banning somebody from participation on GitHub does prevent them from submitting pull requests; it is thus equivalent to full expulsion from the technical effort which the community is dedicated to.
 
 It is necessary for the team to have the authority to ban, as it is the basis of all the soft power the team wields. However, the team should prefer to use bans only as a last resort. When somebody is excluded from a community, the community has no further power to change their heart, help them grow, or otherwise influence them. Bans should not be performed vindictively or as punishments, but only as necessary actions for the well being of the remaining community members. A ban is a sad occasion, no matter how necessary it may be.
 
