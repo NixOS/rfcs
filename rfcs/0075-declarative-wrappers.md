@@ -328,7 +328,7 @@ so:
 ```
 
 `wrapQtAppsHook` and `wrapGAppsHook` should be replaced with `makeWrapperAuto`
-while enable derivations to get rid of well known workarounds such as:
+which enables removing frequent workarounds such as:
 
 ```nix
   # hook for gobject-introspection doesn't like strictDeps
@@ -347,7 +347,7 @@ And often seen in Python + Qt programs:
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Using `wrapProgram` will be simpler then using `combineWrappersInfo` and it might be
+Using `wrapProgram` is simpler than using `combineWrappersInfo` and it might be
 hard to explain why is there no `wrapProgramAuto`. However, this interface
 might get improved in design through this RFC or in the future and in any case
 proper documentation should help.
