@@ -132,6 +132,8 @@ The community team will hold its members accountable to these ideals.
 
 Following the adoption of this RFC, the code of conduct and statement of values will be displayed on a dedicated page on the NixOS website. They will read as follows, unless amended by a future RFC.
 
+The NixOS Foundation aims to promote participation without regard to gender, sexual orientation, disability, ethnicity, age, or similar personal characteristics. We want to strive to create and foster community by providing an intentionally welcoming and safe environment where all feel valued and cared for, and where all are given opportunity to participate meaningfully. The Foundation will work with the community in service of this goal.
+
 The Nix community recognizes that its members come from many walks of life, and that it is natural for us to disagree on some things. Nonetheless, we are all committed to certain values, to allow us to work together and build awesome technologies.
 
 Community members are expected to follow these values in their interactions in all official Nix social spaces, including websites, chat rooms, bug threads, and conferences. We have a community team who will set and enforce social norms, to make that easier for everyone. Community members are expected to follow the community team's requests.
