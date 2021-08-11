@@ -103,7 +103,7 @@ To those who might say that any statement of values is merely performative and t
 
   The formal decision-making process is intended only as a way to resolve membership questions and other long-term questions about the direction of the team; it is neither required nor recommended for routine moderation decisions.
 
-4. The team should attempt to maintain a sufficient size such that there are enough members to cover all the community spaces without major gaps. On no account should the team ever be so large that members can't all know each other, or can't keep each other in the loop on decisions.
+4. The team should attempt to maintain a sufficient size such that there are enough members to cover all the community spaces without major gaps. On no account should the team ever be so large that members can't all know each other, or can't keep each other in the loop on decisions. In the event of a conflict between these two constraints, the latter takes precedence. It is deliberate that no exact number is specified here; it is anticipated that the community's needs will change over time.
 
 5. Members are expected to remain in regular communication with each other and develop their social bonds; it is understood that social bonds among team members are vitally important to doing the job properly. The arrival of new members should be celebrated, and the team should maintain a low-latency communication channel where members can easily reach each other for discussions that are private from the community at large. Retired team members should leave that channel.
 
