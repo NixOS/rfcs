@@ -8,6 +8,13 @@ shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: (will contain links to implementation PRs)
 ---
 
+# About this document
+[about]: #about-document
+
+Most sections in this document are informative, not normative. They describe how to evaluate the normative sections, but do not establish rules. Nothing in the informative sections is meant to be enforced as-written, only to guide discussion of the RFC. The normative sections create procedures which will apply going forward.
+
+Detailed Design and its six sub-sections are normative. All other sections are informative.
+
 # Summary
 [summary]: #summary
 
