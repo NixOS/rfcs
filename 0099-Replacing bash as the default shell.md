@@ -12,7 +12,7 @@ related-issues:
 
 [summary]: #summary
 
-Use oilshell as the default shell for nixos. Oilshell aims to be compatible with bash while trying to bring real programming language features (like hashmap or dicts) to the shell.
+Use oil as the stdenv shell in nixos. Oil aims to be compatible with bash while trying to bring real programming language features (like hashmap or dicts) to the shell.
 
 ## Motivation
 
@@ -27,7 +27,7 @@ Two primary motivations
 
 [design]: #detailed-design
 
-The [oil shell](https://www.oilshell.org/) has two parts osh and oil. Osh is compatible with bash and posix and it's goal is to run existing shell scripts. The oil language is a brand new incompatible language. The idea is to fix more than four decades of accumulated warts in the Unix shell. Many Unix users are angry that shell is so difficult, and Oil aims to fix that. Those definitions were taken verbatim from [reference](https://www.oilshell.org/blog/2021/01/why-a-new-shell.html)
+The [oil shell](https://www.oilshell.org/) has two parts osh and the oil language. Osh is compatible with bash and posix and it's goal is to run existing shell scripts. The oil language is a brand new incompatible language. The idea is to fix more than four decades of accumulated warts in the Unix shell. Many Unix users are angry that shell is so difficult, and Oil aims to fix that. Those definitions were taken verbatim from [reference](https://www.oilshell.org/blog/2021/01/why-a-new-shell.html)
 
 Regarding oil
 
@@ -63,7 +63,6 @@ mkdir /tmp/dest
 cp foo /tmp/dest
 ```
 
-- Oil has
 - Introduce functions that need to explicitely define their parameters
 
 ```Shell
@@ -83,7 +82,7 @@ f() {
 }
 ```
 
-those functions are called procs and their variables don't mess with their outter scope.
+those functions are called procs and their variables don't mess with their outer scope.
 
 - Oil has proper associative arrays (dictionaries or hashmaps) that don't have the problems that bash's have.
 
