@@ -3,8 +3,8 @@ feature: collect-non-source-package-meta
 start-date: 2021-03-14
 author: Robert Scott
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @asymmetric, @aforemny, @alyssais
+shepherd-leader: @asymmetric
 related-issues: (will contain links to implementation PRs)
 ---
 
