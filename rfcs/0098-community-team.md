@@ -84,6 +84,8 @@ Although feedback on moderation practices and philosophy is encouraged, communit
 
 It is important for communities that are seeking to make the world better to have clear values, to articulate those values, and to be willing to stand up for them when necessary. Furthermore, since the Nix community is large and ideologically diverse, it is important that there be transparency as to what the community team is trying to accomplish. The preceding paragraphs are an attempt at finding this delicate balance.
 
+The statement of values is meant as a reminder of what we want to strive for, as a community. It's also a tool for community members to reference when discussing the direction of community efforts. Having the statement of values means that, for example, if a community member is suggesting a way to advance inclusion, nobody needs to argue as to whether inclusion should be in-scope for Nix, because the values make it clear that it is.
+
 To those who might oppose any public statement of values: Isn't it better to have it up front, so you don't have to wonder?
 
 To those who might say that any statement of values is merely performative and that the proof is in actions, not words: These authors fully agree, but we're saying the words anyway. Please hold us accountable for living up to them.
