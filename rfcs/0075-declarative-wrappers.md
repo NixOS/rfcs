@@ -262,6 +262,20 @@ a given package:
 }
 ```
 
+There is a default behaviour that `makeWrapperAuto` will use, for example:
+
+- The separator between the paths should default to `:`, but for some known
+  environment variables that use `;` (e.g `LUA_PATH`), `makeWrapperAuto` should
+  know in advance that this is the separator they need. This information should
+  be coded in a nix / shell file.
+- Some environment variables are not meant to be a list, like
+  `GDK_PIXBUF_MODULE_FILE`. This information should be understood by
+  `makeWrapperAuto` because it appears in `wrappers.json` as a single string.
+- The default behavior for the order used eventually in the wrapper should be
+  the order in which the information is gathered, which leaves the lower level
+  dependencies' paths to the end. If someone reading this RFC can give examples
+  where a special order might be required, let us know.
+
 The information found inside an input's `wrappers.json` will specify the
 wrapper information not only for itself, but for all its dependencies
 (including transitives) as well. Thus, in contrast to the [POC Nixpkgs
