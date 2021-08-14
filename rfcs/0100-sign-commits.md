@@ -203,8 +203,7 @@ pull:
 - `git pull --ff-only origin 21.05` 0:08
 - `git pull --ff-only origin 21.05` 0:08 (after having fetched with `--filter=blob:none`)
 - `git pull --ff-only origin 21.05` 0:07 (after having fetched with `--filter=tree:0`)
-- `git clone git://github.com/NixOS/nixpkgs --single-branch --branch=21.05 --depth 1` 0:08 (pulling doesn't make sense)
-  (Almost supported already, see https://github.com/NixOS/nix/issues/5119)
+- `git clone git://github.com/NixOS/nixpkgs --single-branch --branch=21.05 --depth 1` 0:08 (pulling doesn't work)
 - `curl https://github.com/NixOS/nixpkgs/archive/21.05.tar.gz -LO | tar -xf -`
   0:04 (roughly equivalent to `github:NixOS/nixpkgs?ref=21.05`)
 
@@ -275,7 +274,7 @@ since if there were, users might very often ignore the error even if valid.
 - Merging PRs can not be done through GitHub.
 - Setting up GPG signatures will be a bit extra work for the committers.
 - Committers will need to maintain the list of authorized committers.
-- Fetching Nixpkgs with Nix will take around [4 times](#speeding-up-fetching-git) the time, depending on your hardware.
+- Fetching Nixpkgs with Nix will take around [5 times](#speeding-up-fetching-git) the time, depending on your hardware.
 - Currently building a fork of Nixpkgs (for e.g. a PR) will still work fine, since
   the latest commit will be trusted when adding a new flake input, or referring
   to one from the commandline, but updating the flake input will fail
