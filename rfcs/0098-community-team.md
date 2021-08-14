@@ -18,7 +18,7 @@ Detailed Design and its six sub-sections are normative. All other sections are i
 # Summary
 [summary]: #summary
 
-Establish an official community team to make moderation decisions, model social norms, and mediate interpersonal problems.
+Establish an official community team to model social norms, mediate interpersonal problems, and make moderation decisions.
 
 # Motivation
 [motivation]: #motivation
@@ -76,7 +76,9 @@ The code of conduct and statement of values will set forth the goals of the comm
 
 It is the position of these authors that spelling rules out in precise, formal detail invites people to treat the rules as a game and try to find ways to use the letter of the rules against the spirit of them. By focusing on principles and appealing to community members to live up to those ideals, we hope to make such "gaming" as difficult as possible.
 
-Making this system work without precise rules requires mutual trust between members of the community and the community team. The community team will make their best effort to explain why moderation decisions are being made and to tie those decisions to the statement of values. These explanations will typically be given by the team member who made the decision, but this is an obligation for the team as a whole, not for any single team member. It is understood that explanations are time-consuming, and that demanding them can be a tool for harassment or for undermining the team's authority; placing the obligation on the team as a whole is an attempt to balance those risks against the need for public accountability. There is no specific requirement that explanations be provided rapidly; the community team's workload may not always permit this. Explanations will never disclose private information, whether about community members or about anyone else.
+Making this system work without precise rules requires mutual trust between members of the community and the community team. The community team will model social norms by holding themselves to a high standard of behavior. The community team will make their best effort to explain why moderation decisions are being made and to tie those decisions to the statement of values. These explanations will typically be given by the team member who made the decision, but this is an obligation for the team as a whole, not for any single team member.
+
+It is understood that explanations are time-consuming, and that demanding them can be a tool for harassment or for undermining the team's authority; placing the obligation on the team as a whole is an attempt to balance those risks against the need for public accountability. There is no specific requirement that explanations be provided rapidly; the community team's workload may not always permit this. Explanations will never disclose private information, whether about community members or about anyone else.
 
 Although feedback on moderation practices and philosophy is encouraged, community team decisions are to be disputed only through the process set forth in this document (see the contact section). Community members are expected to respect that there is a difference between giving feedback and attempting to re-litigate a decision in the court of public opinion. It is okay to respectfully disagree, in private or in public; it is not okay to prolong such a discussion unnecessarily or turn it into personal attacks.
 
