@@ -197,6 +197,7 @@ by passing filters (see man page for `git-clone(1)` and `git-rev-list(1)`):
   (Almost supported already, see https://github.com/NixOS/nix/issues/5119)
 - `curl https://github.com/NixOS/nixpkgs/archive/21.05-beta.tar.gz -LO | tar -xf -`
   0:04 (roughly equivalent to `github:NixOS/nixpkgs?ref=21.05-beta`)
+
 Then after doing `cd nixpkgs`, we try fetching `21.05-beta`, which is 659 commits more to
 pull:
 - `git pull --ff-only origin 21.05` 0:08
