@@ -15,8 +15,8 @@ Manage the environment of wrappers declaratively and deprecate shell based
 methods for calculating runtime environment of packages. Make it easier to
 debug why env vars are added to an executable, by storing this information
 inside `/nix/store/.../nix-support/` of the dependencies that using them
-requires require runtime environment. Create a new `makeWrapperAuto` hook that
-will make the `fixupPhase` read all of the deps environment that's needed and
+requires runtime environment. Create a new `makeWrapperAuto` hook that will
+make the `fixupPhase` read all of the deps environment that's needed and
 automatically wrap the executables with the proper environment.
 
 # Motivation
@@ -232,8 +232,8 @@ order to work will get these environment variables set in the wrapper by
 introduce a new `makeWrapperAuto` setup hook that will take care of this in the
 way described as follows.
 
-As a start, we'll need to think about all packages in Nixpkgs that using them
-requires some environment variables to be set. Every such package will put in
+As a start, we'll need to think about all packages in Nixpkgs that require
+environment variables to be set at runtime. Every such package will put in
 `$dev/nix-support/wrappers.json` a list of environment variables that are
 "linked" to this package. "linked" means that using this package requires these
 environment variables to be set in runtime.
@@ -263,9 +263,10 @@ a given package:
 ```
 
 The information found inside an input's `wrappers.json` will specify the
-wrapper information not only for itself, but for all its dependencies (including transitives) as well. Thus, in
-contrast to the [POC Nixpkgs PR](https://github.com/NixOS/nixpkgs/pull/85103)
-and the [original design of the
+wrapper information not only for itself, but for all its dependencies
+(including transitives) as well. Thus, in contrast to the [POC Nixpkgs
+PR](https://github.com/NixOS/nixpkgs/pull/85103) and the [original design of
+the
 RFC](https://github.com/doronbehar/rfcs/blob/60d3825fdd4e6574b7e5d70264445d1c801368c6/rfcs/0075-declarative-wrappers.md#L251),
 prior to [the 1st
 meeting](https://github.com/NixOS/rfcs/pull/75#issuecomment-760942876),
