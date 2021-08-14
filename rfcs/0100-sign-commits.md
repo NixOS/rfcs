@@ -189,17 +189,25 @@ not take advantage of the above method for verifying source code
 integrity.
 
 We can however speed up fetching Git repositories heavily
-by passing filters (see man page for `git-clone(1)` and `git-rev-list(1)`).
-A small benchmark from the author of this RFC:
-- `git clone git://github.com/NixOS/nixpkgs` 4:24
-- `git clone git://github.com/NixOS/nixpkgs --filter=blob:null` 1:06
-- `git clone git://github.com/NixOS/nixpkgs --filter=tree:0` 0:22
-- `git clone git://github.com/NixOS/nixpkgs --depth 1` 0:10
+by passing filters (see man page for `git-clone(1)` and `git-rev-list(1)`):
+- `git clone git://github.com/NixOS/nixpkgs --single-branch --branch=21.05-beta` 4:17
+- `git clone git://github.com/NixOS/nixpkgs --single-branch --branch=21.05-beta --filter=blob:none` 1:05
+- `git clone git://github.com/NixOS/nixpkgs --single-branch --branch=21.05-beta --filter=tree:0` 0:22
+- `git clone git://github.com/NixOS/nixpkgs --single-branch --branch=21.05-beta --depth 1` 0:08
   (Almost supported already, see https://github.com/NixOS/nix/issues/5119)
-- `curl https://github.com/NixOS/nixpkgs/archive/master.tar.gz -LO | tar -xf -`
-  0:05 (roughly equivalent to `github:NixOS/nixpkgs`)
+- `curl https://github.com/NixOS/nixpkgs/archive/21.05-beta.tar.gz -LO | tar -xf -`
+  0:04 (roughly equivalent to `github:NixOS/nixpkgs?ref=21.05-beta`)
+Then after doing `cd nixpkgs`, we try fetching `21.05-beta`, which is 659 commits more to
+pull:
+- `git pull --ff-only origin 21.05` 0:08
+- `git pull --ff-only origin 21.05` 0:08 (after having fetched with `--filter=blob:none`)
+- `git pull --ff-only origin 21.05` 0:07 (after having fetched with `--filter=tree:0`)
+- `git clone git://github.com/NixOS/nixpkgs --single-branch --branch=21.05 --depth 1` 0:08 (pulling doesn't make sense)
+  (Almost supported already, see https://github.com/NixOS/nix/issues/5119)
+- `curl https://github.com/NixOS/nixpkgs/archive/21.05.tar.gz -LO | tar -xf -`
+  0:04 (roughly equivalent to `github:NixOS/nixpkgs?ref=21.05`)
 
-This is with an 850 EVO SSD, the max download speed from GitHub was 24 MiB/s.
+This is with an 850 EVO SSD, the average download speed from GitHub was around 11 MiB/s according to `git`.
 Relevant documentation is:
 - https://github.blog/2020-12-21-get-up-to-speed-with-partial-clone-and-shallow-clone/
 - https://git-scm.com/docs/partial-clone
