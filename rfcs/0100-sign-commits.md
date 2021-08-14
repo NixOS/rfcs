@@ -55,7 +55,7 @@ but is strongly recommended from now on.
 
 Currently merging is done through GitHub, which would not work in this case.
 Merging would have to happen outside of GitHub, so that you can sign the commits,
-since currently the API doesn't support signing commits with your own GPG
+since currently the API doesn't support signing commits with your own PGP
 key: https://github.com/cli/cli/issues/1318.
 
 The exact workflow for merging a PR with ID 123 would be something like this:
@@ -100,7 +100,7 @@ do
 done
 ```
 
-The digest algorithm for GPG must be set to something that isn't SHA-1,
+The digest algorithm for GPG (if you're using GPG) must be set to something that isn't SHA-1,
 as [it isn't secure anymore](https://eprint.iacr.org/2020/014.pdf), for example by putting the following in
 `$HOME/.gnupg/gpg.conf`:
 ```
@@ -215,7 +215,7 @@ Relevant documentation is:
 
 We likely want to make Nix use `--filter=tree:0` by default when fetching repositories.
 `--depth 1` is faster, but it doesn't preserve the commit history,
-and it's not clear how it it interacts with GPG signing.
+and it's not clear how it it interacts with PGP signing.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -272,7 +272,7 @@ since if there were, users might very often ignore the error even if valid.
 [drawbacks]: #drawbacks
 
 - Merging PRs can not be done through GitHub.
-- Setting up GPG signatures will be a bit extra work for the committers.
+- Setting up PGP signatures will be a bit extra work for the committers.
 - Committers will need to maintain the list of authorized committers.
 - Fetching Nixpkgs with Nix will take around [5 times](#speeding-up-fetching-git) the time, depending on your hardware.
 - Currently building a fork of Nixpkgs (for e.g. a PR) will still work fine, since
