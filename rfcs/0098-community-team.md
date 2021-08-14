@@ -192,6 +192,14 @@ Failing to actively manage and lead the community makes it difficult for the com
 
 Creating a hierarchical power structure based on specific individuals having semi-permanent roles is an approach that could initially be successful at reducing conflict. However, it would require a great deal of trust which may not exist, and it is not sustainable to indefinitely place that level of trust in specific people. By having a rotating team which includes *everyone*, we spread the necessary skills throughout the community and foster a culture which handles conflict in appropriate ways from the beginning.
 
+A suggestion from @blaggacao:
+* Submit one procedural RFC for the Moderating(!) Team
+* A normative RFC for our "Statement of Values" which can be discussed without this really incommodating defensive framing of "policing discussions on the public forum"
+* As prominent member pointed out, the NixOS foundation already had had a tweet commiting to the entirety of prerequisite principles of emotional safety in public discussions. An really short RFC could take that statement, maybe expand a little bit in context and move it out of twitter into the body of (accepted) RFCs. Such RFC will have "teeth".
+
+This suggestion is included verbatim, per discussion on the GitHub thread.
+
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
