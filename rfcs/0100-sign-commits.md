@@ -11,12 +11,13 @@ related-issues: https://github.com/NixOS/rfcs/pull/34
 # Summary
 [summary]: #summary
 
-Recommend and eventually require that people who commit directly to
-https://github.com/NixOS/nixpkgs and https://github.com/NixOS/nix,
-so called authorized committers, sign their commits.
-
-Commits inside merges do not have to be signed as long as the merge commit itself is signed,
-such that only Committers have to sign their commits.
+- Add a way for flake inputs that point to Git repositories to be verified for trust.
+- Speed up fetching Git repositories with Nix.
+- Recommend and eventually require that people who commit directly to
+  https://github.com/NixOS/nixpkgs and https://github.com/NixOS/nix,
+  so called authorized committers, sign their commits.
+  - Commits inside merges do not have to be signed as long as the merge commit itself is signed,
+		such that only Committers have to sign their commits.
 
 # Motivation
 [motivation]: #motivation
@@ -58,16 +59,27 @@ Merging would have to happen outside of GitHub, so that you can sign the commits
 since currently the API doesn't support signing commits with your own PGP
 key: https://github.com/cli/cli/issues/1318.
 
-The exact workflow for merging a PR with ID 123 would be something like this:
+We would make a script for merging pull requests instead, something like:
 ```bash
+#!/bin/sh
+# nixpkgsmerge
+
 git switch master
 git pull
-gh pr checkout 123
+gh pr checkout $1
 git switch master
-git merge -m "Merged #123" --no-ff --gpg-sign -
+git merge -m "Merged #$1" --no-ff --gpg-sign -
 git push origin master
-gh pr close 123
+gh pr close $1
 ```
+Then
+```bash
+nixpkgsmerge 123
+```
+
+For mobile platforms, you would use [nix-on-droid](https://github.com/t184256/nix-on-droid)
+to run the script instead.
+
 A merge commit must always be made so that there is something to sign.
 
 A git hook like the one presented here is also recommended,
@@ -161,10 +173,8 @@ automatically, i.e. it is [Trust on First Use](https://en.wikipedia.org/wiki/Tru
 To secure initializations, new attributes are added to the `git` input type:
 - `startsAt` (optional): This is the first commit to use, therefore verification
   starts from this commit on.
-- `startsAtKey` (optional): This is the PGP fingerprint for the `startsAt` commit.
-  This should not be required, but is necessary since SHA-1 is insecure.
 
-The standard registry entries will have `startsAt` and `startsAtKey` attributes
+The standard registry entries will have the `startsAt` attribute
 added, to ensure that NixOS users fetch trusted source code.
 
 ### Other new input attributes
@@ -283,24 +293,34 @@ since if there were, users might very often ignore the error even if valid.
 # Alternatives
 [alternatives]: #alternatives
 
-- Mandating signing only tags is an alternative, though not very useful for most users.
+- Mandating signing only tags is an alternative, though not very useful for most users, since:
+  1) Users of Nixpkgs rarely fix their used revision to a tag.
+  2) Not signing every commit prevents you from using the algorithm described in [updating].
+  Somewhat the same thing can be achieved by the "redirection flake" design described
+  in [future], however.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
 - Should `/.authorized-committers.nix` perhaps not support computation like `flake.nix`?
-  If it supports computation, in Nixpkgs it can be derived from the maintainer list partially.
+  If it supports computation, in Nixpkgs it could be derived from the maintainer list partially.
 - Should we require that repositories that use this mechanism contain
   the public keys corresponding to the fingerprints to remove the need for key servers?
 
 # Future work
 [future]: #future-work
 
-- Currently, Git still uses SHA-1, which means that verifying a commit's signature
-  doesn't mean that the hash of that commit is trusted, since there could be
-  multiple commits with the same hash. See [SHA-1 is a Shambles](https://eprint.iacr.org/2020/014.pdf).
+- Currently, Git still uses SHA-1, which means that you can't
+  completely trust signatures on SHA-1 repositories, since it is a combination
+  of the commit message, parent hashes, and tree hashes, that are seemingly signed.
   To avoid this, all Git repositories must eventually be transitioned to
-  SHA-256 when Git support for SHA-256 is stabilized.
+  SHA-256 when Git support for SHA-256 is stabilized. Users can already
+  try SHA-256 if they want extra security for their own repositories.
+  See:
+  - https://git-scm.com/docs/hash-function-transition/
+  - [Git 2.29.0 release notes](https://github.com/git/git/blob/master/Documentation/RelNotes/2.29.0.txt)
+  - [SHA-1 is a Shambles](https://eprint.iacr.org/2020/014.pdf)
+  - https://sha-mbles.github.io/ for a more readable version.
 - The `github` flake input type could potentially be removed since it doesn't seem to be necessary anymore.
 - Instead of an ad-hoc workflow for signing merges, functionality
   could be added to https://github.com/desktop/desktop and https://github.com/cli/cli
