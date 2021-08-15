@@ -230,7 +230,8 @@ discuss requiring signing will be made.
 Specifically, for now for now, Nixpkgs will have a list of authorized
 committers, `/.well-known/authorized-committers.nix`, as described
 in [verifying trust], with all the authorized committers,
-**in addition** to GitHub's public PGP key.
+**in addition** to GitHub's public PGP key,
+but only until the tooling is done.
 
 This won't provide much extra security, since anybody
 can sign anything with GitHub's key, but it will lay
