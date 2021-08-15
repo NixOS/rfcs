@@ -227,7 +227,8 @@ The required tooling is listed [below](#tooling-for-signing-merges).
 When the tooling is somewhat complete, a new RFC to
 discuss requiring signing will be made.
 
-Specifically, for now for now, Nixpkgs will have a list of authorized
+Specifically, for now for now, we will
+have a transitional phase, where Nixpkgs will have a list of authorized
 committers, `/.well-known/authorized-committers.nix`, as described
 in [verifying trust], with all the authorized committers,
 **in addition** to GitHub's public PGP key,
@@ -235,7 +236,9 @@ but only until the tooling is done.
 
 This won't provide much extra security, since anybody
 can sign anything with GitHub's key, but it will lay
-the foundation for future improvements to security.
+the foundation for future improvements to security,
+so that eventually we can remove GitHub's key and
+get out of the transitional phase.
 
 **Notably**, no part of the current workflow will change with this RFC.
 
