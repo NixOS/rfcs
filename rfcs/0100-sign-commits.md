@@ -298,6 +298,7 @@ since if there were, users might very often ignore the error even if valid.
   2) Not signing every commit prevents you from using the algorithm described in [updating].
   Somewhat the same thing can be achieved by the "redirection flake" design described
   in [future], however.
+- We could trust GitHub's PGP key, so that merging can still be done through GitHub.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
