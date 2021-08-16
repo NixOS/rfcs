@@ -3,8 +3,8 @@ feature: aarch64-tier1
 start-date: 2021-03-09
 author: Vika Shleina
 co-authors: Graham Christensen
-shepherd-team: TBD
-shepherd-leader: TBD
+shepherd-team: @samueldr, @Kloenk, @dhess, @grahamc
+shepherd-leader: @samueldr
 related-issues: TBD
 ---
 
