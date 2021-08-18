@@ -238,11 +238,13 @@ There is also a documentation file
 [pop.md](https://github.com/MuKnIO/nixpkgs/blob/devel/lib/pop.md)
 that discusses the background for the design of POP.
 
-Finally, I have been writing an essay that I intend to submit to some
-academic programming language conference, wherein
-I reconstruct the principles of Object-Oriented Programming
-based on my experience with POP and a similar library I wrote in Scheme:
-[Pure Object-Orientation, Functionally](https://github.com/metareflection/poof).
+Finally, I wrote an academic paper that was accepted at the
+Scheme and Functional Programming Workshop 2021,
+that explains the design behind POP.
+In this paper, I reconstruct the principles of Object-Oriented Programming
+based on my experience with POP and a similar library I wrote in Scheme,
+as well as an extensive bibliographical research on the topic:
+[Prototypes: Object-Orientation, Functionally](https://github.com/metareflection/poof).
 
 ## Notable though minor incompatibility
 
@@ -299,7 +301,7 @@ useCcl = {
 };
 ```
 
-Meanwhile, another extension might be about using a graphical debugging,
+Meanwhile, another extension might be about using a graphical debugger,
 including a graphical inspector:
 ```
 clGraphicalDebugging = {
@@ -429,10 +431,53 @@ extra debugging information.
 
 ## Interaction with modules
 
-NixOS has a notion of modules that has its own extensibility mechanism
-well distinct from the regular extension system.
-Someone ought to learn enough of both POP and modules to tell how it might be possible (or not)
-to have a unified mechanism that can handle modules as well as regular scopes, etc.
+NixOS has a notion of [modules](https://nixos.org/manual/nixos/stable/index.html#sec-writing-modules)
+that has its own extensibility mechanism well distinct from the usual extension systems.
+POP as it is proposed here does not attempt to compete with this notion of modules.
+Yet, it is conceivable to extend POP to build a better (though not 100% compatible)
+variant of NixOS modules.
+
+- The current module system has an `imports` system the effect of which is not very well defined.
+  That's one case where POP's multiple inheritance could give a good meaning
+  to defining dependencies between module definitions such that
+  each is combined only once in dependency order into the mix.
+
+- The NixOS module system actually defines three kinds of entities:
+  modules, configurations, types, each with its own semantics, merging algorithm, etc.
+  (Though, if you squint, modules could a special case of types, and
+  configurations be the type being define by the module system.)
+  The definition for a replacement of each of these entities would require
+  a different use of POP's meta-object protocol.
+
+- The merging algorithms used for modules, configs and types are much more elaborate
+  than the one used by POP by default (`mergeAttrset`), but
+  POP's meta-object protocol (`instantiateMeta`) supports specifying
+  an alternate `mergeInstance` mechanism (though currently the "toplevel" functions
+  `pop`, `basePop`, `kPop`, etc., all use the default mechanism and won't let you override it).
+  In this sense modules or something module-like could be done in POP,
+  and benefit from POP's features and approach.
+
+- Similarly, the `warning` mechanism could be achieved in a POP setting
+  by using the `topProto` feature of `instantiateMeta` to handle warnings
+  at the end of config merging. The same mechanism could more generally `finalize`
+  the values being defined from the result of the merges to something "user-visible".
+
+- POP has a system of dependencies and defaults that is a partial replacement for
+  the priority system of module options: the `defaults` in POP replace low-priority settings,
+  and the multiple inheritance of POP ensures that settings by children objects
+  (importing modules) will override those of parent objects (imported modules),
+  without having to assign priority numbers.
+  My experience with various configuration systems (e.g. SYSV init) is that
+  dependencies are a much more user-friendly way of managing priorities
+  than requiring users to put arbitrary priority numbers.
+  However, usability might require that we extend Nix to allow for cheap cycle detection
+  (see above regarding Missing Primitives for Performance),
+  so we can provide users with better error messages.
+
+Thus, while POP in its current state is not a replacement for the module system,
+it could serve as the basis for such a replacement,
+one that would provide better dependency management
+and a more systematic, more understandable, design.
 
 ## Backward compatibility wrappers
 
