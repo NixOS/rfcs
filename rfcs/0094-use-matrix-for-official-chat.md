@@ -47,7 +47,7 @@ In any case, to avoid a mismatch in cultural norms stemming from having two conn
 [drawbacks]: #drawbacks
 
 * Long-term IRC users might find it difficult to get used to a different chat platform and client. However, we consider the aforementioned benefits to outweigh this drawback.
-* Participating in the conversations requires an account on a homeserver.
+* Participating in the conversations requires an account on a homeserver. However, due to the many publicly usable homeservers and the ability to self-host a homeserver if so desired, we do not consider this to be a significant concern in practice.
 
 # Alternatives
 [alternatives]: #alternatives
