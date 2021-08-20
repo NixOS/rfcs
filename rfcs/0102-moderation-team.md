@@ -26,16 +26,18 @@ self-regulating.
 # Detailed design
 [design]: #detailed-design
 
-The Moderation Team is a volunteer group that may receive and evaluate
+The Moderation Team is a volunteer group that may receive, invite, and evaluate
 applications to the team or alter the composition at any time with approval
-from the NixOS Foundation board. The team's composition and announcements
-should be maintained at
+from the NixOS Foundation board or by any individual choosing to resign. The
+team's composition, contact information, and announcements should be maintained
+at
 [https://nixos.org/community/teams/moderation.html](https://nixos.org/community/teams/moderation.html).
-The team shall perform moderation activities for the [community
-discussions](https://nixos.org/community/index.html) on behalf of the NixOS
-Foundation. The team should utilize the [NixOS Foundation
-mission](https://nixos.org/community/index.html) and the following statement
-during their duties:
+The team shall perform moderation activities on behalf of the NixOS Foundation
+for the discussions in the [official project
+spaces](https://nixos.org/community/index.html) as well as unofficial spaces
+that seek and reach such an agreement with the team. The team should utilize
+the [NixOS Foundation mission](https://nixos.org/community/index.html) and the
+following statement during their duties:
 
 ```
 The NixOS Foundation aims to promote participation without regard to gender,
@@ -84,9 +86,9 @@ and @ryantm.
 * The role of the moderation team could evolve through an effort similar to
   [RFC 98][] into taking a broader community leadership responsibility as a
   'Leadership Team' or 'Community Team'.
-* Further evolve our Community Governance by adopting typical governance tools,
-  such as [Contributor Covenant](https://www.contributor-covenant.org/),
-  Statements of Values, and others in order to provide better guiding
-  principles to our community.
+* Work on clarifying community norm guidelines. This can include adopting
+  typical governance tools, such as [Contributor
+  Covenant](https://www.contributor-covenant.org/), Statements of Values, and
+  others in order to provide better guiding principles to our community.
  
 [RFC 98]: https://github.com/NixOS/rfcs/pull/98
