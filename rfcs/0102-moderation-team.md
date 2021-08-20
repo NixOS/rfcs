@@ -87,8 +87,8 @@ and @ryantm.
   [RFC 98][] into taking a broader community leadership responsibility as a
   'Leadership Team' or 'Community Team'.
 * Work on clarifying community norm guidelines. This can include adopting
-  typical governance tools, such as [Contributor
-  Covenant](https://www.contributor-covenant.org/), Statements of Values, and
+  typical governance tools, such as Contributor
+  Covenant, Statements of Values, and
   others in order to provide better guiding principles to our community.
  
 [RFC 98]: https://github.com/NixOS/rfcs/pull/98
