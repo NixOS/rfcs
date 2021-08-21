@@ -27,13 +27,11 @@ self-regulating.
 [design]: #detailed-design
 
 The Moderation Team is a volunteer group that may receive, invite, and evaluate
-applications to the team or alter the composition at any time with approval
-from the NixOS Foundation board or by any individual choosing to resign. The
-team's composition, contact information, and announcements should be maintained
-at
+applications to the team or alter the composition at any time. The team's
+composition, contact information, and announcements should be maintained at
 [https://nixos.org/community/teams/moderation.html](https://nixos.org/community/teams/moderation.html).
-The team shall perform moderation activities on behalf of the NixOS Foundation
-for the discussions in the [official project
+The team shall perform moderation activities on behalf of the community - with
+oversight via the RFC process - for discussions in [official project
 spaces](https://nixos.org/community/index.html) as well as unofficial spaces
 that seek and reach such an agreement with the team. The team should utilize
 the [NixOS Foundation mission](https://nixos.org/community/index.html) and the
