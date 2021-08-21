@@ -55,7 +55,7 @@ This section is not needed for this RFC.
 [unresolved]: #unresolved-questions
 
 - Not sure how much work there is left on nixpkgs-fmt before most people would consider it ok to use. Not even sure how much it is actually used.
-- Are there situation where automated formatting is worse than manual formatting ? Do we want to have exceptions to automated formatting ?
+- Are there situation where automated formatting is worse than manual formatting? Do we want to have exceptions to automated formatting?
 
 # Future work
 
