@@ -3,20 +3,31 @@ feature: nixpkgs-breaking-change-policy
 start-date: 2020-09-24
 author: Kevin Cox
 co-authors: (TBD)
-shepherd-team: (TBD)
+shepherd-team: @blaggacao, @jonringer, @nrdxp
 related-issues: (TBD)
 ---
 
 # Summary
 
 This defines a policy for how to manage nixpkgs changes that break dependent
-derivations or tests. It specifies time frames and procedures so that
+derivations or tests. It specifies timeframes and procedures so that
 maintainers of dependencies and dependents can know what to expect from each
 other when making breaking changes.
 
+The direct intended result of this RFC is:
+
+- Maintainers of dependencies have a clear framework for handling changes that
+  break dependants.
+- Maintainers of dependants have a clear framework for how dependency breacking
+  changes will be handled.
+- NixOS channels will very rarely (ideally never) stall due to build or test
+  failures.
+
 This document is only focused on changes to derivation builds and tests it
 **does not** aim to make any opinion on changes that can break user machines or
-configurations.
+configurations. (While this is an interesting topic it is harder to put
+concrete rules on due to the difficulty of identifying these breakages. In
+order to be covered by this policy please but tests on your packages.)
 
 # Motivation
 
@@ -29,6 +40,15 @@ from:
 - Merge to `staging`, notify dependents then eventually merge to `master`.
 - Gather a large number of fixes in the PR branch then merge to `staging` or
   `master` once most or all dependencies are fixed.
+
+This adhoc nature has a number of downsides:
+
+- Change authors need to put effort into deciding how to handle each particular
+  change.
+- Maintainers of dependant packages don't know what to expect and have a hard
+  time keeping up with upstream breakages.
+- Merges to `master` or `staging` can result in broken channels which block all
+  updates including security updates.
 
 This aims to provide a uniform approach so that everyone involved knows what to
 expect and to allow further workflows including automation to be build on top
@@ -48,7 +68,7 @@ primary goals:
 - Avoid putting more burden than necessary on the dependency maintainer. If the
   maintainers of core derivations face toil proportionally to the number of
   transitive dependencies they will quickly become overloaded. These
-  maintainers are arguably the most critical to nixpkgs and  their load needs
+  maintainers are arguably the most critical to Nixpkgs and  their load needs
   to be kept manageable.
 - Avoid unnecessarily breaking packages for any period of time. There are a
   number of users on the `*-unstable` channels and it is annoying if packages
@@ -60,7 +80,9 @@ primary goals:
 
 ## Procedure
 
-The target branch for a merge is not affected by this policy. It will be picked, as it is today, according to https://nixos.org/manual/nixpkgs/stable/#submitting-changes-commit-policy.
+The target branch for a merge is not affected by this policy. It will be
+picked, as it is today, according to
+https://nixos.org/manual/nixpkgs/stable/#submitting-changes-commit-policy.
 
 1. The maintainer will prepare a PR with their intended changes.
 2. The maintainer should test a sample of dependent derivations to ensure that
@@ -88,12 +110,12 @@ sub-maintainers were notified.
 [broken](https://nixos.org/manual/nixpkgs/stable/#sec-standard-meta-attributes).
 8. The maintainer can now merge to the target branch.
 
-This procedure should not result in a failing package build in the target branch at any
+This procedure should not result in a failing channel build in the target branch at any
 point.
 
 # Drawbacks
 
-This delays the merge of “core” derivations as the author needs to wait for
+This delays the merge of "core" derivations as the author needs to wait for
 sub-packages to be tested and possibly fixed up to the 7 day threshold.
 
 # Alternatives
@@ -103,7 +125,7 @@ sub-packages to be tested and possibly fixed up to the 7 day threshold.
 A shorter grace period allows maintainers to move more quickly but requires
 maintainers of defendant derivations to jump to action quickly which is not
 always possible for volunteer driven work. For example if a maintainer is on
-vacation it can’t be expected that they respond in a couple of days.
+vacation they can't be expected to respond in a couple of days.
 
 ## Longer grace period
 
@@ -112,14 +134,15 @@ changes in dependencies and provide more time to search for replacement
 maintainers if the original maintainer has abandoned the derivation. The 7 day
 number was mostly arbitrary and can easily be changed in the future. A longer
 grace period would also result in more packages being fixed before the breaking
-change is shipped which would mean that end-users would experience less
-breakage on channels.
+change is shipped, which results in less breakage for end-users.
 
-# Unresolved questions ## Critical Packages and Tests
+# Unresolved questions
+
+## Critical Packages and Tests
 
 What if a breaking change breaks NixOS tests? There must be packages and tests
 so critical that we can not merge without them passing? In that case do we
-leave the PR open until fixed? or use the `staging` branch?
+leave the PR open until fixed?
 
 # Future work
 - Create a tool for automatically notifying maintainers of broken dependents
