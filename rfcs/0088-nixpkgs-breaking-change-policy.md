@@ -14,6 +14,11 @@ derivations or tests. It specifies timeframes and procedures so that
 maintainers of dependencies and dependents can know what to expect from each
 other when making breaking changes.
 
+While this policy should be followed as much as possible once accepted it is
+primarily focused on getting agreement such that tools can be built that make
+implementing this policy very easy. See the [Future Work section](#future-work)
+for examples of the tools that will be built.
+
 The direct intended result of this RFC is:
 
 - Maintainers of dependencies have a clear framework for handling changes that
@@ -90,6 +95,8 @@ their change is not unnecessarily or unintentionally breaking. (Example: Ensure
 that a critical output file was not forgotten) Note that sometimes it **is**
 necessary to break all dependent packages, and the maintainer is not required
 to avoid this.
+    1. A sample of at least 100 packages or 3h of build time is recommend as a guideline.
+    2. The sample should include as many `passthru.tests` tests as is feasible.
 3. The maintainer will get the PR reviewed and approved.
     1. It is **recommended but not required** to have some maintainers of
     dependent packages involved in the review to review if the breakage is
@@ -110,8 +117,9 @@ sub-maintainers were notified.
 [broken](https://nixos.org/manual/nixpkgs/stable/#sec-standard-meta-attributes).
 8. The maintainer can now merge to the target branch.
 
-This procedure should not result in a failing channel build in the target branch at any
-point.
+This procedure should not result in a failing channel build in the target
+branch at any point. In particular NixOS channel constituents are considered
+blocking and are an exception to the 7 day breakage rule.
 
 # Drawbacks
 
@@ -138,11 +146,7 @@ change is shipped, which results in less breakage for end-users.
 
 # Unresolved questions
 
-## Critical Packages and Tests
-
-What if a breaking change breaks NixOS tests? There must be packages and tests
-so critical that we can not merge without them passing? In that case do we
-leave the PR open until fixed?
+None.
 
 # Future work
 - Create a tool for automatically notifying maintainers of broken dependents
