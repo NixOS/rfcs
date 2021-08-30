@@ -1,10 +1,10 @@
 # Nix RFCs (Request For Comments)
 
-Many changes, including bug fixes and documentation improvements can be
+Many ideas, including bug fixes and documentation improvements can be
 implemented and reviewed via the normal GitHub pull request workflow.
 
-Some changes though are "substantial", and we ask that these be put through a
-bit of a design process and produce a consensus among the Nix community.
+Some ideas though are "substantial", and we ask that these be put through a
+bit of a public process and produce a consensus among the Nix community.
 
 ## When this process is followed
 
@@ -17,13 +17,18 @@ community norms, but may include the following.
 * Big restructuring of Nixpkgs
 * Expansions to the scope of Nixpkgs (new arch, major subprojects, ...)
 * Introduction of new interfaces or functions
+* Making changes to important of formalised community processes
+* Record important proof-generated insights that affect the whole community
+* Propose an important experiment that affects the whole community
+* Document important design issues that affect the whole community
+* Start a talk/account/etc. that "officially represents the nix community"
 
 Certain changes do not require an RFC:
 
 * Adding, updating and removing packages in Nixpkgs
 * Fixing security updates and bugs that don't break interfaces
 
-Pull requests that contain any of the aforementioned 'substantial' changes may
+Pull requests that contain any of the aforementioned 'substantial' ideas may
 be closed if there is no RFC connected to the proposed changes.
 
 ## Terminology
@@ -73,25 +78,25 @@ the RFC has received ample discussion and enough of the tradeoffs have been
 discussed. The Shepherd Team will propose to either accept or reject the RFC
 after the FCP.
 
+##### RFC Categories
+In order to do do justice to the different aspects of documents that merit
+generation of broad community consensus via the RFC process, we classify each
+RFC as _feature_, _process_ or _informational_. All follow the same
+high-level process as described above, but each category requires a different
+"mode of discussion", templates, criteria and judgment that it is beneficial
+to the overall RFC process to identify those categories explicitly.
+
 
 ## Process from Creation to Merge
 
-*In short, to get a major change included in Nix or Nixpkgs, one must
+*In short, to get a major change included in Nix, Nixpkgs or the ecosystem, one must
 first get the RFC merged into the RFC repository as a markdown file under the
 `rfcs` directory. At that point the RFC is accepted and may be implemented
-with the goal of eventual inclusion into Nix or Nixpkgs.*
+with the goal of eventual inclusion into Nix, Nixpkgs or the Ecosystem.
 
-0. Have a cool idea!
-1. Fill in the RFC. Put care into the details: RFCs that do not present
-   convincing motivation, demonstrate understanding of the impact of the design,
-   or are disingenuous about the drawbacks or alternatives tend to be
-   poorly-received. You might want to create a PR in your fork of the RFCs
-   repository to help you flesh it out with a few supporters or chat/video
-   conference with a few people involved in the topic of the RFC.
-2. In case your RFC is a technical proposal, you might want to prepare a
-   prototype of your idea to firstly make yourself aware of potential pitfalls
-   and also help reviewers understand the RFC. Code may be able to explain some
-   issues in short.
+0. Have a cool idea or an important information!
+1. Identify its category: _feature_, _process_ or _informational_.
+2. Start with the correct template and follow the instructions and comments.
 3. Submit a pull request. As a pull request the RFC will receive design feedback
    from the larger community, and the author should be prepared to revise it in
    response.
@@ -165,15 +170,15 @@ objections to the implementation.
 
 Furthermore, the fact that a given RFC has been accepted implies nothing about
 what priority is assigned to its implementation, nor does it imply anything
-about whether a Nix/Nixpkgs developer has been assigned the task of implementing
-the feature. While it is not necessary that the author of the RFC also write the
-implementation, it is by far the most effective way to see an RFC through to
+about whether a Nix/Nixpkgs community member has been assigned the task of
+implementing the RFC. While it is not necessary that the author of the RFC also
+does the implementation, it is by far the most effective way to see an RFC through to
 completion: authors should not expect that other project developers will take on
 responsibility for implementing their accepted feature.
 
 Minor modifications to accepted RFCs can be done in follow-up pull requests. We
-strive to write each RFC in a manner that it will reflect the final design of
-the feature; but the nature of the process means that we cannot expect every
+strive to write each RFC in a manner that it will reflect the final state of
+the world; but the nature of the process means that we cannot expect every
 merged RFC to actually reflect what the end result will be after implementation.
 
 In general, once accepted, RFCs should not be substantially changed. Only very
