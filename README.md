@@ -146,7 +146,8 @@ with the goal of eventual inclusion into Nix, Nixpkgs or the Ecosystem.
 11. In most cases, the FCP period is quiet, and the RFC is either merged or
     closed. However, sometimes substantial new arguments or ideas are raised,
     the FCP is canceled, and the RFC goes back into development mode.
-12. In case of acceptance, the RFC Steering Committee merges the PR.
+12. In case of acceptance, the RFC Steering Committee merges the PR and adds it
+    to the [INDEX.md](./INDEX.md).
     Otherwise the RFC's pull request is closed. If no
     consensus can be reached on the RFC but the idea in general is accepted, it
     gets closed, too. A note is added that is should be proposed again, when the
