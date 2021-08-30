@@ -1,5 +1,5 @@
 ---
-feature: deprecate_url_syntax
+identifier: deprecate_url_syntax
 start-date: 2019-04-28
 author: Michael Raskin
 co-authors: 

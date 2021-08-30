@@ -1,5 +1,5 @@
 ---
-feature: replace-unicode-quotes
+identifier: replace-unicode-quotes
 start-date: 2017-03-19
 author: layus
 co-authors: zimbatm

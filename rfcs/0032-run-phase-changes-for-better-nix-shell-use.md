@@ -1,5 +1,5 @@
 ---
-feature: run-phase-changes-for-better-nix-shell-use
+identifier: run-phase-changes-for-better-nix-shell-use
 start-date: 2018-08-26
 author: @globin
 co-authors: @dezgeg

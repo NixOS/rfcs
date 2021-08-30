@@ -1,5 +1,5 @@
 ---
-feature: commonmark-docs
+identifier: commonmark-docs
 start-date: 2020-07-05
 author: mboes
 shepherd-team: garbas, zimbatm, Kloenk

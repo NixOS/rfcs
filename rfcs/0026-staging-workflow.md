@@ -1,5 +1,5 @@
 ---
-feature: staging-workflow
+identifier: staging-workflow
 start-date: 2018-03-05
 author: Vladimír Čunát (@vcunat)
 co-authors: Frederik Rietdijk (@FRidh)

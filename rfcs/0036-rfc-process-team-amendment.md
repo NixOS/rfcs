@@ -1,5 +1,5 @@
 ---
-feature: rfc-process-team-amendment
+identifier: rfc-process-team-amendment
 start-date: 2018-10-27
 author: Robin Gloster <mail@glob.in>
 co-authors: Graham Christensen <graham@grahamc.com>

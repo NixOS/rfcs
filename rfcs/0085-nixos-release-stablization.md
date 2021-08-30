@@ -1,5 +1,5 @@
 ---
-feature: nixos-release-stablization
+identifier: nixos-release-stablization
 start-date: 2021-01-17
 author: Jonathan Ringer (@jonringer)
 co-authors:

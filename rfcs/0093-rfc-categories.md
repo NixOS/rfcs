@@ -1,5 +1,5 @@
 ---
-feature: rfc_categories
+identifier: rfc_categories
 start-date: 2021-05-19
 author: David Arnold
 co-authors: (find a buddy later to help out with the RFC)

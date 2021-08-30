@@ -1,5 +1,5 @@
 ---
-feature: retired-committers
+identifier: retired-committers
 start-date: 2019-08-25
 author: Till Höppner
 co-authors: Graham Christensen

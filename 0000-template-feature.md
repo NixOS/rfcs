@@ -1,5 +1,5 @@
 ---
-feature: (fill me in with a unique ident, my_awesome_feature)
+identifier: (fill me in with a unique ident, my_awesome_feature)
 start-date: (fill me in with today's date, YYYY-MM-DD)
 author: (name of the main author)
 co-authors: (find a buddy later to help out with the RFC)

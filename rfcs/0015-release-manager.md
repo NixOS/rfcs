@@ -1,5 +1,5 @@
 ---
-feature: release-manager-nixos
+identifier: release-manager-nixos
 start-date: 2017-07-18
 author: Robin Gloster (@globin)
 co-authors: Franz Pletz (@fpletz)

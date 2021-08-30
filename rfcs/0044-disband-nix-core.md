@@ -1,5 +1,5 @@
 ---
-feature: disband-nix-core
+identifier: disband-nix-core
 start-date: 2019-04-25
 author: Shea Levy
 co-authors:

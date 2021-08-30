@@ -1,5 +1,5 @@
 ---
-feature: retired-committers-amendment
+identifier: retired-committers-amendment
 start-date: 2020-07-09
 author: worldofpeace
 co-authors: Graham Christensen (@grahamc), Jan Tojnar (@jtojnar)

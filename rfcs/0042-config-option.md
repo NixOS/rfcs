@@ -1,5 +1,5 @@
 ---
-feature: config-option
+identifier: config-option
 start-date: 2019-03-10
 author: Silvan Mosberger
 co-authors:

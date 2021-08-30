@@ -1,5 +1,5 @@
 ---
-feature: mark-stale-issues
+identifier: mark-stale-issues
 start-date: 2019-08-24
 author: Ryan Mulligan
 co-authors: (find a buddy later to help our with the RFC)

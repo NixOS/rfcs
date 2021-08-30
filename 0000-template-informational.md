@@ -1,5 +1,5 @@
 ---
-information: (fill me in with a unique ident, my_new_fact)
+identifier: (fill me in with a unique ident, my_new_fact)
 start-date: (fill me in with today's date, YYYY-MM-DD)
 author: (name of the main author)
 co-authors: (find a buddy later to help out with the RFC)

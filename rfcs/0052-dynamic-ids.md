@@ -1,5 +1,5 @@
 ---
-feature: dynamic-ids
+identifier: dynamic-ids
 start-date: 2019-09-05
 author: Silvan Mosberger
 co-authors:

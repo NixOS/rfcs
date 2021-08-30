@@ -1,5 +1,5 @@
 ---
-feature: nixos-release-schedule
+identifier: nixos-release-schedule
 start-date: 2020-11-28
 author: Jonathan Ringer (@jonringer)
 co-authors: Frederik Rietdijk (@FRidh)

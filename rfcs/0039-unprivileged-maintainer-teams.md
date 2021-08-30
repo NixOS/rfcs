@@ -1,5 +1,5 @@
 ---
-feature: unprivileged-maintainer-teams
+identifier: unprivileged-maintainer-teams
 start-date: 2019-01-16
 author: Graham Christensen <graham@grahamc.com>
 co-authors: zimbatm <zimbatm@zimbatm.com>

@@ -1,5 +1,5 @@
 ---
-feature: platform_support_tiers
+identifier: platform_support_tiers
 start-date: 2019-04-28
 author: Michael Raskin
 shepherd-team: Ryan Mulligan, Jonas Pfenniger, Graham Christensen, John Ericson

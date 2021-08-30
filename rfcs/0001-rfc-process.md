@@ -1,5 +1,5 @@
 ---
-feature: rfc-process
+identifier: rfc-process
 start-date: 2017-02-12
 author: zimbatm
 co-authors: teh, MoreTea

@@ -1,5 +1,5 @@
 ---
-feature: rfcsc-rotation
+identifier: rfcsc-rotation
 start-date: 2019-04-24
 author: Robin Gloster <mail@glob.in>, Simon Lackerbauer <mail@ciil.io>
 related-issues: 36

@@ -1,5 +1,5 @@
 ---
-feature: musl-libc
+identifier: musl-libc
 start-date: 2018-02-19
 author: Will Dietz (@dtzWill)
 co-authors: Shea Levy (@shlevy)

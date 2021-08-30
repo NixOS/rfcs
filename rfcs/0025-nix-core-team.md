@@ -1,5 +1,5 @@
 ---
-feature: nix-core-team
+identifier: nix-core-team
 start-date: 2018-01-31
 end-date: 2019-04-25
 author: Graham Christensen
