@@ -3,8 +3,8 @@ feature: enable-docheck-by-default
 start-date: 2021-06-24
 author: gytis-ivaskevicius
 co-authors:
-shepherd-team:
-shepherd-leader:
+shepherd-team: @Ericson2314 @nh2 @edolstra
+shepherd-leader: @edolstra
 related-issues:
 ---
 
