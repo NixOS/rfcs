@@ -3,8 +3,8 @@ feature: community-team
 start-date: 2021-07-31
 author: Irenes (Irene Knapp)
 co-authors: ashkitten
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @grahamc @spacekookie @zimbatm @7c6f434c @ToxicFrog
+shepherd-leader: @zimbatm
 related-issues: (will contain links to implementation PRs)
 ---
 
