@@ -3,8 +3,8 @@ feature: no-read-store-dir
 start-date: 2021-07-04
 author: Las Safin
 co-authors:
-shepherd-team:
-shepherd-leader:
+shepherd-team: @kevincox @7c6f434c @edolstra
+shepherd-leader: @kevincox
 related-issues:
 ---
 
