@@ -124,7 +124,7 @@ that also happens to contain the tag `server`.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-There's a change that, if this gets implemented in multiple tools, the end-user
+There's a chance that, if this gets implemented in multiple tools, the end-user
 won't use it.
 
 # Alternatives
