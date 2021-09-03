@@ -59,7 +59,7 @@ This would create a virtuous cycle where Nix is easier to use by more people, an
 
 We can break this down nicely into steps.
 
-## Dynamic derivations
+## Part 1: Dynamic derivations
 
 *This is implemented in https://github.com/NixOS/nix/pull/4628.*
 
@@ -124,7 +124,7 @@ We can break this down nicely into steps.
    With this RFC, since drv files themselves can be floating CA derivation outputs, we also might not know the derivations statically, so we need "deep" placeholders to account for arbitrary layers of dynamism.
    This also corresponds to the use of arbitrary many `!` in the CLI.\]
 
-## Deferred import from derivation.
+## Part 2: Deferred import from derivation.
 
 Create a new primop `assumeDerivation` that takes a single expression.
 It's semantics are as follows:
