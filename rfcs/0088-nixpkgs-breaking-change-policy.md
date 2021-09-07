@@ -33,7 +33,7 @@ This document is only focused on changes to derivation builds and tests it
 **does not** aim to make any opinion on changes that can break user machines or
 configurations. (While this is an interesting topic it is harder to put
 concrete rules on due to the difficulty of identifying these breakages. In
-order to be covered by this policy please but tests on your packages.)
+order to be covered by this policy please put tests on your packages.)
 
 # Motivation
 
