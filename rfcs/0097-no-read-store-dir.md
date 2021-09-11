@@ -4,7 +4,7 @@ start-date: 2021-07-04
 author: Las Safin
 co-authors:
 shepherd-team: @kevincox @7c6f434c @edolstra
-shepherd-leader: @kevincox
+shepherd-leader: @edolstra
 related-issues:
 ---
 
