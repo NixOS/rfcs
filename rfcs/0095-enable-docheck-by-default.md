@@ -4,7 +4,7 @@ start-date: 2021-06-24
 author: gytis-ivaskevicius
 co-authors:
 shepherd-team: @Ericson2314 @nh2 @edolstra
-shepherd-leader: @edolstra
+shepherd-leader: @Ericson2314
 related-issues:
 ---
 
