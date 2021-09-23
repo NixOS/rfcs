@@ -79,11 +79,12 @@ Stick to the current release-when-it's-ready non-schedule.
 
 # Previous work
 
-[RFC 0009](#9) proposed a rapid release policy where releases can be
-done at any time (e.g. on request) rather than on a fixed schedule. It
-wasn't feasible at the time because we didn't have a notion of
-experimental features, so we had to give such features some time to
-stabilize before doing a new release.
+[RFC 0009](https://github.com/NixOS/rfcs/pull/9) proposed a rapid
+release policy where releases can be done at any time (e.g. on
+request) rather than on a fixed schedule. It wasn't feasible at the
+time because we didn't have a notion of experimental features, so we
+had to give such features some time to stabilize before doing a new
+release.
 
 # Future work
 [future]: #future-work
