@@ -3,8 +3,8 @@ feature: nix_formatting
 start-date: 2021-08-17
 author: Raphael Megzari
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: Timothy DeHerrera (nrdxp), 0x4A6F
+shepherd-leader: Jonas Chevalier (zimbatm)
 related-issues: (will contain links to implementation PRs)
 ---
 
