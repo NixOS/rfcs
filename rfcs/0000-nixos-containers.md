@@ -37,7 +37,7 @@ of a container:
   service [configures the network interfaces after the container has started](https://github.com/NixOS/nixpkgs/blob/2f96b9a7b4c083edf79374ceb9d61b5816648276/nixos/modules/virtualisation/nixos-containers.nix#L178-L229).
 
 * This means that even though the `network-online.target` is reached, no uplink is available
-  until the machine is fully booted.
+  until the container is fully booted.
 
   The implication is that a lot of services won't work as-is when installed into a container.
   For instance, [oneshot](https://www.freedesktop.org/software/systemd/man/systemd.service.html#Type=)-units
@@ -55,7 +55,7 @@ has stopped since `.nspawn` units aren't used.
 In the following section the design of a replacement is proposed with these goals:
 
 * Use [`networkd`](https://www.freedesktop.org/software/systemd/man/systemd.network.html) as networking stack since `systemd-nspawn` is part of the same project and
-  thus both components are designed to work together.
+  thus both components are designed to work together and issues like no uplink until the container is fully booted will be fixed.
 
 * Provide a useful base to easily use `systemd-nspawn` features:
   * When using actual `.nspawn` units defined with Nix expressions, it will be trivial
@@ -135,7 +135,8 @@ dynamically allocated prefixes.
 
 Hosts will be available on the current system via the
 [`mymachines`-feature of `nss`](https://www.freedesktop.org/software/systemd/man/nss-myhostname.html)
-which is already taken care of by `systemd-networkd`.
+which is already taken care of by `systemd-networkd`. This essentially means that a container
+is reachable via `ping containername`.
 
 ### Static networking
 
@@ -164,7 +165,7 @@ All features from the old implementation are still supported, however several ab
 (such as `networking.useHostResolvConf` or `containers.<name>.macvlans`) are dropped and have
 to be implemented by specifying unit options for `systemd` in the NixOS module system.
 
-The state-directory in `/var/lib/containers/<name>` are also usable by `systemd-nspawn` directly.
+The state-directory in `/var/lib/containers/<name>` is also usable by `systemd-nspawn` directly.
 Thus, the following steps are necessary:
 
 * Port existing container options to the new module (documentation describing how this can be
@@ -184,9 +185,28 @@ Thus, the following steps are necessary:
 `systemd` differentiates between "privileged" & "unprivileged" settings. Each privileged (also
 called "trusted") `nspawn` unit lives in `/etc/systemd/nspawn`. Since unprivileged container's
 don't allow bind-mounts, these will be out of scope. Additionally, this means that
-`/etc/systemd/nspawn` has to be writable for administrative users.
+`/etc/systemd/nspawn` has to be writable for administrative users and can't be a symlink to
+a store path anymore.
 
-*TODO:* polkit; unprivileged; tooling
+The new implementation is written in Python since it's expected to be more accessible than Perl
+and thus more folks are willing to maintain this code (just as it was the case after porting
+the VM test driver from Perl to Python).
+
+The following features won't be available anymore in the new script:
+
+* Start/Stop operations, logging into containers: this can be entirely done via [`machinectl(1)`](https://www.freedesktop.org/software/systemd/man/machinectl.html).
+* No configuration will be made via CLI flags. Instead, the option-set from the
+  NixOS module will be used to declare not only the container's configuration, but also
+  networking. This approach is inspired by [erikarvsted/extra-container](https://github.com/erikarvstedt/extra-container).
+
+But still, not all features from declarative containers are implemented here, for instance:
+
+* One has to explicitly specify whether to restart/reload a container when updating the config.
+  This is done on purpose to avoid duplicating the logic from `switch-to-configuration.pl` here.
+* IPv6 prefix delegation is turned off because `radvd`'s configuration is declaratively specified
+  when building the host's NixOS.
+
+Examples are in the next chapter.
 
 ## Config activation
 
@@ -340,7 +360,64 @@ namespace then:
 
 ### Imperative containers
 
-TODO
+#### Create a container with a pinned `nixpkgs`
+
+Let the following expression be called `imperative-container.nix`:
+
+```nix
+{
+  config.nixpkgs = <nixpkgs>;
+  config.config = { pkgs, ... }: {
+    services.nginx.enable = true;
+    networking.firewall.allowedTCPPorts = [ 80 ];
+  };
+
+  # This implies that the "default" networking mode (i.e. DHCPv4) is used
+  # and not the host's network (which is the default for imperative containers).
+  config.network = {};
+  config.forwardPorts = [ { hostPort = 8080; containerPort = 80; } ];
+}
+```
+
+The container can be built like this now:
+
+```
+$ nixos-nspawn create imperative ./imperative-container.nix
+```
+
+The default page of `nginx` is now reachable like this:
+
+```
+$ curl imperative:80 -i
+$ curl <IPv4 of the host-side veth interface>:8080 -i
+```
+
+#### Modify a container's config imperatively
+
+When `imperative-container.nix` is updated, it can be rebuilt like this:
+
+```
+$ nixos-nspawn update imperative --config ./imperative-container.nix
+```
+
+By default, it will be **restarted**. This can be overridden via `config.activation.strategy`,
+however only `reload`, `restart` and `none` are supported.
+
+Additionally, the way how the container's new config will be activated can be specified
+via `--reload` or `--restart` passed to `nixos-nspawn update`.
+
+If declarative containers are attempted to be modified, the script will terminate early with an
+error.
+
+#### Manage an imperative container's lifecycle
+
+Reboot/Login/etc can be managed via [`machinectl(1)`](https://www.freedesktop.org/software/systemd/man/machinectl.html):
+
+```
+$ machinectl reboot imperative
+$ machinectl shell imperative
+[root@imperative:~]$ …
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
