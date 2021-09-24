@@ -177,8 +177,7 @@ Thus, the following steps are necessary:
   * As soon as the config is ready to deploy, the state-directory in `/var/lib/containers` has to
     be copied to `/var/lib/machines`.
   * Deploy & reboot.
-  * *TODO*: Parallelbetrieb von alter und neuer Implementierung testen für "inkrementelle" Migration
-    & https://github.com/Ma27/nixpkgs/blob/networkd-containers/nixos/tests/container-migration.nix verlinken.
+  * See also https://github.com/Ma27/nixpkgs/blob/networkd-containers/nixos/tests/container-migration.nix as POC.
 
 ## Imperative management
 
