@@ -102,7 +102,8 @@ them.
 - For an unlabeled snapshot:
   - `version` should be constituted of a concatenation of the elements below in
     this order:
-      - the version of the latest labeled snapshot, as defined above;
+      - the version of the latest labeled snapshot (on the same branch, when
+        applicable), as defined above;
         - If the project never released a labeled snapshot, `0_0` should be used
           as default.
      - the string `+unstable=YYYY-MM-DD`, where `YYYY-MM-DD` denotes the date
