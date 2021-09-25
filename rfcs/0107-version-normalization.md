@@ -92,11 +92,12 @@ them.
 
 - For a labeled snapshot:
   - `version` should be constituted of the version of the snapshot, as defined
-    by the upstream project, without any alphabetical characters (e.g. "v",
-    "rel") prepending it.
-    - Alphabetical characters after the first should be maintained, except
-      optionally those clearly used as separators, in which case they are
-      replaced by dots (emulating a typical semver).
+    by the program team, without any alphabetical characters (e.g. "v", "rel")
+    prepending it.
+    - Alphabetical characters following the first numerical character of version
+      (as defined above) should be maintained, except optionally those clearly
+      used as separators, in which case they are replaced by dots (emulating a
+      typical dot-separated version).
 
 - For an unlabeled snapshot:
   - `version` should be constituted of a concatenation of the elements below in
