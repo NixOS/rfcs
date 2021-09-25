@@ -146,6 +146,21 @@ Some useful examples:
   on May 10, 2021; therefore, we have `pname = "cardboard"; version =
   "0_0+unstable=2021-05-21";`.
 
+- Python is a famous programming language and interpreter. Before the
+  deprecation of its 2.x series in 2020, Python had two release branches,
+  popularly known as 'Python 2' and 'Python 3'. Indeed it reflected in many
+  package managers, especially Nixpkgs, that employed `python2` and `python3` as
+  `pname`s.
+
+  As an exercise of imagination, suppose the following scenario:
+
+  Python 2.6 was released 2008-10-01; an unlabeled snapshot of Python 2 branch
+  released at 2008-12-04 would have `version="2.6+unstable=2008-12-04"`.
+
+  At the same time, Python 3.0 was released 2008-12-03; an unlabeled snapshot of
+  Python 3 branch released at 2008-12-04 would have
+  `version="3.0+unstable=2008-12-04"`.
+
 - The Linux drivers for Realtek rtl8192eu can be fetched from a Github page,
   <https://github.com/Mange/rtl8192eu-linux-driver>. It has no labeled release;
   the latest code is from May 12, 2021. Supposing e.g. it was built for Linux
