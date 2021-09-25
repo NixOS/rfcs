@@ -140,7 +140,7 @@ Some useful examples:
   "2.0.14+unstable=2021-05-28";`.
 
 - Cardboard is a typical Gitlab-hosted program; it has no labeled release yet,
-  therefore we use `0.0.0` as default stable version; the latest commit was made
+  therefore we use `0_0` as default stable version; the latest commit was made
   on May 10, 2021; therefore, we have `pname = "cardboard"; version =
   "0_0+unstable=2021-05-21";`.
 
