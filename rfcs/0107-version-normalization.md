@@ -85,8 +85,9 @@ them.
 - Release denotes any distributed snapshot, as defined by its team.
 - Branch denotes a logical sequence of snapshots, as identified by the program's
   team;
-  - Usually these branches are denoted by names such like `stable`, `master`,
-    `unstable`, `trunk`, `experimental`, `staging` etc.;
+  - Usually these branches are denoted by names such as `stable`, `master`,
+    `unstable`, `trunk`, `experimental`, `staging`, `X.Y` (where `X` and
+    `Y` are numbers) etc.
 
 ## Design
 
