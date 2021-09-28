@@ -105,8 +105,8 @@ them.
     this order:
       - the version of the latest labeled snapshot (on the same branch, when
         applicable), as defined above;
-        - If the project never released a labeled snapshot, `0_0` should be used
-          as default.
+        - If the project never released a labeled snapshot, `0.pre` should be
+          used as default.
      - the string `+unstable=YYYY-MM-DD`, where `YYYY-MM-DD` denotes the date
        the mentioned unlabeled snapshot was distributed.
 
@@ -124,36 +124,41 @@ Some useful examples:
 
 - Bochs is a typical Sourceforge-hosted project; its labeled snapshots can be
   fetched from tarballs obtained via URLs like
-  <https://sourceforge.net/projects/bochs/files/bochs/2.6.11/>; for this
-  example, we have `pname = "bochs"; version = "2.6.11";`.
+  <https://sourceforge.net/projects/bochs/files/bochs/2.6.11/>
+
+  For this example, we have `pname = "bochs"; version = "2.6.11";`.
 
 - MPV is a typical Github-hosted program; its labeled snapshots can be fetched
   from tarballs obtained via URLs like
-  <https://github.com/mpv-player/mpv/releases/tag/v0.33.1>; for this example, we
-  get rid of the `"v"` prepended to the version tag: `pname = "mpv"; version =
-  "0.33.1";`.
+  <https://github.com/mpv-player/mpv/releases/tag/v0.33.1>.
+
+  For this example, we get rid of the `"v"` prepended to the version tag: `pname
+  = "mpv"; version = "0.33.1";`.
 
 - SDL2 is hosted on Github; its latest labeled version can be downloaded from
-  <https://github.com/libsdl-org/SDL/releases/tag/release-2.0.14>; therefore we
+  <https://github.com/libsdl-org/SDL/releases/tag/release-2.0.14>. Therefore we
   have `pname = "SDL2"; version = "2.0.14";`.
 
   _However_, this labeled version was released December 21, 2020, while the
-  latest change was done in May 28, 2021. Therefore, for this particular
-  unlabeled releases of SDL2, we have `pname = "SDL2"; version =
-  "2.0.14+unstable=2021-05-28";`.
+  latest change was done in May 28, 2021.
 
-- Cardboard is a typical Gitlab-hosted program; it has no labeled release yet,
-  therefore we use `0_0` as default stable version; the latest commit was made
-  on May 10, 2021; therefore, we have `pname = "cardboard"; version =
-  "0_0+unstable=2021-05-21";`.
+  Therefore, for this particular unlabeled releases of SDL2, we have `pname =
+  "SDL2"; version = "2.0.14+unstable=2021-05-28";`.
+
+- Cardboard is a typical Gitlab-hosted program. It has no labeled release yet,
+  therefore we use `0.pre` as default dummy stable version; further, the latest
+  commit was made on May 10, 2021.
+
+  Therefore, we have `pname = "cardboard"; version =
+  "0.pre+unstable=2021-05-21";`.
 
 - Python is a famous programming language and interpreter. Before the
   deprecation of its 2.x series in 2020, Python had two release branches,
-  popularly known as 'Python 2' and 'Python 3'. Indeed it reflected in many
-  package managers, especially Nixpkgs, that employed `python2` and `python3` as
-  `pname`s.
+  popularly known as 'Python 2' and 'Python 3'. Indeed this peculiar situation
+  reflected in many package managers, especially Nixpkgs, that employed
+  `python2` and `python3` as `pname`s for these particular programs.
 
-  As an exercise of imagination, suppose the following scenario:
+  As an exercise of imagination, suppose the scenarios described below:
 
   Python 2.6 was released 2008-10-01; an unlabeled snapshot of Python 2 branch
   released at 2008-12-04 would have `version="2.6+unstable=2008-12-04"`.
@@ -166,15 +171,16 @@ Some useful examples:
   <https://github.com/Mange/rtl8192eu-linux-driver>. It has no labeled release;
   the latest code is from May 12, 2021. Supposing e.g. it was built for Linux
   kernel version 5.10.01, we therefore have `pname = "rtl8192eu"; version =
-  "0_0+unstable=2021-05-12+linux=5.10.01";`.
+  "0.pre+unstable=2021-05-12+linux=5.10.01";`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
 The main drawback is the conversion of the already existent expressions which
 does not follow the format proposed here. It can require a degree of manual
-intervention. However, this task is easily sprintable and amenable to
-automation.
+intervention and code review, especially for machine-generated expressions (such
+as Lua or Node library sets). However, this task is easily sprintable and
+amenable to automation.
 
 # Alternatives
 [alternatives]: #alternatives
