@@ -27,9 +27,10 @@ along the Nixpkgs' expressions is:
   - `version` is a string following the format `unstable-YYYY-MM-DD`, where
     `YYYY-MM-DD` denotes the date when the code was generated.
 
-This is a simple and easy-to-understand format.
+This is a simple and easy-to-understand format. Nonetheless, there are some
+problems with it.
 
-However, it does not map very well with the Nix function
+First, it does not map very well with the Nix function
 `builtins.parseDrvName`:
 
 ```example
@@ -44,18 +45,18 @@ builtins.parseDrvName "mpv-unstable-2021-05-03"
 { name = "mpv-unstable"; version = "2021-05-03"; }
 ```
 
-It happens because the `version` attribute returned by `builtins.parseDrvName`
-starts with a digit. This is not a bug, but a deliberate design decision of Nix
-specification; therefore we should strive to follow it, neither circumventing
-nor ignoring it.
+It happens because the `version` attribute in the set returned by
+`builtins.parseDrvName` always starts with a digit. This is a deliberate design
+decision of Nix specification, and as such it should not be regarded as a "bug";
+therefore, we should strive to follow it, neither circumventing nor ignoring it.
 
-That being said, `version` attribute should start with a digit.
+Further, the `version` attribute should be crafted to satisfy the expected
+upgrading semantics stated in `nix-env` manpage and implemented by
+`builtins.compareVersions` -- even when the raw version of the original program
+does not meet this expectation.
 
-Furthermore, `version` attribute should follow the semantics for upgrading as
-stated in `nix-env` manpage.
-
-This document describes a format suitable to fix this issue while striving for
-simplicity.
+This document describes a format suitable to fix these issues, while keeping it
+understandable and striving for simplicity.
 
 # Detailed design
 [design]: #detailed-design
@@ -103,8 +104,9 @@ them.
 - For an unlabeled snapshot:
   - `version` should be constituted of a concatenation of the elements below in
     this order:
-      - the version of the latest labeled snapshot (on the same branch, when
-        applicable), as defined above;
+      - the version of the latest previous labeled snapshot (on the same branch,
+        when applicable), according to the rules defined before for labeled
+        snapshots;
         - If the project never released a labeled snapshot, `0.pre` should be
           used as default.
      - the string `+unstable=YYYY-MM-DD`, where `YYYY-MM-DD` denotes the date
@@ -155,7 +157,7 @@ Some useful examples:
 - Python is a famous programming language and interpreter. Before the
   deprecation of its 2.x series in 2020, Python had two release branches,
   popularly known as 'Python 2' and 'Python 3'. Indeed this peculiar situation
-  reflected in many package managers, especially Nixpkgs, that employed
+  reflected in many package management teams, especially Nixpkgs, that employed
   `python2` and `python3` as `pname`s for these particular programs.
 
   As an exercise of imagination, suppose the scenarios described below:
