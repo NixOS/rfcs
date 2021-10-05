@@ -13,18 +13,17 @@ related-issues: #69414, #67265, #67232, #67336
 
 This document suggests a full replacement of the
 [`nixos-container`](https://nixos.org/manual/nixos/stable/#ch-containers) subsystem of NixOS with
-a new implementation which remains to be based on
+a new implementation on
 [`systemd-nspawn(5)`](https://man7.org/linux/man-pages/man5/systemd.nspawn.5.html) and incorporates
 [`systemd-networkd(8)`](https://man7.org/linux/man-pages/man8/systemd-networkd.service.8.html) for
-the networking stack rather than imperative networking while providing a reasonable upgrade-path
+the networking stack rather than imperative networking while providing a reasonable upgrade path
 for existing installations.
 
 # Motivation
 [motivation]: #motivation
 
 The `nixos-container` feature originally appeared in `nixpkgs` in
-[2013](https://github.com/nixos/nixpkgs/commit/9ee30cd9b51c46cea7193993d006bb4301588001)
-which happened at a time where `systemd` support was relatively new to NixOS.
+[2013](https://github.com/nixos/nixpkgs/commit/9ee30cd9b51c46cea7193993d006bb4301588001), at a time where `systemd` support was relatively new to NixOS.
 
 Back then, `systemd-nspawn` was
 [only designed as a development tool for systemd developers](https://lwn.net/Articles/572957/) and NixOS
@@ -33,28 +32,28 @@ Due to those circumstances the entire feature was implemented
 in a fairly ad-hoc way. One of the most notable issues is the broken uplink during boot
 of a container:
 
-* Containers will be started in a so-called template unit named [`container@.service`](https://www.freedesktop.org/software/systemd/man/systemd.unit.html#Description). This
+* Containers will be started in a template unit named [`container@.service`](https://www.freedesktop.org/software/systemd/man/systemd.unit.html#Description). This
   service [configures the network interfaces after the container has started](https://github.com/NixOS/nixpkgs/blob/2f96b9a7b4c083edf79374ceb9d61b5816648276/nixos/modules/virtualisation/nixos-containers.nix#L178-L229).
 
 * This means that even though the `network-online.target` is reached, no uplink is available
   until the container is fully booted.
 
   The implication is that a lot of services won't work as-is when installed into a container.
-  For instance, [oneshot](https://www.freedesktop.org/software/systemd/man/systemd.service.html#Type=)-units
+  For instance, [oneshot](https://www.freedesktop.org/software/systemd/man/systemd.service.html#Type=) services
   such as `nextcloud-setup.service` will hang if a database in e.g. a local network is used. Other
   examples are `rspamd` or `clamav`.
 
-Additionally, we currently have to maintain a Perl script called `nixos-container.pl` which serves
-as CLI frontend for the feature. This isn't just an additional maintenance burden for us, but largely duplicates functionality already provided by [`machinectl(1)`](https://www.freedesktop.org/software/systemd/man/machinectl.html).
+Additionally, we currently maintain a Perl script called `nixos-container.pl` which serves
+as the CLI frontend for the feature. This is not only an additional maintenance burden for us, but largely duplicates functionality already provided by [`machinectl(1)`](https://www.freedesktop.org/software/systemd/man/machinectl.html).
 
-The main reason why `machinectl` cannot be used as replacement are
+The main reason why `machinectl` cannot be used as a complete replacement are
 [imperative containers](https://nixos.org/manual/nixos/stable/index.html#sec-imperative-containers)
 and state getting lost after the `container@<container-name>.service` unit
 has stopped since `.nspawn` units aren't used.
 
 In the following section the design of a replacement is proposed with these goals:
 
-* Use [`networkd`](https://www.freedesktop.org/software/systemd/man/systemd.network.html) as networking stack since `systemd-nspawn` is part of the same project and
+* Use [`networkd`](https://www.freedesktop.org/software/systemd/man/systemd.network.html) as the networking stack since `systemd-nspawn` is part of the same project and
   thus both components are designed to work together and issues like no uplink until the container is fully booted will be fixed.
 
 * Provide a useful base to easily use `systemd-nspawn` features:
@@ -64,10 +63,10 @@ In the following section the design of a replacement is proposed with these goal
   * With this design, it won't be necessary to implement adjustments for advanced features
     such as [MACVLAN interfaces](https://backreference.org/2014/03/20/some-notes-on-macvlanmacvtap/)
     since administrators can directly use the upstream configuration format. The current module
-    only supports `MACVLAN` interfaces for instance, but e.g. no `IPVLAN`.
+    supports `MACVLAN` interfaces for instance, but not `IPVLAN`.
   * Another side effect is that existing knowledge about this configuration can be re-used.
 
-* Provide a reasonable upgrade-path for existing installations. Even though this RFC suggests
+* Provide a reasonable upgrade path for existing installations. Even though this RFC suggests
   deprecating the existing `nixos-container` subsystem, this measure is purely optional. However,
   for this to happen, a smooth migration path must be provided.
 
@@ -86,9 +85,9 @@ following steps (executed via a custom `ExecStartPre=`-script):
 * `systemd-nspawn` only expects `/etc/os-release`, `/etc/machine-id` and `/var` to exist
   inside, however with no content.
 * To get a running NixOS inside, `/nix/store` and its state (`/nix/var/nix/db`,
-  `/nix/var/nix/daemon-socket`) must be bind-mounted into it. As `init`-process
+  `/nix/var/nix/daemon-socket`) are bind-mounted into it. As an `init` process,
   the [stage-2 script](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/system/boot/stage-2-init.sh)
-  must be started which eventually `exec(2)`s into `systemd` and ensures that everything
+  is started which eventually `exec(2)`s into `systemd` and ensures that everything
   is correctly set up.
 * The option `boot.isContainer = true;` will be automatically set for new containers as well.
   This is necessary to
@@ -134,9 +133,8 @@ This is necessary since `systemd-networkd` doesn't support router advertisements
 dynamically allocated prefixes.
 
 Hosts will be available on the current system via the
-[`mymachines`-feature of `nss`](https://www.freedesktop.org/software/systemd/man/nss-myhostname.html)
-which is already taken care of by `systemd-networkd`. This essentially means that a container
-is reachable via `ping containername`.
+[`mymachines` `nss` module](https://www.freedesktop.org/software/systemd/man/nss-myhostname.html),
+which is already taken care of by `systemd-networkd`. This means that container names can be resolved to addresses like DNS names, i.e. `ping containername` works.
 
 ### Static networking
 
@@ -153,7 +151,7 @@ to configure DNS via `/etc/resolv.conf` in the container. This option will be **
 
 * If `networkd` is enabled via NixOS, [`systemd-resolved`](https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html) is enabled as well.
   * By default, DNS for `resolved` will be configured via DHCP which is enabled in the [Default Mode](#default-mode) by default.
-  * With only [Static networking](#static-networking) enabled it is necessary to configure
+  * With only [Static networking](#static-networking) enabled, it is necessary to configure
     configure DNS servers for resolved statically which can be done by setting e.g. DNS
     servers via a `.network`-unit for the `host0` interface.
 * The behavior of `networking.useHostResolvConf` can be implemented with pure `systemd`
@@ -165,17 +163,17 @@ All features from the old implementation are still supported, however several ab
 (such as `networking.useHostResolvConf` or `containers.<name>.macvlans`) are dropped and have
 to be implemented by specifying unit options for `systemd` in the NixOS module system.
 
-The state-directory in `/var/lib/containers/<name>` is also usable by `systemd-nspawn` directly.
+The state directory in `/var/lib/containers/<name>` is also usable by `systemd-nspawn` directly.
 Thus, the following steps are necessary:
 
 * Port existing container options to the new module (documentation describing how this can be
   done for each feature **has** to be written before this is considered ready).
 * Most of the NixOS configuration can be easily reused except for the following differences:
   * `networkd` is used inside the container rather than scripted networking. This means that
-    NixOS's networking configuration may require adjustment. However the basic `networking.interfaces` API
+    NixOS's networking configuration may require adjustment. However the basic `networking.interfaces` interface
     is also supported by the `networkd` stack. More notable is that `eth0` inside the container is
     named `host0` by default.
-  * As soon as the config is ready to deploy, the state-directory in `/var/lib/containers` has to
+  * As soon as the config is ready to deploy, the state directory in `/var/lib/containers` has to
     be copied to `/var/lib/machines`.
   * Deploy & reboot.
   * See also https://github.com/Ma27/nixpkgs/blob/networkd-containers/nixos/tests/container-migration.nix as POC.
@@ -195,7 +193,7 @@ the VM test driver from Perl to Python).
 The following features won't be available anymore in the new script:
 
 * Start/Stop operations, logging into containers: this can be entirely done via [`machinectl(1)`](https://www.freedesktop.org/software/systemd/man/machinectl.html).
-* No configuration will be made via CLI flags. Instead, the option-set from the
+* No configuration will be made via CLI flags. Instead, the option set from the
   NixOS module will be used to declare not only the container's configuration, but also
   networking. This approach is inspired by [erikarvsted/extra-container](https://github.com/erikarvstedt/extra-container).
 
@@ -248,7 +246,7 @@ A container with a private IPv4 & IPv6 address can be configured like this:
 
 It's reachable from locally like this thanks to the `mymachines`-feature of NSS:
 
-```
+```shell
 [root@server:~]# ping demo -c1
 PING demo(fdd1:98a7:f71:61f0:900e:81ff:fe78:e9d6 (fdd1:98a7:f71:61f0:900e:81ff:fe78:e9d6)) 56 data bytes
 64 bytes from fdd1:98a7:f71:61f0:900e:81ff:fe78:e9d6 (fdd1:98a7:f71:61f0:900e:81ff:fe78:e9d6): icmp_seq=1 ttl=64 time=0.292 ms
@@ -260,16 +258,16 @@ rtt min/avg/max/mdev = 0.214/0.214/0.214/0.000 ms
 
 The container can be entirely controlled via `machinectl`:
 
-```
+```shell
 $ machinectl reboot demo
 $ machinectl shell demo
 demo$ ...
 ```
 
-Optionally, containers can be grouped into a networking zone. Instead of a `veth`-pair for each
+Optionally, containers can be grouped into a networking zone. Instead of a `veth` pair for each
 container, all containers will live in an interface named `vz-<zone>`:
 
-``` nix
+```nix
 {
   nixos.containers.zones.demo = {};
   nixos.containers.instances = {
@@ -298,8 +296,8 @@ the network will be properly configured accordingly.
 
 ### Advanced Features
 
-An example for how every unit setting from `networkd` and `nspawn` can be used, are MACVLANs.
-These are helpful to assign multiple virtual interfaces with a distinct MAC to a single
+MACVLANs are an example for how every unit setting from `networkd` and `nspawn` can be used.
+These are helpful to assign multiple virtual interfaces with distinct MAC addresses to a single
 physical NIC.
 
 A sub-interface which is actually part of the physical one can be moved into the container's
