@@ -428,6 +428,8 @@ $ machinectl shell imperative
 * Need to migrate from existing containers.
   * As demonstrated in [*Migration plan*](#migration-plan), a sane path exists.
   * With a long deprecation time, a rush to migrate can be avoided.
+  * This also means that [the container backend](https://github.com/PsyanticY/nixops-container)
+    for `nixops` needs to be deprecated.
 
 # Alternatives
 [alternatives]: #alternatives
