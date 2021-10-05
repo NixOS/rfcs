@@ -13,7 +13,7 @@ related-issues: #69414, #67265, #67232, #67336
 
 This document suggests a full replacement of the
 [`nixos-container`](https://nixos.org/manual/nixos/stable/#ch-containers) subsystem of NixOS with
-a new implementation on
+a new implementation based on
 [`systemd-nspawn(5)`](https://man7.org/linux/man-pages/man5/systemd.nspawn.5.html) and incorporates
 [`systemd-networkd(8)`](https://man7.org/linux/man-pages/man8/systemd-networkd.service.8.html) for
 the networking stack rather than imperative networking while providing a reasonable upgrade path
@@ -182,7 +182,7 @@ Thus, the following steps are necessary:
 
 `systemd` differentiates between "privileged" & "unprivileged" settings. Each privileged (also
 called "trusted") `nspawn` unit lives in `/etc/systemd/nspawn`. Since unprivileged container's
-don't allow bind-mounts, these will be out of scope. Additionally, this means that
+don't allow bind mounts, these will be out of scope. Additionally, this means that
 `/etc/systemd/nspawn` has to be writable for administrative users and can't be a symlink to
 a store path anymore.
 
@@ -195,7 +195,7 @@ The following features won't be available anymore in the new script:
 * Start/Stop operations, logging into containers: this can be entirely done via [`machinectl(1)`](https://www.freedesktop.org/software/systemd/man/machinectl.html).
 * No configuration will be made via CLI flags. Instead, the option set from the
   NixOS module will be used to declare not only the container's configuration, but also
-  networking. This approach is inspired by [erikarvsted/extra-container](https://github.com/erikarvstedt/extra-container).
+  networking. This approach is inspired by [erikarvstedt/extra-container](https://github.com/erikarvstedt/extra-container).
 
 But still, not all features from declarative containers are implemented here, for instance:
 
@@ -244,7 +244,7 @@ A container with a private IPv4 & IPv6 address can be configured like this:
 }
 ```
 
-It's reachable from locally like this thanks to the `mymachines`-feature of NSS:
+It's reachable locally like this thanks to the `mymachines`-feature of NSS:
 
 ```shell
 [root@server:~]# ping demo -c1
@@ -444,7 +444,7 @@ $ machinectl shell imperative
   * The main concern is increased maintenance workload. Also, with the rather prominent
     name `nixos-container` we shouldn't advertise the old, problematic implementation.
 * Do nothing.
-  * As shown above, this change leverages the full featureset of `systemd-nspawn` and also
+  * As shown above, this change leverages the full feature set of `systemd-nspawn` and also
     solves a few existing problems, that are non-trivial to solve when keeping the old
     implementation.
   * Since it's planned to move to `networkd` in the longterm anyways, fundamental changes
