@@ -89,8 +89,7 @@ following steps (executed via a custom `ExecStartPre=`-script):
 * Create an empty directory in `/var/lib/machines` named like the container-name.
 * `systemd-nspawn` only expects `/etc/os-release`, `/etc/machine-id` and `/var` to exist
   inside, however with no content.
-* To get a running NixOS inside, `/nix/store` and its state (`/nix/var/nix/db`,
-  `/nix/var/nix/daemon-socket`) are bind-mounted into it. As an `init` process,
+* To get a running NixOS inside, `/nix/store` is bind-mounted into it. As an `init` process,
   the [stage-2 script](https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/system/boot/stage-2-init.sh)
   is started which eventually `exec(2)`s into `systemd` and ensures that everything
   is correctly set up.
