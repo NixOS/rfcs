@@ -5,7 +5,12 @@ author: Maximilian Bosch <maximilian@mbosch.me>
 co-authors: n/a
 shepherd-team: n/a
 shepherd-leader: n/a
-related-issues: #69414, #67265, #67232, #67336
+related-issues:
+  - https://github.com/NixOS/nixpkgs/issues/69414
+  - https://github.com/NixOS/nixpkgs/issues/67265
+  - https://github.com/NixOS/nixpkgs/pull/67232
+  - https://github.com/NixOS/nixpkgs/pull/67336
+  - POC: https://github.com/NixOS/nixpkgs/pull/140669
 ---
 
 # Summary
