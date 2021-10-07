@@ -59,7 +59,7 @@ has stopped since `.nspawn` units aren't used.
 In the following section the design of a replacement is proposed with these goals:
 
 * Use [`networkd`](https://www.freedesktop.org/software/systemd/man/systemd.network.html) as the networking stack since `systemd-nspawn` is part of the same project and
-  thus both components are designed to work together and issues like no uplink until the container is fully booted will be fixed.
+  thus both components are designed to work together and resolve issues like no uplink until the container is fully booted.
 
 * Provide a useful base to easily use `systemd-nspawn` features:
   * When using actual `.nspawn` units defined with Nix expressions, it will be trivial
