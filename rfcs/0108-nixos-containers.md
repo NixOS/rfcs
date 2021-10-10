@@ -123,22 +123,15 @@ be used for networking. To briefly summarize, this means:
 
 * A [`veth`](https://man7.org/linux/man-pages/man4/veth.4.html) interface-pair will be created,
   one "host-side" interface and a container interface inside its own namespace.
-* A dynamically allocated prefix of `0.0.0.0/28` (or `0.0.0.0/24` for virtual zones) will be used
-  as address pool to distribute IPv4 addresses via DHCP to containers.
-
-Additionally, basic IPv6 support was implemented:
-
-* By specifying `::/64`, a [RFC4193 ULA prefix](https://tools.ietf.org/html/rfc4193) will be
-  allocated to the host-side interface.
-* With [`radvd`](https://github.com/radvd-project/radvd), containers can assign themselves addresses from this address prefix by utilizing
-  [RFC4862 SLAAC](https://tools.ietf.org/html/rfc4862)
-
-This is necessary since `systemd-networkd` doesn't support router advertisements with
-dynamically allocated prefixes.
+* A subnet from a [RFC1918](https://datatracker.ietf.org/doc/html/rfc1918) private IP range
+  is assigned to the host-side interface. IPv4 addresses will be distributed via DHCP to containers.
+* Analogous IPv4, a [RFC4193 IPv6 ULA prefix](https://tools.ietf.org/html/rfc4193) will be
+  assigned to the host-side interface, containers can assign themselves addresses from this
+  prefix by utilizing [RFC4862 SLAAC](https://tools.ietf.org/html/rfc4862).
 
 Hosts will be available on the current system via the
-[`mymachines` `nss` module](https://www.freedesktop.org/software/systemd/man/nss-myhostname.html),
-which is already taken care of by `systemd-networkd`. This means that container names can be resolved to addresses like DNS names, i.e. `ping containername` works.
+[`mymachines` `nss` module](https://www.freedesktop.org/software/systemd/man/nss-myhostname.html).
+This means that container names can be resolved to addresses like DNS names, i.e. `ping containername` works.
 
 ### Static networking
 
