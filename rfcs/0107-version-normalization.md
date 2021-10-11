@@ -189,7 +189,7 @@ amenable to automation.
 
 The alternative is doing nothing. The impact of it is keeping the Nixpkgs
 codebase confusing, less discoverable and incompatible with
-`builtins.parseDrvName`.
+`builtins.parseDrvName` and `builtins.compareVersions`.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
