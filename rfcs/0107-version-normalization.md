@@ -200,6 +200,9 @@ codebase confusing, less discoverable and incompatible with
 
 - Interactions between `pname` and `version`, like multi-branch releases.
 
+- Legacy issues and integration with future implementations of Nix and Nixpkgs,
+  epecially the Flakes framework.
+
 # Future work
 [future]: #future-work
 
