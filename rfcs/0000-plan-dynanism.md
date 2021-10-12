@@ -59,8 +59,6 @@ This would create a virtuous cycle where Nix is easier to use by more people, an
 
 We can break this down nicely into steps.
 
-## Part 1: Dynamic derivations
-
 *This is implemented in https://github.com/NixOS/nix/pull/4628.*
 
 1. Derivation outputs can be valid derivations.
@@ -123,33 +121,6 @@ We can break this down nicely into steps.
    \[With just floating content-addressed derivations but no computed derivations, derivations are always known statically but their outputs aren't.
    With this RFC, since drv files themselves can be floating CA derivation outputs, we also might not know the derivations statically, so we need "deep" placeholders to account for arbitrary layers of dynamism.
    This also corresponds to the use of arbitrary many `!` in the CLI.\]
-
-## Part 2: Deferred import from derivation.
-
-Create a new primop `assumeDerivation` that takes a single expression.
-It's semantics are as follows:
-
- - If the underlying expression evaluates (shallowly) without needing to build derivations (for `import`, `readFile`, etc.), and is a derivation, simply return that.
-   ```
-   e ⇓ e'
-   e' is derivation
-   ------
-   builtins.assumeDerivation e ⇓ e'
-   ```
-
-- If the underlying expression cannot evaluate (shallowly) without building one or more paths, defer evaluation into a derivation-producing-derivation, and take it's output with `builtins.outputOf`:
-  ```
-  e gets stuck on builds
-  defer = derivation {
-    inputDrvs = builds;
-    buildCommand = "nix-instantiate ${reified e} > $out"
-  }
-  ------
-  builtins.assumeDerivation e ⇓ builtins.outputOf defer "out"
-  ```
-
-This allows downstream non-dynamic derivations to be evaluated without getting stuck on their dynamic upstream ones.
-They just depend on the derivation computed by the deferred eval derivations, and those substitutions are performed by the scheduler.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -233,13 +204,9 @@ Concretely, our design means we cannot defer the `pname` `meta` etc. fields: eit
 # Alternatives
 [alternatives]: #alternatives
 
- - Do nothing, and continue to have no good answer for language-specific package managers.
+ - Do nothing, and continue to have no good answer for large builds like Linux and Chromium.
  
- - Instead of deferring only certain portions of the evaluation with `builtins.asssumeDerivation`, simply restart the entire eval.
-   Quite simple, and no existing IFD code today needs to change.
-   
- - Abandon IFD and just let users use the underlying dynamic derivation feature.
-   This was my first idea, but I became worried that this was too hard to use for simple experiments.
+ - Embrace recursive Nix in its current form.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
