@@ -18,41 +18,55 @@ Additionally, introduce a new primop to leverage this in making "import from der
 # Motivation
 [motivation]: #motivation
 
+> Instead of recursive Nix builds, the alternative is to have one gigantic build graph.
+> For instance, if we are building a component that needs a C compiler, the Nix expression for that component simply imports the Nix expression that builds the compiler.
+> The problem with this approach is scalability: the resulting build graphs would become huge.
+> The graph for a simple component such as GNU Hello would include the build graphs for dozens of large components, such as Glibc, GCC, etc.
+> The resulting graph could easily have hundreds of thousands of nodes, far exceeding the graphs typically occurring in deployment (e.g., the one in Figure 1.5).
+> However, apart from its efficiency, this is possibly the most desirable solution because of its conceptual simplicity.
+> Thus it is interesting to develop efficient ways of dealing with very large build graphs
+
+-- Eelco Dolstra's this, page 240.
+
 Nix's design encourages a separation of build *planning* from build *execution*:
 evaluation of the Nix language produces derivations, and then then those derivations are built.
 This usually a great thing.
 It's enforced the separation of the more complex Nix expression language from the simpler derivation language.
 It's also encouraged Nixpkgs to take the "birds eye" view and successful grapple a ton of complexity that would have overwhelmed a more traditional package repository.
 
-Nixpkgs, along with every other distro, also faces a looming crisis: new open source software is increasingly not intended to be packaged by distros at all.
-Many languages now support very large library ecosystems, with dependencies expressed in a language-specific package manager.
-To this new generation of developers, the distro (or homebrew) is a crufty relic from an earlier age to bootstrap modernity, and then be forgotten about.
+The core feature here, derivations that build derivations, is a nice sneaky fundamental primitive for the problem Eelco point's out.
 
-Right now, to deal with these packages, we either convert by hand, or commit lots of generated code into Nixpkgs.
-But I don't think either of those options is healthy or sustainable.
-The problem with the first is sheer effort; we'll never be able to keep up.
-The problem with the second is bloating Nixpkgs but more importantly reproducability: If someone wants to update that generated code it is unclear how.
-All these mean that potential users coming from this new model of development find Nix / Nixpkgs cumbersome and unsuited to their needs.
-
-The core feature here, derivations that build derivations, is the best fundamental primitive for this problem.
 It's very performant, being well-adapted for Nix's current scheduler.
 Unlike recursive Nix, there's is no potential for half-built dependencies to sit around waiting for other builds, wasting resources.
 Each build step (derivation) always runs start to finish blocking on nothing.
 It's very efficient, because it doesn't obligate the use of the Nix expression language.
-Finally, it's quite compatible with `--dry-run`.
 
-However, "import from derivation" is still far and away the easiest method to use, and the one that existing tools to convert to Nix use.
-\[Actually it's not just `import` which is notable, one can `builtins.readFile` a not-yet-buit path and it will also block today, and probably other such primops.
-The exact primop doesn't matter --- all are noticeably more ergonomic than alternatives, and our proposal here is agnostic to the prim-op which would trigger the blocking.
-I will continue to use "IFD" as an umbrella acronym despite its deficiencies because it is best known.\]
-We should continue to support it, finding a way for `hydra.nixos.org` to allow it, so those tools with IFD can be used in Nixpkgs and become first-class members of the Nix ecosystem.
-We have a fairly straightforward mechanism, only slightly more cumbersome than IFD today, to allow evaluation to be deferred after imported things are built.
-This frees up the Hydra evaluator to finish before building, and also meshes well with any plan to build more than one eval-realized path at a time.
-This should allow us to drop the `hydra.nixos.org` restriction.
+It's also quite compatible with `--dry-run`.
+Because derivations don't get new dependencies *mid build*, we have no need to mess with individual steps to explore the plan.
+There still becomes multiple sorts of `--dry-run` policies, but all of them just have to do with building or not buidling derivations which *themselves* are unchanged.
 
-With these steps, I think we will be able to successfully convert to Nix a bunch of developers that mainly work in one language, and didn't even think they were in need of a better distro.
-In turn, I hope these upstream packages and ecosystems might even care about packaging and integration of the sort that we do.
-This would create a virtuous cycle where Nix is easier to use by more people, and Nixpkgs is easier to maintain as upstream packages better match our values.
+To make that more, clear, if you *do* want one big ("hundreds of thousands of nodes"-big), static graph, you can still have it!
+Build all the derivations that compute derivations, but not nothing else.
+Then the results of those can be substituted (think partial eval, also remember we already do this sort of thing for CA derivations), and one has just that.
+
+If one *doesn't* want that however, do a normal build, and graph in "goals" form in Nixpkgs can stay small.
+Graphs evaluate into large graphs, but goals are GC'd as they are built.
+This keeps the "working set" small, at least in the archetypal use-case where the computed subgraphs are disjoint, coming from the `Makefile`s of individual packages.
+
+Finally there is a sense in which this extension is very natural.
+The opening sentence of every revised scheme report is:
+
+> Programming languages should be designed not by piling feature on top of feature,
+> but by removing the weaknesses and restrictions that make additional features appear necessary.
+
+We already have a dynamic scheduler that doesn't need to know all the goals up front.
+We also already rewrite derivations based on previous builds for CA-derivations.
+All the underlying mechanisms are thus there, and the patch implementing this in a sense wrote itself.
+
+Now, there is a good argument that maybe the Nix derivation language today has other implementation strategies where this *wouldn't* be so natural and easy.
+This is like saying "we can add this axiom for free in our current model, but not in all possible models of our current axioms".
+Well, if such a concrete other strategy ever arises, it is very easy to statically prohibit the new features this RFC proposes.
+Until then, down with the artificial restrictions!
 
 # Detailed design
 [design]: #detailed-design
@@ -189,7 +203,7 @@ The above is no doubt hard to read -- I am sorry about that --- but here are a f
 
  - The scheduler "substitutes on demand" giving us a lazy evaluation of sorts.
    This means that in the extreme case where we to make to, e.g., make a derivation for every C compiler invocation, we can avoid storing a very large completely static graph all at once.
-   
+
  - At the same time, the derivations can be built in many different orders, so one can intentionally build all the `cabal2nix` derivations first and try to accumulate up the biggest static graph with `--dry-run`.
    This approximates what would happen in the "infinitely parallel" case when the scheduler will try to dole out work to do as fast as it can.
 
@@ -205,7 +219,7 @@ Concretely, our design means we cannot defer the `pname` `meta` etc. fields: eit
 [alternatives]: #alternatives
 
  - Do nothing, and continue to have no good answer for large builds like Linux and Chromium.
- 
+
  - Embrace recursive Nix in its current form.
 
 # Unresolved questions
@@ -222,7 +236,7 @@ The exact way the outputs refer to the replacement derivations / their outputs i
 2. Try to breach the build system package manager divide.
    Just as there are foreign packages graphs to convert to Nix, there are Ninja and Make graphs we can also convert to Nix.
    This might really help with big builds like Chromium and LLVM.
-   
+
 3. Try to convince upstream tools to use Nix like CMake, Meson, etc. use Ninja.
    Rather than converting Ninja plans, we might convince those tools to have purpose-built Nix backends.
    Language-specific package mangers that don't use Ninja today might also be modified to "let Nix do that actual building".
