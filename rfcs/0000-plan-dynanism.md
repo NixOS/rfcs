@@ -26,7 +26,7 @@ Additionally, introduce a new primop to leverage this in making "import from der
 > However, apart from its efficiency, this is possibly the most desirable solution because of its conceptual simplicity.
 > Thus it is interesting to develop efficient ways of dealing with very large build graphs
 
--- Eelco Dolstra's this, page 240.
+-- [*The Purely Functional Software Deployment Model*](https://edolstra.github.io/pubs/phd-thesis.pdf), Eelco Dolstra's dissertation, page 240.
 
 Nix's design encourages a separation of build *planning* from build *execution*:
 evaluation of the Nix language produces derivations, and then then those derivations are built.
