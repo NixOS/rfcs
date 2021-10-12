@@ -108,6 +108,17 @@ TODO, demonstrate changes to Nixpkgs, e.g. using the Haskell infrastructure, in 
    Finally, there's being able to `override`, `overrideAttrs`, etc. the derivation downstream.
    IFD alone allows computed packages that follow all these norms.
 
+4. Say I want IFD that depends on other IFD?
+
+   In other words, can one import a derivation that is itself evaluated from and import from a derivation?
+   No, not without introducing another round of building and evaluating for Hydra.
+   But I don't think we need arbitrarily-deep dynamism anyways: it is a tool that should be used with care anyways, because stasis \[staticism?\] is the goodly disciplinarian that makes Nixpkgs so great.
+
+   That said, `cabal2nix` is written in Haskell, `crate2nix` is written in Rust, etc. etc.
+   We can vendor enough code to build these tools and thus bootstrap the IFD we will do.
+   Per the 3rd rule for Nixpkgs above, as long as we make the vendoring automatic and pure, this is fine, and improvement upon today.
+   Also, even if we didn't have the "one round of dynamism" restriction, we would still have the bootstrapping issue.
+
 # Alternatives
 [alternatives]: #alternatives
 
