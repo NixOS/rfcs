@@ -47,9 +47,11 @@ The only barrier then is addressing eval resource usage costs.
 
 2. Add a new `allImportedDerivations` top-level attribute.
    This *must* be buildable with `enableImportFromDerivation = false`.
-   It *must* have in its runtime closure any derivation output that Nixpkgs with `enableImportFromDerivation = true` imports.
+   It *must* have in its run-time closure any derivation output that Nixpkgs with `enableImportFromDerivation = true` imports.
+   \(CI will verify these conditions as described in the next subsection.\)
 
-3. Any code vendored in Nixpkgs must correspond to code produced in a derivation, so the code can be mechanistically re-vendored.
+3. Any code vendored in Nixpkgs *must* correspond to code produced in an imported derivation, so the code can be mechanistically re-vendored.
+   We should write tests that each pair of vendored and computed derivations are the same.
 
 ## Hydra policy
 
@@ -59,8 +61,8 @@ Instead of kicking of single evaluations of Nixpkgs, we will kick of double eval
 
   2. Build `allImportedDerivations`, and copy its closure to the evaluation machine.
 
-  3. Evaluate Nixpkgs with `enableImportFromDerivation = true`, with the closure added to the eval paths whitelist, and with IFD partially "allowed, but with `-j0`".
-     What this means is no building can happen at eval time, but we can import derivations that are already built.
+  3. Evaluate Nixpkgs with `enableImportFromDerivation = true`, with the closure of `allImportedDerivations` added to the eval paths whitelist, and with IFD partially "allowed, but with `-j0`".
+     What this means is no building can happen at eval time, but we can import the outputs of derivations that are already built and whitelisted.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
