@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Many of us want IFD to be allowed in Nixpkgs.
+Many of us want "import from derivation" \[hereafter, IFD\] be allowed in Nixpkgs.
 IFD would be terrible for `hydra.nixos.org`, though,
 The solution is to cut the Gordian knot: Allow IFD in Nixpkgs while still (effectively) prohibiting it in CI.
 
@@ -42,12 +42,12 @@ The only barrier then is addressing eval resource usage costs.
 
 ## Nixpkgs
 
-1. Add a new `enableIFD` config parameter to Nixpkgs.
+1. Add a new `enableImportFromDerivation` config parameter to Nixpkgs.
    When it is `false`, anything using IFD must be disabled so that a regular evaluation like we do today succeeds.
 
 2. Add a new `allImportedDerivations` top-level attribute.
-   This *must* be buildable with `enableIFD = false`.
-   It *must* have in its runtime closure any derivation output that Nixpkgs with `enableIFD = true` imports.
+   This *must* be buildable with `enableImportFromDerivation = false`.
+   It *must* have in its runtime closure any derivation output that Nixpkgs with `enableImportFromDerivation = true` imports.
 
 3. Any code vendored in Nixpkgs must correspond to code produced in a derivation, so the code can be mechanistically re-vendored.
 
@@ -59,7 +59,7 @@ Instead of kicking of single evaluations of Nixpkgs, we will kick of double eval
 
   2. Build `allImportedDerivations`, and copy its closure to the evaluation machine.
 
-  3. Evaluate Nixpkgs with `enableIFD = true`, with the closure added to the eval paths whitelist, and with IFD partially "allowed, but with `-j0`".
+  3. Evaluate Nixpkgs with `enableImportFromDerivation = true`, with the closure added to the eval paths whitelist, and with IFD partially "allowed, but with `-j0`".
      What this means is no building can happen at eval time, but we can import derivations that are already built.
 
 # Examples and Interactions
@@ -127,7 +127,7 @@ The only alternative that isn't massively harder is doing nothing.
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-Should we call it `IFD`, or should we give it a different name?
+Should we call it "import from Derivation", or should we give it a different name?
 `builtins.readFile <drv>` is really the same thing for our purposes, so I am sympathetic to renaming.
 
 # Future work
