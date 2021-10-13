@@ -67,7 +67,28 @@ Instead of kicking off single evaluations of Nixpkgs, we will kick off double ev
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-TODO, demonstrate changes to Nixpkgs, e.g. using the Haskell infrastructure, in a fork, and link?
+1. TODO, demonstrate changes to Nixpkgs, e.g. using the Haskell infrastructure, in a fork, and link?
+
+2. Vendoring to avoid critical path regressions
+
+   @FRidh brings up a good example, that of GHC and Sphinx.
+   Today, both are in Nixpkgs, and GHC depends on Sphinx to render it's docs.
+   With this change, we could perhaps instead package Sphinx via some hypothetical "pypi2nix" IFD.
+   That would mean GHC also indirectly depends on pypi2nix.
+
+   To avoid the fallout, we could replace the hand-written Sphinx with a vendored copy of the generate code.
+   We would then test that the IFD and vendored Sphinx are the same.
+   Sphinx, if I recall correctly, might has some non-python dependencies.
+   Just as we do for Haskell packages today, handwritten overs overrides of the generated stuff would remain in Nixpkgs to make that go.
+   In this way, Sphinx and GHC don't "regress", remaining usable from the first `enableImportFromDerivation = false` evaluation.
+
+   Now, one might argue that GHC is not very useful except for building downstream packages.
+   Also, with or without this PR, I have a very long-standing goal to build the compiler itself and "wired-in" libariess separately, which would allow using cabal2nix for much of GHC itself.
+   *If* we do that, and also *if* we decide to stop vendoring the generated Hackage packages and only rely on IFD, GHC would become a second-eval-only, `enableImportFromDerivation = true`-only package.
+   At that point, there might not be a reason to vendor Sphinx anymore, and so we would stop doing so and only rely on the IFD too.
+
+   Again, note that the final paragraph of that story is purely hypothetical, just one possible future.
+   This RFC does *not* propose making any specific concrete packages second-eval-only.
 
 # Drawbacks
 [drawbacks]: #drawbacks
