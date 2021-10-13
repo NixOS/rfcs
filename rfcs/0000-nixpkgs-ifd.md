@@ -55,7 +55,7 @@ The only barrier then is addressing eval resource usage costs.
 
 ## Hydra policy
 
-Instead of kicking of single evaluations of Nixpkgs, we will kick of double evaluations:
+Instead of kicking off single evaluations of Nixpkgs, we will kick off double evaluations:
 
   1. Evaluate Nixpkgs normally.
 
