@@ -124,7 +124,21 @@ TODO, demonstrate changes to Nixpkgs, e.g. using the Haskell infrastructure, in 
 # Alternatives
 [alternatives]: #alternatives
 
-The only alternative that isn't massively harder is doing nothing.
+1. Instead of evaluating Nixpkgs twice, just evaluate `allImportedDerivations` the first round.
+
+   We could do this, and would reduce total eval time, yes.
+   But, I think it would come at the cost of inciting great controversy.
+   This means users of the `enableImportFromDerivation = false` subset of Nixpkgs would still have to *wait*, for all the IFD to complete first.
+   And remember, with mass rebuilds, that could be quite some time.
+   Increasing the critical path length of *everything* we do with Nixpkgs would cause real pain in some quarters, and I don't want that to pay that as the cost of IFD.
+
+   With the plan as written, users of packages depending on IFD do have to wait slightly longer as the first eval is longer (and we wait for it before beginning to build `allImportedDerivations`).
+   But I think that is fair; we would be the "new constituency", the bottom of the pecking order, and so we should be patient so that other's workflows are not disturbed.
+
+   Longer term we could revisit this, or we could e.g. double down on automatic vendoring, committing all generated code to a second "roll-up" repo.
+   Many options between those two extremes; I rather not worry to much about it now and just take the conservative polite route proposed here to begin.
+
+2. As always, do nothing, and keep the status quo.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
