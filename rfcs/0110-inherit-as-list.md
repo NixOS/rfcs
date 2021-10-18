@@ -35,14 +35,19 @@ with attrs; [ a b c ]
 ```
 
 However, the `with` expression has many well-known drawbacks, such as
-unintuitive shadowing behavior [1], prevention of static scope checking [2],
-and reduced evaluation performance [2].
+unintuitive shadowing behavior [1][2], prevention of static scope checking [3][4],
+and reduced evaluation performance [3].
 
-* [1] https://github.com/NixOS/nix/issues/1361
-* [2] https://github.com/NixOS/nixpkgs/pull/101139
+* [1] https://github.com/NixOS/nix/issues/490
+* [2] https://github.com/NixOS/nix/issues/1361
+* [3] https://github.com/NixOS/nixpkgs/pull/101139
+* [4] https://nix.dev/anti-patterns/language#with-attrset-expression
 
 Nonetheless, Nix expression authors are subtly guided toward the `with` form
 because it is (or at least appears) simpler than any existing alternatives.
+Some alternatives are suggested in
+https://nix.dev/anti-patterns/language#with-attrset-expression, but as these
+are more verbose and complex than `with`, they are rarely used.
 
 The goal of this RFC is to provide a similarly-terse alternative which avoids
 these drawbacks.
