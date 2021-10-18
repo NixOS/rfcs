@@ -92,11 +92,11 @@ meta.maintainers = inherit (lib.maintainers) [ johndoe janedoe ];
 
 And build inputs which are commonly extracted from attrsets:
 ```nix
-buildInputs = inherit (darwin.apple_sdk.frameworks) [
+buildInputs = (inherit (darwin.apple_sdk.frameworks) [
   IOKit
-] ++ inherit (llvmPackages) [
+]) ++ (inherit (llvmPackages) [
   llvm
-];
+]);
 ```
 
 # Drawbacks
@@ -112,7 +112,7 @@ buildInputs = inherit (darwin.apple_sdk.frameworks) [
 
 * Skillful use of `with` to avoid its drawbacks
 * Fine-grained attribute selection via existing (more verbose) language
-  features, such as `builtins.attrValues (inherit (attrs) a b c;)`
+  features, such as `builtins.attrValues { inherit (attrs) a b c; }`
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
