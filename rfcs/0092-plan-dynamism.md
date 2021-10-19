@@ -229,7 +229,7 @@ gives us the path to an output of it.
   since 1) the daemon will consider the build doing `nix build`
   as an active build, 2) it messes with logging, often the log
   of a failing inner build will not be easily accessible, and
-  3) we can't actually have derivations that build derivations.
+  3) we can't actually have derivations that output derivations.
 - Do nothing, and continue to have no good answer for large builds like Linux and Chromium.
 
 # Unresolved questions
