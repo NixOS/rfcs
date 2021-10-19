@@ -34,6 +34,9 @@ Notable improvements it allows:
 - We can fetch Merkle trees by just knowing the hash of the root,
   with Θ(n) derivations for n nodes in the tree.
 
+NB: This is **not** a replacement for Recursive Nix. We still need the ability to
+access the store inside the build for many usages of this RFC's features.
+
 # Motivation
 [motivation]: #motivation
 
@@ -219,12 +222,14 @@ gives us the path to an output of it.
 # Alternatives
 [alternatives]: #alternatives
 
-- Do what we would do with this RFC with only Recursive Nix.
-  The issue with doing something like `nixBuild` with Recursive Nix,
-  is that the derivations you're building inside the build will not be registered
-  as dependencies. This makes logging essentially useless if an inner build fails.
-  NB: This is **not** a replacement for Recursive Nix. We still need the ability to
-  access the store inside the build for many usages of this RFC's features.
+- Restrict ourselves to a subset of what we can do with this RFC,
+  and implement that using only Recursive Nix without making use
+  of this RFC.
+  Notably, we can still run `nix build` at the end of builds. This isn't as great,
+  since 1) the daemon will consider the build doing `nix build`
+  as an active build, 2) it messes with logging, often the log
+  of a failing inner build will not be easily accessible, and
+  3) we can't actually have derivations that build derivations.
 - Do nothing, and continue to have no good answer for large builds like Linux and Chromium.
 
 # Unresolved questions
