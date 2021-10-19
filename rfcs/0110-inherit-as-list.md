@@ -57,7 +57,7 @@ these drawbacks.
 
 The proposed syntax is:
 
-```nix
+```
 [ inherit (attrs) a b c; ]
 [ inherit a b c; ]
 ```
@@ -95,7 +95,7 @@ more fine-grained alternative to `python3.withPackages (ps: with ps; [ ... ])`.
 This would apply similarly to `vim.withPlugins`, `lua.withPackages`, etc.
 
 Certain list-typed `meta` fields could also make use of this feature, e.g.:
-```nix
+```
 meta.licenses = [ inherit (lib.licenses) bsd3 mit; ];
 meta.maintainers = [ inherit (lib.maintainers) johndoe janedoe; ];
 ```
@@ -103,7 +103,7 @@ meta.maintainers = [ inherit (lib.maintainers) johndoe janedoe; ];
 List-inherits can be used multiple times in a list-expression, and intermingled
 with ordinary list elements without needing to concatenate:
 
-```nix
+```
 buildInputs = [
   a b c /* ordinary list elements */
   inherit (pkgsFoo) d e f;
@@ -117,7 +117,7 @@ this RFC proposes a corresponding list-inherit syntax which also inherits
 from the current scope. So if the order of the ordinary elements in the
 previous list is not significant, one could rewrite the list as:
 
-```nix
+```
 buildInputs = [
   inherit a b c;
   inherit (pkgsFoo) d e f;
