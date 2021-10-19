@@ -11,9 +11,28 @@ related-issues: https://github.com/NixOS/nix/pull/4628 https://github.com/NixOS/
 # Summary
 [summary]: #summary
 
-We need build plan dynamism -- interleaved building and planning -- to cope with the ever-growing world of language-specific package managers.
-Propose to allow derivations to build derivations, and depend on those built derivations, as the core primitive for this.
-Additionally, introduce a new primop to leverage this in making "import from derivation" (IFD), still the gold standard for ease of use, more efficient and compatible with `hydra.nixos.org`'s queue runner.
+We introduce three fundamental new features:
+- The ability to have derivations which output store path end in `.drv`
+  (e.g. `$out` is /nix/store/something.drv).
+- The ability for a derivation to depend on the output of a derivation,
+  that isn't yet built but has to be built by another derivation.
+- A primitive `builtins.outputOf` to make use of this feature from within
+  the Nix language.
+
+These features work best in combination with Recursive Nix, such that you
+can add to the host store from within the build.
+It can replace doing `nix build` within a build with a mechanism
+that works better with the design constraints of Nix.
+
+Notable improvements it allows:
+- We can split up big builds like the Linux kernel into
+  smaller derivations without introducing automatically generated
+  code into Nixpkgs.
+- We can do the above automatically for many *2nix tools,
+  allowing us to have source-file-level derivations for most
+  languages (forget crate-level!).
+- We can fetch Merkle trees by just knowing the hash of the root,
+  with Θ(n) derivations for n nodes in the tree.
 
 # Motivation
 [motivation]: #motivation
