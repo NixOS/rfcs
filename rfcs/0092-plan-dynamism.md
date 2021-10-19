@@ -2,10 +2,10 @@
 feature: plan-dynamism
 start-date: 2019-02-01
 author: John Ericson (@Ericson2314)
-co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
-related-issues: (will contain links to implementation PRs)
+co-authors: Las Safin (@L-as)
+shepherd-team: @tomberek, @ldesgoui, @gytis-ivaskevicius, @L-as
+shepherd-leader: @tomberek
+related-issues: https://github.com/NixOS/nix/pull/4628 https://github.com/NixOS/nix/pull/5364 https://github.com/NixOS/nix/pull/4543 https://github.com/NixOS/nix/pull/3959
 ---
 
 # Summary
@@ -18,7 +18,7 @@ Additionally, introduce a new primop to leverage this in making "import from der
 # Motivation
 [motivation]: #motivation
 
-> Instead of recursive Nix builds, the alternative is to have one gigantic build graph.
+> Instead of Recursive Nix builds, the alternative is to have one gigantic build graph.
 > For instance, if we are building a component that needs a C compiler, the Nix expression for that component simply imports the Nix expression that builds the compiler.
 > The problem with this approach is scalability: the resulting build graphs would become huge.
 > The graph for a simple component such as GNU Hello would include the build graphs for dozens of large components, such as Glibc, GCC, etc.
@@ -37,7 +37,7 @@ It's also encouraged Nixpkgs to take the "birds eye" view and successful grapple
 The core feature here, derivations that build derivations, is a nice sneaky fundamental primitive for the problem Eelco point's out.
 
 It's very performant, being well-adapted for Nix's current scheduler.
-Unlike recursive Nix, there's is no potential for half-built dependencies to sit around waiting for other builds, wasting resources.
+Unlike Recursive Nix, there's is no potential for half-built dependencies to sit around waiting for other builds, wasting resources.
 Each build step (derivation) always runs start to finish blocking on nothing.
 It's very efficient, because it doesn't obligate the use of the Nix expression language.
 
@@ -79,7 +79,7 @@ We can break this down nicely into steps.
    \[If one tries to output a drv file today, they will find Nix doesn't accept the output as such because these small paper cuts.
    This list item and its children should be thought of as "lifting artificial restrictions".\]
 
-   1. Allow derivation outputs to be content addressed in the same manner as drv files.
+   1. Allow derivation outputs to be content-addressed in the same manner as drv files.
       (The little-exposed name for this is "text" content addressing).
 
    2. Lift the (perhaps not yet documented) restriction barring derivations output paths from ending in `.drv`, but only for derivation outputs that are so content-addressed.
@@ -124,14 +124,14 @@ We can break this down nicely into steps.
 3. Extend the scheduler and derivation dependencies similarly:
 
   - Derivations can depend on the outputs of derivations that are themselves derivation outputs.
-    The scheduler will substitute derivations to simplify dependencies as computed derivations are built, just like how floating content addressed derivations are realized.
+    The scheduler will substitute derivations to simplify dependencies as computed derivations are built, just like how floating content-addressed derivations are realized.
 
   - Missing derivations get their own full fledged goals so they can be built, not just fetched from substituters.
 
 4. Add a new `outputOf` primop:
 
    `builtins.outputOf drv outputName` produces a placeholder string with the appropriate string context to access the output of that name produced by that derivation.
-   The placeholder string is quite analogous to that used for floating content addressed derivation outputs.
+   The placeholder string is quite analogous to that used for floating content-addressed derivation outputs.
    \[With just floating content-addressed derivations but no computed derivations, derivations are always known statically but their outputs aren't.
    With this RFC, since drv files themselves can be floating CA derivation outputs, we also might not know the derivations statically, so we need "deep" placeholders to account for arbitrary layers of dynamism.
    This also corresponds to the use of arbitrary many `!` in the CLI.\]
@@ -220,7 +220,7 @@ Concretely, our design means we cannot defer the `pname` `meta` etc. fields: eit
 
  - Do nothing, and continue to have no good answer for large builds like Linux and Chromium.
 
- - Embrace recursive Nix in its current form.
+ - Embrace Recursive Nix in its current form.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
