@@ -158,73 +158,45 @@ We can break this down nicely into steps.
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-Here is everything put together with a Haskell and `cabal2nix` example.
+A good example is available at https://github.com/L-as/nix-build.nix.
 
-Given the following code, and assuming `bar` will depend on `foo`
+Specifically, we can do the following:
 ```nix
-mkScope (self: {
-  foo = builtins.assumeDerivation (self.callCabal2nix "foo" ./foo);
-  bar = builtins.assumeDerivation (self.callCabal2nix "bar" ./bar);
-})
+{ pkgs, nixBuild }:
+
+let
+  drv = pkgs.runCommand "hello-drv.nix" {} ''
+    echo "with import ${pkgs.path} {}; hello" > $out
+  '';
+in
+nixBuild pkgs.system "hello" drv
 ```
-After some evaluation, we get something like the following derivations with dependencies:
+
+`nixBuild` essentially runs the following builder internally:
+```bash
+cp $(nix-instantiate $input) $out
 ```
-(cabal2nix foo)!out ----> deFoo = deferred eval (fooNix: self.callPackage fooNix)
-(cabal2nix bar)!out ----> deBar = deferred eval (barNix: self.callPackage barNix)
+
+However, you don't have to use the Nix language, nor do you have to use `nix-instantiate`.
+The following also works:
+```bash
+cat > $out <<END
+Derive([("out","/nix/store/15c875mwri8xx3s0gqsdkdw7sqqyv55c-hello-2.10","","")],[("/nix/store/3x7l9pm7hqbhz2s59hsrg2y1dxr8glw8-hello-2.10.tar.gz.drv",["out"]),("/nix/store/bqfy8ydlxs0xhzqmy7rc3zjw60vwab6j-stdenv-linux.drv",["out"]),("/nix/store/k6c94x4g937sh8wh5sx90czd9wn9apks-bash-5.1-p8.drv",["out"])],["/nix/store/9krlzvny65gdc8s7kpb6lkx8cd02c25b-default-builder.sh"],"x86_64-linux","/nix/store/wadmyilr414n7bimxysbny876i2vlm5r-bash-5.1-p8/bin/bash",["-e","/nix/store/9krlzvny65gdc8s7kpb6lkx8cd02c25b-default-builder.sh"],[("buildInputs",""),("builder","/nix/store/wadmyilr414n7bimxysbny876i2vlm5r-bash-5.1-p8/bin/bash"),("configureFlags",""),("depsBuildBuild",""),("depsBuildBuildPropagated",""),("depsBuildTarget",""),("depsBuildTargetPropagated",""),("depsHostHost",""),("depsHostHostPropagated",""),("depsTargetTarget",""),("depsTargetTargetPropagated",""),("doCheck","1"),("doInstallCheck",""),("name","hello-2.10"),("nativeBuildInputs",""),("out","/nix/store/15c875mwri8xx3s0gqsdkdw7sqqyv55c-hello-2.10"),("outputs","out"),("patches",""),("pname","hello"),("propagatedBuildInputs",""),("propagatedNativeBuildInputs",""),("src","/nix/store/3x7dwzq014bblazs7kq20p9hyzz0qh8g-hello-2.10.tar.gz"),("stdenv","/nix/store/qcq1y0nfxv8za7w6c682s93gk87r2xy1-stdenv-linux"),("strictDeps",""),("system","x86_64-linux"),("version","2.10")])
+END
 ```
-and evaluated nix
+
+The way you would use a derivation that outputs a derivation to `out` is then
+as such:
 ```nix
-mkScope (self: {
-  foo = builtins.outputOf /nix/store/deFoo.drv "out";
-  bar = builtins.outputOf /nix/store/deBar.drv "out";
-})
+{ pkgs, drv }
+
+pkgs.runCommand "example" {} ''
+  ls ${builtins.outputOf drv.out "out"} > $out
+''
 ```
 
-If we then build `bar` we will get something steps like:
-
-1. ```
-   deBar!out
-   ```
-2. Expand `deBar` in to see dep
-   ```
-   ((cabal2nix bar)!out ----> (deferred eval (fooNix: self.callPackage barNix {}))!out
-   ```
-3. Build cabal2nix and inline path for simplicity (or if cabal2nix job is floating CA derivation)
-   ```
-   (deferred eval self.callPackage built-barNix)!out
-   ```
-4. Build deferred eval job and substitute
-   ```
-   deFoo!out ----> bar.drv!out
-   ```
-5. Expand `deFoo` in to see dep
-   ```
-   ((cabal2nix foo)!out ----> (deferred eval (fooNix: self.callPackage fooNix {}))!out ----> bar.drv!out
-   ```
-6. Build cabal2nix and inline path for simplicity (or if cabal2nix job is floating CA derivation)
-   ```
-   (deferred eval self.callPackage built-fooNix)!out ----> bar.drv!out
-   ```
-7. Build deferred eval job and substitute
-   ```
-   foo.drv!out ----> bar.drv!out
-   ```
-8. Build foo and realize bar
-   ```
-   bar.drv[foo-path/foo!out]!out
-   ```
-9. Build bar
-   ```
-   bar-path
-   ```
-
-The above is no doubt hard to read -- I am sorry about that --- but here are a few things to note:
-
- - The scheduler "substitutes on demand" giving us a lazy evaluation of sorts.
-   This means that in the extreme case where we to make to, e.g., make a derivation for every C compiler invocation, we can avoid storing a very large completely static graph all at once.
-
- - At the same time, the derivations can be built in many different orders, so one can intentionally build all the `cabal2nix` derivations first and try to accumulate up the biggest static graph with `--dry-run`.
-   This approximates what would happen in the "infinitely parallel" case when the scheduler will try to dole out work to do as fast as it can.
+Given a path to a derivation that might not yet be built, `builtins.outputOf`
+gives us the path to an output of it.
 
 # Drawbacks
 [drawbacks]: #drawbacks
