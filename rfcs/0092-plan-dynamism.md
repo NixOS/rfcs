@@ -191,7 +191,7 @@ END
 The way you would use a derivation that outputs a derivation to `out` is then
 as such:
 ```nix
-{ pkgs, drv }
+{ pkgs, drv }:
 
 pkgs.runCommand "example" {} ''
   ls ${builtins.outputOf drv.out "out"} > $out
