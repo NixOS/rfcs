@@ -21,7 +21,7 @@ We introduce three fundamental new features:
 
 These features work best in combination with Recursive Nix, such that you
 can add to the host store from within the build.
-It can replace doing `nix build` within a build with a mechanism
+It can replace invoking `nix build` within a build with a mechanism
 that works better with the design constraints of Nix.
 
 Notable improvements it allows:
