@@ -201,22 +201,38 @@ gives us the path to an output of it.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-The main drawback is that these stub expressions are *only* "pure" derivations --- placeholder strings (with the proper string context) and not attrsets with all the niceties we are used to getting from `mkDerivation`.
-This is true even when the deferred evaluation in fact *does* use `mkDerivation` and would provide those niceties.
-For other sort of values, we have no choice but wait; that would require a fully incremental / deferral evaluation which is a completely separate feature not an extension of this.
-Concretely, our design means we cannot defer the `pname` `meta` etc. fields: either make do with the bare string `builtins.outputOf` provides, or *statically* add a fake `name` and `meta` etc. that must be manually synced with the deferred eval derivation if it is to match.
+- We add a bit of complexity to Nix.
+- There is currently no way of getting a "derivation object"
+  as you do from `builtins.derivation` with `builtins.outputOf`.
+  There are reasons for why this can't be done, mainly that you
+  don't actually know the attributes the built derivation will have,
+  but it might be an ergonomic issue.
+- This is for many things not an alternative to IFD, since we
+  still can not build derivations and then use them at evaluation
+  time, meaning that you can't have an attribute set whose contents
+  are determined by some build, and then access that attribute set
+  outside of build that dependens on that derivation.
+- We unfortunately expose the `text` `outputHashMode` to users.
+  Preferably this should be removed entirely, in addition to `flat`,
+  and everything should just use `recursive`.
 
 # Alternatives
 [alternatives]: #alternatives
 
- - Do nothing, and continue to have no good answer for large builds like Linux and Chromium.
-
- - Embrace Recursive Nix in its current form.
+- Do what we would do with this RFC with only Recursive Nix.
+  The issue with doing something like `nixBuild` with Recursive Nix,
+  is that the derivations you're building inside the build will not be registered
+  as dependencies. This makes logging essentially useless if an inner build fails.
+  NB: This is **not** a replacement for Recursive Nix. We still need the ability to
+  access the store inside the build for many usages of this RFC's features.
+- Do nothing, and continue to have no good answer for large builds like Linux and Chromium.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-The exact way the outputs refer to the replacement derivations / their outputs is subject to bikeshedding.
+- The exact way the outputs refer to the replacement derivations / their outputs is subject to bikeshedding.
+- Do we need the new CLI?
+- Can we make `builtins.outputOf` more ergonomic?
 
 # Future work
 [future]: #future-work
@@ -230,4 +246,4 @@ The exact way the outputs refer to the replacement derivations / their outputs i
 
 3. Try to convince upstream tools to use Nix like CMake, Meson, etc. use Ninja.
    Rather than converting Ninja plans, we might convince those tools to have purpose-built Nix backends.
-   Language-specific package mangers that don't use Ninja today might also be modified to "let Nix do that actual building".
+   Language-specific package managers that don't use Ninja today might also be modified to "let Nix do that actual building".
