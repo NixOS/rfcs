@@ -11,8 +11,8 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-This RFC proposes a new Nix syntax `inherit (<attrset>) [ <attrnames> ]`, which
-constructs a list from the values of an attrset.
+This RFC proposes a new Nix syntax `[ inherit (<attrset>) <attrnames>; ]`,
+which constructs a list from the values of an attrset.
 
 The goal is to provide a similarly-terse but more principled alternative
 to the often-used `with <attrset>; [ <attrnames> ]`.
@@ -55,19 +55,29 @@ these drawbacks.
 # Detailed design
 [design]: #detailed-design
 
-The proposed expression syntax is:
+The proposed syntax is:
 
 ```nix
-inherit (attrs) [ a b c ]
+[ inherit (attrs) a b c; ]
+[ inherit a b c; ]
+```
+
+These expressions are (respectively) syntactic sugar for:
+
+```nix
+builtins.attrValues { inherit (attrs) a b c; }
+builtins.attrValues { inherit a b c; }
 ```
 
 The `inherit` keyword is intentionally reused so as to not add any new
-keywords to the Nix grammar.
+keywords to the Nix grammar, and to evoke the similarities with the
+existing attribute-based inherit syntax.
 
-As this expression is currently a syntax error, a Nix interpreter which
-supports this language feature will be compatible with existing Nix code.
+As the `inherit` keyword is currently a syntax error inside a list expression,
+a Nix interpreter which supports this new language feature will be compatible
+with existing Nix code.
 
-An implementation PR is pending.
+This RFC is implemented here: https://github.com/nixos/nix/pull/5402
 
 For MVP functionality, only minor additions to `src/libexpr/parser.y` are
 needed. If accepted, the changes to the Nix interpreter can be backported
@@ -80,24 +90,42 @@ third-party parsers/linters would also need to be updated.
 This would be useful for many languages and frameworks in Nixpkgs which
 extract packages from a package set argument.
 
-For example, `python3.withPackages (ps: inherit (ps) [ ... ])` will serve as a
+For example, `python3.withPackages (ps: [ inherit (ps) ...; ])` will serve as a
 more fine-grained alternative to `python3.withPackages (ps: with ps; [ ... ])`.
 This would apply similarly to `vim.withPlugins`, `lua.withPackages`, etc.
 
 Certain list-typed `meta` fields could also make use of this feature, e.g.:
 ```nix
-meta.licenses = inherit (lib.licenses) [ bsd3 mit ];
-meta.maintainers = inherit (lib.maintainers) [ johndoe janedoe ];
+meta.licenses = [ inherit (lib.licenses) bsd3 mit; ];
+meta.maintainers = [ inherit (lib.maintainers) johndoe janedoe; ];
 ```
 
-And build inputs which are commonly extracted from attrsets:
+List-inherits can be used multiple times in a list-expression, and intermingled
+with ordinary list elements without needing to concatenate:
+
 ```nix
-buildInputs = (inherit (darwin.apple_sdk.frameworks) [
-  IOKit
-]) ++ (inherit (llvmPackages) [
-  llvm
-]);
+buildInputs = [
+  a b c /* ordinary list elements */
+  inherit (pkgsFoo) d e f;
+  g h i /* ordinary list elements */
+  inherit (pkgsBar) j k l;
+];
 ```
+
+Sinc attributes inherit from the current scope with `{ inherit a b c; }`,
+this RFC proposes a corresponding list-inherit syntax which also inherits
+from the current scope. So if the order of the ordinary elements in the
+previous list is not significant, one could rewrite the list as:
+
+```nix
+buildInputs = [
+  inherit a b c;
+  inherit (pkgsFoo) d e f;
+  inherit g h i;
+  inherit (pkgsBar) j k l;
+];
+```
+
 
 # Drawbacks
 [drawbacks]: #drawbacks
