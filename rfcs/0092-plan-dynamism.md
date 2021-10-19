@@ -99,7 +99,7 @@ We can break this down nicely into steps.
    This list item and its children should be thought of as "lifting artificial restrictions".\]
 
    1. Allow derivation outputs to be content-addressed in the same manner as drv files.
-      (The little-exposed name for this is "text" content addressing).
+      (`outputHashMode = "text";`, see [Advanced Attributes](https://nixos.org/manual/nix/unstable/expressions/advanced-attributes.html)).
 
    2. Lift the (perhaps not yet documented) restriction barring derivations output paths from ending in `.drv`, but only for derivation outputs that are so content-addressed.
       \[There are probably other ways to make store paths that end in `.drv` that aren't valid derivations, so we could make the simpler change of lifting this restriction entirely without breaking invariants. But I'm fine keeping it for the wrong sorts of derivations as a useful guard rail.\]
