@@ -65,8 +65,8 @@ The proposed syntax is:
 These expressions are (respectively) syntactic sugar for:
 
 ```nix
-builtins.attrValues { inherit (attrs) a b c; }
-builtins.attrValues { inherit a b c; }
+[ attrs.a attrs.b attrs.c ]
+[ a b c ]
 ```
 
 The `inherit` keyword is intentionally reused so as to not add any new
@@ -112,17 +112,15 @@ buildInputs = [
 ];
 ```
 
-Sinc attributes inherit from the current scope with `{ inherit a b c; }`,
-this RFC proposes a corresponding list-inherit syntax which also inherits
-from the current scope. So if the order of the ordinary elements in the
-previous list is not significant, one could rewrite the list as:
+The order of the elements is preserved inside of and between inherits,
+so the previous is exactly equivalent to
 
 ```
 buildInputs = [
-  inherit a b c;
-  inherit (pkgsFoo) d e f;
-  inherit g h i;
-  inherit (pkgsBar) j k l;
+  a b c
+  pkgsFoo.d pkgsFoo.e pkgsFoo.f
+  g h i
+  pkgsBar.j pkgsBar.k pkgsBar.l
 ];
 ```
 
