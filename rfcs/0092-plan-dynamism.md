@@ -12,7 +12,7 @@ related-issues: https://github.com/NixOS/nix/pull/4628 https://github.com/NixOS/
 [summary]: #summary
 
 We introduce three fundamental new features:
-- The ability to have derivations which output store path end in `.drv`
+- The ability to have derivations which output store paths end in `.drv`
   (e.g. `$out` is /nix/store/something.drv).
 - The ability for a derivation to depend on the output of a derivation,
   that isn't yet built but has to be built by another derivation.
