@@ -33,6 +33,10 @@ Notable improvements it allows:
   languages (forget crate-level!).
 - We can fetch Merkle trees by just knowing the hash of the root,
   with Θ(n) derivations for n nodes in the tree.
+- It is a better way of evaluating Nix code inside a build compared
+  to standard Recursive Nix, and can serve as an alternative to **i**mport-**f**rom-**d**erivation
+  in many cases. (IFD is where you import the output of a derivation into
+  the "evaluation stage", e.g. `import drv` or `builtins.readFile drv`).
 
 NB: This is **not** a replacement for Recursive Nix. We still need the ability to
 access the store inside the build for many usages of this RFC's features.
