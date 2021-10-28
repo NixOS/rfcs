@@ -319,7 +319,7 @@ Define the preferences about the amount of time to wait for Tier-2 platform
 fixes in various situations, and about interim resolution in case of failure
 (keep old version on one platform, mark as broken, something else).
 
-# Appendix A. Non-normative description of platforms in November 2019
+# Appendix A. Non-normative description of platforms in October 2021
 
 We currently have a relatively steady state, so the tiers for each platform do
 not differ too much and we can approximate it with a single tier per platform.
@@ -343,12 +343,6 @@ If there is a complicated problem on this platform when updating a package
 that was previously built succesfully on Aarch64, @NixOS/aarch64-maintainers
 team should be informed.
 
-* `x86_64-darwin`, `clang`+Darwin/macOS
-
-If there is a complicated problem on this platform when updating a package
-that was previously built succesfully on macOS, @NixOS/darwin-maintainers team
-should be informed.
-
 ### Tier 3
 
 * `i686-linux`, `gcc`+`glibc` — `ofBorg` builds via `pkgsi686Linux`, binary
@@ -367,6 +361,12 @@ maintained as a part of `x86_64-linux` Wine support.
 * `mipsel-linux`, `gcc`+`glibc`
 
 * `x86_64-linux`, `gcc`+`musl`
+
+* `x86_64-darwin`, `clang`+Darwin/macOS
+
+If there is a complicated problem on this platform when updating a package
+that was previously built succesfully on macOS, @NixOS/darwin-maintainers team
+should be informed.
 
 ### Tier 4
 
