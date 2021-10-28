@@ -54,7 +54,7 @@ no later than two months from the date of acceptance.
 
 In addition, any currently existing topics which are not strictly related to
 Nix in either technical or operational terms, should also be moved within the
-same time frame. Most likely to unofficial or semi-official Nix Community
+same time frame. Most likely to an unofficial or semi-official Nix Community
 Matrix Space. This is so that the scope of official communications can be kept
 to a reasonable baseline for moderators and operators.
 
@@ -101,6 +101,12 @@ extended is therefore expected in return.
 The design has been updated accordingly. Admittedly, and intentionally, this is
 not an attempt to address _all_ of these problems in one fell swoop, but
 instead to set a solid foundation for future policy RFCs.
+
+As a brief addendum, and specifically because some of the suggestions that have
+been made about ulterior motives for this RFC, let it be known that the author
+of this RFC has offered to take, and has now taken the very same actions for
+his own project's room that he is asking others to take for the sake of the
+community, i.e. removed it from `nixos.org`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
