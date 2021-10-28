@@ -63,12 +63,12 @@ to a reasonable baseline for moderators and operators.
 
 The very intention of this RFC, in letter, and in spirit is to improve the
 transparent communication between disparate members of the community, which has
-already come to a head elsewhere in both public and private, to the point that
-certain members of the community have expressed a need to self segregate! This
-is clearly _not_ sustainable long term, and NixOS _should_ take a hard and
-clear stance suggesting that while we, in no way, codemn the act of private
-communications and coordinations, our _official_ stance is one of collaboration
-and openness.
+already come to a head elsewhere in both public and private. It has even reached
+a point that certain members of the community have expressed a need to self
+segregate! This is clearly _not_ sustainable long term, and NixOS _should_ take
+a hard and clear stance suggesting that while we, in no way, codemn the act of
+private communications and coordinations, our _official_ stance is one of
+collaboration and openness.
 
 This sends the signal that, if any serious contribution or opinion is to be
 laid bear, it should be done publicly, even if the details or the organization
@@ -79,10 +79,10 @@ continuity. This will only exacerbate as the divergence grows.
 
 Additionally, the importance and primacy of openness was weighed carefully by
 the author against the potential for further conflict. It was deemed that
-further conflict was, in the current state of affairs, inevitable and therefore
+further conflict was, in the current state of affairs, inevitable, and therefore
 only incidental should it arise during the course of this RFC. Unless and until
-decisions are made about the heirarcy of values in the NixOS Organization, such
-conflict will be inevitable.
+decisions are made about the heirarcy of values in the NixOS Organization, it is
+the author's opinion that such conflict _will_ continue.
 
 And to be sure, a certain amount of conflict is _always_ present, and sometimes
 even healthy. The target of focus here, then, is the type by which core values
@@ -98,7 +98,8 @@ drafting, despite the obvious and somewhat _easy_ conception that it was merely
 an attack on a particular group of individuals. The good faith that has been
 extended is therefore expected in return.
 
-The design has been updated accordingly. Admittedly, and intentionally, this is
+In light of feedback, the scope as been extended a bit, and th design has been
+updated accordingly. Admittedly, and intentionally, this is
 not an attempt to address _all_ of these problems in one fell swoop, but
 instead to set a solid foundation for future policy RFCs.
 
