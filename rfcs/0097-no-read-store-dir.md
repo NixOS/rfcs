@@ -29,6 +29,9 @@ This, however, should be optional, since the user should be able to do what they
 Some users might also want to do things like `chmod o-r /nix/store`, which
 gives you the interesting property that you can not access paths you do not
 already know of.
+Do note that given that all processes can by default read `/proc/cmdline`,
+they can still read your system's closure, which makes it an insufficient
+solution for security in many cases.
 This, however, is also entirely optional and is not the default in any way.
 
 # Detailed design
