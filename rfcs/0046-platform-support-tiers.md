@@ -49,7 +49,7 @@ the manual.
 achievement of the requirements defined in this RFC.
 
 * Discussions of platform support at the Tier 3 and above start using the
-vocubulary based on this RFC and ensure that the requirements of this RFC are
+vocabulary based on this RFC and ensure that the requirements of this RFC are
 met.
 
 ## Platform elements
@@ -312,7 +312,7 @@ generally encouraged could be defined. (Example: when building an FHS
 environment becomes a reasonable strategy to get something running on a NixOS
 machine?)
 
-Define the expetations of maintenance for specific packages; consider the
+Define the expectations of maintenance for specific packages; consider the
 notion of platform-specific maintenance.
 
 Define the preferences about the amount of time to wait for Tier-2 platform
@@ -340,13 +340,13 @@ A team @NixOS/aarch64-maintainers shall be created to include people who
 understand the platform and use it.
 
 If there is a complicated problem on this platform when updating a package
-that was previously built succesfully on Aarch64, @NixOS/aarch64-maintainers
+that was previously built successfully on Aarch64, @NixOS/aarch64-maintainers
 team should be informed.
 
 * `x86_64-darwin`, `clang`+Darwin/macOS
 
 If there is a complicated problem on this platform when updating a package
-that was previously built succesfully on macOS, @NixOS/darwin-maintainers team
+that was previously built successfully on macOS, @NixOS/darwin-maintainers team
 should be informed.
 
 ### Tier 3
