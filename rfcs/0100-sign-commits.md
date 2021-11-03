@@ -3,8 +3,8 @@ feature: sign-commits
 start-date: 2021-08-14
 author: Las Safin
 co-authors:
-shepherd-team:
-shepherd-leader:
+shepherd-team: znewman01, tomberek, hmenke
+shepherd-leader: tomberek
 related-issues: https://github.com/NixOS/rfcs/pull/34
 ---
 
