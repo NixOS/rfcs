@@ -3,7 +3,7 @@ feature: plan-dynamism
 start-date: 2019-02-01
 author: John Ericson (@Ericson2314)
 co-authors: Las Safin (@L-as)
-shepherd-team: @tomberek, @ldesgoui, @gytis-ivaskevicius, @L-as
+shepherd-team: @tomberek, @ldesgoui, @gytis-ivaskevicius, @edolstra 
 shepherd-leader: @tomberek
 related-issues: https://github.com/NixOS/nix/pull/4628 https://github.com/NixOS/nix/pull/5364 https://github.com/NixOS/nix/pull/4543 https://github.com/NixOS/nix/pull/3959
 ---
