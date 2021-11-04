@@ -12,7 +12,7 @@ related-issues: #98 #102
 [summary]: #summary
 
 The NixOS Community needs some foundation of shared values which can be used
-to determine appropriate when contributing and interacting with the community.
+to determine appropriate behavior when contributing and interacting with the community.
 We currently have a [community ethos](https://nixos.org/community/index.html), but
 this only states that we are an inclusive community, but doesn't define
 inappropriate behavior when interacting with the community. This RFC aims
