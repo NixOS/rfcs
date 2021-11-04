@@ -65,7 +65,8 @@ a safe place for you and we’ve got your back.
 [examples-and-interactions]: #examples-and-interactions
 
 There have been a few spectacular failures of communication and good faith within the community.
-Most notable recent examples include the [block evasion thread](https://discourse.nixos.org/t/github-block-evasion-is-not-acceptable/12763),
+Most notable recent examples include [ad-hominem attacks in a PR review](https://github.com/NixOS/nixpkgs/pull/120729#discussion_r621885348)
+and associated [block evasion discourse thread](https://discourse.nixos.org/t/github-block-evasion-is-not-acceptable/12763),
 heated discussions in [RFC #98](https://github.com/NixOS/rfcs/pull/98) and [RFC #111](https://github.com/NixOS/rfcs/pull/111).
 Each of these incidents have caused significant discussion on IRC (when it was still official),
 matrix, discourse, and would bleed over into github and even non-official platforms.
