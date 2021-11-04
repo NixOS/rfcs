@@ -35,7 +35,7 @@ when behavior becomes disruptive.
 
 These statutes are taken from [rust-lang's Code of Conduct](https://www.rust-lang.org/policies/code-of-conduct),
 which provides a great compromise between explicit behaviors and subjective goals.
-Only the moderation body name has been changed.
+Only minor changes have been made.
 
 - We are committed to providing a friendly, safe and welcoming environment for
 all, regardless of level of experience, gender identity and expression,
