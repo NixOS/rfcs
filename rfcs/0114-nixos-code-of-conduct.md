@@ -16,7 +16,7 @@ to determine appropriate when contributing and interacting with the community.
 We currently have a [community ethos](https://nixos.org/community/index.html), but
 this only states that we are an inclusive community, but doesn't define
 inappropriate behavior when interacting with the community. This RFC aims
-to established the shared values, so they can be used to identify behavior
+to establish the shared values, so they can be used to identify behavior
 which is disruptive to the community.
 
 This RFC does not intend to define moderation practices. This is intended to only lay
