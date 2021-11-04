@@ -102,7 +102,7 @@ existing [community ethos](https://nixos.org/community/index.html) as moderation
 # Future work
 [future]: #future-work
 
-- Ratification of a "NixOS moderation team" as described in the second to last bullet.
+- Ratification of a "NixOS moderation team" as described in the second to last bullet point.
 - Add Code of Conduct to nixos.org, and mention the Code of Conduct on all relevant
 repositories under the NixOS organization.
 
