@@ -83,8 +83,8 @@ for behavior within the community.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- There are more "rules" for the community to follow. However, these statutes are intended to
-still allow individuals to participate within the community in a healthy way for all.
+- There are potentially more "rules" for the community to follow. However, many of these rules
+are enforced already under the current moderation team, but without an explicit definition.
 
 # Alternatives
 [alternatives]: #alternatives
