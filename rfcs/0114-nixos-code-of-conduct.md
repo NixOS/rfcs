@@ -96,6 +96,9 @@ of unacceptable behavior.
 - #102 Codifies some of the existing moderation practices, and uses the
 existing [community ethos](https://nixos.org/community/index.html) as moderation criteria.
 
+- Use existing [community ethos](https://nixos.org/community/index.html) as moderation criteria.
+However, this only includes inclusive statements, and doesn't define unacceptable behavior.
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
