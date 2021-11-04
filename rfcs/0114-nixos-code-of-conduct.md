@@ -45,7 +45,7 @@ religion, nationality, or other similar characteristics.
 detract from a friendly, safe and welcoming environment for all.
 - Please be kind and courteous. There’s no need to be mean or rude.
 - Respect that people have differences of opinion and that every design or
-implementation choice carries a trade-off and numerous costs. There is seldom a right answer.
+implementation choice carries a trade-off and numerous costs. There is seldom a single right answer.
 - Please keep unstructured critique to a minimum. If you have solid ideas
 you want to experiment with, make a fork and see how it works.
 - We will exclude you from interaction if you insult, demean or harass anyone.
