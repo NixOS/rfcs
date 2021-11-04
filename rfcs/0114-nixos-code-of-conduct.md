@@ -25,7 +25,7 @@ a framework of shared values for the community.
 # Motivation
 [motivation]: #motivation
 
-The NixOS community struggles with a clearly defined way in which someone's behavior may
+The NixOS community lacks a clearly defined way in which someone's behavior may
 be disruptive. A well-defined Code of Conduct gives an explicit
 set of expectations for all contributors, which will also make it easier to identify
 when behavior becomes disruptive.
