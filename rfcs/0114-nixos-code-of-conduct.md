@@ -71,7 +71,7 @@ Each of these incidents have caused significant discussion on IRC (when it was s
 matrix, discourse, and would bleed over into github and even non-official platforms.
 These discussions are generally very polarizing, and causes an enormous amount
 of emotional and mental stress to those involved.
-These incidents are also very embarressing for the greater nix community,
+These incidents are also very embarrassing for the greater nix community,
 and not having a way to identify disruptive before it becomes a heated
 issue is detrimental to the health of the community.
 
