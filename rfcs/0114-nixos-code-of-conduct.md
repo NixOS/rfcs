@@ -40,7 +40,7 @@ Only the moderation body name has been changed.
 - We are committed to providing a friendly, safe and welcoming environment for
 all, regardless of level of experience, gender identity and expression,
 sexual orientation, disability, personal appearance, body size, race, ethnicity, age,
-religion, nationality, or other similar characteristics.
+religion (or lack thereof), socioeconomic status, nationality, or other similar characteristics.
 - Please avoid using overtly sexual aliases or other nicknames that might
 detract from a friendly, safe and welcoming environment for all.
 - Please be kind and courteous. There’s no need to be mean or rude.
