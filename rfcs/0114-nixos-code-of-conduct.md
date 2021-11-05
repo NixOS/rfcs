@@ -50,7 +50,7 @@ implementation choice carries a trade-off and numerous costs. There is seldom a 
 you want to experiment with, make a fork and see how it works.
 - We will exclude you from interaction if you insult, demean or harass anyone.
 That is not welcome behavior. We interpret the term “harassment” as including the definition in the
-[Citizen Code of Conduct](https://github.com/stumpsyn/policies/blob/master/citizen_code_of_conduct.md);
+[Citizen Code of Conduct](https://github.com/stumpsyn/policies/blob/b8ee50e7a9fc79c39c936830901f8863d493b7cd/citizen_code_of_conduct.md);
 if you have any lack of clarity about what might be included in that concept,
 please read their definition. In particular, we don’t tolerate behavior that excludes
 people in socially marginalized groups.
