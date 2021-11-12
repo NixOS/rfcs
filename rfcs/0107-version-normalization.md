@@ -25,7 +25,7 @@ along the Nixpkgs' expressions is:
 - For unstable releases:
   - `pname` reflects the software name;
   - `version` is a string following the format `unstable-YYYY-MM-DD`, where
-    `YYYY-MM-DD` denotes the date when the code was generated.
+    `YYYY-MM-DD` denotes the date when the code was released.
 
 This is a simple and easy-to-understand format. Nonetheless, there are some
 problems with it.
@@ -51,7 +51,7 @@ decision of Nix specification, and as such it should not be regarded as a "bug";
 therefore, we should strive to follow it, neither circumventing nor ignoring it.
 
 Further, the `version` attribute should be crafted to satisfy the expected
-upgrading semantics stated in `nix-env` manpage and implemented by
+upgrading semantics stated in the manual pages, as effectively implemented by
 `builtins.compareVersions` -- even when the raw version of the original program
 does not meet this expectation.
 
@@ -151,7 +151,7 @@ Some useful examples:
   therefore we use `0.pre` as default dummy stable version; further, the latest
   commit was made on May 10, 2021.
 
-  Therefore, we have `pname = "cardboard"; version =
+  Therefore, for this particular commit have `pname = "cardboard"; version =
   "0.pre+date=2021-05-21";`.
 
 - Python is a famous programming language and interpreter. Before the
@@ -179,16 +179,18 @@ Some useful examples:
 [drawbacks]: #drawbacks
 
 The main drawback is the conversion of the already existent expressions which
-does not follow the format proposed here. It can require a degree of manual
+does not follow the format proposed here. It can possibly require manual
 intervention and code review, especially for machine-generated expressions (such
-as Lua or Node library sets). However, this task is easily sprintable and
-amenable to automation.
+as Lua, Emacs Lisp or Node library sets).
+  
+Nonetheless, this task can be done incrementally, is easily sprintable, and
+easily amenable to automation.
 
 # Alternatives
 [alternatives]: #alternatives
 
 The alternative is doing nothing. The impact of it is keeping the Nixpkgs
-codebase confusing, less discoverable and incompatible with
+codebase confusing, inconsistent, less discoverable and incompatible with
 `builtins.parseDrvName` and `builtins.compareVersions`.
 
 # Unresolved questions
@@ -198,14 +200,18 @@ codebase confusing, less discoverable and incompatible with
   different, non-standard naming schemes or unusual releasing schedules
   eventually employed by many teams.
 
-- Interactions between `pname` and `version`, like multi-branch releases.
+- Interactions between `pname` and `version`, like multi-branch releases and
+  configuration options.
 
 - Legacy issues and integration with future implementations of Nix and Nixpkgs,
   epecially the Flakes framework.
+  
+- Discussions about making `version` a data structure or abstract datatype.
 
 # Future work
 [future]: #future-work
 
 - Update expressions that do not follow this proposal.
+
 - Update manuals and related documentation in order to reflect this proposal for
   future expressions.
