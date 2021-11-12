@@ -200,13 +200,16 @@ codebase confusing, inconsistent, less discoverable and incompatible with
   different, non-standard naming schemes or unusual releasing schedules
   eventually employed by many teams.
 
+  - Regarding this, discuss about making `version` a data structure or abstract
+    datatype.
+
 - Interactions between `pname` and `version`, like multi-branch releases and
   configuration options.
 
 - Legacy issues and integration with future implementations of Nix and Nixpkgs,
   epecially the Flakes framework.
-  
-- Discussions about making `version` a data structure or abstract datatype.
+
+- Integration and interfacing with package databases like Repology.
 
 # Future work
 [future]: #future-work
