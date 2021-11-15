@@ -56,7 +56,10 @@ There are multiple options. Here I am going to list a few:
 # Alternatives
 [alternatives]: #alternatives
 
-The impact of avoiding this is a lack of assurance of delivered package quality.
+If enabling `doCheck` globally is too expensive, there are some ideas for running tests anyway:
+- Let ofborg build pkg.overrideAttrs { doCheck = true; }. That way our CI runs tests but users who build from source don't have to.
+- Have more .passthru.test derivations to test installed packages.
+- Split tests into separate derivations, e.g. by saving the build tree into a separate output and running the test from there. This would be quite expensive for Hydra in terms of storage space, since build trees are large.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
