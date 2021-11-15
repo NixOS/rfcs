@@ -49,7 +49,9 @@ There are multiple options. Here I am going to list a few:
 [drawbacks]: #drawbacks
 
 - Increased build time.
-- Increases likelihood of failing derivations after a simple update.
+- More non-deterministic build failures.
+- Extra dependencies for the test framework.
+- Upstream tests don't often reveal downstream packaging/integration issues, because most are functional tests that are unlikely to break.
 
 # Alternatives
 [alternatives]: #alternatives
