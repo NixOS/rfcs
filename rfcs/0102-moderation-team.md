@@ -28,7 +28,8 @@ self-regulating.
 
 The Moderation Team is a volunteer group that may receive, invite, and evaluate
 applications to the team or alter the composition at any time. The team's
-composition, contact information, and announcements should be maintained at
+composition, contact information, procedures, and announcements should be
+maintained at
 [https://nixos.org/community/teams/moderation.html](https://nixos.org/community/teams/moderation.html).
 The team shall perform moderation activities on behalf of the community - with
 oversight via the RFC process - for discussions in [official project
@@ -51,8 +52,14 @@ ref: [twitter](https://twitter.com/grhmc/status/1390775249424338944)
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-The initial Moderation Team is defined to be @grahamc, @zimbatm, @domenkozar,
-and @ryantm.
+- The initial Moderation Team is defined to be @grahamc, @zimbatm, @domenkozar,
+  @Mic92, @garbas, and @ryantm.
+- Rename the Discourse Team to Moderation Team on
+  https://nixos.org/community/teams/discourse.html and utilize
+  https://nixos.org/community/teams/moderation.html.
+- Establish and publish a clear point of contact for abuse reporting and a
+  venue for discussion about moderation specific topics such as a dedicated
+  Matrix channel or Discourse topic.
 
 # Drawbacks
 [drawbacks]: #drawbacks
