@@ -24,7 +24,7 @@ The direct intended result of this RFC is:
 
 - Maintainers of dependencies have a clear framework for handling changes that
   break dependants.
-- Maintainers of dependants have a clear framework for how dependency breacking
+- Maintainers of dependants have a clear framework for how dependency breaking
   changes will be handled.
 - NixOS channels will very rarely (ideally never) stall due to build or test
   failures.
@@ -74,7 +74,7 @@ primary goals:
 - Avoid putting more burden than necessary on the dependency maintainer. If the
   maintainers of core derivations face toil proportionally to the number of
   transitive dependencies they will quickly become overloaded. These
-  maintainers are arguably the most critical to Nixpkgs and  their load needs
+  maintainers are arguably the most critical to Nixpkgs and their load needs
   to be kept manageable.
 - Avoid unnecessarily breaking packages for any period of time. There are a
   number of users on the `*-unstable` channels and it is annoying if packages
