@@ -30,13 +30,14 @@ Expected outcome:
 # Detailed design
 [design]: #detailed-design
 
-`nixUnstable` derivation definitions should be updated in such a way so end users would be able to overwrite features with something along the lines of this:
-```nix
-nixUnstable.override { experimentalFeatures = ["flakes"]; }
-```
+`nix` derivation definitions should be updated in such a way so end users would be able to overwrite features with something along the lines of this:
+\```nix
+nix.override { experimentalFeatures = ["flakes"]; }
+\```
 
 What's so special about this override:
-- Makes specified experimental features enabled by default. (A little similar to [this](https://github.com/NixOS/nixpkgs/pull/120141) PR)
+- Passes configure flag which looks something like this: `--with-experimental-features="nix-command flakes"`
+- Allows building `nix` with selected features enabled by the default
 - When using these overwritten derivations warning should be shown.
 
 
