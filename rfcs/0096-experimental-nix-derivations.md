@@ -31,9 +31,9 @@ Expected outcome:
 [design]: #detailed-design
 
 `nix` derivation definitions should be updated in such a way so end users would be able to overwrite features with something along the lines of this:
-\```nix
+```nix
 nix.override { experimentalFeatures = ["flakes"]; }
-\```
+```
 
 What's so special about this override:
 - Passes configure flag which looks something like this: `--with-experimental-features="nix-command flakes"`
