@@ -45,10 +45,7 @@ Warning expected to look something like this:
 WARNING: You are using experimental Nix features which are up to a subject to change. For more information visit https://nixos.org/xyz
 ```
 
-A webpage is expected to contain information as such:
-- Support channels if any.
-- A little rundown of the current state of the feature(s).
-- Some "URL dump" kind of wiki page that that would contain a list of links to issues with existing bugs/workarounds/edge-cases.
+Currently, experimental features are undiscoverable and undocumented. It would be nice if there was a way to query which experimental features are available in a Nix release, and to get some documentation about them (like a link to an associated RFC and possibly links to additional resources)
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
