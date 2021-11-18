@@ -103,7 +103,7 @@ do folks believe the costs are too high?
 
 ## Additional Resources
 
-* [musl FAQ](https://www.musl.libc.org/faq.html)
+* [musl FAQ](https://www.musl-libc.org/faq.html)
 * [projects using musl](https://wiki.musl-libc.org/projects-using-musl.html)
 * [Slides from a talk discussing various libcs, 2014](http://events17.linuxfoundation.org/sites/events/files/slides/libc-talk.pdf)
 
