@@ -24,7 +24,7 @@ The direct intended result of this RFC is:
 
 - Maintainers of dependencies have a clear framework for handling changes that
   break dependants.
-- Maintainers of dependants have a clear framework for how dependency breaking
+- Maintainers of dependents have a clear framework for how dependency breaking
   changes will be handled.
 - NixOS channels will very rarely (ideally never) stall due to build or test
   failures.
