@@ -10,9 +10,9 @@ related-issues: (TBD)
 
 # Summary
 
-This defines a policy for how to manage nixpkgs changes that break dependent
+This defines a policy for how to manage nixpkgs changes that break dependant
 derivations or tests. It specifies timeframes and procedures so that
-maintainers of dependencies and dependents can know what to expect from each
+maintainers of dependencies and dependants can know what to expect from each
 other when making breaking changes.
 
 While this policy should be followed as much as possible once accepted it is
@@ -24,7 +24,7 @@ The direct intended result of this RFC is:
 
 - Maintainers of dependencies have a clear framework for handling changes that
   break dependants.
-- Maintainers of dependents have a clear framework for how dependency breaking
+- Maintainers of dependants have a clear framework for how dependency breaking
   changes will be handled.
 - NixOS channels will very rarely (ideally never) stall due to build or test
   failures.
@@ -42,8 +42,8 @@ and is largely tribal knowledge. There are a wide variety of approaches ranging
 from:
 
 - After testing to confirm that a change is correct, merge and notify
-  dependents that they need to update their packages.
-- Merge to `staging`, notify dependents then eventually merge to `master`.
+  dependants that they need to update their packages.
+- Merge to `staging`, notify dependants then eventually merge to `master`.
 - Gather a large number of fixes in the PR branch then merge to `staging` or
   `master` once most or all dependencies are fixed.
 
@@ -91,18 +91,18 @@ picked, as it is today, according to
 https://nixos.org/manual/nixpkgs/stable/#submitting-changes-commit-policy.
 
 1. The maintainer will prepare a PR with their intended changes.
-2. The maintainer should test a sample of dependent derivations to ensure that
+2. The maintainer should test a sample of dependant derivations to ensure that
 their change is not unnecessarily or unintentionally breaking. (Example: Ensure
 that a critical output file was not forgotten) Note that sometimes it **is**
-necessary to break all dependent packages, and the maintainer is not required
+necessary to break all dependant packages, and the maintainer is not required
 to avoid this.
     1. A sample of at least 100 packages or 3h of build time is recommend as a guideline.
     2. The sample should include as many `passthru.tests` tests as is feasible.
 3. The maintainer will get the PR reviewed and approved.
     1. It is **recommended but not required** to have some maintainers of
-    dependent packages involved in the review to review if the breakage is
+    dependant packages involved in the review to review if the breakage is
     justified.
-4. The maintainer will contact the maintainers of all dependent, broken
+4. The maintainer will contact the maintainers of all dependant, broken
 packages (herein called sub-maintainers).
     1. The sub-maintainers will be provided a link to the PR with the breaking
     changes as well as any context that will help them resolve the breakages.
@@ -150,7 +150,7 @@ change is shipped, which results in less breakage for end-users.
 None.
 
 # Future work
-- Create a tool for automatically notifying maintainers of broken dependents
+- Create a tool for automatically notifying maintainers of broken dependants
 - Create a tool for automatically marking broken packages as broken.
 - [This is a milestone on the way to implemented a queue-based merge process
   for nixpkgs.](https://paper.dropbox.com/doc/MTSY8xKH6y1xDEwavyDNW)
