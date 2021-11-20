@@ -51,6 +51,20 @@ to block channel advances. Hydra will start building aarch64 packages and run
 aarch64-based tests as part of stable and unstable channels, including them in
 the binary cache, increasing its coverage as a result.
 
+A team for aarch64-specific build failures should be established (or, more
+precisely, revived, as per [RFC0046](https://github.com/NixOS/rfcs/blob/master/rfcs/0046-platform-support-tiers.md) there should already be a team for ARM platforms called @NixOS/aarch64-maintainers)
+to help track down and fix breaking changes specific to ARM platforms and be
+at the front line of battle for ARM stability.
+
+Additionally, maintainers of critical packages (e.g. binutils) should be given
+an advance notice before implementing the change to ensure no delays in channel
+advances happen and no surprises occur, such as suddenly increased workload. An
+option would be to ping them on the PR implementing this RFC and discuss it there
+(and potentially delay the merge if there is any pushback).
+
+For help with testing packages on aarch64 for those maintainers who don't have
+access to the machine, the [community build box](https://github.com/nix-community/aarch64-build-box) by @grahamc should provide a sufficient environment for running basic tests (and provide quick rebuilds using remote building).
+
 ## Dealing with Capacity Issues
 [design-capacity]: #design-capacity
 
@@ -83,7 +97,13 @@ The list of NixOS AMIs on NixOS.org will also be extended to include aarch64 ima
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Some build failures could unneccesarily delay channel advances, delaying critical updates.
+ - Some build failures could unneccesarily delay channel advances, delaying critical updates
+   - Already an issue on `x86_64-linux` from time to time
+   - We already run aarch64 tests on Hydra and they're mostly green - what's not green could be fixed if more attention is paid to those failures
+ - Maintainers of critical packages might not be ready for additional load
+   - Will there be additional load on them? Sounds more like already existing problems will float up to the surface and need to be fixed ASAP
+   - Potentially alleviated by reviving the aarch64-specific maintainer team and pinging it on all aarch64-specific issues not reproducible on x86_64-linux
+     - that makes `aarch64-linux` still sound inferior to `x86_64-linux` though...
 
 # Alternatives
 [alternatives]: #alternatives
@@ -98,6 +118,11 @@ to a heterogeneous cluster of x86_64 and aarch64 machines very challenging.
 Elaborating on the previous alternative, create an aarch64-focused channel. Show
 there are enough resources and commitment to keep it green for half a year to a year.
 Carry on with the RFC topic once this is the case.
+
+## "Just use your own CI"
+Everyone needing `aarch64-linux` would then just track master on their own and build commits,
+which would result in a lot of wasted work that could be saved by centralizing builds (which
+is one of the reasons Hydra exists) and a lot of complexity for end-users.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
