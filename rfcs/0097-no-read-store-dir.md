@@ -22,17 +22,19 @@ related-issues:
 Right now you can't set the permissions for `/nix/store`, since they'll be overwritten
 by Nix anytime you use `nix`.
 
-We want to `chmod g-r /nix/store`, because the `nixbld` group doesn't actually
+`chmod g-r /nix/store` is beneficial because the `nixbld` group doesn't actually
 need to read the directory. It only needs to be able to write and "execute" it.
-This, however, should be optional, since the user should be able to do what they want.
+This, however, should be optional, since the user should be able to configure
+the permissions however they want.
 
 Some users might also want to do things like `chmod o-r /nix/store`, which
 gives you the interesting property that you can not access paths you do not
 already know of.
 Do note that given that all processes can by default read `/proc/cmdline`,
-`/run/current-system`, and many other places, they can still read your
-system's closure, which makes it an insufficient solution for security in many cases.
-This, however, is also entirely optional and is not the default in any way.
+`/run/current-system`, and many other places which reveal your
+system's closure, making this permission change an insufficient solution for
+security in many cases. This, however, is also entirely optional and is not
+the default in any way.
 
 # Detailed design
 [design]: #detailed-design
@@ -60,7 +62,7 @@ nix.store-perms = "xxxx";
 [drawbacks]: #drawbacks
 
 If a user on a non-NixOS platform mistakenly sets the permissions for `/nix/store` to
-something else, it won't be reverted by Nix automatically.
+something undesirable, it won't be reverted by Nix automatically.
 
 # Alternatives
 [alternatives]: #alternatives
