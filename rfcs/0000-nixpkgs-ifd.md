@@ -121,7 +121,7 @@ Instead of kicking off single evaluations of Nixpkgs, we will kick off double ev
 3. > IFD, is too controversial, don't do it!
 
    I think this is a classic example of don't let the perfect be the enemy of the good.
-   The problems with IFD and the problems IFD is trying trying to address both don't let a lot of attention.
+   The problems with IFD and the problems IFD is trying to address both don't let a lot of attention.
    The fact of the matter is Nixpkgs is how this community coordinates with itself, and agrees on priorities.
    If it isn't being used in Nixpkgs, there is hard ceiling of how much attention it will get.
 
