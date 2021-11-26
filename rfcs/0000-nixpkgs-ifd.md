@@ -83,7 +83,7 @@ Instead of kicking off single evaluations of Nixpkgs, we will kick off double ev
    In this way, Sphinx and GHC don't "regress", remaining usable from the first `enableImportFromDerivation = false` evaluation.
 
    Now, one might argue that GHC is not very useful except for building downstream packages.
-   Also, with or without this PR, I have a very long-standing goal to build the compiler itself and "wired-in" libariess separately, which would allow using cabal2nix for much of GHC itself.
+   Also, with or without this PR, I have a very long-standing goal to build the compiler itself and "wired-in" libraries separately, which would allow using cabal2nix for much of GHC itself.
    *If* we do that, and also *if* we decide to stop vendoring the generated Hackage packages and only rely on IFD, GHC would become a second-eval-only, `enableImportFromDerivation = true`-only package.
    At that point, there might not be a reason to vendor Sphinx anymore, and so we would stop doing so and only rely on the IFD too.
 
@@ -102,7 +102,7 @@ Instead of kicking off single evaluations of Nixpkgs, we will kick off double ev
    You can think of that as a bunch of ungainly massive rectangular tiles we are trying to fit on a floor, the floor being our machine resources to schedule.
    What would be really bad is *increasing the tile size*.
    This means we need a bigger floor or else laying tile is harder.
-   What this is doing is *increasing the number of times*.
+   What this is doing is *increasing the number of tiles*.
    We can simple add a second floor to solve any problems that arise from that.
 
    This is simplification, sure, but I think the parable is correct to the "real" situation, too.
@@ -179,4 +179,4 @@ I will say, though, with these steps, I think we will be able to successfully co
 In turn, I hope these upstream packages and ecosystems might even care about packaging and integration of the sort that we do.
 This would create a virtuous cycle where Nix is easier to use by more people, and Nixpkgs is easier to maintain as upstream packages better match our values.
 
-The most important future work is technical, but being able to win upstream developer hearts and minds better than before, because ultimately distribution's live and die by upstream's decisions.
+The most important future work is not technical, but being able to win upstream developer hearts and minds better than before, because ultimately distribution's live and die by upstream's decisions.
