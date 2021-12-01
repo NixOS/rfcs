@@ -16,7 +16,7 @@ the defacto standard of Linux libc implementations:
 [glibc](https://www.gnu.org/software/libc/).
 
 This RFC proposes adding **experimental** support in Nixpkgs for the use
-of an alternative libc implementation, [musl](https://www.musl-libc.org/),
+of an alternative libc implementation, [musl](https://musl.libc.org/),
 for the reasons outlined below.
 Adding this support is similar to introducing support for an architecture,
 and realistically will be limited in compatibility and features
