@@ -51,7 +51,7 @@ master and include them in a new release.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Infrequent releases give more stability to users. Users of Nix-stable
+Infrequent releases give somewhat more stability to users. Users of Nix-stable
 have been blissfully isolated from all the code churn on master for
 the last two years.
 
