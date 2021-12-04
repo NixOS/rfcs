@@ -37,29 +37,43 @@ For some users, these concerns are enough to deter them from using Nix entirely.
 # Detailed design
 [design]: #detailed-design
 
-Add a new `meta` attribute to non-source-built packages, `fromSource = false`.
-Leave other packages as-is with the assumption of a missing attribute meaning
-`true`.
+Add a new `meta` attribute to non-source-built packages, `sourceProvenance`.
+The value of this attribute being a list of at least one entriy from a
+collection of possibilities maintained in `lib.sourceTypes`. These possibilities
+can be of opaque type, but should have entries to represent at least "built from
+source", "binary native code", "binary bytecode" and "binary firmware".
+
+Packages built from source can be left as-is with the assumption of a missing
+attribute being the equivalent of `[ lib.sourceTypes.fromSource ]`.
+
+Multiple values present in a package's `sourceProvenance` would be used to
+mean that the package contains parts that fall under each of these categories.
+However, a "source type" not appearing in a package's `sourceProvenance` would
+_not_ necessarily mean that the package _doesn't_ contain parts which fall
+under that category - it could simply mean that a package hasn't been fully
+assessed yet. See "Future work" for discussion of adding the ability to make
+such a "comprehensive" declaration.
 
 Add a mechanism to allow `.nixpkgs/config.nix` to specify
 `allowNonSource = false` to prevent use of these packages in a similar manner
-to `allowUnfree`.
+to `allowUnfree`. An `allowNonSourcePredicate` parameter would allow the
+distinction to be customized, but the default predicate should take into account
+the possible hierarchical nature of `lib.sourceTypes` entries.
 
 # Alternatives
 [alternatives]: #alternatives
 
-I might have been tempted to collect the inverse, i.e. `isBinary = true` but
-this runs into problems with clunky terminology. In my mind, the kind of package
-that fails the transparency/malleability tests goes beyond what many people
-would argue is "a binary". For instance, many (most?) java packages in nixpkgs
-simply pull opaque `.jar`s - if not for their own app, they pull `.jar`
-dependencies from maven. These are not transparent or malleable, but it's quite
-an obtuse and disputable use of the term "binary" to describe them as such.
+The original proposal used a simple boolean attribute to declare whether the
+package contains any binary parts, mostly in an attempt to avoid having
+to go down the route of devising and debating an ontology of source types. This
+was deemed by the shepherding meeting to not embrace extensibility enough.
 
-I decided that those packages which _did_ pass these transparency/malleability
-tests had more in common than those that don't: that they are "from source", a
-form where users have as much ability to inspect and alter the result as the
-original author did.
+Another suggestion involved using a single value from a collection of "source
+types" to describe the source provenance in an effort to avoid complexity, but
+this appeared to have the disadvantages of requiring an ontology to be agreed
+upon and still yet not providing sufficient flexibility to cover many cases.
+The missing ability to express multiple provenances might even encourage
+maintainers to proliferate source types that represent combinations of others.
 
 There already exists a rather informally-applied convention of adding a `-bin`
 suffix to the package names of "binary packages". This is non-ideal because:
@@ -81,23 +95,23 @@ packages.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Some maintainers may be upset by having their packages marked as
-  `fromSource = false`.
-- It could spur us to disappear into endless navel-gazing conversations about
-  what really counts as "from source" and what doesn't.
-- On the other hand, _not_ discussing where the line stands thoroughly enough
-  could cause the flag to be over-applied and thus become useless. Should we be
-  compiling all our fonts where e.g. fontforge files are available? If all of
-  these got marked as `fromSource = false`, all of a sudden users with
-  `allowNonSource = false` set may end up with no installable desktop.
+- It could spur us to disappear into endless navel-gazing conversations over
+  the `lib.sourceTypes` ontology.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-Exact attribute names are open for debate.
+Exact attribute names and contents of `lib.sourceTypes` are open for debate.
 
 # Future work
 [future]: #future-work
 
 The author is willing to spend a significant amount of time finding and marking
 non-source packages in nixpkgs.
+
+Addition of a simple accompanying boolean flag could allow the meaning of the
+`sourceProvenance` field to be switched to imply the declaration is
+"comprehensive" and that "source types" missing from the declaration are not
+present. This is something that could be added once a maintainer has thoroughly
+inspected a package, but should not place extra burden on someone wanting to
+simply flag up that they have spotted some binary element in the package.
