@@ -110,7 +110,7 @@ The author is willing to spend a significant amount of time finding and marking
 non-source packages in nixpkgs.
 
 Addition of a simple accompanying boolean flag could allow the meaning of the
-`sourceProvenance` field to be switched to imply the declaration is
+`sourceProvenance` field to be changed to imply the declaration is
 "comprehensive" and that "source types" missing from the declaration are not
 present. This is something that could be added once a maintainer has thoroughly
 inspected a package, but should not place extra burden on someone wanting to
