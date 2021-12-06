@@ -38,7 +38,7 @@ For some users, these concerns are enough to deter them from using Nix entirely.
 [design]: #detailed-design
 
 Add a new `meta` attribute to non-source-built packages, `sourceProvenance`.
-The value of this attribute being a list of at least one entriy from a
+The value of this attribute being a list of at least one entry from a
 collection of possibilities maintained in `lib.sourceTypes`. These possibilities
 can be of opaque type, but should have entries to represent at least "built from
 source", "binary native code", "binary bytecode" and "binary firmware".
