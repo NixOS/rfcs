@@ -97,7 +97,7 @@ Until then, down with the artificial restrictions!
 # Detailed design
 [design]: #detailed-design
 
-Really, this RFC is just proposing that we create the expirmental feature.
+Really, this RFC is just proposing that we create the experimental feature.
 All details are subject to change.
 But so we aren't just proposing an arbitrary experiment, with nothing concrete to judge, we include here the initial design.
 
