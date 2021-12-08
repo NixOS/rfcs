@@ -1,5 +1,5 @@
 ---
-feature: plan-dynamism
+feature: plan-dynamism-experiment
 start-date: 2019-02-01
 author: John Ericson (@Ericson2314)
 co-authors: Las Safin (@L-as)
@@ -11,7 +11,7 @@ related-issues: https://github.com/NixOS/nix/pull/4628 https://github.com/NixOS/
 # Summary
 [summary]: #summary
 
-We introduce three fundamental new features:
+Guarded under an experimental feature, introduce three fundamental new features:
 - The ability to have derivations which output store paths end in `.drv`
   (e.g. `$out` is /nix/store/something.drv).
 - The ability for a derivation to depend on the output of a derivation,
@@ -97,7 +97,11 @@ Until then, down with the artificial restrictions!
 # Detailed design
 [design]: #detailed-design
 
-We can break this down nicely into steps.
+Really, this RFC is just proposing that we create the expirmental feature.
+All details are subject to change.
+But so we aren't just proposing an arbitrary experiment, with nothing concrete to judge, we include here the initial design.
+
+We can break the initial experimental feature down nicely into steps.
 
 *This is implemented in https://github.com/NixOS/nix/pull/4628.*
 
@@ -256,3 +260,7 @@ gives us the path to an output of it.
 3. Try to convince upstream tools to use Nix like CMake, Meson, etc. use Ninja.
    Rather than converting Ninja plans, we might convince those tools to have purpose-built Nix backends.
    Language-specific package managers that don't use Ninja today might also be modified to "let Nix do that actual building".
+
+4. Another RFC when we finalize the feature and propose its stabilization.
+   This is a bit speculative, as we haven't pinned down an official experimental feature process/lifecycle.
+   But we include it here to reiterate this RFC is *not* mandating the final design.
