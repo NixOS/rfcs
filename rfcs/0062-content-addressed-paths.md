@@ -12,7 +12,7 @@ related-issues: (will contain links to implementation PRs)
 
 [summary]: #summary
 
-Add some basic but simple support for content-addressed store paths to Nix.
+Add some experimental support for content-addressed store paths to Nix.
 
 We plan here to give the possibility to mark certain store paths as
 content-adressed (ca), while keeping the other input-adressed as they are
