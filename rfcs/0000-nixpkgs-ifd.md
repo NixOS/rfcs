@@ -3,8 +3,8 @@ feature: nixpkgs-ifd
 start-date: 2021-10-12
 author: John Ericson (@Ericson2314)
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @L-as @grahamc @sternenseemann
+shepherd-leader: @sternenseemann
 related-issues: (will contain links to implementation PRs)
 ---
 
