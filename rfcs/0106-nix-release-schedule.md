@@ -39,14 +39,23 @@ master and include them in a new release.
 # Detailed design
 [design]: #detailed-design
 
-* We do a new Nix release every 6 weeks. The release process is
-  already almost entirely automated so this is pretty easy.
+* We do a new Nix release (named 2.5.0, 2.6.0, 3.0.0, ...) every 6
+  weeks. The release process is already almost entirely automated so
+  this is pretty easy.
 
-* The master branch should be kept in a releasable state at all times.
+* For each major release, we create a maintenance branch (named
+  e.g. `2.5-maintenance`) and corresponding Hydra jobset. Patch
+  releases (e.g. 2.5.1) are made as needed.
+
+* The master branch should be kept in a releasable state at all
+  times. This means that the jobset
+  https://hydra.nixos.org/jobset/nix/master should be completely
+  green.
 
 * PRs should include release notes, if applicable. (Currently trawling
   through the history to dig up interesting stuff for the release
-  notes is the most work in making a new release.)
+  notes is the most work in making a new release.) The PR template
+  will be updated to reflect this.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -59,23 +68,6 @@ the last two years.
 [alternatives]: #alternatives
 
 Stick to the current release-when-it's-ready non-schedule.
-
-# Unresolved questions
-[unresolved]: #unresolved-questions
-
-* Should we still do maintenance releases (like 2.3.x)? Should there
-  be a long-term stability release (like 2.3 is now, de facto)?
-  Probably we should at least provide bug fixes for whatever Nix
-  release is used by the latest NixOS release.
-
-* Is 6 weeks the ideal interval between releases? It seems to work
-  well for Rust.
-
-* Should we keep using the current versioning scheme? For now we can
-  stick with the current scheme (i.e. only bumping the major version
-  if there are incompatible changes or major non-experimental new
-  features), but in the future we could switch to date-based versions
-  (e.g. Nix 21.07).
 
 # Previous work
 
