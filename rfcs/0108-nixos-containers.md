@@ -3,8 +3,8 @@ feature: NixOS Container rewrite
 start-date: 2021-02-14
 author: Maximilian Bosch <maximilian@mbosch.me>
 co-authors: n/a
-shepherd-team: n/a
-shepherd-leader: n/a
+shepherd-team: @Mic92, @lheckemann, @SuperSandro2000, @arianvp, @Lassulus 
+shepherd-leader: @Lassulus 
 related-issues:
   - https://github.com/NixOS/nixpkgs/issues/69414
   - https://github.com/NixOS/nixpkgs/issues/67265
