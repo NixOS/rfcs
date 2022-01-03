@@ -96,8 +96,7 @@ following steps (executed via a custom `ExecStartPre=`-script):
 * The option `boot.isContainer = true;` will be automatically set for new containers as well.
   This is necessary to
   * avoid bogus `modprobe` calls since `nspawn` doesn't have its own kernel.
-  * as option to skip building a `stage-1` boot script when building a NixOS system for
-    the container.
+  * avoid building a `stage-1` boot script and initramfs as part of the container's NixOS system
 
 This init-script can be built by evaluating a NixOS config against `<nixpkgs/nixos/lib/eval-config.nix>`.
 
@@ -125,12 +124,12 @@ be used for networking. To briefly summarize, this means:
   one "host-side" interface and a container interface inside its own namespace.
 * A subnet from a [RFC1918](https://datatracker.ietf.org/doc/html/rfc1918) private IP range
   is assigned to the host-side interface. IPv4 addresses will be distributed via DHCP to containers.
-* Analogous IPv4, a [RFC4193 IPv6 ULA prefix](https://tools.ietf.org/html/rfc4193) will be
-  assigned to the host-side interface, containers can assign themselves addresses from this
+* Analogous to IPv4, a [RFC4193 IPv6 ULA prefix](https://tools.ietf.org/html/rfc4193) will be
+  assigned to the host-side interface. Containers can assign themselves addresses from this
   prefix by utilizing [RFC4862 SLAAC](https://tools.ietf.org/html/rfc4862).
 
 Hosts will be available on the current system via the
-[`mymachines` `nss` module](https://www.freedesktop.org/software/systemd/man/nss-myhostname.html).
+[`mymachines` `nss` module](https://www.freedesktop.org/software/systemd/man/nss-mymachines.html).
 This means that container names can be resolved to addresses like DNS names, i.e. `ping containername` works.
 
 ### Static networking
@@ -147,10 +146,10 @@ to configure DNS via `/etc/resolv.conf` in the container. This option will be **
 `systemd` can take care of it:
 
 * If `networkd` is enabled via NixOS, [`systemd-resolved`](https://www.freedesktop.org/software/systemd/man/systemd-resolved.service.html) is enabled as well.
-  * By default, DNS for `resolved` will be configured via DHCP which is enabled in the [Default Mode](#default-mode) by default.
+  * By default, `resolved` will be configured via DHCP which is enabled in [Default Mode](#default-mode).
   * With only [Static networking](#static-networking) enabled, it is necessary to configure
-    configure DNS servers for resolved statically which can be done by setting e.g. DNS
-    servers via a `.network`-unit for the `host0` interface.
+    DNS servers for resolved statically which can be done by setting DNS
+    servers via a `.network` unit for the `host0` interface.
 * The behavior of `networking.useHostResolvConf` can be implemented with pure `systemd`
   by setting the `ResolvConf`-setting for the container's `.nspawn`-unit.
 
@@ -178,7 +177,7 @@ Thus, the following steps are necessary:
 ## Imperative management
 
 `systemd` differentiates between "privileged" & "unprivileged" settings. Each privileged (also
-called "trusted") `nspawn` unit lives in `/etc/systemd/nspawn`. Since unprivileged container's
+called "trusted") `nspawn` unit lives in `/etc/systemd/nspawn`. Since unprivileged containers
 don't allow bind mounts, these will be out of scope. Additionally, this means that
 `/etc/systemd/nspawn` has to be writable for administrative users and can't be a symlink to
 a store path anymore.
@@ -206,7 +205,7 @@ Examples are in the next chapter.
 ## Config activation
 
 By default, NixOS has to decide how to activate configuration changes for a container to avoid
-e.g. unnecessary reboots, but `reload`s aren't necessarily sufficient either because e.g.
+unnecessary reboots, but `reload`s aren't necessarily sufficient either because changes such as
 new bind mounts require a reboot. The host's `switch-to-configuration.pl` implements it like
 this:
 
@@ -215,7 +214,7 @@ this:
 * When activating a new config on the host, the following things happen:
   * If the setting `Parameter=` in the container's `.nspawn`-unit is the only thing that has changed,
     a `reload` will be done. This parameter contains the `init`-script for the container's NixOS
-    and only changes if the container's NixOS config changes.
+    and changes every time the container's NixOS config changes.
   * If anything else changes, `systemd-nspawn@container-name.service` will be scheduled for a restart
     which effectively reboots the container.
 * This behavior can be turned off completely which means that the container where this is turned
@@ -235,13 +234,13 @@ A container with a private IPv4 & IPv6 address can be configured like this:
   nixos.containers.instances.demo = {
     network = {};
     config = { pkgs, ... }: {
-      environment.etc."foo".text = "bar";
+      environment.systemPackages = [ pkgs.hello ];
     };
   };
 }
 ```
 
-It's reachable locally like this thanks to the `mymachines`-feature of NSS:
+It's reachable locally like this thanks to systemd's `mymachines` NSS module:
 
 ```shell
 [root@server:~]# ping demo -c1
@@ -314,7 +313,7 @@ namespace then:
   };
 
   # The host-side sub-interface of the MACVLAN. This means that the host is reachable
-  # within the (internal) network at `192.168.2.2`.
+  # at `192.168.2.2`, both on the physical interface and from the container.
   systemd.network.networks."20-mv-eth1-host" = {
     matchConfig.Name = "mv-eth1-host";
     networkConfig.IPForward = "yes";
