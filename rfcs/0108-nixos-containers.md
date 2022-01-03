@@ -210,7 +210,7 @@ new bind mounts require a reboot. The host's `switch-to-configuration.pl` implem
 this:
 
 * `systemctl reload systemd-nspawn@container-name.service` runs `switch-to-configuration test`
-  inside the container `container-name` using `nsenter`.
+  inside the container `container-name`.
 * When activating a new config on the host, the following things happen:
   * If the setting `Parameter=` in the container's `.nspawn`-unit is the only thing that has changed,
     a `reload` will be done. This parameter contains the `init`-script for the container's NixOS
