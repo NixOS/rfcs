@@ -222,6 +222,12 @@ this:
   force a `reload` or `restart`. See [Examples & Interactions](#examples-and-interactions) for
   details.
 
+## Deprecation
+
+The current `nixos-container`-implementation should be considered deprecated as soon as the new
+implementation is part of a stable NixOS release. To give end-users a reasonable time to migrate,
+it should be kept and maintained for **at least two release cycles**, if necessary even longer.
+
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
