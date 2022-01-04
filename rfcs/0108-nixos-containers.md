@@ -233,7 +233,7 @@ A container with a private IPv4 & IPv6 address can be configured like this:
 {
   nixos.containers.instances.demo = {
     network = {};
-    config = { pkgs, ... }: {
+    system-config = { pkgs, ... }: {
       environment.systemPackages = [ pkgs.hello ];
     };
   };
@@ -282,7 +282,7 @@ IP addresses can be statically assigned to a container as well:
       v4.static.containerPool = [ "10.237.1.3/16" ];
       v6.static.containerPool = [ "2a01:4f9:4b:1659:3aa3:cafe::3/96" ];
     };
-    config = {};
+    system-config = {};
   };
 }
 ```
@@ -336,7 +336,7 @@ namespace then:
   # Assign a MACVLAN to a container. This is done by pure nspawn.
   systemd.nspawn.vlandemo.networkConfig.MACVLAN = "eth1";
   nixos.containers = {
-    instances.vlandemo.config = {
+    instances.vlandemo.system-config = {
       systemd.network = {
         networks."10-mv-eth1" = {
           matchConfig.Name = "mv-eth1";
@@ -360,16 +360,16 @@ Let the following expression be called `imperative-container.nix`:
 
 ```nix
 {
-  config.nixpkgs = <nixpkgs>;
-  config.config = { pkgs, ... }: {
+  nixpkgs = <nixpkgs>;
+  system-config = { pkgs, ... }: {
     services.nginx.enable = true;
     networking.firewall.allowedTCPPorts = [ 80 ];
   };
 
   # This implies that the "default" networking mode (i.e. DHCPv4) is used
   # and not the host's network (which is the default for imperative containers).
-  config.network = {};
-  config.forwardPorts = [ { hostPort = 8080; containerPort = 80; } ];
+  network = {};
+  forwardPorts = [ { hostPort = 8080; containerPort = 80; } ];
 }
 ```
 
@@ -394,7 +394,7 @@ When `imperative-container.nix` is updated, it can be rebuilt like this:
 $ nixos-nspawn update imperative --config ./imperative-container.nix
 ```
 
-By default, it will be **restarted**. This can be overridden via `config.activation.strategy`,
+By default, it will be **restarted**. This can be overridden via `activation.strategy`,
 however only `reload`, `restart` and `none` are supported.
 
 Additionally, the way how the container's new config will be activated can be specified
