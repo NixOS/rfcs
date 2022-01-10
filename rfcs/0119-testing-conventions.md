@@ -31,7 +31,7 @@ Breakages are a constant painpoint for nixpkgs. It is a very poor user experienc
 have a configuration broken because one or more packages fail to build. Often when
 these breakages occur, it is because the change had a large impact on the entirity
 of nixpkgs; and unless there's a dedicated hydra jobset for the pull request, it's
-infeasible to expect pull request author(s) to verify every package that's affected
+infeasible to expect pull request authors to verify every package affected
 by a change they are proposing. However, it is feasible to specify packages that
 are very likely to be affected by changes in another package, and use this information
 to help mitigate regressions from appearing in release channels.
