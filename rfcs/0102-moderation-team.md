@@ -21,18 +21,19 @@ sustainable to have to call on Graham any time there's a spammer or conflict
 that requires moderation, and we'd like to help the community become more
 self-regulating.
 
-(adopted from #98)
+The intention behind this RFC is to codify the current moderation practices.
 
 # Detailed design
 [design]: #detailed-design
 
 The Moderation Team is a volunteer group that may receive, invite, and evaluate
 applications to the team or alter the composition at any time. The team's
-composition, contact information, procedures, and announcements should be
-maintained at
+composition, contact information, procedures, moderation log, and announcements
+should be available via
 [https://nixos.org/community/teams/moderation.html](https://nixos.org/community/teams/moderation.html).
 The team shall perform moderation activities on behalf of the community - with
-oversight via the RFC process - for discussions in [official project
+oversight via the RFC process and input from the NixOS Foundation - for
+discussions in [official project
 spaces](https://nixos.org/community/index.html) as well as unofficial spaces
 that seek and reach such an agreement with the team. The team should utilize
 the [NixOS Foundation mission](https://nixos.org/community/index.html) and the
@@ -52,8 +53,9 @@ ref: [twitter](https://twitter.com/grhmc/status/1390775249424338944)
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-- The initial Moderation Team is defined to be @grahamc, @zimbatm, @domenkozar,
-  @Mic92, @garbas, and @ryantm.
+- The initial Moderation Team - drawn from the existing Discourse and GitHub
+  teams - is defined to be @grahamc, @zimbatm, @domenkozar, @Mic92, @garbas,
+  and @ryantm.
 - Rename the Discourse Team to Moderation Team on
   https://nixos.org/community/teams/discourse.html and utilize
   https://nixos.org/community/teams/moderation.html.
