@@ -75,6 +75,7 @@ ref: [twitter](https://twitter.com/grhmc/status/1390775249424338944)
 
 # Alternatives
 [alternatives]: #alternatives
+* Define a consistuency of project participants and some (more bottom-up/grassroots) procedure with a foundation in popular support for specific moderators.
 
 * An existing [RFC 98][].
 * Do nothing.
