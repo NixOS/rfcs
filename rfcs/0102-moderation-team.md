@@ -3,8 +3,8 @@ feature: moderation team
 start-date: 2021-08-18
 author: tomberek
 co-authors: blaggacao
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @ryantm, @7c6f434c, @IreneKnapp
+shepherd-leader: @zimbatm
 related-issues: https://github.com/NixOS/rfcs/pull/98
 ---
 
@@ -31,6 +31,7 @@ applications to the team or alter the composition at any time. The team's
 composition, contact information, procedures, moderation log, and announcements
 should be available via
 [https://nixos.org/community/teams/moderation.html](https://nixos.org/community/teams/moderation.html).
+The distribution of work within the team may be treated as an internal matter.
 The team shall perform moderation activities on behalf of the community - with
 oversight via the RFC process and input from the NixOS Foundation - for
 discussions in [official project
