@@ -76,6 +76,8 @@ potential improvements could be:
 - Move `hardware.opengl.package` + `hardware.opengl.extraPackages` to a single `hardware.drivers.packages`
   - The current paradigm seems to be a compromise of `package` existing, but needed to adapt for other hardware acceleration libraries.
   - Enable option can default to `hardware.drivers.packages != []` ?
+- Move `services.xserver.videoDrivers` to `hardware.gpu.drivers`?
+  - Very awkward for sway users to need to set something in `services.xserver`
 
 # Future work
 [future]: #future-work
