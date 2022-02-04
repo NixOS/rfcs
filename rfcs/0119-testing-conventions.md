@@ -1,6 +1,6 @@
 ---
 feature: Defined conventions around testing of official Nixpkgs packages.
-start-date: 2021-09-03
+start-date: 2021-12-29
 author: Jonathan Ringer
 co-authors:
 shepherd-team:
