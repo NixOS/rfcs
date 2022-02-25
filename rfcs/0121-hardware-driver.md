@@ -12,7 +12,7 @@ related-issues: https://github.com/NixOS/nixpkgs/issues/141803
 [summary]: #summary
 
 Currently, NixOS mounts video drivers under the path `/run/opengl-driver/`,
-but should be mounted under a more generic '/run/hardware-drivers/` path.
+but should be mounted under a more generic `/run/hardware-drivers/` path.
 The usage of opengl explicitly may have been an accurate name given the time
 in which NixOS was first created; however, graphic drivers alone include much
 more than just userland graphics libraries so this usages is now misaligned with
