@@ -55,6 +55,9 @@ upgrading semantics stated in the manual pages, as effectively implemented by
 `builtins.compareVersions` -- even when the raw version of the original program
 does not meet this expectation.
 
+Besides, Nixpkgs should provide a consistent interface to external package
+monitoring services like [Repology](https://repology.org/).
+
 This document describes a format suitable to fix these issues, while keeping it
 understandable and striving for simplicity.
 
