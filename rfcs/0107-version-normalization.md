@@ -46,9 +46,9 @@ builtins.parseDrvName "mpv-unstable-2021-05-03"
 ```
 
 It happens because the `version` attribute in the set returned by
-`builtins.parseDrvName` always starts with a digit. This is a deliberate design
-decision of Nix specification, and as such it should not be regarded as a "bug";
-therefore, we should strive to follow it, neither circumventing nor ignoring it.
+`builtins.parseDrvName` always starts with a digit. It happens by a deliberate
+design decision, and as such it should not be regarded as a "bug"; therefore, we
+should strive to follow it, neither circumventing nor ignoring it.
 
 Further, the `version` attribute should be crafted to satisfy the expected
 upgrading semantics stated in the manual pages, as effectively implemented by
@@ -182,19 +182,19 @@ Some useful examples:
 [drawbacks]: #drawbacks
 
 The main drawback is the conversion of the already existent expressions which
-does not follow the format proposed here. It can possibly require manual
-intervention and code review, especially for machine-generated expressions (such
-as Lua, Emacs Lisp or Node library sets).
+does not follow the format proposed here, possibly requiring manual intervention
+and code review, especially for machine-generated expressions (such as Lua,
+Emacs Lisp or Node library sets).
   
-Nonetheless, this task can be done incrementally, is easily sprintable, and
-easily amenable to automation.
+Nonetheless, this task is easily sprintable, can be done incrementally, and is
+amenable to automation.
 
 # Alternatives
 [alternatives]: #alternatives
 
 The alternative is doing nothing. The impact of it is keeping the Nixpkgs
-codebase confusing, inconsistent, less discoverable and incompatible with
-`builtins.parseDrvName` and `builtins.compareVersions`.
+codebase incompatible with `builtins.parseDrvName` and
+`builtins.compareVersions`, confusing, inconsistent and discoverable.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
