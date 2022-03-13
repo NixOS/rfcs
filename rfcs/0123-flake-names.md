@@ -26,6 +26,7 @@ Also, the discoverability and usability of flakes needs to be improved. Current 
 
 A new supported property for flakes is introduced, `name`.  
 Running `nix flake metadata` on a flake that declares this field displays it at the top.  
+Running `nix flake show` on a flake that declares this field shows the name instead of the URL, followed by the URL in parentheses.  
 The derivation that contains the flake’s content is called `flake-source-${name}` or, if a short revision identifier is available, `flake-source-${name}-${shortRev}`.
 
 # Examples and Interactions
@@ -52,6 +53,9 @@ $ nix flake metadata /example
 Name:          example
 Resolved URL:  git+file:///example
 Locked URL:    …
+$ nix flake show /example
+example (git+file:///home/anselmschueler/Code/example?rev=b0&rev=c714c8624f5d49a9d88e6e24550dd88515923c18)
+└───lib: unknown
 ```
 
 # Drawbacks
