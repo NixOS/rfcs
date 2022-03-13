@@ -61,7 +61,8 @@ example (git+file:///home/anselmschueler/Code/example?rev=b0&rev=c714c8624f5d49a
 # Drawbacks
 [drawbacks]: #drawbacks
 
-This may cause clutter and additional maintenance.
+This may cause clutter and additional maintenance.  
+Since this changes the output of nix flake metadata and nix flake show, it might cause scripts that read this output to break.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -71,7 +72,8 @@ Flake names could be handled entirely through outside means, with things like th
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-The name scheme could be changed. `flake-source-${name}-${shortRev}` could be too long.
+The name scheme could be changed. `flake-source-${name}-${shortRev}` could be too long.  
+The interactions with nix flake metadata and nix flake show are not critical to the design, which is mostly aimed at clarifying derivation names.
 
 # Future work
 [future]: #future-work
