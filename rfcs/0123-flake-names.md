@@ -33,7 +33,7 @@ The derivation that contains the flake’s content is called `flake-source-${nam
 
 Example:
 
-File `./example/flake.nix`
+File `/example/flake.nix`
 ```nix
 {
   name = "example";
@@ -45,12 +45,13 @@ File `./example/flake.nix`
 
 Shell
 ```console
-$ nix eval git+file://./example
+$ nix eval git+file:///example
 […] copying flake-source-example
 "example"
-$ nix flake metadata ./example
+$ nix flake metadata /example
 Name:          example
-Resolved URL:  …
+Resolved URL:  git+file:///example
+Locked URL:    …
 ```
 
 # Drawbacks
