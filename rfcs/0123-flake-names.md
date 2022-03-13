@@ -31,7 +31,27 @@ The derivation that contains the flake’s content is called `flake-source-${nam
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-None
+Example:
+
+File `./example/flake.nix`
+```nix
+{
+  name = "example";
+  outputs = { ... }: {
+    lib.example = "example";
+  };
+}
+```
+
+Shell
+```console
+$ nix eval git+file://./example
+[…] copying flake-source-example
+"example"
+$ nix flake metadata ./example
+Name:          example
+Resolved URL:  …
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
