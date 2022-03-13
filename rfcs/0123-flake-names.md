@@ -25,7 +25,7 @@ Also, the discoverability and usability of flakes needs to be improved. Current 
 [design]: #detailed-design
 
 A new supported property for flakes is introduced, `name`.  
-The derivation that contains the flake’s content is called `flake-source-${name}` or, if a short revision identifier is available, `flake-source-${name}-${shortRev}`.
+The derivation that contains the flake’s content is called `flake-source-${name}` or, if a source control tag (e.g. git tag such as V3) is available, `flake-source-${name}-${tag}`.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -48,7 +48,7 @@ File `/example/flake.nix`
 Shell
 ```console
 $ nix eval git+file:///example
-[…] copying flake-source-example-e1279e9
+[…] copying flake-source-example
 "example"
 ```
 
@@ -79,7 +79,7 @@ Flake names could be handled entirely through outside means, with things like th
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-The name scheme could be changed. `flake-source-${name}-${shortRev}` could be too long.  
+The name scheme could be changed. `flake-source-${name}-${tag}` could be too long.  
 The interactions with nix flake metadata and nix flake show are not critical to the design, which is mostly aimed at clarifying derivation names.
 
 # Future work
