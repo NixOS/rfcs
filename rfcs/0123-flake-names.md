@@ -31,7 +31,7 @@ The derivation that contains the flake’s content is called `flake-source-${nam
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-A flake that is in the registry should have its name match the registry identifier.
+None
 
 # Drawbacks
 [drawbacks]: #drawbacks
