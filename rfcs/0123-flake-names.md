@@ -25,14 +25,15 @@ Also, the discoverability and usability of flakes needs to be improved. Current 
 [design]: #detailed-design
 
 A new supported property for flakes is introduced, `name`.  
-Running `nix flake metadata` on a flake that declares this field displays it at the top.  
-Running `nix flake show` on a flake that declares this field shows the name instead of the URL, followed by the URL in parentheses.  
 The derivation that contains the flake’s content is called `flake-source-${name}` or, if a short revision identifier is available, `flake-source-${name}-${shortRev}`.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-Example:
+Running `nix flake metadata` on a flake that declares this field displays it at the top.  
+Running `nix flake show` on a flake that declares this field shows the name instead of the URL, followed by the URL in parentheses.
+
+Examples:
 
 File `/example/flake.nix`
 ```nix
@@ -47,8 +48,14 @@ File `/example/flake.nix`
 Shell
 ```console
 $ nix eval git+file:///example
-[…] copying flake-source-example
+[…] copying flake-source-example-e1279e9
 "example"
+```
+
+Example of interactions:
+
+Shell (using the previous file)
+```
 $ nix flake metadata /example
 Name:          example
 Resolved URL:  git+file:///example
