@@ -22,7 +22,7 @@ channel.
 
 Another desire of this rfc is also to have a way for various review tools
 (e.g. ofborg, hydra, nixpkgs-review) to have a standard way to determine if a
-package has additional tests which can help verify it's correctness.
+package has additional tests which can help verify its correctness.
 
 # Motivation
 [motivation]: #motivation
