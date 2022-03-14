@@ -19,13 +19,14 @@ The derivations for a flake are no longer called `source`, but use the flake nam
 [motivation]: #motivation
 
 Flake-centric workflows often end up with a lot of derivations named “source”, and it’s difficult to navigate this.
-Also, the discoverability and usability of flakes needs to be improved. Current commands mostly show technical information. This would be a step in the right direction.
+This can also make flake-centric commands friendlier and easier to approach.
 
 # Detailed design
 [design]: #detailed-design
 
 A new supported property for flakes is introduced, `name`.  
-The derivation that contains the flake’s content is called `flake-source-${name}` or, if a source control tag (e.g. git tag such as V3) is available, `flake-source-${name}-${tag}`.
+The derivation that contains the flake’s content is called `flake-source-${name}`  
+If a source control tag (e.g. git tag such as V3) is available, it is `flake-source-${name}-${tag}`.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -79,10 +80,10 @@ Flake names could be handled entirely through outside means, with things like th
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-The name scheme could be changed. `flake-source-${name}-${tag}` could be too long.  
+The name scheme could be changed. `flake-source-${name}` could be too long. Alternatives include `source-${name}`.  
 The interactions with nix flake metadata and nix flake show are not critical to the design, which is mostly aimed at clarifying derivation names.
 
 # Future work
 [future]: #future-work
 
-Flake discoverability and usability needs to be improved.
+Flake usability can be improved.
