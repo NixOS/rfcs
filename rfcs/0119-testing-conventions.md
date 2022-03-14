@@ -29,7 +29,7 @@ package has additional tests which can help verify it's correctness.
 
 Breakages are a constant painpoint for nixpkgs. It is a very poor user experience to
 have a configuration broken because one or more packages fail to build. Often when
-these breakages occur, it is because the change had a large impact on the entirity
+these breakages occur, it is because the change had a large impact on the entirety
 of nixpkgs; and unless there's a dedicated hydra jobset for the pull request, it's
 infeasible to expect pull request authors to verify every package affected
 by a change they are proposing. However, it is feasible to specify packages that
