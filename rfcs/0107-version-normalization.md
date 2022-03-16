@@ -112,13 +112,13 @@ them.
         snapshots;
         - If the project never released a labeled snapshot, `0.pre` should be
           used as default.
-     - the string `,date=YYYY-MM-DD`, where `YYYY-MM-DD` denotes the date
+     - the string `+date=YYYY-MM-DD`, where `YYYY-MM-DD` denotes the date
        the mentioned unlabeled snapshot was distributed.
 
 - Some atypical programs have special considerations:
   - Linux kernel modules:
     - Besides the rules established above for typical snapshots (whether labeled
-      or unlabeled), `version` shoud have appended `,linux=XX.XX.XX`, where
+      or unlabeled), `version` shoud have appended `+linux=XX.XX.XX`, where
       `XX.XX.XX` is the corresponding Linux kernel version used to build the
       aforementioned module.
 
@@ -148,14 +148,14 @@ Some useful examples:
   latest change was done in May 28, 2021.
 
   Therefore, for this particular unlabeled releases of SDL2, we have `pname =
-  "SDL2"; version = "2.0.14,date=2021-05-28";`.
+  "SDL2"; version = "2.0.14+date=2021-05-28";`.
 
 - Cardboard is a typical Gitlab-hosted program. It has no labeled release yet,
   therefore we use `0.pre` as default dummy stable version; further, the latest
   commit was made on May 10, 2021.
 
   Therefore, for this particular commit have `pname = "cardboard"; version =
-  "0.pre,date=2021-05-21";`.
+  "0.pre+date=2021-05-21";`.
 
 - Python is a famous programming language and interpreter. Before the
   deprecation of its 2.x series in 2020, Python had two release branches,
@@ -166,17 +166,17 @@ Some useful examples:
   As an exercise of imagination, suppose the scenarios described below:
 
   Python 2.6 was released 2008-10-01; an unlabeled snapshot of Python 2 branch
-  released at 2008-12-04 would have `version="2.6,date=2008-12-04"`.
+  released at 2008-12-04 would have `version="2.6+date=2008-12-04"`.
 
   At the same time, Python 3.0 was released 2008-12-03; an unlabeled snapshot of
   Python 3 branch released at 2008-12-04 would have
-  `version="3.0,date=2008-12-04"`.
+  `version="3.0+date=2008-12-04"`.
 
 - The Linux drivers for Realtek rtl8192eu can be fetched from a Github page,
   <https://github.com/Mange/rtl8192eu-linux-driver>. It has no labeled release;
   the latest code is from May 12, 2021. Supposing e.g. it was built for Linux
   kernel version 5.10.01, we therefore have `pname = "rtl8192eu"; version =
-  "0.pre,date=2021-05-12,linux=5.10.01";`.
+  "0.pre+date=2021-05-12+linux=5.10.01";`.
 
 # Drawbacks
 [drawbacks]: #drawbacks
