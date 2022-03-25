@@ -69,15 +69,6 @@ of the programs were linked correctly.
 - Assert behavior post installation (e.g. python's native extensions only get installed
 and are not present in a build directory)
 
-# Examples and Interactions
-[examples-and-interactions]: #examples-and-interactions
-
-This section illustrates the detailed design. This section should clarify all
-confusion the reader has from the previous sections. It is especially important
-to counterbalance the desired terseness of the detailed design; if you feel
-your detailed design is rudely short, consider making this section longer
-instead.
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
