@@ -108,7 +108,7 @@ take into consideration how much testing is feasible for a given change.
 
 Onboarding of CI tools to support testing paradigms:
 - ofborg
-  - Testing of <package>.passthru.tests is already done.
+  - Testing of `<package>.passthru.tests` is already done.
   - Testing of downstream dependencies and their tests when minimal (e.g. <10 rebuilds?)
 - hydra
   - Allow for derivations exposed to hydraJobs to also probe for `<drv>.passthru.tests`?
