@@ -94,7 +94,7 @@ Continue to use current ad-hoc conventions.
 How far should testing go?
 - What consistitutes that "enough testing" was done to a package before a change was merged?
 
-Should `<packaga>.passthru.tests` be flat?
+Should `<package>.passthru.tests` be flat?
 For packages which have extremes in resource usage when testing (e.g. pytorch), it may
 be beneficial to have additional structure for the tests to denote expectations of resources
 and ownership of testing for upstream packages.
