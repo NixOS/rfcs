@@ -3,8 +3,8 @@ feature: Use a more canonical name for hardware driver path and modules
 start-date: 2022-02-03
 author: @jonringer
 co-authors:
-shepherd-team:
-shepherd-leader:
+shepherd-team: @edolstra @colemickens @Ericson2314
+shepherd-leader: @colemickens
 related-issues: https://github.com/NixOS/nixpkgs/issues/141803
 ---
 
