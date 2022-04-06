@@ -3,8 +3,8 @@ feature: Defined conventions around testing of official Nixpkgs packages.
 start-date: 2021-12-29
 author: Jonathan Ringer
 co-authors:
-shepherd-team:
-shepherd-leader:
+shepherd-team: @Mic92 @Artturin @kevincox
+shepherd-leader: @Mic92
 related-issues:
   - [RFC 0088 - Nixpkgs Breaking Change Policy](https://github.com/NixOS/rfcs/pull/88)
 ---
