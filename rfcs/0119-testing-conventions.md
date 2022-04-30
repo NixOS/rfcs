@@ -101,5 +101,5 @@ Onboarding of CI tools to support testing paradigms:
 
 Nixpkgs:
 - Add existing nixosTests to related packages
-- Updated testing clause on PR template
+- Update testing clause on PR template
 - Update contributing documentation
