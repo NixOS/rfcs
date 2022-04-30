@@ -39,16 +39,11 @@ to help mitigate regressions from appearing in release channels.
 # Detailed design
 [design]: #detailed-design
 
-Standardize `passthru.tests.<name>` and `passthru.nixosTests.<name>` as a mechanism of 
+Standardize `passthru.tests.<name>` as a mechanism of 
 more expensive but automatic testing for nixpkgs. As well as encourage the usage of
 `checkPhase` or `installCheckPhase` when packaging within nixpkgs.
 
-Usage for `passthru.nixosTests.<name>`
-- Reserved for tests utilitizing the nixosTest utilties.
-  - Generally these are more resource intensive, and may require additional system features
-  such as kvm
-
-Usage for `passthru.tests.<name>`:
+Criteria for `passthru.tests.<name>`:
 - Running tests which include downstream dependencies.
   - This avoids cyclic dependency issues for test suites.
 - Running lengthy or more resource expensive tests.
@@ -57,6 +52,9 @@ Usage for `passthru.tests.<name>`:
 - Referencing downstream dependencies which are most likely to experience regressions.
   - Most applicable to [RFC 0088 - Nixpkgs Breaking Change Policy](https://github.com/NixOS/rfcs/pull/88),
 as this will help define what breakages a pull request author should take ownership.
+- Running integration tests (E.g. nixosTests)
+  - Tests which have heavy usage or platform requirements should add the appropriate systemFeature
+    - E.g. `nixos-test` `kvm` `big-parallel`
 
 Usage for mkDerivation's `checkPhase`:
 - Quick "cheap" tests, which run units tests and maybe some addtional scenarios.
@@ -85,21 +83,23 @@ Continue to use current ad-hoc conventions.
 How far should testing go?
 - What consistitutes that "enough testing" was done to a package before a change was merged?
 
-Should `<package>.passthru.tests` be flat?
-For packages which have extremes in resource usage when testing (e.g. pytorch), it may
-be beneficial to have additional structure for the tests to denote expectations of resources
-and ownership of testing for upstream packages.
+Hydra: How would this look for hydra adoption and hydraChecks?
 
 # Future work
 [future]: #future-work
 
-Problem with onboarding more test to aspects of nixpkgs CI and processes is the increased
+One problem with onboarding more tests to the current nixpkgs CI and processes is the increased
 need of compute, storage, and ram resources. Therefore, consideration of future work should
 take into consideration how much testing is feasible for a given change.
 
 Onboarding of CI tools to support testing paradigms:
+- nixpkgs-review
+  - Run `passthru.tests` on affected packages
+  - Allow for filtering based upon requiredSystemFeatures
 - ofborg
   - Testing of `<package>.passthru.tests` is already done.
-  - Testing of downstream dependencies and their tests when minimal (e.g. <10 rebuilds?)
-- hydra
-  - Allow for derivations exposed to hydraJobs to also probe for `<drv>.passthru.tests`?
+
+Nixpkgs:
+- Add existing nixosTests to related packages
+- Updated testing clause on PR template
+- Update contributing documentation
