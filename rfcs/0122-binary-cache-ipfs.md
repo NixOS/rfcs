@@ -3,8 +3,8 @@ feature: binary-cache-ipfs
 start-date: 2022-03-07
 author: lucasew
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: John Ericson, Tom Bereknyei, Kevin Amado
+shepherd-leader: Tom Bereknyei
 related-issues: (will contain links to implementation PRs)
 ---
 
