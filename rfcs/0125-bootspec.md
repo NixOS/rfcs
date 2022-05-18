@@ -5,7 +5,7 @@ author: Graham Christensen
 co-authors: Cole Helbling
 shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
-related-issues: (will contain links to implementation PRs)
+related-issues: https://github.com/NixOS/nixpkgs/pull/172237
 ---
 
 # Summary
