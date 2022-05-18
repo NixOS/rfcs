@@ -66,7 +66,7 @@ By creating a well defined specification of generations and the boot-relevant da
 Systemd's bootloader specification is a good format for a different problem.
 A single NixOS generation can contain multiple bootable systems and options, with additional features unique to NixOS built on top.
 Most Linux distributions don't deal with many unique and ever-changing bootables.
-This proposal is specifically to deal with the collection of bootables and improve our ability to interface with.
+This proposal is specifically to deal with the collection of bootables and improve our ability to treat the collection consistently.
 
 # Goals
 [goals]: #goals
