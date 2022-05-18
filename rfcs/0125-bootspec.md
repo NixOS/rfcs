@@ -16,6 +16,8 @@ These facts are used as the primary input for bootloader backends like systemd-b
 
 In this proposal, we create a stable, comprehensive, and machine-parsable definition of a NixOS Generation as an intermediate representation (IR) between the NixOS system definition and the bootloader management tools.
 
+This document describes Bootspec v1.
+
 # Motivation
 [motivation]: #motivation
 
@@ -88,6 +90,7 @@ This proposal is specifically to deal with the collection of bootables and impro
 
 - Each NixOS generation will have a bootspec (a JSON document) at `$out/bootspec/boot.v1.json` containing all of the boot properties for that generation.
   NixOS's bootloader backends will read these files as inputs to the bootloader installation phase.
+  A bootspec document named `boot.v1.json` must have the `schemaVersion` set to `1`. Any other value makes the document invalid.
     - The bootloader installation phase is relatively unchanged from the way it is now.
       The bootloader backend will have an executable that is run against a collection of generations, and the backend is any of the currently supported backends plus an "external" backend which the user can define.
 - The bootloader backends will avoid reading data from the other files and directories when possible, preferring the information in the bootspec.
