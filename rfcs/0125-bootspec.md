@@ -84,6 +84,7 @@ This proposal is specifically to deal with the collection of bootables and impro
   The goal of this RFC is to make the feature development *easier*, not actually do it.
 - Supporting SecureBoot.
   The authors of this RFC have done work in this regard, but this RFC is not about SecureBoot.
+- Integrating Bootspec into an existing bootloader backend is not expected to perfectly produce the exact same result. For example, it is likely that the text describing the entrties in the menu may differ.
 
 # Proposed Solution
 [proposed-solution]: #proposed-solution
