@@ -145,8 +145,8 @@ Using the following JSON:
     // <name> corresponds to <name> in specialisation.<name>.configuration.
     // Note: a specialisation's bootspec document should not contain any specialisations.
     "<name>": {
-      // bootspec is the path to a bootspec document
-      "bootspec": "/path/to/a/bootspec.v1.json",
+      // A full Bootspec v1 document.
+      // Note that it is not valid for a specialisation to have further specialisations.
     }
   }
 }
