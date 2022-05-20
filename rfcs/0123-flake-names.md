@@ -13,7 +13,7 @@ related-issues: None
 
 Flakes can declare the field `name`.  
 It represents the name of the flake.  
-The derivations for a flake are no longer called `source`, but use the flake name.
+The store paths corresponding to a flake source are no longer called `source`, but use the flake name.
 
 # Motivation
 [motivation]: #motivation
