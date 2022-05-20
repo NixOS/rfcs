@@ -26,7 +26,6 @@ This can also make flake-centric commands friendlier and easier to approach.
 
 A new supported property for flakes is introduced, `name`.  
 The derivation that contains the flake’s content is called `flake-source-${name}`  
-If a source control tag (e.g. git tag such as V3) is available, it is `flake-source-${name}-${tag}`.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
