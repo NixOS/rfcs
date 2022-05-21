@@ -18,8 +18,8 @@ The store paths corresponding to a flake source are no longer called `source`, b
 # Motivation
 [motivation]: #motivation
 
-Flake-centric workflows often end up with a lot of derivations named “source”, and it’s difficult to navigate this.
-This can also make flake-centric commands friendlier and easier to approach.
+- Flake-centric workflows often end up with a lot of derivations named “source”, and it’s difficult to navigate this.
+- This metadata can be used to make flakes more discoverable and usable, in particular, it can be output instead or with the URI, making the command friendlier.
 
 # Detailed design
 [design]: #detailed-design
@@ -68,21 +68,24 @@ example (git+file:///home/anselmschueler/Code/example?rev=b0&rev=c714c8624f5d49a
 # Drawbacks
 [drawbacks]: #drawbacks
 
-This may cause clutter and additional maintenance.  
-Since this changes the output of nix flake metadata and nix flake show, it might cause scripts that read this output to break.
+- This may cause clutter and additional maintenance.
+- Since this changes the output of nix flake metadata and nix flake show, it might cause scripts that read this output to break.
+- This requires a significant change to the way flakes are handled.
+- This treats the Nix store as a user-facing part of Nix, which is generally not intended.
 
 # Alternatives
 [alternatives]: #alternatives
 
-Flake names could be handled entirely through outside means, with things like the global registry merely pointing to flakes under names.
+- Flake names could be handled entirely through outside means, with things like the global registry merely pointing to flakes under names.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-The name scheme could be changed. `flake-source-${name}` could be too long. Alternatives include `source-${name}`.  
-The interactions with nix flake metadata and nix flake show are not critical to the design, which is mostly aimed at clarifying derivation names.
+- The name scheme could be changed. `flake-source-${name}` could be too long. Alternatives include `source-${name}`.
+- The interactions with nix flake metadata and nix flake show are not critical to the design, which is mostly aimed at clarifying derivation names.
 
 # Future work
 [future]: #future-work
 
-Flake usability can be improved.
+- Flake usability can be improved.
+- Issues with indicipherable derivations named “source” also exist elsewhere.
