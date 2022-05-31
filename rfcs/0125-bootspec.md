@@ -84,7 +84,7 @@ This proposal is specifically to deal with the collection of bootables and impro
   The goal of this RFC is to make the feature development *easier*, not actually do it.
 - Supporting SecureBoot.
   The authors of this RFC have done work in this regard, but this RFC is not about SecureBoot.
-- Integrating Bootspec into an existing bootloader backend is not expected to perfectly produce the exact same result. For example, it is likely that the text describing the entrties in the menu may differ.
+- Integrating Bootspec into an existing bootloader backend is not expected to perfectly produce the exact same result. For example, it is likely that the text describing the entries in the menu may differ.
 
 # Proposed Solution
 [proposed-solution]: #proposed-solution
@@ -170,7 +170,7 @@ Using the following JSON:
 - Create and package the backwards compatibility synthesizer as a standalone tool.
   A version of it already exists, but it is not standalone.
 - Generate the bootspec files as part of building the system closure.
-- Update the bootloader backends to use bootspec as its primary source of installation data.
+- Update the bootloader backends to use bootspec as their primary source of installation data.
 - Implement a NixOS module which supports external bootloader tooling.
 
 # FAQ
