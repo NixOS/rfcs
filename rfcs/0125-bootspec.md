@@ -89,9 +89,10 @@ This proposal is specifically to deal with the collection of bootables and impro
 # Proposed Solution
 [proposed-solution]: #proposed-solution
 
-- Each NixOS generation will have a bootspec (a JSON document) at `$out/bootspec/boot.v1.json` containing all of the boot properties for that generation.
+- Each NixOS generation will have a bootspec (a JSON document) at `$out/boot.json` containing all of the boot properties for that generation.
   NixOS's bootloader backends will read these files as inputs to the bootloader installation phase.
-  A bootspec document named `boot.v1.json` must have the `schemaVersion` set to `1`. Any other value makes the document invalid. Generally, the file must be named `boot.v${schemaVersion}.json`.
+  A bootspec document named `boot.json` must have a `"v1"` key that contains the body of the specification.
+  Generally, the key must follow the format of `v${schemaVersion}`.
     - The bootloader installation phase is relatively unchanged from the way it is now.
       The bootloader backend will have an executable that is run against a collection of generations, and the backend is any of the currently supported backends plus an "external" backend which the user can define.
 - The bootloader backends will avoid reading data from the other files and directories when possible, preferring the information in the bootspec.
@@ -107,47 +108,48 @@ Using the following JSON:
 
 ```json5
 {
-  // Version of the specification used in the document
-  "schemaVersion": 1,
+  // Toplevel key describing the version of the specification used in the document
+  "v1": {
 
-  // Path to the stage-2 init, executed by the initrd
-  "init": "/nix/store/xxx-nixos-system-xxx/init",
+    // Path to the stage-2 init, executed by the initrd
+    "init": "/nix/store/xxx-nixos-system-xxx/init",
 
-  // Path to the initrd
-  "initrd": "/nix/store/xxx-initrd-linux/initrd",
+    // Path to the initrd
+    "initrd": "/nix/store/xxx-initrd-linux/initrd",
 
-  // Optional path to a tool to dynamically add secrets to an initrd
-  "initrdSecrets": "/nix/store/xxx-append-secrets/bin/append-initrd-secrets",
+    // Optional path to a tool to dynamically add secrets to an initrd
+    "initrdSecrets": "/nix/store/xxx-append-secrets/bin/append-initrd-secrets",
 
-  // Path to the kernel image
-  "kernel": "/nix/store/xxx-linux/bzImage",
+    // Path to the kernel image
+    "kernel": "/nix/store/xxx-linux/bzImage",
 
-  // Kernel commandline options
-  "kernelParams": [
-    "amd_iommu=on",
-    "amd_iommu=pt",
-    "iommu=pt",
-    "kvm.ignore_msrs=1",
-    "kvm.report_ignored_msrs=0",
-    "udev.log_priority=3",
-    "systemd.unified_cgroup_hierarchy=1",
-    "loglevel=4"
-  ],
+    // Kernel commandline options
+    "kernelParams": [
+      "amd_iommu=on",
+      "amd_iommu=pt",
+      "iommu=pt",
+      "kvm.ignore_msrs=1",
+      "kvm.report_ignored_msrs=0",
+      "udev.log_priority=3",
+      "systemd.unified_cgroup_hierarchy=1",
+      "loglevel=4"
+    ],
 
-  // The label of the system. It should contain the operating system, kernel version,
-  // and other user-relevant information to identify the system. This corresponds
-  // loosely to `config.system.nixos.label`.
-  "label": "NixOS 21.11.20210810.dirty (Linux 5.15.30)",
+    // The label of the system. It should contain the operating system, kernel version,
+    // and other user-relevant information to identify the system. This corresponds
+    // loosely to `config.system.nixos.label`.
+    "label": "NixOS 21.11.20210810.dirty (Linux 5.15.30)",
 
-  // Top level path of the closure, in case some spelunking is required
-  "toplevel": "/nix/store/xxx-nixos-system-xxx",
+    // Top level path of the closure, in case some spelunking is required
+    "toplevel": "/nix/store/xxx-nixos-system-xxx",
 
-  "specialisation": {
-    // <name> corresponds to <name> in specialisation.<name>.configuration.
-    // Note: a specialisation's bootspec document should not contain any specialisations.
-    "<name>": {
-      // A full Bootspec v1 document.
-      // Note that it is not valid for a specialisation to have further specialisations.
+    "specialisation": {
+      // <name> corresponds to <name> in specialisation.<name>.configuration.
+      // Note that it is not valid for a specialisation to be a different version than the main document.
+      "<name>": {
+        // A full Bootspec v1 document, _without_ the `"v1"` key.
+        // Note that it is not valid for a specialisation to have further specialisations.
+      }
     }
   }
 }
