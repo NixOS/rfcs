@@ -71,9 +71,10 @@ For these reasons, we advocate in priority order:
 # Detailed design
 [design]: #detailed-design
 
-Apply this diff to the `.github/stale.yml` configuration file:
+1. Follow the stale policy of nixpkgs, except Nix may have different exempt labels.
 
-1. ```diff
+   That should look something like this diff to the `.github/stale.yml` configuration file:
+   ```diff
    diff --git a/.github/stale.yml b/.github/stale.yml
    index fe24942f4..539720b6d 100644
    --- a/.github/stale.yml
