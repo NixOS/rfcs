@@ -34,7 +34,7 @@ To be clear, there *is* no formal violation, as that RFC was just about Nixpkgs,
 
 Firstly, whatever the policy is, it should be clearly announced.
 
-Without a big announcement of this decision, many of us were caught of guard when issues were closed the other day.
+Without a big announcement of this decision, many of us were caught off guard when issues were closed the other day.
 Anyone that just saw the previous stale bot "marking stale" messages probably assumed stale bot was configured like Nixpkgs.
 Without knowing that auto-closing was enabled, people who might have bothered to aggressively triage stale issues before the auto-close deadline didn't.
 For the social aspects of the stale bot auto-closing to work as intended, it is very important people *do* know the policy, because incentivizing that triaging by the threat of auto-closing is precisely the point!
