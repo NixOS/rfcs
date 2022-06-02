@@ -3,8 +3,8 @@ feature: nix-mark-stale-issues
 start-date: 2022-04-18
 author: John Ericson (@Ericson2314)
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @ryantm, @nh2, @infinisil
+shepherd-leader: @ryantm
 related-issues: (will contain links to implementation PRs)
 ---
 
@@ -78,18 +78,20 @@ Apply this diff to the `.github/stale.yml` configuration file:
    index fe24942f4..539720b6d 100644
    --- a/.github/stale.yml
    +++ b/.github/stale.yml
-   @@ -1,10 +1,9 @@
+   @@ -1,10 +1,8 @@
     # Configuration for probot-stale - https://github.com/probot/stale
     daysUntilStale: 180
    -daysUntilClose: 365
    +daysUntilClose: false
     exemptLabels:
       - "critical"
+   +  - "never-stale"
     staleLabel: "stale"
-    markComment: |
-      I marked this as stale due to inactivity. &rarr; [More info](https://github.com/NixOS/nix/blob/master/.github/STALE-BOT.md)
+   -markComment: |
+   -  I marked this as stale due to inactivity. &rarr; [More info](https://github.com/NixOS/nix/blob/master/.github/STALE-BOT.md)
    -closeComment: |
    -  I closed this issue due to inactivity. &rarr; [More info](https://github.com/NixOS/nix/blob/master/.github/STALE-BOT.md)
+   +markComment: false
    +closeComment: false
    ```
 
