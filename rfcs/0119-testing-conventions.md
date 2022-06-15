@@ -39,11 +39,11 @@ to help mitigate regressions from appearing in release channels.
 # Detailed design
 [design]: #detailed-design
 
-Standardize `passthru.tests.<name>` as a mechanism of 
+Standardize `tests.<name>` (previously `passthru.tests.<name>` as a mechanism of 
 more expensive but automatic testing for nixpkgs. As well as encourage the usage of
 `checkPhase` or `installCheckPhase` when packaging within nixpkgs.
 
-Criteria for `passthru.tests.<name>`:
+Criteria for `tests.<name>`:
 - Running tests which include downstream dependencies.
   - This avoids cyclic dependency issues for test suites.
 - Running lengthy or more resource expensive tests.
@@ -94,10 +94,10 @@ take into consideration how much testing is feasible for a given change.
 
 Onboarding of CI tools to support testing paradigms:
 - nixpkgs-review
-  - Run `passthru.tests` on affected packages
+  - Run `<package>.tests` on affected packages
   - Allow for filtering based upon requiredSystemFeatures
 - ofborg
-  - Testing of `<package>.passthru.tests` is already done.
+  - Testing of `<package>.tests` is already done.
 
 Nixpkgs:
 - Add existing nixosTests to related packages
