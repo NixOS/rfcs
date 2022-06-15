@@ -18,8 +18,8 @@ The store paths corresponding to a flake source are no longer called `source`, b
 # Motivation
 [motivation]: #motivation
 
-- Flake-centric workflows often end up with a lot of derivations named “source”, and it’s difficult to navigate this.
-- This metadata can be used to make flakes more discoverable and usable, in particular, it can be output instead or with the URI, making the command friendlier.
+- Flakes generate store paths named “source”, and it’s difficult to navigate this when manually inspecting the store.
+- This metadata can be used to make flakes more approachable and usable, in particular, it can be output instead or with the URI, making the nix commands friendlier.
 
 # Detailed design
 [design]: #detailed-design
