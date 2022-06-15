@@ -39,7 +39,7 @@ to help mitigate regressions from appearing in release channels.
 # Detailed design
 [design]: #detailed-design
 
-Standardize `tests.<name>` (previously `passthru.tests.<name>` as a mechanism of 
+Standardize `tests.<name>` (previously known as `passthru.tests.<name>`) as a mechanism of 
 more expensive but automatic testing for nixpkgs. As well as encourage the usage of
 `checkPhase` or `installCheckPhase` when packaging within nixpkgs.
 
