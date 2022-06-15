@@ -31,17 +31,19 @@ Apart from that, there is need for a general per-package warning mechanism in ni
 
 A new attribute is added to the `meta` section of a package: `issues`. If present, it is a list of attrsets which each have the following fields:
 
-- `message`: Required. A string message describing the issue with the package. Linking issues and pull requests is encouraged.
+- `message`: Required. A string message describing the issue with the package.
 - `kind`: Optional but recommended. If present, the resulting warning will be printed as `kind: message`.
 - `date`: Required. An ISO 8601 `yyyy-mm-dd`-formatted date from when the issue was added.
+- `urls`: Optional, list of strings. Can be used to link issues, pull requests and other related items.
 
 Example values:
 
 ```nix
 meta.issues = [{
   kind = "deprecated";
-  message = "This package depends on Python 2, which has reached end of life. #148779";
+  message = "This package depends on Python 2, which has reached end of life.";
   date = "1970-01-01";
+  urls = [ "https://github.com/NixOS/nixpkgs/issues/148779" ];
 } {
   kind = "removal";
   message = "The application has been abandoned upstream, use libfoo instead";
