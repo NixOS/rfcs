@@ -3,8 +3,8 @@ feature: inherit-as-list
 start-date: 2021-10-17
 author: Ryan Burns (@r-burns)
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: @synthetica9, @infinisil, @edolstra 
-shepherd-leader: @edolstra 
+shepherd-team: @synthetica9, @infinisil, @kevincox 
+shepherd-leader: @kevincox 
 related-issues: (will contain links to implementation PRs)
 ---
 
