@@ -13,7 +13,7 @@ related-issues: (will contain links to implementation PRs)
 
 This defines two alternate "end states" for RFCs.
 
-The "Awaiting Author" state defines an RFC that isn't ready to be pushed forward and is intentinally stalled. The NixOS RFC Steering Committee will not ping or push this RFC until it returns to the main workflow. These RFCs will be put into a draft status until they are ready to re-enter the process.
+The "Awaiting Author" state defines an RFC that isn't ready to be pushed forward and is intentionally stalled. The NixOS RFC Steering Committee will not ping or push this RFC until it returns to the main workflow. These RFCs will be put into a draft status until they are ready to re-enter the process.
 
 The "Lacking Interest" state defines an RFC that can not gather a shepherd team. This is taken to indicate that there is not enough interest in the Nix community. These RFCs will be Closed until more interest is gathered.
 
