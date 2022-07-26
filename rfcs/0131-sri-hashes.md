@@ -41,6 +41,8 @@ None at this time.
   - Text replacement for the majority of cases, with an AST-based solution for others?
 - Do we want to eventually deprecate the use of `sha256`, `sha512`, etc. in fetchers that support SRI hashes, leading to their eventual removal?
   - This would require updating every script that uses these arguments, and would cause breakage for any usage of them out-of-tree; we'd need to weigh the benefits of this
+- Is `hash` the correct name to use for the argument?
+  - Nix builtins use `narHash`
 
 # Future work
 [future]: #future-work
