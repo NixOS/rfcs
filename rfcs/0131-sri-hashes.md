@@ -27,7 +27,7 @@ Currently in Nixpkgs, the hash formats that are used in parameters to fetchers r
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- Some fetchers still don't support SRI hashes (i.e. [`fetchgit`](https://github.com/NixOS/nixpkgs/pull/79987), which is blocked due to [this discussion](https://github.com/NixOS/nixpkgs/pull/79987#discussion_r378735698) not being resolved)
+None at this time.
 
 # Alternatives
 [alternatives]: #alternatives
