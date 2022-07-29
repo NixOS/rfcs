@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-This RFC proposes a new Nix syntax `[ inherit (<attrset>) <attrnames>; ]`,
+This RFC proposes a new Nix syntax `<attrset>.[ <attrnames> ]`,
 which constructs a list from the values of an attrset.
 
 The goal is to provide a similarly-terse but more principled alternative
@@ -58,22 +58,16 @@ these drawbacks.
 The proposed syntax is:
 
 ```
-[ inherit (attrs) a b c; ]
-[ inherit a b c; ]
+attrs.[ a b c ]
 ```
 
-These expressions are (respectively) syntactic sugar for:
+This expression is syntactic sugar for:
 
 ```nix
 [ attrs.a attrs.b attrs.c ]
-[ a b c ]
 ```
 
-The `inherit` keyword is intentionally reused so as to not add any new
-keywords to the Nix grammar, and to evoke the similarities with the
-existing attribute-based inherit syntax.
-
-As the `inherit` keyword is currently a syntax error inside a list expression,
+As the token `.` immediately preceding `[` is currently a syntax error,
 a Nix interpreter which supports this new language feature will be compatible
 with existing Nix code.
 
@@ -90,38 +84,14 @@ third-party parsers/linters would also need to be updated.
 This would be useful for many languages and frameworks in Nixpkgs which
 extract packages from a package set argument.
 
-For example, `python3.withPackages (ps: [ inherit (ps) ...; ])` will serve as a
+For example, `python3.withPackages (ps: ps.[ ... ])` will serve as a
 more fine-grained alternative to `python3.withPackages (ps: with ps; [ ... ])`.
 This would apply similarly to `vim.withPlugins`, `lua.withPackages`, etc.
 
 Certain list-typed `meta` fields could also make use of this feature, e.g.:
 ```
-meta.licenses = [ inherit (lib.licenses) bsd3 mit; ];
-meta.maintainers = [ inherit (lib.maintainers) johndoe janedoe; ];
-```
-
-List-inherits can be used multiple times in a list-expression, and intermingled
-with ordinary list elements without needing to concatenate:
-
-```
-buildInputs = [
-  a b c /* ordinary list elements */
-  inherit (pkgsFoo) d e f;
-  g h i /* ordinary list elements */
-  inherit (pkgsBar) j k l;
-];
-```
-
-The order of the elements is preserved inside of and between inherits,
-so the previous is exactly equivalent to
-
-```
-buildInputs = [
-  a b c
-  pkgsFoo.d pkgsFoo.e pkgsFoo.f
-  g h i
-  pkgsBar.j pkgsBar.k pkgsBar.l
-];
+meta.licenses = lib.licenses.[ bsd3 mit ];
+meta.maintainers = lib.maintainers.[ johndoe janedoe ];
 ```
 
 
