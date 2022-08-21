@@ -20,7 +20,6 @@ There is plenty of future work building upon this we could do, but we stop here 
 
 Nixpkgs, along with every other distro, also faces a looming crisis: new open source software is increasingly not intended to be packaged by distros at all.
 Many languages now support very large library ecosystems, with dependencies expressed in a language-specific package manager.
-To this new generation of developers, the distro (or homebrew) is a crufty relic from an earlier age to bootstrap modernity, and then be forgotten about.
 
 Right now, to deal with these packages, we either convert by hand, or commit lots of generated code into Nixpkgs.
 But I don't think either of those options is healthy or sustainable.
@@ -188,8 +187,3 @@ This culture shift I think will be the main and most important legacy of this RF
 A lot of developers come to the Nix ecosystem, and find that the tools work great for sysadmin-y or power-user-y things (NixOS, home-manager, etc.) but the development experience is not nearly as clearly better than using language-specific tools in comparison.
 (I prefer it, but the tradeoffs are very complex.)
 With the new both-ways communication described above, I think we'll have a huge leg up in refining best practices so that ultimately we have better developement workflows, and retain these people better.
-
-The developers I am most eager to reach are those of major upstream projects
-In turn, I hope these upstream packages and ecosystems might even care about packaging and integration of the sort that we do.
-This would create a virtuous cycle where Nix is easier to use by more people, and Nixpkgs is easier to maintain as upstream packages better match our values.
-Instead of a situation where distros and upstream projects don't really like each other, we might end up with a situation where they all get along via Nix.
