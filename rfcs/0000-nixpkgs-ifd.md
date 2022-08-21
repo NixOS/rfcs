@@ -1,5 +1,5 @@
 ---
-feature: nixpkgs-ifd
+feature: nixpkgs-generated-code-policy
 start-date: 2021-10-12
 author: John Ericson (@Ericson2314)
 co-authors: (find a buddy later to help out with the RFC)
@@ -11,9 +11,9 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Many of us want "import from derivation" \[hereafter, IFD\] be allowed in Nixpkgs.
-IFD would be terrible for `hydra.nixos.org`, though,
-The solution is to cut the Gordian knot: Allow IFD in Nixpkgs while still (effectively) prohibiting it in CI.
+Nixpkgs contains non-trivial amounts of generated, rather than hand-written code.
+We want to start systematizing to make it easier to maintain.
+There is plenty of future work building upon this we could do, but we stop here for now to avoid needing to change any tools (Nix, Hydra, etc.).
 
 # Motivation
 [motivation]: #motivation
@@ -25,158 +25,171 @@ To this new generation of developers, the distro (or homebrew) is a crufty relic
 Right now, to deal with these packages, we either convert by hand, or commit lots of generated code into Nixpkgs.
 But I don't think either of those options is healthy or sustainable.
 The problem with the first is sheer effort; we'll never be able to keep up.
-The problem with the second is bloating Nixpkgs but more importantly reproducability: If someone wants to update that generated code it is unclear how.
+The problem with the second is bloating Nixpkgs but more importantly reproducibility: If someone wants to update that generated code it is unclear how.
 All these mean that potential users coming from this new model of development find Nix / Nixpkgs cumbersome and unsuited to their needs.
 
-The solution *outside* of Nixpkgs is today is "import from derivation", i.e. building code in Nix to be consumed at eval time.
-Many institutional users of Nix use this.
-But while the practice is banned in Nixpkgs, those efforts are not very coordinated, and the `lang2nix` ecosystem has a hard time getting off the ground.
-
-I am *not* arguing that IFD is the best possible solution.
-But it's the one we've got to day, and long term alternatives, like RFC #92, face *significant* hurdles in being ergonomic and integrating with current idioms in Nixpkgs -- e.g. the `meta` on every derivation from `mkDerivation`.
-In the spirit of learning to walk before learning to run, and beginning to acknowledge addresses these problems, we are best-serviced by getting IFD in Nixpkgs as a first-gen solution as soon as possible.
-The only barrier then is addressing eval resource usage costs.
+The lowest hanging fruit is to systematize our generated code.
+We should ensure anyone can update the generated code, which means it should be built in derivations not some ad-hoc way.
+In short, we should apply the same level of rigour that we do for packages themselves to generate code.
 
 # Detailed design
 [design]: #detailed-design
 
 ## Nixpkgs
 
-1. Add a new `enableImportFromDerivation` config parameter to Nixpkgs.
-   When it is `false`, anything using IFD must be disabled so that a regular evaluation like we do today succeeds.
+1. Establish the policy that all generated code in nixpkgs must be produced by a derivation.
+   The derivation should be built by CI (so exposed as some Nixpkgs in some fashion).
 
-2. Add a new `allImportedDerivations` top-level attribute.
-   This *must* be buildable with `enableImportFromDerivation = false`.
-   It *must* have in its run-time closure any derivation output that Nixpkgs with `enableImportFromDerivation = true` imports.
-   \(CI will verify these conditions as described in the next subsection.\)
+2. Implement script(s) for maintainers which automatically builds these derivations and vendors their results to the appropriate places.
+   Running such scripts should be sufficient to regenerated all generated code in Nixpkgs.
 
-3. Any code vendored in Nixpkgs *must* correspond to code produced in an imported derivation, so the code can be mechanistically re-vendored.
-   We should write tests that each pair of vendored and computed derivations are the same.
-
-## Hydra policy
-
-Instead of kicking off single evaluations of Nixpkgs, we will kick off double evaluations:
-
-  1. Evaluate Nixpkgs normally.
-
-  2. Build `allImportedDerivations`, and copy its closure to the evaluation machine.
-
-  3. Evaluate Nixpkgs with `enableImportFromDerivation = true`, with the closure of `allImportedDerivations` added to the eval paths whitelist, and with IFD partially "allowed, but with `-j0`".
-     What this means is no building can happen at eval time, but we can import the outputs of derivations that are already built and whitelisted.
+3. Ensure via CI that the vendored generated code is exactly what running the scripts produce.
+   This check should be one of the "channel blocking" CI jobs.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-1. TODO, demonstrate changes to Nixpkgs, e.g. using the Haskell infrastructure, in a fork, and link?
+## Impurities
 
-2. Vendoring to avoid critical path regressions
+Many `lang2nix`-type tools have impure steps today.
+Since these tools must be only invoked inside the derivations to generate code, the impure inputs must be gotten via fixed output derivations.
+This might require changes to those tools
 
-   @FRidh brings up a good example, that of GHC and Sphinx.
-   Today, both are in Nixpkgs, and GHC depends on Sphinx to render it's docs.
-   With this change, we could perhaps instead package Sphinx via some hypothetical "pypi2nix" IFD.
-   That would mean GHC also indirectly depends on pypi2nix.
+Updating fixed output hashes and similar however is perfectly normal and not affected by this RFC.
+The updates can be performed by hand, or with update bots like today.
+The update bots would just need to learn to run the regeneration script (or risk failing CI because the vendored generated code is caught as being out of date).
 
-   To avoid the fallout, we could replace the hand-written Sphinx with a vendored copy of the generate code.
-   We would then test that the IFD and vendored Sphinx are the same.
-   Sphinx, if I recall correctly, might has some non-python dependencies.
-   Just as we do for Haskell packages today, handwritten overs overrides of the generated stuff would remain in Nixpkgs to make that go.
-   In this way, Sphinx and GHC don't "regress", remaining usable from the first `enableImportFromDerivation = false` evaluation.
+## Idempotency and bootstrapping
 
-   Now, one might argue that GHC is not very useful except for building downstream packages.
-   Also, with or without this PR, I have a very long-standing goal to build the compiler itself and "wired-in" libraries separately, which would allow using cabal2nix for much of GHC itself.
-   *If* we do that, and also *if* we decide to stop vendoring the generated Hackage packages and only rely on IFD, GHC would become a second-eval-only, `enableImportFromDerivation = true`-only package.
-   At that point, there might not be a reason to vendor Sphinx anymore, and so we would stop doing so and only rely on the IFD too.
+The test that the generated sources are up to date will have to work by regenerating those generated sources and then taking a diff.
+That means the regeneration process hash to be idempotent in that running it twice is the same as running it once.
 
-   Again, note that the final paragraph of that story is purely hypothetical, just one possible future.
-   This RFC does *not* propose making any specific concrete packages second-eval-only.
+This is a bit tricker than it sounds, because many `lang2nix` tools rely on their own output.
+E.g. the Nix packaging for `cabal2nix` is itself generated with `cabal2nix`.
+Sane setups should work fine --- after all, it would be really weird if two valid builds of `cabal2nix` behaved so differently as to generate different code --- but it still an issue worth being aware of.
+
+(That we continue to vendor code does at least "unroll" the bootstrapping to avoid issues that we would have with, say, import-from-derivation alone.
+The vendored code works analogously to the prebuilt bootstrapping tools in this case.)
+
+@sternenseemann reminds me that some `lang2nix` tools might pin a Nixpkgs today, for various reasons.
+But in this plan the tools must be built with the current Nixpkgs in the CI job ensuring sources are up to date.
+`lang2nix` tools must therefore be kept continuously working when built against the latest Nixpkgs.
+
+## What CI to use?
+
+The easiest, and most important foundational step to do is just add a regular `release.nix` job for Hydra to test.
+We might, however, want to catch these issues earlier at PR merge time, with ofborg or GitHub actions.
+That is fine too.
+
+## Who does the work?
+
+In the short term, this is a decent chunk of work for `lang2nix` tool authors and language-specific packages maintainers, who must work to ensure their tools and workflows are brought into line with this policy.
+That won't always be fun!
+
+On the flip side, a major cost of today's situation is since so many of the workflows are more an "oral tradition" to the maintainers and not fully reproducible, one-off contributors often need a lot of hand-holding.
+@sternenseemann tells me he must spend a lot of manual time shepherding PRs, because those PR authors are unable to jump through the hoops themselves.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-1. > We've *doubled* the amount of evaluation we do, oh no!
+This is now a very conservative RFC so I do not think there are any drawbacks as to the goals themselves.
 
-   Sounds scary, I know.
-   But I don't think that's bad, actually.
-   What's so bad today is the time and memory usage of *each* evaluation.
-
-   You can think of that as a bunch of ungainly massive rectangular tiles we are trying to fit on a floor, the floor being our machine resources to schedule.
-   What would be really bad is *increasing the tile size*.
-   This means we need a bigger floor or else laying tile is harder.
-   What this is doing is *increasing the number of tiles*.
-   We can simple add a second floor to solve any problems that arise from that.
-
-   This is simplification, sure, but I think the parable is correct to the "real" situation, too.
-
-2. > Isn't IFD really slow?
-
-   What is slow is that evaluator has no parallelism.
-   That means is that every time we hit an *unbuilt* derivation, we block until it's finished building.
-   Worse, even if it is easy to run, we're probably going to check some substituters, etc., so there are all sorts of slow IO round trips making the critical path worse.
-   We could fix this, but there is no energy to do so right now.
-   Making the evaluator parallel without making our memory issues worse is hard work.
-
-   But, none of that matters for this proposal.
-   `hydra.nixos.org` will only need to read built paths, and that shouldn't be meaningfully slower than regular `import`-ing.
-
-3. > IFD, is too controversial, don't do it!
-
-   I think this is a classic example of don't let the perfect be the enemy of the good.
-   The problems with IFD and the problems IFD is trying to address both don't let a lot of attention.
-   The fact of the matter is Nixpkgs is how this community coordinates with itself, and agrees on priorities.
-   If it isn't being used in Nixpkgs, there is hard ceiling of how much attention it will get.
-
-   The benefits of IFD don't get enough attention.
-   A package in Nixpkgs is more than a derivation: there's the `meta` as I mentioned above.
-   There's also being able to read the code and (somewhat) understand what's going in reference to other derivations.
-   Finally, there's being able to `override`, `overrideAttrs`, etc. the derivation downstream.
-   IFD alone allows computed packages that follow all these norms.
-
-4. Say I want IFD that depends on other IFD?
-
-   In other words, can one import a derivation that is itself evaluated from and import from a derivation?
-   No, not without introducing another round of building and evaluating for Hydra.
-   But I don't think we need arbitrarily-deep dynamism anyways: it is a tool that should be used with care anyways, because stasis \[staticism?\] is the goodly disciplinarian that makes Nixpkgs so great.
-
-   That said, `cabal2nix` is written in Haskell, `crate2nix` is written in Rust, etc. etc.
-   We can vendor enough code to build these tools and thus bootstrap the IFD we will do.
-   Per the 3rd rule for Nixpkgs above, as long as we make the vendoring automatic and pure, this is fine, and improvement upon today.
-   Also, even if we didn't have the "one round of dynamism" restriction, we would still have the bootstrapping issue.
+Bringing our tools into compliance with this policy will take effort, and of course that effort could be spent elsewhere, so there is opportunity cost to be aware of.
+But given the general level of concern over the sustainability of Nixpkgs, I think the benefits are worth the costs.
 
 # Alternatives
 [alternatives]: #alternatives
 
-1. Instead of evaluating Nixpkgs twice, just evaluate `allImportedDerivations` the first round.
-
-   We could do this, and would reduce total eval time, yes.
-   But, I think it would come at the cost of inciting great controversy.
-   This means users of the `enableImportFromDerivation = false` subset of Nixpkgs would still have to *wait*, for all the IFD to complete first.
-   And remember, with mass rebuilds, that could be quite some time.
-   Increasing the critical path length of *everything* we do with Nixpkgs would cause real pain in some quarters, and I don't want that to pay that as the cost of IFD.
-
-   With the plan as written, users of packages depending on IFD do have to wait slightly longer as the first eval is longer (and we wait for it before beginning to build `allImportedDerivations`).
-   But I think that is fair; we would be the "new constituency", the bottom of the pecking order, and so we should be patient so that other's workflows are not disturbed.
-
-   Longer term we could revisit this, or we could e.g. double down on automatic vendoring, committing all generated code to a second "roll-up" repo.
-   Many options between those two extremes; I rather not worry to much about it now and just take the conservative polite route proposed here to begin.
-
-2. As always, do nothing, and keep the status quo.
+None at this time, we had other ideas but they are reframed as future work.
+The one proposed here is unquestionably the most conservative one, and basically a prerequisite of all the others.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-Should we call it "import from Derivation", or should we give it a different name?
-`builtins.readFile <drv>` is really the same thing for our purposes, so I am sympathetic to renaming.
+None at this time.
 
 # Future work
 [future]: #future-work
 
-In a grand future we might do things completely differently.
-But I have no idea how stuff is going to shake out.
-In particular, if we don't do something like this, I don't think we will ever get to that future.
-So even if this technically "barking up the wrong tree", I think it is a necessary first step to get things going.
+## Vendor generated code "out of tree"
 
-I will say, though, with these steps, I think we will be able to successfully convert to Nix a bunch of developers that mainly work in one language, and didn't even think they were in need of a better distro.
+The first issue that remains after this RFC is generated code still bloats the Nixpkgs history.
+It would be nice to get it "out of tree" (outside the Nixpkgs repo) so this is no longer the case.
+In our shepherd discussions we had two ideas for how this might proceed.
+
+It was tempting to go straight to proposing one of these as part of the RFC proper,
+but they both contained enough hard-to-surmount issues that we figured it was better to start something more conservative first.
+
+### Dump in other repo and fetch it
+
+We could opt to offload all generated code into a separate repository which would become an optional additional input to nixpkgs.
+This could be done via an extra `fetchTarball`, possibly a (somehow synced) channel or, in the presence of experimental features, a flake input.
+
+####  Drawbacks
+
+- This would be a truly breaking change to nixpkgs user interface:
+  Either an additional input would need to be provided or fetched (which wouldn't interact well with restrict-eval).
+
+- Generated code becomes a second class as the extra input would need to be optional for this reason.
+  This is problematic for central packages that use code generation already today (pandoc, cachix, …).
+
+- Similar Bootstrapping problems as the other alternative below: new generated code needs nixpkgs and a previous version of the generated code.
+
+- `builtins.fetch*` is a nuisance to deal with at the moment and would probably need to be improved to make this work.
+  E.g. gcrooting this evaluation only dependency could prove tricky without changes to Nix.
+
+- Extra bureaucracy would be involved with updating the generated repository and the reference to it in nixpkgs.
+  Additionally, special support in CI would be required for this.
+
+### Nixpkgs itself becomes a derivation output
+
+This alternative implementation was proposed by @L-as at the meeting.
+The idea is that nixpkgs would become a derivation that builds a “regular” nixpkgs source tree by augmenting files available statically with code generation.
+
+The upside of this would be that there would only be one instance of IFD that can ever happen, namely when the source tree is built.
+The produced store path then would require no IFD, and it would be obvious what relates to IFD and what doesn't.
+
+In practice, IFD would not be necessary for users of nixpkgs if we can design a mechanism that allows the dynamically produced nixpkgs source tree to be used as a channel.
+Then the IFD would only need to be executed when working on nixpkgs.
+
+#### Drawbacks
+
+- This approach creates a bootstrapping problem for the entirety of nixpkgs, not just for the IFD parts.
+  It would be necessary to build the new nixpkgs source tree using an old version of the nixpkgs source tree.
+  This could either be done using a fixed “nixpkgs bootstrap tarball” which occasionally needs to be bumped manually as code generation tools require newer dependencies, or by pulling in the latest nixpkgs source tree produced by e.g. Hydra.
+  The latter approach of course runs the risk of getting stuck at a bad nixpkgs revision which is unable to build the next ones fixing the problem.
+
+- Working on nixpkgs may involve more friction: It'd require a bootstrap nixpkgs to be available and executing the IFD for the nixpkgs source tree, likely involving hundreds of derivations.
+
+- Hydra jobsets would need to be sequenced: First the new nixpkgs source tree would need to be built before it can be passed on to the regular `nixpkgs:trunk`, `nixos:trunk-combined` etc. jobsets.
+
+- Channel release would change significantly: Instead of having a nixpkgs git revision from which a channel tarball is produced (mostly by adding version information to the tree), a checkout of nixpkgs would produce a store path from which the channel tarball would be produced.
+  This could especially pose a problem for the experimental Flakes feature which currently (to my knowledge) assumes that inputs are git repositories.
+
+## Import from derivation
+
+Even if we store the generated sources outside of tree, we are still doing the tedious work of semi-manually remaining a build cache (this time of Nix code).
+Isn't that what Nix itself is for!
+
+"import from derivation" is a technique where Nix code can simply import the result of a build, with no vendoring generated code in-tree or out-of-tree needed.
+
+There are a number of implementation issues with it, however, that means we can't simply enable it on `hydra.nixos.org` today.
+We have some "low tech" mitigations that were the original body of this RFC,
+but they still require changing tools (Hydra), which adds latency and risk to the project.
+
+## Reaching developers, more broadly
+
+This proposal is far from the final decision on how language-specific ecosystems packages should be dealt with.
+I make no predictions for the far future, it is possible we will eventually land on something completely different.
+
+However, I think this RFC will help us reach a very big milestone where the `lang2nix` ecosystem and Nixpkgs will both be talking to each other a bit better, not just Nixpkgs saying things but not listening to a chaotic and disorganized `lang2nix` ecosystem.
+This culture shift I think will be the main and most important legacy of this RFC.
+
+A lot of developers come to the Nix ecosystem, and find that the tools work great for sysadmin-y or power-user-y things (NixOS, home-manager, etc.) but the development experience is not nearly as clearly better than using language-specific tools in comparison.
+(I prefer it, but the tradeoffs are very complex.)
+With the new both-ways communication described above, I think we'll have a huge leg up in refining best practices so that ultimately we have better developement workflows, and retain these people better.
+
+The developers I am most eager to reach are those of major upstream projects
 In turn, I hope these upstream packages and ecosystems might even care about packaging and integration of the sort that we do.
 This would create a virtuous cycle where Nix is easier to use by more people, and Nixpkgs is easier to maintain as upstream packages better match our values.
-
-The most important future work is not technical, but being able to win upstream developer hearts and minds better than before, because ultimately distribution's live and die by upstream's decisions.
+Instead of a situation where distros and upstream projects don't really like each other, we might end up with a situation where they all get along via Nix.
