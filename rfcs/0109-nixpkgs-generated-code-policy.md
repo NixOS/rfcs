@@ -99,7 +99,7 @@ But given the general level of concern over the sustainability of Nixpkgs, I thi
 # Alternatives
 [alternatives]: #alternatives
 
-None at this time, we had other ideas but they are reframed as future work.
+None at this time, we had other ideas but they are reframed as possible future work.
 The one proposed here is unquestionably the most conservative one, and basically a prerequisite of all the others.
 
 # Unresolved questions
@@ -110,7 +110,7 @@ None at this time.
 # Future work
 [future]: #future-work
 
-## Vendor generated code "out of tree"
+## A possible 2nd step: Vendor generated code "out of tree"
 
 The first issue that remains after this RFC is generated code still bloats the Nixpkgs history.
 It would be nice to get it "out of tree" (outside the Nixpkgs repo) so this is no longer the case.
@@ -119,7 +119,7 @@ In our shepherd discussions we had two ideas for how this might proceed.
 It was tempting to go straight to proposing one of these as part of the RFC proper,
 but they both contained enough hard-to-surmount issues that we figured it was better to start something more conservative first.
 
-### Dump in other repo and fetch it
+### Alternative 1: Dump in other repo and fetch it
 
 We could opt to offload all generated code into a separate repository which would become an optional additional input to nixpkgs.
 This could be done via an extra `fetchTarball`, possibly a (somehow synced) channel or, in the presence of experimental features, a flake input.
@@ -140,7 +140,7 @@ This could be done via an extra `fetchTarball`, possibly a (somehow synced) chan
 - Extra bureaucracy would be involved with updating the generated repository and the reference to it in nixpkgs.
   Additionally, special support in CI would be required for this.
 
-### Nixpkgs itself becomes a derivation output
+### Alternative 2: Nixpkgs itself becomes a derivation output
 
 This alternative implementation was proposed by @L-as at the meeting.
 The idea is that nixpkgs would become a derivation that builds a “regular” nixpkgs source tree by augmenting files available statically with code generation.
@@ -165,7 +165,7 @@ Then the IFD would only need to be executed when working on nixpkgs.
 - Channel release would change significantly: Instead of having a nixpkgs git revision from which a channel tarball is produced (mostly by adding version information to the tree), a checkout of nixpkgs would produce a store path from which the channel tarball would be produced.
   This could especially pose a problem for the experimental Flakes feature which currently (to my knowledge) assumes that inputs are git repositories.
 
-## Import from derivation
+## A possible 3rd step: Import from derivation
 
 Even if we store the generated sources outside of tree, we are still doing the tedious work of semi-manually remaining a build cache (this time of Nix code).
 Isn't that what Nix itself is for!
