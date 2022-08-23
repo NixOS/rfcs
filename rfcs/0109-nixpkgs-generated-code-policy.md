@@ -42,6 +42,9 @@ In short, we should apply the same level of rigour that we do for packages thems
 2. Implement script(s) for maintainers which automatically builds these derivations and vendors their results to the appropriate places.
    Running such scripts should be sufficient to regenerated all generated code in Nixpkgs.
 
+   Greenfield tooling should not be merged unless it complies with the policy from day one.
+   Existing non-compliant tooling doesn't need to be ripped out of Nixpkgs, but the "grace period" in which is brought to compliance should be bounded.
+
 3. Ensure via CI that the vendored generated code is exactly what running the scripts produce.
    This check should be one of the "channel blocking" CI jobs.
 
@@ -52,10 +55,17 @@ In short, we should apply the same level of rigour that we do for packages thems
 
 Many `lang2nix`-type tools have impure steps today.
 Since these tools must be only invoked inside the derivations to generate code, the impure inputs must be gotten via fixed output derivations.
-This might require changes to those tools
+This might require changes to those tools to separate the pure work from the impuire gather steps.
 
-Updating fixed output hashes and similar however is perfectly normal and not affected by this RFC.
-The updates can be performed by hand, or with update bots like today.
+Additionally, as @7c6f434c point out, some upstream tooling thinks it is being pure, but the "lock files" (or similar) pinning mechanism it provides isn't up to the task for Nix's purposes.
+Quicklisp, for example, uses a "weird mix of MD5 constraints and SHA1 constraints" that isn't really up to the task.
+Another example would be using git commit hashes, which, since we don't want to download the whole history, are not good enough on their own.
+
+A concrete example of a change that would bring such tooling into compliance is via "prefetching" to build a map of insufficient upstream-tool keys (say a pair of a name and lousy hash) to higher quality hashes for fixed output derivations.
+The prefetching step would be run impurely but do as little work as possible, and the remaining bulk of the work would be done purely in derivations.
+
+Updating fixed output hashes and similar --- including running such a prefetch script as described above --- however, is perfectly normal and not affected by this RFC.
+Such updates, as opposed to regenerations of Nix code, can be performed by hand, or with update bots like today.
 The update bots would just need to learn to run the regeneration script (or risk failing CI because the vendored generated code is caught as being out of date).
 
 ## Idempotency and bootstrapping
@@ -107,7 +117,7 @@ The plan proposed here is unquestionably the most conservative one, and basicall
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-None at this time.
+How long should the "grace period" be for bringing existing tooling into compliance be?
 
 # Future work
 [future]: #future-work
@@ -177,6 +187,15 @@ Isn't that what Nix itself is for!
 There are a number of implementation issues with it, however, that means we can't simply enable it on `hydra.nixos.org` today.
 We have some "low tech" mitigations that were the original body of this RFC,
 but they still require changing tools (Hydra), which adds latency and risk to the project.
+
+## Getting upstream tools to agree on how to pin source code
+
+A source of frustration outlined in the [Impurities](#impurities) section is when upstream tools think they are pinning exactly dependencies down, but nonetheless do so in a way that isn't good enough for our purposes.
+A long standing goal of mine is to try to communicate these concerns back upstream, and nudge everyone agreeing on a common definition of what a pinned deps looks like.
+
+I think policies such as this RFC proposes will allow us to get our `lang2nix` infrastructure in a more state not only more legible to ourselves (Nix users and contributors) but also upstream developers who won't want to spend too long investigating what exactly our requirements are.
+That will make such concerns easier to communicate, and I think unlock the gradual convergence on a standard.
+That's the hope at least!
 
 ## Reaching developers, more broadly
 
