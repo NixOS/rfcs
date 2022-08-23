@@ -99,8 +99,10 @@ But given the general level of concern over the sustainability of Nixpkgs, I thi
 # Alternatives
 [alternatives]: #alternatives
 
-None at this time, we had other ideas but they are reframed as possible future work.
-The one proposed here is unquestionably the most conservative one, and basically a prerequisite of all the others.
+No good this time, we had other ideas but they are reframed as *possible* future work.
+It is unclear which of the alternative "2nd steps" is better, or whether we ought to try to jump ahead straight to the "3rd step".
+
+The plan proposed here is unquestionably the most conservative one, and basically a prerequisite of all the others --- a first step no matter what we plan to do afterwords.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
