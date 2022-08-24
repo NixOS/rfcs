@@ -29,7 +29,7 @@ All these mean that potential users coming from this new model of development fi
 
 The lowest hanging fruit is to systematize our generated code.
 We should ensure anyone can update the generated code, which means it should be built in derivations not some ad-hoc way.
-In short, we should apply the same level of rigour that we do for packages themselves to generate code.
+In short, we should apply the same level of rigour that we do for packages themselves to generated code.
 
 # Detailed design
 [design]: #detailed-design
@@ -193,7 +193,7 @@ but they still require changing tools (Hydra), which adds latency and risk to th
 A source of frustration outlined in the [Impurities](#impurities) section is when upstream tools think they are pinning exactly dependencies down, but nonetheless do so in a way that isn't good enough for our purposes.
 A long standing goal of mine is to try to communicate these concerns back upstream, and nudge everyone agreeing on a common definition of what a pinned deps looks like.
 
-I think policies such as this RFC proposes will allow us to get our `lang2nix` infrastructure in a more state not only more legible to ourselves (Nix users and contributors) but also upstream developers who won't want to spend too long investigating what exactly our requirements are.
+I think policies such as this RFC proposes will allow us to get our `lang2nix` infrastructure in a state not only more legible to ourselves (Nix users and contributors) but also to upstream developers who won't want to spend too long investigating what exactly our requirements are.
 That will make such concerns easier to communicate, and I think unlock the gradual convergence on a standard.
 That's the hope at least!
 
