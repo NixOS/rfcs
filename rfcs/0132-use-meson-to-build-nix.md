@@ -123,7 +123,7 @@ Questions that deserve further inquiry:
 # Future work
 [future]: #future-work
 
-- Deprecate the quasi-autotools script set
+- Deprecate the current build scripts
 - Backport the new build system to Nix 2.3
   - It was the latest release without Flakes support; it is important to
     bring such a deep modification to it.
