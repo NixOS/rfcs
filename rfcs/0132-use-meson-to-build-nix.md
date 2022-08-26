@@ -88,6 +88,10 @@ Some possible drawbacks:
     projects ranging from DOSBox Staging and mpv to GNOME and Xorg; therefore it
     is already included in many package managers' databases
 
+- The transition between between the old and new build systems should be smooth
+  - A wrapper script, maybe?
+  + Meson is not an obscure project; a mere documentation update should suffice
+
 # Alternatives
 [alternatives]: #alternatives
 
@@ -115,8 +119,6 @@ Questions that deserve furtehr inquiry:
 
 - Unexpected interactions with Meson and Ninja
   - Specially, vendoring and reproducibility.
-- Smooth the transition between the old and new build systems
-  - A wrapper script, maybe?
 
 # Future work
 [future]: #future-work
