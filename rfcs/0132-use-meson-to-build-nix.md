@@ -18,11 +18,12 @@ Nix.
 [motivation]: #motivation
 
 Currently, the reference implementation of Nix evaluator and its companion
-toolset generated from the Nix source tree are built using an autotools-like
-script.
+toolset generated from the Nix source tree are built using the typical
+`./configure` shell script that relies on autoconf and the standard GNU Make
+utility.
 
-This quasi-autotools script became clunky and plastered, and consequently hard
-to understand, modify, improve and port to other systems besides Linux.
+This build system became clunky and plastered, and consequently hard to
+understand, modify, improve and port to other systems besides Linux.
 
 Such state of things hinders development, specially outside the Linux and NixOS
 niches.
