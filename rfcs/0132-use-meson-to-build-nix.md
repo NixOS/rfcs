@@ -97,11 +97,16 @@ The alternatives are
 
   It would keep the current code confusing and harder to work with.
   
-- Other building systems (cmake, waf, scons etc.)
+- Other building systems (cmake, waf, premake etc.)
   - Their strenghts and weaknesses should be evaluated.
-    - Tools like waf and scons are strongly discouraged, because they are tied
-      to other programming languages, bringing the bootstrap concerns already
-      discussed above.
+    - Tools strongly tied to other programming languages are strongly
+      discouraged, because they further complexifies the bootstrap route as
+      discussed above. Namely, waf is basically a Python libraries, whereas
+      premake is a Lua library.
+    - Cmake has many noteworthy advantages:
+      - Can generates Make- and Ninja-compatible scripts;
+      - Supports Windows NT
+      - Supports typical high level idiomatic constructions
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
