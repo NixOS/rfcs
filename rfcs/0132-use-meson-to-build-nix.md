@@ -1,5 +1,5 @@
 ---
-feature: use_meson_to_build_nix
+feature: meson_builds_nix
 start-date: 2022-08-25
 author: Anderson Torres
 co-authors: @p01arst0rm
