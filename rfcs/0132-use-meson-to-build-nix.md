@@ -115,7 +115,7 @@ The alternatives are
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-Questions that deserve furtehr inquiry:
+Questions that deserve further inquiry:
 
 - Unexpected interactions with Meson and Ninja
   - Specially, vendoring and reproducibility.
