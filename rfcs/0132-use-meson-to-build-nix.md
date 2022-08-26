@@ -11,45 +11,32 @@ related-issues:
 # Summary
 [summary]: #summary
 
-Use meson as an alternative build system for the reference implementation of
-Nix.
+Use meson as an alternative build system for the reference implementation of Nix.
 
 # Motivation
 [motivation]: #motivation
 
-Currently, the reference implementation of Nix evaluator and its companion
-toolset generated from the Nix source tree are built using the typical
-`./configure` shell script that relies on autoconf and the standard GNU Make
-utility.
+Currently, the reference implementation of Nix evaluator and its companion toolset generated from the Nix source tree are built using the typical `./configure` shell script that relies on autoconf and the standard GNU Make utility.
 
-This build system became clunky and plastered, and consequently hard to
-understand, modify, improve and port to other systems besides Linux.
+This build system became clunky and plastered, and consequently hard to understand, modify, improve and port to other systems besides Linux.
 
-Such state of things hinders development, specially outside the Linux and NixOS
-niches.
+Such state of things hinders development, specially outside the Linux and NixOS niches.
 
-In light of this, we propose a novel, from-scratch alternative build
-infrastructure.
+In light of this, we propose a novel, from-scratch alternative build infrastructure.
 
 We expect to accomplish, among other goals,
 
 - better code structuring
-- improved cross-platform support, especially in other programming environments,
-  including but not limited to Unix-like operating systems;
+- improved cross-platform support, especially in other programming environments, including but not limited to Unix-like operating systems;
 - shorter build times;
 - an overall improved user experience.
 
 # Detailed design
 [design]: #detailed-design
 
-A carefully crafted set of files written in Meson should be included in the Nix
-repository, in order to describe how to deploy the Nix repository, generating
-all the expected artifacts (command line tools, libraries, configuration files
-etc.)
+A carefully crafted set of files written in Meson should be included in the Nix repository, in order to describe how to deploy the Nix repository, generating all the expected artifacts (command line tools, libraries, configuration files etc.)
 
-This novel build infrastructure should be able to provide at least all the
-features already present on the current quasi-autotools implementation, possibly
-with a different user interface.
+This novel build infrastructure should be able to provide at least all the features already present on the current quasi-autotools implementation, possibly with a different user interface.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -66,27 +53,19 @@ Some possible drawbacks:
   
 - A new build system requires the developers become familiarized with it
   - Specially when this build system uses its own description language
-  + However, the Meson language is easy to grasp, specially for those
-    familiarized with Python, besides being well documented.
+  + However, the Meson language is easy to grasp, specially for those familiarized with Python, besides being well documented.
 
 - A new build system indirectly brings its own dependencies to the Nix project
   - In particular, the reference implementation of Meson is written in Python.
-  - Further, this reference implementation generates script files meant to be
-    consumed by Ninja, a tool written in C++ that acts like a Make replacement.
-  - This particular setting brings concerns about complexifying the bootstrap
-    route.
-  + Given that Nix is currently written in C++, we can assume a C++ compiler as 
-    part of such a bootstrap route.
-  + There are full-featured alternative tools that replace Meson and Ninja.
-    Namely, Muon and Samurai are implementations of Meson and Ninja that require
-    only a C compiler and a set of POSIX standard tools.
+  - Further, this reference implementation generates script files meant to be consumed by Ninja, a tool written in C++ that acts like a Make replacement.
+  - This particular setting brings concerns about complexifying the bootstrap route.
+  + Given that Nix is currently written in C++, we can assume a C++ compiler as part of such a bootstrap route.
+  + There are full-featured alternative tools that replace Meson and Ninja. 
+    + Namely, Muon and Samurai are implementations of Meson and Ninja that require only a C compiler and a set of POSIX standard tools.
 
 - A new build system would require new strategies from the end users
-  - In particular, package managers that deploy Nix for their respective
-    platforms
-  + However, Meson is nowadays a widespread tool, used in many open source
-    projects ranging from DOSBox Staging and mpv to GNOME and Xorg; therefore it
-    is already included in many package managers' databases
+  - In particular, package managers that deploy Nix for their respective platforms
+  + However, Meson is nowadays a widespread tool, used in many open source projects ranging from DOSBox Staging and mpv to GNOME and Xorg; therefore it is already included in many package managers' databases
 
 - The transition between between the old and new build systems should be smooth
   - A wrapper script, maybe?
@@ -103,10 +82,8 @@ The alternatives are
   
 - Other building systems (cmake, waf, premake etc.)
   - Their strenghts and weaknesses should be evaluated.
-    - Tools strongly tied to other programming languages are strongly
-      discouraged, because they further complexifies the bootstrap route as
-      discussed above. Namely, waf is basically a Python libraries, whereas
-      premake is a Lua library.
+    - Tools strongly tied to other programming languages are strongly discouraged, because they further complexifies the bootstrap route as discussed above.
+      - Namely, waf is basically a Python library, whereas premake is a Lua library.
     - Cmake has many noteworthy advantages:
       - Can generates Make- and Ninja-compatible scripts;
       - Supports Windows NT
@@ -125,5 +102,4 @@ Questions that deserve further inquiry:
 
 - Deprecate the current build scripts
 - Backport the new build system to Nix 2.3
-  - It was the latest release without Flakes support; it is important to
-    bring such a deep modification to it.
+  - It was the latest release without Flakes support; it is important to bring such a deep modification to it.
