@@ -26,7 +26,7 @@ In light of this, we propose a novel, from-scratch alternative build infrastruct
 
 We expect to accomplish, among other goals,
 
-- better code structuring
+- better code structuring;
 - improved cross-platform support, especially in other programming environments, including but not limited to Unix-like operating systems;
 - shorter build times;
 - an overall improved user experience.
@@ -52,8 +52,8 @@ Some possible drawbacks:
   + On the other hand, such changes are likely to improve the code base.
   
 - A new build system requires the developers become familiarized with it
-  - Specially when this build system uses its own description language
-  + However, the Meson language is easy to grasp, specially for those familiarized with Python, besides being well documented.
+  - Specially when this build system uses its own description language.
+  + However, Meson is well documented, and its language is easy to grasp, specially for those familiarized with Python.
 
 - A new build system indirectly brings its own dependencies to the Nix project
   - In particular, the reference implementation of Meson is written in Python.
@@ -85,9 +85,10 @@ The alternatives are
     - Tools strongly tied to other programming languages are strongly discouraged, because they further complexifies the bootstrap route as discussed above.
       - Namely, waf is basically a Python library, whereas premake is a Lua library.
     - Cmake has many noteworthy advantages:
-      - Can generates Make- and Ninja-compatible scripts;
-      - Supports Windows NT
-      - Supports typical high level idiomatic constructions
+      + Can generates Make- and Ninja-compatible scripts;
+      + Supports Windows NT;
+      + Supports typical high level idiomatic constructions;
+      - On the other hand, the language is arguably more complex.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
