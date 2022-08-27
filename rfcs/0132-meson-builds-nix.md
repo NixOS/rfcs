@@ -114,3 +114,11 @@ Questions that deserve further inquiry:
 - Deprecate the current build scripts
 - Backport the new build system to Nix 2.3
   - It was the latest release without Flakes support; it is important to bring such a deep modification to it.
+
+# References
+[references]: #references
+
+- [Current work in progress from @p01arst0rm](https://github.com/NixOS/nix/pull/3160)
+- [Muon](https://muon.build/), a C99 implementation of [Meson](https://meson.build/)
+- [Samurai](https://github.com/michaelforney/samurai), a C99 implementation of [Ninja](https://ninja-build.org/)
+- [Cmake](https://cmake.org/)
