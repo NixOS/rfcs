@@ -43,6 +43,14 @@ This novel build infrastructure should be able to provide at least all the featu
 
 Currently @p01arst0rm is writing an implementation from scratch.
 
+Some typical expected interactions are:
+
+- Configuring: `meson setup build_dir`
+- Building: `ninja -C build_dir` (or the backend-agnostic `meson -C build_dir compile`)
+- Installing: `ninja -C build_dir install` (or the backend-agnostic `meson -C build_dir install`)
+
+Usually, commandline options assume the format `-Dname=value`. This small change in user interface when compared to the typical `--name=value` is mostly harmless.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
