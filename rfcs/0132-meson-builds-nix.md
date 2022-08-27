@@ -64,8 +64,10 @@ Some possible drawbacks:
     + Namely, Muon and Samurai are implementations of Meson and Ninja that require only a C compiler and a set of POSIX standard tools.
 
 - A new build system would require new strategies from the end users
-  - In particular, package managers that deploy Nix for their respective platforms
-  + However, Meson is nowadays a widespread tool, used in many open source projects ranging from DOSBox Staging and mpv to GNOME and Xorg; therefore it is already included in many package managers' databases
+  - In particular, package managers that deploy Nix for their respective platforms.
+  + However, Meson and Ninja are nowadays a widespread toolset.
+    + Many open source projects use it, from mpv and dosbox-staging to Xorg and GNOME
+    + According to Repology, Meson is present in 53 package manager's families
 
 - The transition between between the old and new build systems should be smooth
   - A wrapper script, maybe?
