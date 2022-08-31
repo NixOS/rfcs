@@ -22,7 +22,7 @@ Over time, this build system has been modified to keep up with the development n
 
 In particular, many changes have been introduced that impact compatibility outside Linux and NixOS niches. These issues can hinder development on other platforms, including but not limited to Unix-like systems.
 
-In light of this state of things, propose a novel alternative to the current buildsystem infrastructure.
+In light of this state of things, we propose a novel alternative to the current building infrastructure.
 
 We expect to accomplish, among other goals,
 
