@@ -44,13 +44,16 @@ This novel building infrastructure should be able to provide at least feature pa
 
 Currently @p01arst0rm is writing an implementation from scratch.
 
-Some typical expected interactions are:
+Here is a table comparing some expected interactions:
 
-- Configuring: `meson setup build_dir`
-- Building: `ninja -C build_dir` (or the backend-agnostic `meson -C build_dir compile`)
-- Installing: `ninja -C build_dir install` (or the backend-agnostic `meson -C build_dir install`)
-
-Usually, commandline options assume the format `-Dname=value`. This small change in user interface when compared to the typical `--name=value` is mostly harmless.
+|----------------------|--------------------|------------------------------|
+| Action               | Current            | Meson                        |
+|----------------------|--------------------|------------------------------|
+| Configuring          | `./configure`      | `meson setup build_dir`      |
+| Building             | `make`             | `meson -C build_dir compile` |
+| Installing           | `make install`     | `meson -C build_dir install` |
+| Command-line Options | `--enable-gc=true` | `-Dgc=enabled`               |
+|----------------------|--------------------|------------------------------|
 
 # Drawbacks
 [drawbacks]: #drawbacks
