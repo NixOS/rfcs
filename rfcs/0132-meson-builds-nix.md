@@ -75,6 +75,7 @@ Some possible drawbacks:
   + Given that Nix is currently written in C++, we can assume a C++ compiler as part of such a bootstrap route.
   + There are full-featured alternative tools that replace Meson and Ninja. 
     + Namely, Muon and Samurai are implementations of Meson and Ninja that require only a C compiler and a set of POSIX standard tools.
+  + Autotools also have its own set of dependencies, and a fair comparison should include them
 
 - A new build system would require new strategies from the end users
   - In particular, package managers that deploy Nix for their respective platforms.
