@@ -11,12 +11,12 @@ related-issues:
 # Summary
 [summary]: #summary
 
-Use meson as an alternative build system for the reference implementation of Nix.
+Use meson as an alternative build system for Nix.
 
 # Motivation
 [motivation]: #motivation
 
-Currently, the reference implementation of Nix evaluator, as well as its companion toolset generated from the Nix source tree, is built using the typical `./configure` shell script that relies on autoconf, along with standard GNU Make utility.
+Currently, the Nix evaluator and its companion toolset generated from the Nix source tree are built using the typical `./configure` shell script that relies on autoconf, along with standard GNU Make utility.
 
 Over time, this build system has been modified to keep up with the development needs of Nix projec. However, it has reached a state where the build system became clunky and plastered, hard to understand and modify, consequently making improvements to the project as a whole very difficult.
 
