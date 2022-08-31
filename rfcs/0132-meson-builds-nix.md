@@ -102,10 +102,10 @@ The alternatives are
       - Namely, waf is basically a Python library, whereas premake is a Lua library.
     - Cmake has many noteworthy advantages:
       + Can generates Make- and Ninja-compatible scripts;
-      + Supports Windows NT and MacOS platforms
       + Supports typical high level idiomatic constructions;
       - On the other hand, cmake language is arguably more complex.
-      - Both Meson and Cmake support Apple Xcode and Microsoft MSVC project file formats
+      + Both Meson and Cmake support Microsoft Windows NT and Apple MacOS platforms;
+        + including project file formats of both MSVC and Xcode.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
