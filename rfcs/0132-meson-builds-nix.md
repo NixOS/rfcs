@@ -118,7 +118,11 @@ Questions that deserve further inquiry:
 # Future work
 [future]: #future-work
 
+- Update project's continuous integration and related stuff
 - Deprecate and remove the current quasi-autotools scripts
+  - Preferably, the removal should be allocated to a minor version release
+- Evaluate the positive and negative impacts of such a change
+  - Specially the most subjective ones
 
 # References
 [references]: #references
