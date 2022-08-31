@@ -131,3 +131,5 @@ Questions that deserve further inquiry:
 - [Muon](https://muon.build/), a C99 implementation of [Meson](https://meson.build/)
 - [Samurai](https://github.com/michaelforney/samurai), a C99 implementation of [Ninja](https://ninja-build.org/)
 - [Cmake](https://cmake.org/)
+- [Meson tutorial](https://mesonbuild.com/Porting-from-autotools.html) comparing autotools and Meson
+- [NetBSD tutorial](https://wiki.netbsd.org/pkgsrc/how_to_convert_autotools_to_meson/) comparing Meson and autotools
