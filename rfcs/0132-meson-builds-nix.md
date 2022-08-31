@@ -84,8 +84,7 @@ Some possible drawbacks:
     + According to Repology, Meson is present in 53 package manager's families
 
 - The transition between between the old and new build systems should be smooth
-  - A wrapper script, maybe?
-  + Meson is not an obscure project; a mere documentation update should suffice
+  + Meson is not an obscure project; a careful documentation update should be sufficient
 
 # Alternatives
 [alternatives]: #alternatives
