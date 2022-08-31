@@ -27,7 +27,7 @@ In light of this state of things, we propose a novel alternative to the current 
 We expect to accomplish, among other goals,
 
 - better code structuring and documentation;
-- improved cross-platform support, especially in other programming environments, including but not limited to Unix-like operating systems;
+- improved cross-platform support, especially outside NixOS and Linux programming environments
 - shorter build times;
 - improved unit testing;
 - an overall improved user experience.
