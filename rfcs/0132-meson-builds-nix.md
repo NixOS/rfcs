@@ -95,9 +95,10 @@ The alternatives are
 
   It would keep the current code confusing and harder to work with.
   
-- Other building systems (cmake, waf, premake etc.)
+- Other building systems (waf, premake, cmake etc.)
   - Their strenghts and weaknesses should be evaluated.
-    - Tools strongly tied to other programming languages are strongly discouraged, because they further complexifies the bootstrap route as discussed above.
+    - Tools strongly tied to other programming languages are strongly discouraged
+      - They complexify the bootstrap route as discussed above.
       - Namely, waf is basically a Python library, whereas premake is a Lua library.
     - Cmake has many noteworthy advantages:
       + Can generates Make- and Ninja-compatible scripts;
