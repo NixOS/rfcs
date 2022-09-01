@@ -127,9 +127,12 @@ Questions that deserve further inquiry:
 # References
 [references]: #references
 
-- [Current work in progress from @p01arst0rm](https://github.com/NixOS/nix/pull/3160)
-- [Muon](https://muon.build/), a C99 implementation of [Meson](https://meson.build/)
-- [Samurai](https://github.com/michaelforney/samurai), a C99 implementation of [Ninja](https://ninja-build.org/)
-- [Cmake](https://cmake.org/)
+- [Meson](https://meson.build/) official site
+  - [Muon](https://muon.build/), a C99 alternative implementation
+- [Ninja](https://ninja-build.org/) official site
+  - [Samurai](https://github.com/michaelforney/samurai), a C99 alternative implementation
+- [CMake](https://cmake.org/)
 - [Meson tutorial](https://mesonbuild.com/Porting-from-autotools.html) comparing autotools and Meson
 - [NetBSD tutorial](https://wiki.netbsd.org/pkgsrc/how_to_convert_autotools_to_meson/) comparing Meson and autotools
+
+- [Current work in progress from @p01arst0rm](https://github.com/NixOS/nix/pull/3160)
