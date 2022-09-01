@@ -27,9 +27,10 @@ In light of this state of things, we propose a novel alternative to the current 
 We expect to accomplish, among other goals,
 
 - better code structuring and documentation;
-- improved cross-platform support, especially outside NixOS and Linux programming environments
+- improved support across platforms, especially outside NixOS and Linux
 - shorter build times;
-- improved unit testing;
+- improved testing;
+- more reasonable dependency management;
 - an overall improved user experience.
 
 # Detailed design
