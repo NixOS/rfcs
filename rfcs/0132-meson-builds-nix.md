@@ -43,18 +43,54 @@ This novel building infrastructure should be able to provide at least feature pa
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-Currently @p01arst0rm is writing an implementation from scratch.
+Before the examples, some informative paragraphs:
+
+## What is Meson?
+
+Meson is an open source, multiplatform build system crafted to be fast, correct and user-friendly.
+
+According to its main site,
+
+> The main design point of Meson is that every moment a developer spends writing or debugging build definitions is a second wasted. So is every second spent waiting for the build system to actually start compiling code.
+
+Among its features, we highlight:
+
+- user-friendly non-Turing complete DSL
+  - very readable Python-esque syntax and functional, stateless semantics
+- multiplatform support
+  - among operating systems: Linux, Apple MacOS, Microsoft Windows NT
+  - among programming environments: GCC, Clang, Xcode, Visual Studio etc.
+  - among programming languages: C, C++, D, Fortran, Java, Rust etc.
+    - supports command customization
+  - cross compilation
+  - many useful modules included (pkg-config, filesystem inspection, internationalization etc.)
+- Comprehensive documentation
+  - including tutorials, reference manuals and real world projects using it
+
+## What is Ninja?
+
+Ninja is a small, speed-focused, build tool that fills a similar role of Unix `make` or GNU `gmake`.
+
+Its main feature is a low-level approach to build description. Where other build systems act like high level languages, Ninja acts like an assembly.
+
+Ninja is bare-bones and constrained by design, having only the necessary semantics to describe build dependency graphs, relegating decision-making to superior tools like Meson or CMake.
+
+Ninja DSL is human-readable, however it is not convenient to be manually written by human beings. As said before, Ninja is commonly used in tandem with other, higher-level build system.
+
+## Example interaction
 
 Here is a table comparing some expected interactions:
 
-|----------------------|--------------------|------------------------------|
-| Action               | Current            | Meson                        |
-|----------------------|--------------------|------------------------------|
-| Configuring          | `./configure`      | `meson setup build_dir`      |
-| Building             | `make`             | `meson -C build_dir compile` |
-| Installing           | `make install`     | `meson -C build_dir install` |
-| Command-line Options | `--enable-gc=true` | `-Dgc=enabled`               |
-|----------------------|--------------------|------------------------------|
+| Action    | Current                        | Meson+Ninja                          | Meson, backend-agnostic              |
+|-----------|--------------------------------|--------------------------------------|--------------------------------------|
+| Configure | `./configure --enable-gc=true` | `meson setup build_dir -Dgc=enabled` | `meson setup build_dir -Dgc=enabled` |
+| Build     | `make`                         | `ninja -C build_dir build`           | `meson -C build_dir compile`         |
+| Install   | `make install`                 | `ninja -C build_dir install`         | `meson -C build_dir install`         |
+| Uninstall | `make uninstall`               | `ninja -C build_dir unistall`        | `meson -C build_dir unistall`        |
+
+## Implementation
+
+Currently, @p01arst0rm is working on an implementation from scratch.
 
 # Drawbacks
 [drawbacks]: #drawbacks
