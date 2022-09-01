@@ -95,33 +95,50 @@ Currently, @p01arst0rm is working on an implementation from scratch.
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Some possible drawbacks:
+Below we will list some possible drawbacks and balances to them.
 
-- A new build system would require changes on the code
-  + On the other hand, such changes are likely to improve the code base.
-  
-- A new build system requires the developers become familiarized with it
-  - Specially when this build system uses its own description language.
-  + However, Meson is well documented, and its Python-esque language is easy to grasp.
+## Complexity and Bootstrap Issues
 
-- A new build system indirectly brings its own dependencies to the Nix project
-  - In particular, the reference implementation of Meson is written in Python.
-  - Further, this reference implementation generates script files meant to be consumed by Ninja.
-  - Ninja is a tool written in C++ that acts like a `make` replacement.
-  - This particular setting brings concerns about complexifying the bootstrap route.
-  + Given that Nix is currently written in C++, we can assume a C++ compiler as part of such a bootstrap route.
-  + There are full-featured alternative tools that replace Meson and Ninja. 
-    + Namely, Muon and Samurai are implementations of Meson and Ninja that require only a C compiler and a set of POSIX standard tools.
-  + Autotools also have its own set of dependencies, and a fair comparison should include them
+A new build system, and any build system for that matter, indirectly brings its own dependencies to the Nix project.
 
-- A new build system would require new strategies from the end users
-  - In particular, package managers that deploy Nix for their respective platforms.
-  + However, Meson and Ninja are a widespread toolset.
-    + Many open source projects use Meson, from mpv and dosbox-staging to Xorg and GNOME
-    + According to Repology, Meson is present in 53 package manager's families
+Ideally, such dependencies should be minimal, both in number and complexity, with extra good points for dependencies already present (e.g the ubiquitous C compiler).
 
-- The transition between between the old and new build systems should be smooth
-  + Meson is not an obscure project; a careful documentation update should be sufficient
+About this specific point, a non-negligible drawback is: the reference implementation of Meson is written in Python. At least theoretically, it brings the necessity of including a Python 3 interpreter on the _bootstrap route_ of Nix.
+
+However, some points can be laid out on the opposite side:
+
+1. By design, the meson reference evaluator depends only on Python, avoiding the use of extra libraries.
+2. Also by design, the implementation language is never exposed to the meson DSL. Because of it, the reimplementation of Meson in other programming languages becomes way more facilitated.
+   1. Indeed, Muon is an alternative implementation of Meson written in C.
+3. As part of this evaluation of this bootstrap route, we should also evaluate the current bootstrap route, in order to have a fair comparison.
+
+Further, in principle the same criticisms and answers can be laid out for Ninja; however, Ninja is written in C++, a language already used to implement Nix. Therefore the bootstrap route suffers little to no alteration here.
+
+## Learning the new system
+
+A somewhat subjective but important and non-negligible issue is the barrier of entrance of this new build system.
+
+Paraphasing Eelco Dolstra, switching from a known build system to one unknown is not without its problems.
+
+However, the Meson development team strives to keep the DSL easy to learn and pleasurable to use. It should not be hard to become familiar with the Python-esque syntax of meson, and its functional, stateless approach is certainly something very appreciated by the Nix community as a whole.
+
+The huge advantages of implementing Meson surpass the small drawbacks of learning it.
+
+## Source code changes
+
+Further to the obvious inclusion of meson files (and the removal of the old quasi-autotools ones), there is a reasonable expectation of code refactoring.
+
+However, such refactorings are completely validated on the long term goals of Nix, in particular the improvements on portability.
+
+## End users
+
+The most known end user of Nix is certainly Nixpkgs. However, there are many other Linux distributions that already keep Nix on their repositories (15 families, according to Repology). There is also a reasonable expectation of affecting those package managers' devteams.
+
+However, most (if not all) of those distributions already have Meson and its companion tool Ninja in their respective package databases (53 families, according to Repology), given that many open source tools use them as build system.
+
+## Transition between old and new build infrastructure
+
+The transition between between the old and new build systems should be as smooth and controlled as possible.
 
 # Alternatives
 [alternatives]: #alternatives
