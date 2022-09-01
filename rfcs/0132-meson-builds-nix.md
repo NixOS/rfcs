@@ -145,21 +145,29 @@ The transition between between the old and new build systems should be as smooth
 
 The alternatives are
 
-- Doing nothing
+- Do nothing
 
-  It would keep the current code confusing and harder to work with.
-  
-- Other building systems (waf, premake, cmake etc.)
-  - Their strenghts and weaknesses should be evaluated.
-    - Tools strongly tied to other programming languages are strongly discouraged
-      - They complexify the bootstrap route as discussed above.
-      - Namely, waf is basically a Python library, whereas premake is a Lua library.
-    - Cmake has many noteworthy advantages:
-      + Can generates Make- and Ninja-compatible scripts;
-      + Supports typical high level idiomatic constructions;
-      - On the other hand, cmake language is arguably more complex.
-      + Both Meson and Cmake support Microsoft Windows NT and Apple MacOS platforms;
-        + including project file formats of both MSVC and Xcode.
+  It would keep the current code confusing and harder to work with, as stated on the motivation section.
+
+- Use CMake
+
+  Indeed, CMake has many noteworthy advantages:
+
+  - Supports typical high level idiomatic constructions.
+  - Can generate GNU Make- and Ninja-compatible scripts.
+    - By design, Meson does not have a Make backend.
+  - Both Meson and CMake support Microsoft Windows NT and Apple MacOS platforms
+    - As well as MSVC and XCode.
+
+  - On the other hand, CMake DSL cmake language is arguably more complex and cumbersome.
+
+- Evaluate other building systems (waf, premake, cmake etc.)
+
+  About this, a principle should be observed:
+
+  Per the bootstrap route issue discussed above, build tools strongly tied to other programming languages are strongly discouraged.
+
+  E.g. waf is basically a Python library, whereas premake is a Lua library. They can't reasonable be decoupled of their implementation languages.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
