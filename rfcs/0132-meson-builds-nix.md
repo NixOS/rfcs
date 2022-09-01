@@ -36,7 +36,7 @@ We expect to accomplish, among other goals,
 # Detailed design
 [design]: #detailed-design
 
-A carefully crafted set of Meson files should be included in the Nix repository, providing a description on how to deploy the Nix repository, generating all the expected artifacts (command line tools, libraries, configuration files etc.)
+A carefully crafted set of Meson files should be included in order to describe how to deploy the Nix repository, generating all the expected artifacts (command line tools, libraries, configuration files, documentation etc.)
 
 This novel building infrastructure should be able to provide at least feature parity with the current quasi-autotools implementation, albeit in a different user interface.
 
