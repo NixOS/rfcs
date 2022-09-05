@@ -116,11 +116,9 @@ Further, in principle the same criticisms and answers can be laid out for Ninja;
 
 ## Learning the new system
 
-A somewhat subjective but important and non-negligible issue is the barrier of entrance of this new build system.
+A somewhat subjective but non-negligible issue is the entry barrier of this new build system. Switching from a known build system to one unknown is not without its problems.
 
-Paraphasing Eelco Dolstra, switching from a known build system to one unknown is not without its problems.
-
-However, the Meson development team strives to keep the DSL easy to learn and pleasurable to use. It should not be hard to become familiar with the Python-esque syntax of meson, and its functional, stateless approach is certainly something very appreciated by the Nix community as a whole.
+However, the Meson development team strives to keep the DSL easy to learn and pleasurable to use. It should not be hard to become familiar with the Python-esque syntax of meson, and its functional, stateless approach is certainly a feature highly appreciated by the Nix community as a whole.
 
 The huge advantages of implementing Meson surpass the small drawbacks of learning it.
 
@@ -134,7 +132,7 @@ However, such refactorings are completely validated on the long term goals of Ni
 
 The most known end user of Nix is certainly Nixpkgs. However, there are many other Linux distributions that already keep Nix on their repositories (15 families, according to Repology). There is also a reasonable expectation of affecting those package managers' devteams.
 
-However, most (if not all) of those distributions already have Meson and its companion tool Ninja in their respective package databases (53 families, according to Repology), given that many open source tools use them as build system.
+However, most (if not all) of those distributions already have Meson and its companion tool Ninja in their respective package databases (53 families, according to Repology), given that many open source projects use them as build system.
 
 ## Transition between old and new build infrastructure
 
@@ -161,13 +159,13 @@ The alternatives are
 
   - On the other hand, CMake DSL cmake language is arguably more complex and cumbersome.
 
-- Evaluate other building systems (waf, premake, cmake etc.)
+- Evaluate other building systems (waf, premake, etc.)
 
   About this, a principle should be observed:
 
   Per the bootstrap route issue discussed above, build tools strongly tied to other programming languages are strongly discouraged.
 
-  E.g. waf is basically a Python library, whereas premake is a Lua library. They can't reasonable be decoupled of their implementation languages.
+  E.g. waf is basically a Python library, whereas premake is a Lua library. They can't be decoupled of their implementation languages.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
