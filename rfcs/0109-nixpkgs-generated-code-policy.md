@@ -3,7 +3,7 @@ feature: nixpkgs-generated-code-policy
 start-date: 2021-10-12
 author: John Ericson (@Ericson2314)
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: @L-as @grahamc @sternenseemann
+shepherd-team: @L-as @sternenseemann @tomberek @DavHau
 shepherd-leader: @sternenseemann
 related-issues: (will contain links to implementation PRs)
 ---
