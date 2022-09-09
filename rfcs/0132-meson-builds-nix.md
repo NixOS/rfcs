@@ -152,10 +152,10 @@ The alternatives are
   Indeed, CMake has many noteworthy advantages:
 
   - Supports typical high level idiomatic constructions.
-  - Can generate GNU Make- and Ninja-compatible scripts.
-    - By design, Meson does not have a Make backend.
+  - Can generate GMake- and Ninja-compatible scripts.
+    - By design, Meson does not provide a Make backend.
   - Both Meson and CMake support Microsoft Windows NT and Apple MacOS platforms
-    - As well as MSVC and XCode.
+    - As well as MSVC and XCode programming environments.
 
   - On the other hand, CMake DSL cmake language is arguably more complex and cumbersome.
 
