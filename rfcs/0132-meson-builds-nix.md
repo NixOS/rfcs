@@ -191,8 +191,9 @@ Questions that deserve further inquiry:
   - [Muon](https://muon.build/), a C99 alternative implementation
 - [Ninja](https://ninja-build.org/) official site
   - [Samurai](https://github.com/michaelforney/samurai), a C99 alternative implementation
-- [CMake](https://cmake.org/)
 - [Meson tutorial](https://mesonbuild.com/Porting-from-autotools.html) comparing autotools and Meson
 - [NetBSD tutorial](https://wiki.netbsd.org/pkgsrc/how_to_convert_autotools_to_meson/) comparing Meson and autotools
+- [CMake](https://cmake.org/)
+- [Xmake](https://xmake.io/)
 
 - [Current work in progress from @p01arst0rm](https://github.com/NixOS/nix/pull/3160)
