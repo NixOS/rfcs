@@ -159,7 +159,7 @@ The alternatives are
 
   - On the other hand, CMake DSL cmake language is arguably more complex and cumbersome.
 
-- Evaluate other building systems (waf, premake, etc.)
+- Evaluate other building systems (waf, premake, bazel, xmake etc.)
 
   About this, a principle should be observed:
 
