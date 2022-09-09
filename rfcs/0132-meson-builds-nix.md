@@ -36,13 +36,6 @@ We expect to accomplish, among other goals,
 # Detailed design
 [design]: #detailed-design
 
-A carefully crafted set of Meson files should be included in order to describe how to deploy the Nix repository, generating all the expected artifacts (command line tools, libraries, configuration files, documentation etc.)
-
-This novel building infrastructure should be able to provide at least feature parity with the current quasi-autotools implementation, albeit in a different user interface.
-
-# Examples and Interactions
-[examples-and-interactions]: #examples-and-interactions
-
 Before the examples, some informative paragraphs:
 
 ## What is Meson?
@@ -69,13 +62,20 @@ Among its features, we highlight:
 
 ## What is Ninja?
 
-Ninja is a small, speed-focused, build tool that fills a similar role of Unix `make` or GNU `gmake`.
+Ninja is a small, speed-focused build tool that fills a similar role of Unix `make` or its GNU counterpart `gmake`.
 
-Its main feature is a low-level approach to build description. Where other build systems act like high level languages, Ninja acts like an assembly.
+Its main feature is a low-level approach to build description. Ninja is bare-bones and constrained by design, having only the necessary semantics to describe build dependency graphs, relegating decision-making to superior tools like Meson or CMake. Where other build systems act like high level languages, Ninja acts like an assembly.
 
-Ninja is bare-bones and constrained by design, having only the necessary semantics to describe build dependency graphs, relegating decision-making to superior tools like Meson or CMake.
+Albeit Ninja DSL is human-readable, it is not convenient to be manually written by human beings. As said before, Ninja is commonly used in tandem with other, higher-level build system in a two-pass fashion. In our present use case, the Meson interpreter converts Meson files to Ninja files that will be consumed by Ninja tool to effectively execute the building/deployment commands.
 
-Ninja DSL is human-readable, however it is not convenient to be manually written by human beings. As said before, Ninja is commonly used in tandem with other, higher-level build system.
+## Design
+
+A carefully crafted set of Meson files should be included in order to describe how to deploy the Nix repository, generating all the expected artifacts (command line tools, libraries, configuration files, documentation etc.)
+
+This novel building infrastructure should be able to provide at least feature parity with the current quasi-autotools implementation, albeit in a different user interface.
+
+# Examples and Interactions
+[examples-and-interactions]: #examples-and-interactions
 
 ## Example interaction
 
