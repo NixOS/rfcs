@@ -163,7 +163,7 @@ The alternatives are
 
   Per the bootstrap route issue discussed above, build tools strongly tied to other programming languages are strongly discouraged.
 
-  E.g. waf is basically a Python library, whereas premake is a Lua library. They can't be decoupled of their implementation languages.
+  E.g. waf is basically a Python library, whereas premake and xmake are Lua libraries. They can't be decoupled of their implementation languages.
 
 - Use Bazel
 
