@@ -165,6 +165,23 @@ The alternatives are
 
   E.g. waf is basically a Python library, whereas premake is a Lua library. They can't be decoupled of their implementation languages.
 
+- Use Bazel
+
+  For the sake of completeness, there is Bazel.
+
+  Advantages:
+
+  - Fast, scalable, multi-language and extensible.
+  - Backed by Google(TM).
+
+  Disadvantages:
+
+  - [Not fully open source yet](https://bazel.build/about/faq#are_you_done_open_sourcing_bazel)
+  - Written in Java
+    - Java bootstrap is fairly complex and completely dependent on _open-source abandonware_, as demonstrated by [Bootstrappable](https://bootstrappable.org/projects/java.html) project.
+    - At the time there is no alternative implementation of Bazel in another language.
+  - Backed by Google(TM).
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
