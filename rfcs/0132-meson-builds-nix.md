@@ -36,8 +36,6 @@ We expect to accomplish, among other goals,
 # Detailed design
 [design]: #detailed-design
 
-Before the examples, some informative paragraphs:
-
 ## What is Meson?
 
 Meson is an open source, multiplatform build system crafted to be fast, correct and user-friendly.
