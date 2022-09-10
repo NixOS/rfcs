@@ -208,7 +208,9 @@ Questions that deserve further inquiry:
   - [Samurai](https://github.com/michaelforney/samurai), a C99 alternative implementation
 - [Meson tutorial](https://mesonbuild.com/Porting-from-autotools.html) comparing autotools and Meson
 - [NetBSD tutorial](https://wiki.netbsd.org/pkgsrc/how_to_convert_autotools_to_meson/) comparing Meson and autotools
+- [Boostrappable Builds](https://bootstrappable.org/)
 - [CMake](https://cmake.org/)
 - [Xmake](https://xmake.io/)
+- [Bazel](https://bazel.build)
 
 - [Current work in progress from @p01arst0rm](https://github.com/NixOS/nix/pull/3160)
