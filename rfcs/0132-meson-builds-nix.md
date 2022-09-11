@@ -167,11 +167,12 @@ The alternatives are
 
 - Use Bazel
 
-  For the sake of completeness, there is Bazel.
+  For the sake of completeness, there is Bazel, a Google(TM)-backed build system that sells itself as "fast, scalable, multi-language and extensible".
 
   Advantages:
 
   - Fast, scalable, multi-language and extensible.
+    - Your mileage may vary.
   - Backed by Google(TM).
 
   Disadvantages:
