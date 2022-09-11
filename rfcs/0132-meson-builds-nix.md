@@ -47,9 +47,9 @@ According to its main site,
 Among its features, we highlight:
 
 - user-friendly non-Turing complete DSL
-  - very readable Python-esque syntax and functional, stateless semantics
+  - Python-esque syntax and functional, stateless semantics
 - multiplatform support
-  - among operating systems: Linux, Apple MacOS, Microsoft Windows NT
+  - among operating systems: Linux, *BSD, Apple MacOS, Microsoft Windows NT
   - among programming environments: GCC, Clang, Xcode, Visual Studio etc.
   - among programming languages: C, C++, D, Fortran, Java, Rust etc.
     - supports command customization
