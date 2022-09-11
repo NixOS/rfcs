@@ -106,11 +106,11 @@ About this specific point, a non-negligible drawback is: the reference implement
 However, some points can be laid out on the opposite side:
 
 1. By design, the meson reference evaluator depends only on Python, avoiding the use of extra libraries.
-2. Also by design, the implementation language is never exposed to the meson DSL. Because of it, the reimplementation of Meson in other programming languages becomes way more facilitated.
+2. Also by design, the implementation language is never exposed to the meson DSL. It allows the possibility of implementating alternative evaluators in other programming languages.
    1. Indeed, Muon is an alternative implementation of Meson written in C.
 3. As part of this evaluation of this bootstrap route, we should also evaluate the current bootstrap route, in order to have a fair comparison.
 
-Further, in principle the same criticisms and answers can be laid out for Ninja; however, Ninja is written in C++, a language already used to implement Nix. Therefore the bootstrap route suffers little to no alteration here.
+In principle, the same criticisms and answers can be laid out for Ninja too; however, Ninja is written in C++, a language already used to implement Nix. Therefore the bootstrap route suffers little to no alteration here.
 
 ## Learning the new system
 
