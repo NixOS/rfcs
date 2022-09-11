@@ -84,7 +84,7 @@ Here is a table comparing some expected interactions:
 | Configure | `./configure --enable-gc=true` | `meson setup build_dir -Dgc=enabled` | `meson setup build_dir -Dgc=enabled` |
 | Build     | `make`                         | `ninja -C build_dir build`           | `meson -C build_dir compile`         |
 | Install   | `make install`                 | `ninja -C build_dir install`         | `meson -C build_dir install`         |
-| Uninstall | `make uninstall`               | `ninja -C build_dir unistall`        | `meson -C build_dir unistall`        |
+| Uninstall | `make uninstall`               | `ninja -C build_dir uninstall`        | `meson -C build_dir uninstall`        |
 
 ## Implementation
 
