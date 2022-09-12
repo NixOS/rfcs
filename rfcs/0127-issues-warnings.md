@@ -69,7 +69,7 @@ There are two ways issues interact with the removal of packages: Either they get
 
 ### Propagation across transitive dependencies
 
-When a package that is depended on has an issue, all packages that depend on it will fail to evaluate until that package is ignored or the issue resolved. Sometimes, this is sufficient.
+When a package has an issue, all packages that depend on it will fail to evaluate until that package is ignored or the issue resolved. Sometimes, this is sufficient.
 
 When the issue requires actions on dependents however, it does not sufficiently inform about all packages that need action. Marking all dependents with that issue is not a good idea either though: it would require users to go through some potentially long dependency chains. Instead, only applications, leaf packages or packages with very few dependents should get the issue.
 
