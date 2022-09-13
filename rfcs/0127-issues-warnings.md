@@ -13,7 +13,7 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/177272
 ## Summary
 [summary]: #summary
 
-Inspired by the derivation checks for broken and insecure packages, a new system called "warnings" is introduced. It is planned to eventually replace the previously mentioned systems, as well as the current "warnings" (which currently only prints a trace message for unmaintained packages). `meta.issues` is added to derivations, which can be used to let the evaluation of individual packages fail with a custom message. This will then be used to warn users about packages that are in need of maintenance. Packages that have an open issue for a long time should eventually be removed, although doing so is not part of the RFC.
+Inspired by the derivation checks for broken and insecure packages, a new system called "warnings" is introduced. It is planned to eventually replace the previously mentioned systems, as well as the current – undocumented – "warnings" (which currently only prints a trace message for unmaintained packages). `meta.issues` is added to derivations, which can be used to let the evaluation of individual packages fail with a custom message. This will then be used to warn users about packages that are in need of maintenance. Packages that have an open issue for a long time should eventually be removed, although doing so is not part of the RFC.
 
 ## Motivation
 [motivation]: #motivation
@@ -55,13 +55,13 @@ meta.issues = [{
 
 ### nixpkgs integration
 
-The following new config options are added to nixpkgs: `ignoreWarningsPredicate`, `ignoreWarningsPackages`, `traceIgnoredWarnings`. The option `showDerivationWarnings` will be removed. A new environment variable is defined, `NIXPKGS_IGNORE_WARNINGS`.
+The following new config options are added to nixpkgs: `ignoreWarningsPredicate`, `ignoreWarningsPackages`, `traceIgnoredWarnings`. The undocumented option `showDerivationWarnings` will be removed. A new environment variable is defined, `NIXPKGS_IGNORE_WARNINGS`.
 
 The semantic and implementation of `ignoreWarningsPredicate` and `ignoreWarningsPackages` directly parallels the existing "insecure" package handling.
 
 Similarly to broken, insecure and unfree packages, evaluating a package with an issue fails evaluation. Ignoring a package without issues (i.e. they have all been resolved) results in a warning at evaluation time.
 
-The previous warnings system in `check-meta.nix` is removed, together with `showDerivationWarnings`. Instead, ignored warnings are printed with `builtins.trace` depending on the new option `traceIgnoredWarnings`.
+The previous undocumented warnings system in `check-meta.nix` is removed, together with `showDerivationWarnings`. Instead, ignored warnings are printed with `builtins.trace` depending on the new option `traceIgnoredWarnings`.
 
 ### Warning kinds
 
