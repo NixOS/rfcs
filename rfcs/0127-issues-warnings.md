@@ -84,7 +84,8 @@ New issues generally should not be added to stable branches, and also not be bac
 ## Drawbacks
 [drawbacks]: #drawbacks
 
-- People have voiced strong negative opionions about the prospect of removing packages from nixpkgs at all, especially when they still *technically* work.
+- People have voiced strong negative opinions about the prospect of removing packages from nixpkgs at all, especially when they still *technically* work.
+  - We do not want to encourage the use of unmaintained software likely to contain security vulnerabilities, and we do not have the bandwidth to maintain packages deprecated by upstream. Nothing is lost though, because we have complete binary cache coverage of old nixpkgs versions, providing a comparatively easy way to pin old very package versions.
 - There is a slight long-term maintenance burden. It is expected to be similar to or slightly greater than the maintenance of our deprecation aliases.
   - We expect that in the long term, having a defined process for removing unmaintained and obsolete packages, especially compared to deciding on a case-by-case basis, is likely to reduce the overall maintenance burden.
 - Some of the example interactions are built on the premise that parts of nixpkgs are under-maintained, and that most users are at least somewhat involved in the nixpkgs development process. At the time of writing this RFC this is most certainly true, but the effects on this in the future are unknown.
