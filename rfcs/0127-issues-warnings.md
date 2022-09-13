@@ -85,7 +85,8 @@ New issues generally should not be added to stable branches, and also not be bac
 - People have voiced strong negative opionions about the prospect of removing packages from nixpkgs at all, especially when they still *technically* work.
 - There is a slight long-term maintenance burden. It is expected to be similar to or slightly greater than the maintenance of our deprecation aliases.
   - We expect that in the long term, having a defined process for removing unmaintained and obsolete packages, especially compared to deciding on a case-by-case basis, is likely to reduce the overall maintenance burden.
-- Some of the example interactions are built on the premise that nixpkgs is under-maintained, and that most users are at least somewhat involved in the nixpkgs development process. At the time of writing this RFC this is most certainly true, but the effects on this in the future are unknown.
+- Some of the example interactions are built on the premise that parts of nixpkgs are under-maintained, and that most users are at least somewhat involved in the nixpkgs development process. At the time of writing this RFC this is most certainly true, but the effects on this in the future are unknown.
+  - We hope that drawing attention to packages in need of maintenance can encourage new maintainers -- both from the existing pool of nixpkgs contributors and from non-contributor users -- to step up.
 
 ## Alternatives
 [alternatives]: #alternatives
