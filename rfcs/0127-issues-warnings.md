@@ -13,7 +13,7 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/177272
 ## Summary
 [summary]: #summary
 
-Introduce an issue system into Nixpkgs, similar to broken and insecure, but with a custom per-package message. This will then be used to warn users about packages that are in need of maintenance. Packages that have an open issue for a long time should eventually be removed.
+Inspired by the derivation checks for broken and insecure packages, a new system called "warnings" is introduced. It is planned to eventually replace the previously mentioned systems, as well as the current "warnings" (which currently only prints a trace message for unmaintained packages). `meta.issues` is added to derivations, which can be used to let the evaluation of individual packages fail with a custom message. This will then be used to warn users about packages that are in need of maintenance. Packages that have an open issue for a long time should eventually be removed, although doing so is not part of the RFC.
 
 ## Motivation
 [motivation]: #motivation
@@ -29,14 +29,14 @@ Apart from that, there is need for a general per-package warning mechanism in ni
 
 ### Package issues
 
-A new attribute is added to the `meta` section of a package: `issues`. If present, it is a list of attrsets which each have the following fields:
+A new attribute is added to the `meta` section of a package: `issues`. If present, it is a list of attrsets which each have at least the following fields:
 
 - `message`: Required. A string message describing the issue with the package.
 - `kind`: Optional but recommended. If present, the resulting warning will be printed as `kind: message`.
 - `date`: Required. An ISO 8601 `yyyy-mm-dd`-formatted date from when the issue was added.
 - `urls`: Optional, list of strings. Can be used to link issues, pull requests and other related items.
 
-Other attributes are allowed. Their meanings may be kind-specific.
+Other attributes are allowed. Some message kinds may specify additional required attributes.
 
 Example values:
 
@@ -55,9 +55,24 @@ meta.issues = [{
 
 ### nixpkgs integration
 
-Two new config options are added to nixpkgs, `ignoreWarningsPredicate` and `ignoreWarningsPackages`. A new environment variable is defined, `NIXPKGS_IGNORE_WARNINGS`. Their semantic and implementation directly parallel the existing "insecure" package handling.
+The following new config options are added to nixpkgs: `ignoreWarningsPredicate`, `ignoreWarningsPackages`, `traceIgnoredWarnings`. The option `showDerivationWarnings` will be removed. A new environment variable is defined, `NIXPKGS_IGNORE_WARNINGS`.
+
+The semantic and implementation of `ignoreWarningsPredicate` and `ignoreWarningsPackages` directly parallels the existing "insecure" package handling.
 
 Similarly to broken, insecure and unfree packages, evaluating a package with an issue fails evaluation. Ignoring a package without issues (i.e. they have all been resolved) results in a warning at evaluation time.
+
+The previous warnings system in `check-meta.nix` is removed, together with `showDerivationWarnings`. Instead, ignored warnings are printed with `builtins.trace` depending on the new option `traceIgnoredWarnings`.
+
+### Warning kinds
+
+At the moment, the following values for the `kind` field of a warning are known:
+
+- `removal`: The package is scheduled for removal some time in the future.
+- `deprecated`: The package has been abandoned upstream or has end of life dependencies.
+- `maintainerless`: `meta.maintainers` is empty
+- `insecure`: The package has some security vulnerabilities
+
+Not all values make sense as issues (i.e. within `meta.issues`): Some warnings may be automatically generated from other `meta` attributes (for example `maintainerless`). New kinds may be added in the future.
 
 ## Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -79,7 +94,7 @@ As an example, take `gksu` with the `gksu` → `libgksu` → `libglade` → `pyt
 
 ### Backporting
 
-New issues generally should not be added to stable branches, and also not be backported to them, since this breaks evaluation.
+New issues generally should not be added to stable branches if possible, and also not be backported to them, since this breaks evaluation. The same rule applies to other changes to a pacakge's `meta` which may generate a warning and thus lead to evaluation failure too. A notable exception are warnings of kind `insecure`, if there is no fix that can be backported.
 
 ## Drawbacks
 [drawbacks]: #drawbacks
@@ -115,6 +130,11 @@ A few other sketches about how the declaration syntax might look like in differe
       message = "deprecation: Python 2 is deprecated #12345";
     };
   };
+
+  # Proposal by @matthiasbeyer
+  meta.issues = [
+    { transitive = pkgs.python2.issues }
+  ];
 }
 ```
 
@@ -122,8 +142,10 @@ A few other sketches about how the declaration syntax might look like in differe
 [unresolved]: #unresolved-questions
 
 - From above: "Ignoring a package without issues (i.e. they have all been resolved) results in a warning at evaluation time". How could this be implemented, and efficiently?
-- Should issues be a list or an attrset?
-- A lot of bike shedding. (See below)
+- ~~Should issues be a list or an attrset?~~
+  - We are using a list for now, there is always the possibility to also allow attrsets in the future.
+- ~~A lot of bike shedding. (See below)~~
+  - Packages may have "issues" that generate "warnings" that have to be "ignored". Issues are explicitly added to packages in `meta.issues`, whereas warnings can be generated automatically from other sources, like other `meta` attributes.
 
 ## Future work
 [future]: #future-work
