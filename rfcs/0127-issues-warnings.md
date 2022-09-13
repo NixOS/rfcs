@@ -2,9 +2,9 @@
 feature: issues-warnings
 start-date: 2022-06-11
 author: piegames
-co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+co-authors: —
+shepherd-team: @lheckemann, @mweinelt, @fgaz
+shepherd-leader: @mweinelt
 related-issues: https://github.com/NixOS/nixpkgs/pull/177272
 ---
 
