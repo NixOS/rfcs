@@ -36,6 +36,8 @@ A new attribute is added to the `meta` section of a package: `issues`. If presen
 - `date`: Required. An ISO 8601 `yyyy-mm-dd`-formatted date from when the issue was added.
 - `urls`: Optional, list of strings. Can be used to link issues, pull requests and other related items.
 
+Other attributes are allowed. Their meanings may be kind-specific.
+
 Example values:
 
 ```nix
