@@ -130,18 +130,8 @@ All that said, below the store layer there is no difference in vision.
 Because our communities are so separate, it would be easy to come up with diverging versions of how derivations, store objects, etc. should work.
 That we have not done so I think is testament to the broad applicability of the Nix store design to many diverse groups of people with diverse goals.
 
-What hope to do with Guix, then, is convene both projects to standardize this store layer in a way that supports both projects' goals.
+What hope to do with Guix, then, is convene both projects to make their store store layers interoperate.
 Complementing the idea of a "marketplace of ideas" is when there is a certain design (like the Nix store layer), that is so broadly popular as to be a sort of "natural monopoly", that we should foster the most expansive and general idea of it as an exercise in coalition building and outreach.
-
-Guix currently uses a stripped-down fork of C++ for its core daemon.
-Clearly, it would be nicer than that if, as this RFC proposes, we supporting building just such a stripped-down daemon with*out* any forking needed.
-Then we could all collaborate on one portion of C++ that didn't drag in features Guix didn't want, no forking needed.
-
-That said, Guix has a long-term goal of rewriting that remaining C++ into Guile Scheme too.
-So to be clear, I *don't* think there is interest in sharing a store layer implementation as both project's reference copy.
-But that's fine.
-Having separate Nix and Guix reference implementations means both parties have recourse to implement ideas as they see fit prior to standardization.
-Insofar as Guix is the smaller community, we can compare them to Mozilla in web standardization committees having a proper amount of say because they can do what they like with Firefox.
 
 I do not expect Guix to be immediately sold on this plan, but as that larger project, I think it behooves us to take the first steps to build trust and coordination.
 Making a stand-alone Nix store executable demonstrates we are serious about layering and serious about standardizing that layer, and not just trying to get Guix users to use Nix instead.
