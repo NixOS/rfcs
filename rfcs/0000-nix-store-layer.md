@@ -40,8 +40,6 @@ We should instead fully embrace it:
 
 - Separate executable ensure lower layers build in isolation, new integration tests those executable without aid of high-layer info.
 
-- New NixOS-Foundation-authorized teams foster and advocate for layers in isolation
-
 ### Starting with the store layer
 
 Ultimately, I would like to take this approach to all the layers.
@@ -69,15 +67,6 @@ etc. and "UX projects" like
 - Hard-wired module system
 
 So focusing on the lowest layer first, we get the most "bang for buck" in terms of managing extremely different sorts of work separately.
-
-### A disclaimer
-
-To be clear, none of this is to say we should abandon the idea of Nix as a whole.
-There can still be governance of Nix as a whole, that teams and people focused on "infra" or "flakes" would ultimately need to report to.
-The goal is not to overreact, but strike a balance between:
-
-1. Making sure Nix as a whole continues to make sense
-2. Make sure layers make sense in isolation not just in the context of the way they are currently used.
 
 ## Marketplace of Ideas
 
@@ -214,13 +203,6 @@ Of course, store-only and full  can share sections, so we aren't duplicating wor
 
 ## Out-of-tree obligations
 
-### A store team
-
-An official NixOS-foundation-authorized teams should be set up to manage store layer design decisions (below the threshold of needing an RFC) that don't effect that the rest of Nix.
-\[Some sort of decision that affect all layers is out of scope, must be deliberated with stakeholders from other layers too, probably should be RFC due to such large scope.\]
-
-This team should establish communication with counter parties in Guix leadership.
-
 ### Website
 
 The fully and store-only version of Nix should both be presented for download on the website.
@@ -267,7 +249,7 @@ Creating new teams, trying to build ties with other communities sounds scary.
 # Alternatives
 [alternatives]: #alternatives
 
-Do technical parts without governance or documentation parts.
+Do programming parts without the documentation and website parts.
 But that feels to me like turning an ongoing shift in focus to a one-off change that is likely to bit-rot.
 
 # Unresolved questions
@@ -278,11 +260,25 @@ What should the store-only Nix be called?
 # Future work
 [future]: #future-work
 
+## Nix Store Team
+
+Now that we have this division in the implementation, we also have the opportunity to leverage it for governance purposes.
+An official, NixOS-foundation-authorized team could be set up to manage store layer design decisions (below the threshold of needing an RFC) that don't effect that the rest of Nix.
+\[Some sort of decision that affect all layers is out of scope, must be deliberated with stakeholders from other layers too, probably should be RFC due to such large scope.\]
+
+To be clear, this is to say we should abandon the idea of Nix as a whole.
+There can still be governance of Nix as a whole; this team, and similar hypothetical, say, Flakes, Nix language, or User Experience teams would ultimately need to report to.
+The goal is not to overreact, but strike a balance between:
+
+1. Making sure Nix as a whole continues to make sense
+2. Make sure layers make sense in isolation not just in the context of the way they are currently used.
+
 ## Standardization across projects
 
 If we establish informal interop across store-layer implementations with Guix, a next step would be establish some sort of living standard that both communities have equal say in.
 (Of course, implementations are free to implement features in excess of what the standard requires!)
-The new store team can lead the process from our end.
+
+A new store team, per the above, could lead the process from our end, since the other parts of Nix are not shared with Guix and thus out of scope for this sort of cross-project standardization.
 
 ## Stabilization
 
