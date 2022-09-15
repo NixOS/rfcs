@@ -106,17 +106,20 @@ To help explain the community-building benefits, it might help to go over some s
 ### Tvix and go-nix
 
 In https://tvl.fyi/blog/rewriting-nix, TVL announced that, frustrated in trying to refactor Nix into something more modular and flexible, they were aiming to make a new implementation from scratch.
+More recently, in https://tvl.fyi/blog/tvix-status-september-22 they lay out a basic approach of two projects:
 
-Since then, what has emerged is that [*Tvix*](https://cs.tvl.fyi/depot/-/tree/tvix) is a new implementation of the Nix language evaluator,
-and [*go-nix*](https://github.com/nix-community/go-nix) is a new implementation of the store layer.
+- [*Tvix*](https://cs.tvl.fyi/depot/-/tree/tvix) is a new implementation of the Nix language evaluator,
+
+- [*go-nix*](https://github.com/nix-community/go-nix) is a new implementation of the store layer.
 
 First of all, the fact that they are planning on two completely separate implementation oriented around this same "narrow waist" is testament to the appeal of the design.
 
-Second of all, note that per their blog post, they have separate, orthogonal experiments they wish to run on both sides of the store interface divide.
+Second of all, note that per they have separate, orthogonal experiments they wish to run on both sides of the store interface divide.
 Above, they want to experiment with radically different evaluation strategies, especially to speed up Nixpkgs evaluation.
-Below, they want to experiment with the standardized containerization technologies that exist for new ways of sandboxing and distributing builds with less bespoke Nix-specific code.
+Below, they want to experiment with the standardized containerization technologies that already exist for new ways of sandboxing and distributing builds with less bespoke Nix-specific code.
+They also want to apply the layering paradigm *within* go-nix, fostering even more modularity.
 
-I think these are both great goals, and for the sake of the ecosystem as a whole, it should be as easy as possible to run such new experiments.
+I think these are great goals, and for the sake of the ecosystem as a whole, it should be as easy as possible to run such new experiments.
 In particular, a novel evaluator should be usable with the standard C++ Nix store layer, and a novel store layer should be reusable with the standard C++ Nix evaluator.
 
 Yes, strictly speaking, we only need a stable daemon protocol to accommodate that goal, which we have.
