@@ -233,7 +233,7 @@ Now that we have this division in the implementation, we also have the opportuni
 An official, NixOS-foundation-authorized team could be set up to manage store layer design decisions (below the threshold of needing an RFC) that don't effect that the rest of Nix.
 \[Some sort of decision that affect all layers is out of scope, must be deliberated with stakeholders from other layers too, probably should be RFC due to such large scope.\]
 
-To be clear, this is to say we should abandon the idea of Nix as a whole.
+To be clear, this is *not* to say we should abandon the idea of Nix as a whole.
 There can still be governance of Nix as a whole; this team, and similar hypothetical, say, Flakes, Nix language, or User Experience teams would ultimately need to report to.
 The goal is not to overreact, but strike a balance between:
 
