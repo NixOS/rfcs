@@ -79,10 +79,11 @@ The goal is not to overreact, but strike a balance between:
 1. Making sure Nix as a whole continues to make sense
 2. Make sure layers make sense in isolation not just in the context of the way they are currently used.
 
-## Pluralism
+## Marketplace of Ideas
 
 As Nix grows more popularity, it will be inevitable that different groups want to explore in different directions.
 This is the *pluralism* of a larger community, and we should embrace it as a strength.
+We do that be fostering a *marketplace of ideas*.
 
 There are many possible ways in which to write down packages, The Nix language and Nixpkgs idioms, and Guix, for example, are just two points in a much larger space.
 There are also many possible ways set up build farms.
