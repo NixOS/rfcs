@@ -124,46 +124,27 @@ The choice of language is just the tip of the iceberg here.
 More profoundly, they also have a more "library" than "interpreter" model where packages depend on Guix as a library, which talks to a small rump daemon.
 Guile sits far lower in their stack than the Nix language interpreter does; it is as if we rewrote some of our C++ into nix language code, and nix language code could do enough side effects to make that possible.
 
-The point of this discursion is to show that not only are radically different implementation of the same spec possible on either side of the store interface (what Tvix + go-nix aim for), but radically different designs not going for comparability also.
+The point of this discursion is to show that not only are radically different implementation of the same spec possible on either side of the store interface (what Tvix + go-nix aim for), but radically different designs not at all trying to be comparable also.
+
+All that said, below the store layer there is no difference in vision.
+Because our communities are so separate, it would be easy to come up with diverging versions of how derivations, store objects, etc. should work.
+That we have not done so I think is testament to the broad applicability of the Nix store design to many diverse groups of people with diverse goals.
+
+What hope to do with Guix, then, is convene both projects to standardize this store layer in a way that supports both projects' goals.
+Complementing the idea of a "marketplace of ideas" is when there is a certain design (like the Nix store layer), that is so broadly popular as to be a sort of "natural monopoly", that we should foster the most expansive and general idea of it as an exercise in coalition building and outreach.
 
 Guix currently uses a stripped-down fork of C++ for its core daemon.
 Clearly, it would be nicer than that if, as this RFC proposes, we supporting building just such a stripped-down daemon with*out* any forking needed.
-Then we could all collaborate on one bit C++ that didn't drag in features Guix didn't want, no forking needed.
+Then we could all collaborate on one portion of C++ that didn't drag in features Guix didn't want, no forking needed.
 
-Still, the long term goal of Guix is to rewrite that remaining C++ into Guile Scheme too?
-At that point, does that mean the benefits of this RFC for Guix are gone too?
-
-I don't think so.
-It makes total sense that Guix wants an implementation they fully control, in the language they prefer, and I have no interest in dissuading them from that goal!
-But it would be still nice to have full interop so Nix can work with the Guix daemon, and Guix with the Nix daemon.
-
-This is especially important in "institutional settings", such as high performance computing (HPC) build farms for science, software development shops, and everything in between.
-HPC and academic use in particular is something Nix and Guix are both interested in.
-
-Firstly, this RFC has benefits for bureaucratic expediency.
-There is usually a lot of red tape needed to get a new technology deployed thought a build farm.
-If Guix and Nix users have to separately ask for their build farm store layer backend to be rolled out, that is twice the headache for IT, with half the stakeholders asking for each deploymenet.
-If, on the other hand, Guix and Nix users separately agree on one store layer backend to be rolled out they both can use, that is twice has many people asking for a single deployment --- a much stronger ask on IT.
-
-Secondly, and perhaps more abstractly, I think this project allows both projects to better utilize their own design and resources.
-
-Nix and Guix have completely independent visions above the store layer --- it is for here that Guix was created.
-This is where both projects are choosing to innovate post "fork" (Guix from day 1 with Guile, us more recently with Flakes).
-This is where the projects compete at the level of *ideas*.
-Below the store interface, conversely, I think everyone wants the same things.
-I have yet to hear of any store-layer idea that is "Guix-y but not Nix-y", or "Nix-y but not Guix-y".
-Here the projects are not competing on *what* is being implemented, but *how well* it is being implemented.
-
-In such a situation, interoperability is a free win.
-Since there is no underlying philosophical difference at this layer, there is straightjacket imposed from trying to be interoperable.
-And while it's good and fine to compete on implementation, including rewriting the renaming C++, it's nice to be able abandon that competition at any more moment and join forces on a shared implementation, freeing up resources for other things.
-To be very clear, this doesn't mean I am advocating that Guix "give up" on its independence from Nix --- maybe go-nix will end up being the dominant implementation and we all just use that!
-I do not what the future holds, but I want to make sure we keep our options open, and each project is allowed to boost the other as much as possible without sacrificing design flexibility.
-
-Ultimately, while the single-machine single-user Nix experience is quite good, the shared build-farm multi-user experience with Nix and Guix is quite a bit *worse* than it could be.
-I want to see major improvements in that area, and I want to see all projects benefits, and I really don't care whole ends up delivering those features first so long as the rest of us can benefit.
+That said, Guix has a long-term goal of rewriting that remaining C++ into Guile Scheme too.
+So to be clear, I *don't* think there is interest in sharing a store layer implementation as both project's reference copy.
+But that's fine.
+Having separate Nix and Guix reference implementations means both parties have recourse to implement ideas as they see fit prior to standardization.
+Insofar as Guix is the smaller community, we can compare them to Mozilla in web standardization committees having a proper amount of say because they can do what they like with Firefox.
 
 I do not expect Guix to be immediately sold on this plan, but as that larger project, I think it behooves us to take the first steps to build trust and coordination.
+Making a stand-alone Nix store executable demonstrates we are serious about layering and serious about standardizing that layer, and not just trying to get Guix users to use Nix instead.
 
 # Detailed design
 [design]: #detailed-design
