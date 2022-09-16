@@ -61,8 +61,8 @@ Additionally, as @7c6f434c point out, some upstream tooling thinks it is being p
 Quicklisp, for example, uses a "weird mix of MD5 constraints and SHA1 constraints" that isn't really up to the task.
 Another example would be using git commit hashes, which, since we don't want to download the whole history, are not good enough on their own.
 
-A concrete example of a change that would bring such tooling into compliance is via "prefetching" to build a map of insufficient upstream-tool keys (say a pair of a name and lousy hash) to higher quality hashes for fixed output derivations.
-The prefetching step would be run impurely but do as little work as possible, and the remaining bulk of the work would be done purely in derivations.
+A concrete example of a change that would bring such tooling into compliance is via "map-building" to build a map of insufficient upstream-tool keys (say a pair of a name and lousy hash) to higher quality hashes for fixed output derivations.
+The map-building step would be run impurely but do as little work as possible, and the remaining bulk of the work would be done purely in derivations.
 
 Updating fixed output hashes and similar --- including running such a prefetch script as described above --- however, is perfectly normal and not affected by this RFC.
 Such updates, as opposed to regenerations of Nix code, can be performed by hand, or with update bots like today.
