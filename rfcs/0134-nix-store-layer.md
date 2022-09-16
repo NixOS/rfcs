@@ -230,7 +230,7 @@ What should the store-only Nix be called?
 ## Nix Store Team
 
 Now that we have this division in the implementation, we also have the opportunity to leverage it for governance purposes.
-An official, NixOS-foundation-authorized team could be set up to manage store layer design decisions (below the threshold of needing an RFC) that don't effect that the rest of Nix.
+An official, NixOS-foundation-authorized team could be set up to manage store layer design decisions (below the threshold of needing an RFC) that don't affect that the rest of Nix.
 \[Some sort of decision that affect all layers is out of scope, must be deliberated with stakeholders from other layers too, probably should be RFC due to such large scope.\]
 
 To be clear, this is *not* to say we should abandon the idea of Nix as a whole.
