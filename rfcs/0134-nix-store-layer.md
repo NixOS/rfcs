@@ -36,7 +36,7 @@ We should instead fully embrace it:
   - More advanced documentation can explain layering for those that want a deeper understanding of Nix.
 
   - Even more basic documentation can still benefit from separate terminology before the layering is fully explained.
-    See https://www.haskellforall.com/2022/08/stop-calling-everything-nix.html for a phenomenal take-down of how calling everything "Nix" today confuses users and leaves them unable to articulate what parts of the ecosystem are frustrating then.
+    See https://www.haskellforall.com/2022/08/stop-calling-everything-nix.html for a phenomenal take-down of how calling everything "Nix" today confuses users and leaves them unable to articulate what parts of the ecosystem are frustrating.
 
 - Separate executable ensure lower layers build in isolation, new integration tests those executable without aid of high-layer info.
 
