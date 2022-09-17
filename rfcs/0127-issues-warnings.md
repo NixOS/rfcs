@@ -31,35 +31,41 @@ Apart from that, there is need for a general per-package warning mechanism in ni
 
 A new attribute is added to the `meta` section of a package: `issues`. If present, it is a list of attrsets which each have at least the following fields:
 
+- `kind`: Required. If present, the resulting warning will be printed as `kind: message`.
 - `message`: Required. A string message describing the issue with the package.
-- `kind`: Optional but recommended. If present, the resulting warning will be printed as `kind: message`.
+- `name`: Optional but recommended. Give the issue a custom name for more easy filtering
 - `date`: Required. An ISO 8601 `yyyy-mm-dd`-formatted date from when the issue was added.
 - `urls`: Optional, list of strings. Can be used to link issues, pull requests and other related items.
+- `resolved`: Optional. Indicate that the issue is resolved so that it does not generate a warning anymore.
 
 Other attributes are allowed. Some message kinds may specify additional required attributes.
 
 Example values:
 
 ```nix
-meta.issues = [{
-  kind = "deprecated";
-  message = "This package depends on Python 2, which has reached end of life.";
-  date = "1970-01-01";
-  urls = [ "https://github.com/NixOS/nixpkgs/issues/148779" ];
-} {
-  kind = "removal";
-  message = "The application has been abandoned upstream, use libfoo instead";
-  date = "1970-01-01";
-}];
+meta.issues = [
+  {
+    name = "python2-eol";
+    kind = "deprecated";
+    message = "This package depends on Python 2, which has reached end of life.";
+    date = "1970-01-01";
+    urls = [ "https://github.com/NixOS/nixpkgs/issues/148779" ];
+  }
+  {
+    kind = "removal";
+    message = "The application has been abandoned upstream, use libfoo instead";
+    date = "1970-01-01";
+  }
+];
 ```
 
 ### nixpkgs integration
 
-The following new config options are added to nixpkgs: `ignoreWarningsPredicate`, `ignoreWarningsPackages`, `traceIgnoredWarnings`. The undocumented option `showDerivationWarnings` will be removed. A new environment variable is defined, `NIXPKGS_IGNORE_WARNINGS`.
+The following new config options are added to nixpkgs: `ignoreWarnings` and `traceIgnoredWarnings`. The undocumented option `showDerivationWarnings` will be removed. A new environment variable is defined, `NIXPKGS_IGNORE_WARNINGS`.
 
-The semantic and implementation of `ignoreWarningsPredicate` and `ignoreWarningsPackages` directly parallels the existing "insecure" package handling.
+`ignoreWarnings` is a list of string of the format `packageName.warningKind`. A wildcard '\*' may be used before or after the dot, to ignore all warnings of one kind or all warnings of a package. For issues that have a name, `packageName.issueName` is allowed too. If an issue spans multiple packages, it is recommended to use the same name everywhere so that one may ignore all with `*.issueName`.
 
-Similarly to broken, insecure and unfree packages, evaluating a package with an issue fails evaluation. Ignoring a package without issues (i.e. they have all been resolved) results in a warning at evaluation time.
+Similarly to broken, insecure and unfree packages, evaluating a package with an unignored warning fails evaluation. Ignoring resolved warnings results in a trace warning at evaluation time.
 
 The previous undocumented warnings system in `check-meta.nix` is removed, together with `showDerivationWarnings`. Instead, ignored warnings are printed with `builtins.trace` depending on the new option `traceIgnoredWarnings`.
 
@@ -71,6 +77,8 @@ At the moment, the following values for the `kind` field of a warning are known:
 - `deprecated`: The package has been abandoned upstream or has end of life dependencies.
 - `maintainerless`: `meta.maintainers` is empty
 - `insecure`: The package has some security vulnerabilities
+- `broken`: The package is marked as broken
+- `unsupported`: The package is not expected to build on this platform
 
 Not all values make sense as issues (i.e. within `meta.issues`): Some warnings may be automatically generated from other `meta` attributes (for example `maintainerless`). New kinds may be added in the future.
 
@@ -101,6 +109,7 @@ New issues generally should not be added to stable branches if possible, and als
 
 - People have voiced strong negative opinions about the prospect of removing packages from nixpkgs at all, especially when they still *technically* work.
   - We do not want to encourage the use of unmaintained software likely to contain security vulnerabilities, and we do not have the bandwidth to maintain packages deprecated by upstream. Nothing is lost though, because we have complete binary cache coverage of old nixpkgs versions, providing a comparatively easy way to pin old very package versions.
+  - This change is a general improvement in the ecosystem even if we do not end up using it to remove any packages.
 - There is a slight long-term maintenance burden. It is expected to be similar to or slightly greater than the maintenance of our deprecation aliases.
   - We expect that in the long term, having a defined process for removing unmaintained and obsolete packages, especially compared to deciding on a case-by-case basis, is likely to reduce the overall maintenance burden.
 - Some of the example interactions are built on the premise that parts of nixpkgs are under-maintained, and that most users are at least somewhat involved in the nixpkgs development process. At the time of writing this RFC this is most certainly true, but the effects on this in the future are unknown.
@@ -109,7 +118,7 @@ New issues generally should not be added to stable branches if possible, and als
 ## Alternatives
 [alternatives]: #alternatives
 
-An alternative design would be to have issues as a separate list (not part of the package). Instead of allowing individual packages, one could ignore individual warnings (they'd need an identifying number for that). The advantage of doing this is that one could have one issue and apply it for a lot of packages (e.g. "Python 2 is deprecated"). The main drawback there is that it is more complex.
+An alternative design would be to have issues as a separate list (not part of the package). ~~Instead of allowing individual packages, one could ignore individual warnings (they'd need an identifying number for that). The advantage of doing this is that one could have one issue and apply it for a lot of packages (e.g. "Python 2 is deprecated"). The main drawback there is that it is more complex.~~ The advantages of that approach have been integrated while keeping the downsides small: Warnings are ignored with a per-kind granularity, but one may give some of them a name to allow finer control where necessary.
 
 A few other sketches about how the declaration syntax might look like in different scenarios:
 
@@ -117,6 +126,8 @@ A few other sketches about how the declaration syntax might look like in differe
 {
   # As proposed in the RFC
   meta.issues = [{
+    kind = "deprecated";
+    name = "python2-eol";
     message = "deprecation: Python 2 is EOL. #12345";
     # (Other fields omitted for brevity)
   }];
@@ -141,7 +152,10 @@ A few other sketches about how the declaration syntax might look like in differe
 ## Unresolved questions
 [unresolved]: #unresolved-questions
 
-- From above: "Ignoring a package without issues (i.e. they have all been resolved) results in a warning at evaluation time". How could this be implemented, and efficiently?
+- ~~From above: "Ignoring a package without issues (i.e. they have all been resolved) results in a warning at evaluation time". How could this be implemented, and efficiently?~~
+  - ~~More generally, how do we tell users that their ignored warning can be removed, so that they won't accidentally miss future warnings?~~
+  - Issues have a `resolved` attribute that may be used for that purpose.
+  - The ignore mechanism has been refined so that there is less risk of missing future warnings.
 - ~~Should issues be a list or an attrset?~~
   - We are using a list for now, there is always the possibility to also allow attrsets in the future.
 - ~~A lot of bike shedding. (See below)~~
@@ -160,6 +174,8 @@ A few other sketches about how the declaration syntax might look like in differe
   - Issues can certainly be automatically integrated into the release notes somehow. However, this alone would not allow us to move most of our release notes into the packages, because for many release entries breaking eval would be overkill.
 
 ## Bike shedding
+
+*Note: the bike shedding phase is considered over.*
 
 Here are a few naming proposals, and how well they would be suited to describe different conditions. "broken" and "unsupported" must be acknowledged but – unlike the others – don't imply some required user action. "unfree" is somewhat out of scope because it is unlikely to be replaced anytime soon.
 
