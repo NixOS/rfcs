@@ -112,3 +112,4 @@ This change requires no change to the language grammar.
 [questions]: #unresolved-questions
 
 - What should the exact name of `message` and `success` be?
+- What should the error messsage be?
