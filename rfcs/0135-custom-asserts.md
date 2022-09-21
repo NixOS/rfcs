@@ -19,9 +19,8 @@ Allow users to use attribute sets with a boolean attribute `success` and a strin
 Since Nix is an untyped language, asserts are often needed to ensure that a function or program works correctly. However, the current assert system is unsuitable for more sophisticated error reporting that aims to inform the user as to what has happened.
 
 Consider a nixpkgs package expression that wants to validate its arguments. Currently, the best way to
-provide a custom error message is to use `assert … -> throw …; …`.
-This method has several disadvantages: Since an implication from a falsehood is always true, you are required
-to invert the condition. Additionally, since the assertion itself is not triggered by the error,
+provide a custom error message is to use `assert … || throw …; …`.
+This method has several disadvantages: Since the assertion itself is not triggered by the error,
 the function of the `assert` keyword is reduced to providing an imperative shorthand for `seq`. This also means that by default,
 the error location is not printed, and there is no mention of an assert in the error message.
 Instead, expressions could use this more natural syntax:
