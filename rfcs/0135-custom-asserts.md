@@ -21,8 +21,7 @@ Since Nix is an untyped language, asserts are often needed to ensure that a func
 Consider a nixpkgs package expression that wants to validate its arguments. Currently, the best way to
 provide a custom error message is to use `assert … || throw …; …`.
 This method has several disadvantages: Since the assertion itself is not triggered by the error,
-the function of the `assert` keyword is reduced to providing an imperative shorthand for `seq`. This also means that by default,
-the error location is not printed, and there is no mention of an assert in the error message.
+the function of the `assert` keyword is reduced to providing an imperative shorthand for `seq`.
 Instead, expressions could use this more natural syntax:
 
 ```nix
