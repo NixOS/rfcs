@@ -48,10 +48,11 @@ Ultimately, we should take this approach to all the layers.
 The constrained scope here is to keep this RFC actionable.
 
 Layering between e.g. Flakes and the Nix Language doesn't yet exist in the implementation in the form of a library separation.
-I don't want to be "blocked" on major new development work, and anything involving Flakes is also far more controversial, and best avoided at first.
+Separating Flakes into its own library would require major new development work, and I don't want to "block" exposing the layering for the first time to users on such work when there is an easier way to try this idea how.
+Flakes also has more development going on due being unstable, so it is nice to not get in its way.
 
 Conversely, the store layer is already quite well separated.
-The orthogonality between it and other layers "proven" in the wild by projects like Guix (more on that latter part in the next section).
+Its conceptual independence from Nix's other layers is "proven" in the wild by projects like Guix.
 The gap is also widest in terms of the layer of abstraction between, on one hand, nascent "infrastructure projects" like
 
 - content-addressed derivations
@@ -96,8 +97,8 @@ To help explain the community-building benefits, it might help to go over some s
 
 ### Tvix and go-nix
 
-In https://tvl.fyi/blog/rewriting-nix, TVL announced that, frustrated in trying to refactor Nix into something more modular and flexible, they were aiming to make a new implementation from scratch.
-More recently, in https://tvl.fyi/blog/tvix-status-september-22 they lay out a basic approach of two projects:
+[TVL announced](https://tvl.fyi/blog/rewriting-nix) that, frustrated in trying to refactor Nix into something more modular and flexible, they were aiming to make a new implementation from scratch.
+More recently, [they lay out a basic approach](https://tvl.fyi/blog/tvix-status-september-22) of two projects:
 
 - [Tvix](https://cs.tvl.fyi/depot/-/tree/tvix) is a new implementation of the Nix language evaluator,
 
@@ -157,7 +158,7 @@ Support for testing Nix against a separately-built daemon already exists and is 
 
 The store-only Nix and its tests should be built as part of CI, as "first class" as our existing CI jobs.
 That means both in the channel-blocking Hydra evaluation, and for each pull request.
-If we hit the limits of Github Actions in per-PR CI, we should consider using Hydra instead / in addition, something that has already been discussed.
+If we hit the limits of GitHub Actions in per-pull-request CI, we should consider using Hydra either instead or in addition to GitHub Actions, something that has already been discussed.
 
 ## 2. Manual
 
