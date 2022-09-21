@@ -71,12 +71,28 @@ with types;
 
 While these implementations get more and more verbose, they also get more and more idiomatic and flexible.
 
+Consider also a nixpkgs package expression that wants to validate its arguments. Currently, the best way to
+provide a custom error message is to use `assert … -> throw …; …`.
+This method has several disadvantages: Since an implication from a falsehood is always true, you are required
+to invert the condition. Additionally, since the assertion itself is not triggered by the error,
+the function of the `assert` keyword is reduced to providing an imperative shorthand for `seq`. This also means that by default,
+the error location is not printed, and there is no mention of an assert in the error message.
+Instead, expressions could now use this more natural syntax:
+
+```nix
+{ foo, bar }:
+assert {
+  success = foo || bar;
+  message = "At least one of Foo or Bar must be set";
+};
+[ foo bar ]
+```
+
 # Detailed design
 [design]: #detailed-design
 
 Allow users to use attribute sets with a boolean attribute `success` and a string attribute `message` instead of a boolean in `assert …; …` expressions.
 If the `success` attribute is false, the assertion fails with a message including the `message` attribute.
-If `--trace-verbose` is enabled, and the assertion succeeds, a message including the `message` attribute is also printed.
 
 This change requires no change to the language grammar.
 
@@ -95,5 +111,4 @@ This change requires no change to the language grammar.
 # Unresolved questions
 [questions]: #unresolved-questions
 
-- Should `message` on successful assertions be printed if `--trace-verbose` is passed, or is that too verbose?
 - What should the exact name of `message` and `success` be?
