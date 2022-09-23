@@ -40,7 +40,7 @@ graph TD
     style Draft fill:#008,color:#FFF
 
     Discuss[Discuss and Refine]
-    Discuss --> |On Hold| Draft
+    Discuss ---> |On Hold| Draft
     Discuss --> |Can't Find Shepherds| NoShepherds
     Discuss --> |Motion for FCP| FCP
 
