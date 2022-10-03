@@ -152,7 +152,7 @@ That is the purpose of this RFC!
 We do *not* propose adding delay to once-again separate those features from Flakes, as that would introduce more feature work which would delay stabilization and be unacceptable to the pro-Flakes faction.
 
 That said, an ancillary incremental process of incremental stabilization is to bolster a *sense* of layering in Nix's user interface that has been, according to this camp, lost.
-Ensuring that the these two subsets of the new CLI --- without lakes, and without Nix language support --- do in fact make sense in isolation will provide a "scaffolding" upon which interested parties can later introduce generalized features like search and pure eval without Flakes.
+Ensuring that the these two subsets of the new CLI --- without Flakes, and without Nix language support --- do in fact make sense in isolation will provide a "scaffolding" upon which interested parties can later introduce generalized features like search and pure eval without Flakes.
 
 The hope is that such scaffolding will assuage this faction their concerns are heard without holding things up.
 
