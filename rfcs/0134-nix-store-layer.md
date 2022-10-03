@@ -253,22 +253,5 @@ A new store team, per the above, could lead the process from our end, since the 
 ## Stabilization
 
 There is a looming question on how to stabilize Nix's big backlog of unstable features (New CLI, Flakes).
-There is a lot of bad-blood over Flakes, both the feature itself and the way it has been rolled out.
-I think the stabilization process can be an opportunity to heal old wounds.
-
-At a minimum, this can involve stabilizing the new CLI before Flakes.
-But even that that is a lot of new feature surface area to review.
-I think even better is stabilizing just the store-only new CLI first.
-
-This is easily the least controversial part of our unstable feature backlog, and yet there is still plenty to discuss.
-Questions like
-
-- logging
-- store paths on `stdout` at end of build?
-- Should commands like `show-derivation` should use `--json` by default
-- Flat vs hierarchical commands
-- is `--derivation` a good flag? (I think not!)
-
-are all in-scope.
-
-Having a conversation just on this narrow first batch of stabilization both builds trust, and ensures these still-important issues they aren't lost in flame wars over more divisive topics.
+[RFC 136](https://github.com/NixOS/rfcs/pull/136) is a plan on how to stabilize these features that greatly leverages this.
+See it for further details.
