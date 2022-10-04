@@ -173,7 +173,7 @@ As long as we are making progress stabilizing features and having healthy discus
 
 Of course, we could instead count on the magnitude of new years making the concerns of old users unimportant, but I think the plan here has little downsides; we can instead make everyone happy with only a small delay.
 If that is true, why not do that instead!
-A plan to stabilize F
+That is what this plan is trying to be.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
