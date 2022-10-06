@@ -82,7 +82,7 @@ This "dusty corner" off the new CLI is rather calm with a very constrained desig
 By starting with these relatively easy material to stabilize, we can prove we can all come together as a community to agree on a design after all.
 This should build trust between opposing individuals and factions, giving us a foundation upon which to tackle the more challenging material in subsequent steps.
 
-since these features became very popular while they are still unstable, there is now both an urgency to stabilize them, and little ability to modify them.
+Since these features became very popular while they are still unstable, there is now both an urgency to stabilize them, and little ability to modify them.
 This is the opposite of how experimental features are supposed to leisurely incubate with both plenty of flexibility to change them, and little rush to stabilize them until they feel ready.
 But, there is little we can do about this at this point, an this RFC recognizes that fact and does *not* try to resist it.
 
