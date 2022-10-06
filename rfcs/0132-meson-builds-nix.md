@@ -55,6 +55,8 @@ Among its features, we highlight:
     - supports command customization
   - cross compilation
   - many useful modules included (pkg-config, filesystem inspection, internationalization etc.)
+- out-of-source build support
+  - indeed, meson does not support inside-source build
 - Comprehensive documentation
   - including tutorials, reference manuals and real world projects using it
 
