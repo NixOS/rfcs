@@ -134,6 +134,8 @@ Doing nothing leaves the behaviour to be taken when an RFC can not find a shephe
 
 This can reduce the burden from the NixOS RFC Steering Committee however it still clutters the list of "Open" RFCs with these RFCs that are not seeing forward progress. Ultimately it is a decision of definition of what "Open" means and this RFC takes the stance that if an RFC is stalled for too long it makes sense to remove it from the default search for "Open" RFCs.
 
+Due to similarity with [RFC 51 - Mark stale nixpkgs issues)[https://github.com/NixOS/rfcs/pull/51] which settled on labeling without closing after a lot of discussion, extra effort was made to ensure that this was not too controversial. Notably a forum post at https://discourse.nixos.org/t/stalled-rfcs-proposing-rfcs-with-no-interest/21952. It appears that to the Nix community this is in fact a substantially different case so closing is acceptable. 
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
