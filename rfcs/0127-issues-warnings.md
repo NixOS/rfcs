@@ -90,7 +90,7 @@ Not all values make sense as issues (i.e. within `meta.issues`): Some warnings m
 There are two ways issues interact with the removal of packages: Either they get an issue because they are going to be removed, or they are removed because they have an open issue for a prolonged period of time.
 
 - Instead of removing a package directly, it should first get an issue announcing the planned removal. This will allow users to migrate away beforehand. `removal` must be used as `kind` (This will facilitate automation in the future).
-- Before branch-off for a new release, all (leaf) packages with issues that predate the previous branch-off are deemed safe for removal (unless stated otherwise). If a package is removed based on its issue, the issue's message becomes part of the new `throw` alias.
+- Before branch-off for a new release, all (leaf) packages with issues that predate the previous branch-off are deemed safe for removal via `throw` (unless stated otherwise). If a package is removed based on its issue, the issue's message becomes part of the new `throw` alias.
 
 ### Propagation across transitive dependencies
 
