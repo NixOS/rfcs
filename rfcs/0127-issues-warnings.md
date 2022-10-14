@@ -61,7 +61,7 @@ meta.issues = [
 
 ### nixpkgs integration
 
-The following new config options are added to nixpkgs: `ignoreWarnings` and `traceIgnoredWarnings`. The undocumented option `showDerivationWarnings` will be removed. A new environment variable is defined, `NIXPKGS_IGNORE_WARNINGS`.
+The following new config options are added to nixpkgs: `config.ignoreWarnings` and `config.traceIgnoredWarnings`. The undocumented option `config.showDerivationWarnings` will be removed. A new environment variable is defined, `NIXPKGS_IGNORE_WARNINGS`.
 
 `ignoreWarnings` is a list of string of the format `packageName.warningKind`. A wildcard '\*' may be used before or after the dot, to ignore all warnings of one kind or all warnings of a package. For issues that have a name, `packageName.issueName` is allowed too. If an issue spans multiple packages, it is recommended to use the same name everywhere so that one may ignore all with `*.issueName`.
 
