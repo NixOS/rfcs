@@ -36,7 +36,6 @@ A new attribute is added to the `meta` section of a package: `issues`. If presen
 - `name`: Optional but recommended. Give the issue a custom name for more easy filtering
 - `date`: Required. An ISO 8601 `yyyy-mm-dd`-formatted date from when the issue was added.
 - `urls`: Optional, list of strings. Can be used to link issues, pull requests and other related items.
-- `resolved`: Optional. Indicate that the issue is resolved so that it does not generate a warning anymore.
 
 Other attributes are allowed. Some message kinds may specify additional required attributes.
 
@@ -154,7 +153,8 @@ A few other sketches about how the declaration syntax might look like in differe
 
 - ~~From above: "Ignoring a package without issues (i.e. they have all been resolved) results in a warning at evaluation time". How could this be implemented, and efficiently?~~
   - ~~More generally, how do we tell users that their ignored warning can be removed, so that they won't accidentally miss future warnings?~~
-  - Issues have a `resolved` attribute that may be used for that purpose.
+  - ~~Issues have a `resolved` attribute that may be used for that purpose.~~
+    - Properly implementing this turned out to be non-trivial, so this feature was cut for the sake of simplicity as it was not of hight importance anyways.
   - The ignore mechanism has been refined so that there is less risk of missing future warnings.
 - ~~Should issues be a list or an attrset?~~
   - We are using a list for now, there is always the possibility to also allow attrsets in the future.
