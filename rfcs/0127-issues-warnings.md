@@ -156,8 +156,8 @@ A few other sketches about how the declaration syntax might look like in differe
   - ~~Issues have a `resolved` attribute that may be used for that purpose.~~
     - Properly implementing this turned out to be non-trivial, so this feature was cut for the sake of simplicity as it was not of hight importance anyways.
   - The ignore mechanism has been refined so that there is less risk of missing future warnings.
-- ~~Should issues be a list or an attrset?~~
-  - We are using a list for now, there is always the possibility to also allow attrsets in the future.
+- ~~Should issues be a list or an attrset?~~·
+  - We are using a list ~~for now, there is always the possibility to also allow attrsets in the future.~~
 - ~~A lot of bike shedding. (See below)~~
   - Packages may have "issues" that generate "warnings" that have to be "ignored". Issues are explicitly added to packages in `meta.issues`, whereas warnings can be generated automatically from other sources, like other `meta` attributes.
 
