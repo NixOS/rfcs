@@ -43,11 +43,11 @@ The significant changes will be around naming conventions used within
 Nixpkgs and NixOS.
 
 Deprecate and move existing `/run/opengl-driver/` logic:
-- Rename `hardware.opengl` options to `hardware.drivers`
-- Rename `pkgs.addOpenGLRunpath` shell hook to `addHardwareRunpath`
-  - Alias `addOpenGLRunpath` to `addHardwareRunpath` for compatibility
-- Update nixpkgs references of `/run/opengl-driver/` to point to `/run/current-system/drivers/`
-- Update `mesa.driverLink` to point to `/run/current-system/drivers/lib`
+- Rename `hardware.opengl` options to `hardware.drivers` (pre 22.11)
+- Rename `pkgs.addOpenGLRunpath` shell hook to `addHardwareRunpath` (pre 22.11)
+  - Alias `addOpenGLRunpath` to `addHardwareRunpath` for compatibility (pre 22.11)
+- Update nixpkgs references of `/run/opengl-driver/` to point to `/run/current-system/drivers/` (post 22.11)
+- Update `mesa.driverLink` to point to `/run/current-system/drivers/lib` (post 22.11)
 
 For compatibility with existing nixpkgs packages, `/run/opengl-driver{,-32}/` will
 be a symbolic link to `/run/current-system/drivers{,-32}/`. This will likely be
