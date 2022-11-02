@@ -3,8 +3,8 @@ feature: nixpkgs_version_normalization
 start-date: 2021-09-24
 author: Anderson Torres
 co-authors:
-shepherd-team:
-shepherd-leader:
+shepherd-team: @7c6f434c @SuperSandro2000 @jeff-hykin
+shepherd-leader: @7c6f434c
 related-issues:
 ---
 
