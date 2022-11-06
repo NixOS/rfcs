@@ -94,6 +94,20 @@ meta.licenses = lib.licenses.[ bsd3 mit ];
 meta.maintainers = lib.maintainers.[ johndoe janedoe ];
 ```
 
+Note that only simple textual attrnames are allowed in the square brackets.
+For example, `pkgs.[ (openssl.overrideAttrs { patches = [ ... ]; }) ]`
+is currently a syntax error, as is `pkgs.[ "${some_expression}" ]`,
+`a.[ b.[ c d ] ]`, and `a.[ [ b c ] [ d e ] ]`.
+Future RFCs may add additional support for useful idioms such as
+`pkgs.[ python310 python310Packages.pytorch ]` on a case-by-case basis,
+but that is not planned for this RFC.
+
+Other forms of syntax which were considered but are not proposed
+in this RFC include:
+* `[ inherit (attrs) a b c; ]`
+* `[ inherit a b c; ]`
+* `inherit (attrs) [ a b c ]`
+* `pkgs.{ python = python310; openssl = openssl_3; }`
 
 # Drawbacks
 [drawbacks]: #drawbacks
