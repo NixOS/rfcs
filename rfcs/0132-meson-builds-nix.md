@@ -101,7 +101,7 @@ Below we will list some possible drawbacks and balances to them.
 
 A new build system, and any build system for that matter, indirectly brings its own dependencies to the Nix project.
 
-Ideally, such dependencies should be minimal, both in number and complexity, with extra good points for dependencies already present (e.g the ubiquitous C compiler).
+Ideally, such dependencies should be minimal, both in number and complexity, with extra good points for dependencies already present (e.g. the ubiquitous C compiler).
 
 About this specific point, a non-negligible drawback is: the reference implementation of Meson is written in Python. At least theoretically, it brings the necessity of including a Python 3 interpreter on the _bootstrap route_ of Nix.
 
