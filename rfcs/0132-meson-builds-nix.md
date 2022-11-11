@@ -216,4 +216,6 @@ Questions that deserve further inquiry:
 - [Xmake](https://xmake.io/)
 - [Bazel](https://bazel.build)
 
+- [Free-to-read book from the creator of Meson](https://nibblestew.blogspot.com/2021/12/this-year-receive-gift-of-free-meson.html)
+
 - [Current work in progress from @p01arst0rm](https://github.com/NixOS/nix/pull/3160)
