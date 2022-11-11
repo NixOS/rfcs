@@ -86,7 +86,7 @@ Here is a table comparing some expected interactions:
 | Configure | `./configure --enable-gc=true` | `meson setup build_dir -Dgc=enabled` | `meson setup build_dir -Dgc=enabled` |
 | Build     | `make`                         | `ninja -C build_dir build`           | `meson -C build_dir compile`         |
 | Install   | `make install`                 | `ninja -C build_dir install`         | `meson -C build_dir install`         |
-| Uninstall | `make uninstall`               | `ninja -C build_dir uninstall`        | `meson -C build_dir uninstall`        |
+| Uninstall | `make uninstall`               | `ninja -C build_dir uninstall`       | `meson -C build_dir uninstall`       |
 
 ## Implementation
 
@@ -108,11 +108,11 @@ About this specific point, a non-negligible drawback is: the reference implement
 However, some points can be laid out on the opposite side:
 
 1. By design, the meson reference evaluator depends only on Python, avoiding the use of extra libraries.
-2. Also by design, the implementation language is never exposed to the meson DSL. It allows the possibility of implementating alternative evaluators in other programming languages.
+2. Also by design, the implementation language is never exposed to the meson DSL. It allows the possibility of implementing alternative evaluators in other programming languages.
    1. Indeed, Muon is an alternative implementation of Meson written in C.
 3. As part of this evaluation of this bootstrap route, we should also evaluate the current bootstrap route, in order to have a fair comparison.
 
-In principle, the same criticisms and answers can be laid out for Ninja too; however, Ninja is written in C++, a language already used to implement Nix. Therefore the bootstrap route suffers little to no alteration here.
+In principle, the same criticisms and answers can be laid out for Ninja too; however, Ninja is written in C++, a language already used to implement Nix. Therefore, the bootstrap route suffers little to no alteration here.
 
 ## Learning the new system
 
@@ -136,7 +136,7 @@ However, most (if not all) of those distributions already have Meson and its com
 
 ## Transition between old and new build infrastructure
 
-The transition between between the old and new build systems should be as smooth and controlled as possible.
+The transition between old and new build systems should be as smooth and controlled as possible.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -157,13 +157,13 @@ The alternatives are
   - Both Meson and CMake support Microsoft Windows NT and Apple MacOS platforms
     - As well as MSVC and XCode programming environments.
 
-  - On the other hand, CMake DSL cmake language is arguably more complex and cumbersome.
+  However, CMake DSL is arguably more complex and cumbersome, whereas Meson is more polished.
 
 - Evaluate other building systems (waf, premake, bazel, xmake etc.)
 
   About this, a principle should be observed:
 
-  Per the bootstrap route issue discussed above, build tools strongly tied to other programming languages are strongly discouraged.
+  Per the bootstrap route issue discussed above, build tools strongly tied to other programming languages are severely discouraged.
 
   E.g. waf is basically a Python library, whereas premake and xmake are Lua libraries. They can't be decoupled of their implementation languages.
 
