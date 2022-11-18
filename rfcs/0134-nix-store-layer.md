@@ -133,7 +133,7 @@ All that said, below the store layer there is no difference in vision.
 Because our communities are so separate, it would be easy to come up with diverging versions of how derivations, store objects, etc. should work.
 That we have not done so I think is testament to the broad applicability of the Nix store design to many diverse groups of people with diverse goals.
 
-What I hope to do with Guix, then, is convene both projects to make their store store layers interoperate.
+What I hope to do with Guix, then, is convene both projects to make their store layers interoperate.
 Complementing the idea of a "marketplace of ideas" is when there is a certain design (like the Nix store layer), that is so broadly popular as to be a sort of "natural monopoly", that we should foster the most expansive and general idea of it as an exercise in coalition building and outreach.
 
 I do not expect Guix to be immediately sold on this plan, but as that larger project, I think it behooves us to take the first steps to build trust and coordination.
@@ -209,7 +209,7 @@ So whether we formally make a store-only Nix or not, I suspect the overhauled ma
 
 The daemon is a privileged process.
 Even if with upcoming changes it shouldn't need root, it does tasks like administrating OS sandboxes correctly which still are security-critical.
-Having less code in the story-only Nix daemon, even if we think the removed code was "dead anyways" is always good.
+Having less code in the store-only Nix daemon, even if we think the removed code was "dead anyways" is always good.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -234,7 +234,7 @@ What should the store-only Nix be called?
 
 Now that we have this division in the implementation, we also have the opportunity to leverage it for governance purposes.
 An official, NixOS-foundation-authorized team could be set up to manage store layer design decisions (below the threshold of needing an RFC) that don't affect that the rest of Nix.
-\[Some sort of decision that affect all layers is out of scope, must be deliberated with stakeholders from other layers too, probably should be RFC due to such large scope.\]
+Decisions that would affect all layers is out of scope for that team, must be deliberated with stakeholders from other layers too, and probably should be RFCs.
 
 To be clear, this is *not* to say we should abandon the idea of Nix as a whole.
 There can still be governance of Nix as a whole; this team, and similar hypothetical, say, Flakes, Nix language, or User Experience teams would ultimately need to report to.
