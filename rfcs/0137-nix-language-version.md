@@ -28,6 +28,8 @@ Introduce a magic comment in the first line of a Nix file:
 
 where `<version>` is a released version of Nix the given file is intended to work with.
 
+Add an appropriate parameter to commands that allow encoding the same information where where files are not involved.
+
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
