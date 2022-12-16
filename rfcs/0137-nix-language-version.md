@@ -11,13 +11,13 @@ related-issues: https://github.com/NixOS/nix/issues/7255
 # Summary
 [summary]: #summary
 
-Add a mechanism to determine which version of the Nix language grammar to use for parsing Nix files.
+Introduce a convention to determine which version of the Nix language grammar to use for parsing a Nix file.
 
 # Motivation
 [motivation]: #motivation
 
 Currently it's impossible to introduce backwards-incompatible changes to the Nix language without breaking existing setups.
-This proposal is an attempt to overcome that limitation.
+This proposal is first step towards overcoming that limitation.
 
 # Detailed design
 [design]: #detailed-design
@@ -26,9 +26,7 @@ Introduce a magic comment in the first line of a Nix file:
 
     #? Nix <version>
 
-where `<version>` is a released version of Nix the given file is known to work with.
-
-It is left to the implementation how to use this information.
+where `<version>` is a released version of Nix the given file is intended to work with.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -38,40 +36,49 @@ It is left to the implementation how to use this information.
 "nothing"
 ```
 
-# Advantages
+# Arguments
 [advantages]: #advantages
 
-- Backwards compatible
-- Visually unintrusive
-- Self-describing and human-readable
-- Opt-in until the feature is implemented in Nix *and* the first backwards-incompatible change to the language is introduced.
-- Follows a well-known convention of using [magic numbers in files](https://en.m.wikipedia.org/wiki/Magic_number_(programming)#In_files)
-- Encourages, but does not require the Nix evaluator to deal with backwards-incompatible changes in a principled manner.
-
-# Drawbacks
-[drawbacks]: #drawbacks
-
-- The syntax of the magic comment is arbitrary.
-- At least one form of comment is forever bound to begin with `#` to maintain compatibility.
-- There is a chance of abusing the magic comment for more metadata in the future.
-  Let's avoid that.
-- It requires effort to implement an appropriate system to make use of the version information.
+* (+) Encourages developing Nix to deal with changes to the Nix language in a principled manner.
+* (+) Backwards-compatible
+  * (+) Allows for gradual adoption: opt-in until semantics is implemented in Nix *and* the first backwards-incompatible change to the language is introduced.
+* (+) Visually unintrusive
+* (+) Self-describing and human-readable
+* (+) Follows a well-known convention of using [magic numbers in files](https://en.m.wikipedia.org/wiki/Magic_number_(programming)#In_files)
+* (-) The syntax of the magic comment is arbitrary.
+* (-) There is a chance of abusing the magic comment for more metadata in the future. Let's avoid that.
+* (-) At least one form of comment is forever bound to begin with `#` to maintain compatibility.
+* (-) It requires significant additional effort to implement and maintain an appropriate system to make use of the version information.
 
 # Alternatives
 [alternatives]: #alternatives
 
 - Never introduce backwards-incompatible changes to the language.
 
-  This is what has been happening so far, and required additions to be made very carefully.
+  * (+) No additional effort required.
+  * (-) Requires additions to be made very carefully.
+  * (-) Makes solving some well-known problems impossible.
 
-- Use a different versioning scheme for the Nix language that is decoupled from the rest of Nix.
+- Use the output of [`builtins.langVersion`] for specifying the version of the Nix language.
 
-  Although this can be done at any point in the future, because it's the evaluator that will read this information.
+  * (-) `builtins.langVersion` is currently only internal and undocumented.
+    * (-) Requires adding another built-in or command line option to the public API.
+    * (-) Using a language feature requires an additional steps from users to determine the current version.
+      * (+) We can add a command line option such that it is not more effort than `nix --version`.
+  * (+) The Nix language version is decoupled Nix version numbering.
+    * (+) It changes less often than the Nix version.
+      * (-) That was probably due to making changes being so hard.
+    * (-) There are two version numbers to keep track of.
+  * (-) The magic comment should reflect that it's specifying the *Nix language* version, which would make it longer.
+    * (-) Renaming the Nix language will be impossible once the mechanism is part of stable Nix.
+
+[`builtins.langVersion`]: https://github.com/NixOS/nix/blob/26c7602c390f8c511f326785b570918b2f468892/src/libexpr/primops.cc#L3952-L3957
 
 - Use a magic string that is incompatible with evaluators prior to the feature, e.g. `%? Nix <version>`.
 
-  This would make clear to users that the file is not intended to be used without explicit handling of compatibility.
-  Such a breaking change could be reserved for later iterations of how Nix encodes language version information.
+  * (+) Makes clear that the file is not intended to be used without explicit handling of compatibility.
+    * (-) Cannot be introduced gradually.
+  * (+) Such a breaking change could also be reserved for later iterations of the Nix language.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
@@ -82,4 +89,4 @@ It is left to the implementation how to use this information.
 # Future work
 [future]: #future-work
 
-Determine what exaclty to do with the information given in the magic comment.
+Define semantics, that is, what exactly to do with the information given in the magic comment.
