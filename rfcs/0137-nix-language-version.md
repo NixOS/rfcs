@@ -61,7 +61,9 @@ where `<version>` is a released version of Nix the given file is intended to wor
 
 - Use the output of [`builtins.langVersion`] for specifying the version of the Nix language.
 
+  * (+) This would serve other Nix language evaluators which are not and should not be tied to the rest of Nix.
   * (-) `builtins.langVersion` is currently only internal and undocumented.
+    * (+) Documentation is easy to add.
     * (-) Requires adding another built-in or command line option to the public API.
     * (-) Using a language feature requires an additional steps from users to determine the current version.
       * (+) We can add a command line option such that it is not more effort than `nix --version`.
