@@ -39,12 +39,15 @@ where `<version>` is a released version of Nix the given file is intended to wor
 # Arguments
 [advantages]: #advantages
 
-* (+) Encourages developing Nix to deal with changes to the Nix language in a principled manner.
+* (+) Makes explicit what can be expected to work.
+* (+) Enables communicating language changes systematically.
 * (+) Backwards-compatible
   * (+) Allows for gradual adoption: opt-in until semantics is implemented in Nix *and* the first backwards-incompatible change to the language is introduced.
 * (+) Visually unintrusive
 * (+) Self-describing and human-readable
 * (+) Follows a well-known convention of using [magic numbers in files](https://en.m.wikipedia.org/wiki/Magic_number_(programming)#In_files)
+* (-) May make the appearance that changing the language is harmless.
+  * (+) The convention itself is harmless and independent of the development culture around the language.
 * (-) The syntax of the magic comment is arbitrary.
 * (-) There is a chance of abusing the magic comment for more metadata in the future. Let's avoid that.
 * (-) At least one form of comment is forever bound to begin with `#` to maintain compatibility.
@@ -91,4 +94,5 @@ where `<version>` is a released version of Nix the given file is intended to wor
 # Future work
 [future]: #future-work
 
-Define semantics, that is, what exactly to do with the information given in the magic comment.
+- Define semantics, that is, what exactly to do with the information given in the magic comment.
+- Define rules deciding when a change to the language is appropriate to avoid proliferation and limit complexity of implementation.
