@@ -28,6 +28,8 @@ Introduce a magic comment in the first line of a Nix file:
 
 where `<version>` is a released version of Nix the given file is intended to work with.
 
+If no magic comment is present, Nix 2.12 – the stable release at the time this RFC was accepted – is assumed.
+
 Add an appropriate parameter to commands that allow encoding the same information where where files are not involved.
 
 # Examples and Interactions
