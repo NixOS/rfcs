@@ -85,6 +85,20 @@ where `<version>` is a released version of Nix the given file is intended to wor
     * (-) Cannot be introduced gradually.
   * (+) Such a breaking change could also be reserved for later iterations of the Nix language.
 
+# Prior art
+
+- [Rust `edition` field]
+
+  Rust has an easier problem to solve. Cargo files are written in TOML, so the `edition` information does not have to be part of Rust itself.
+
+- [Flakes `edition` field]
+
+  There had been an attempt to include an `edition` field into the Flakes schema.
+  It did not solve the problem of having to evaluate the Nix expression using *some* version of the grammar.
+
+[Rust `edition` field]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-edition-field
+[Flakes `edition` field]: https://discourse.nixos.org/t/nix-2-8-0-released/18714/6
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
