@@ -119,7 +119,7 @@ Using the following JSON:
     // (Optional) Path to the initrd
     "initrd": "/nix/store/xxx-initrd-linux/initrd",
 
-    // (Optional) path to a tool to dynamically add secrets to an initrd
+    // (Optional) Path to a tool to dynamically add secrets to an initrd
     "initrdSecrets": "/nix/store/xxx-append-secrets/bin/append-initrd-secrets",
 
     // (Required) Path to the kernel image
