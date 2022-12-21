@@ -168,7 +168,7 @@ Using the following JSON:
 }
 ```
 
-An *optional* field mean: either missing or present, **not null**.
+An *optional* field means: a field that is either missing or present, but **never `null`**.
 
 ### Risks
 [risks]: #risks
