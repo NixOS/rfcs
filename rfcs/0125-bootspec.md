@@ -110,20 +110,22 @@ Using the following JSON:
 {
   // Toplevel key describing the version of the specification used in the document
   "v1": {
+    // (Required) System type the bootspec is intended for (e.g. `x86_64-linux`, `aarch64-linux`)
+    "system": "x86_64-linux",
 
-    // Path to the stage-2 init, executed by the initrd
+    // (Required) Path to the stage-2 init, executed by the initrd
     "init": "/nix/store/xxx-nixos-system-xxx/init",
 
-    // Path to the initrd
+    // (Optional) Path to the initrd
     "initrd": "/nix/store/xxx-initrd-linux/initrd",
 
-    // Optional path to a tool to dynamically add secrets to an initrd
+    // (Optional) Path to a tool to dynamically add secrets to an initrd
     "initrdSecrets": "/nix/store/xxx-append-secrets/bin/append-initrd-secrets",
 
-    // Path to the kernel image
+    // (Required) Path to the kernel image
     "kernel": "/nix/store/xxx-linux/bzImage",
 
-    // Kernel commandline options
+    // (Required) Kernel commandline options
     "kernelParams": [
       "amd_iommu=on",
       "amd_iommu=pt",
@@ -135,14 +137,15 @@ Using the following JSON:
       "loglevel=4"
     ],
 
-    // The label of the system. It should contain the operating system, kernel version,
+    // (Required) The label of the system. It should contain the operating system, kernel version,
     // and other user-relevant information to identify the system. This corresponds
     // loosely to `config.system.nixos.label`.
     "label": "NixOS 21.11.20210810.dirty (Linux 5.15.30)",
 
-    // Top level path of the closure, in case some spelunking is required
+    // (Required) Top level path of the closure, in case some spelunking is required
     "toplevel": "/nix/store/xxx-nixos-system-xxx",
 
+    // (Optional) Mapping of specialisation names to their bootspec document
     "specialisation": {
       // <name> corresponds to <name> in specialisation.<name>.configuration.
       // Note that it is not valid for a specialisation to be a different version than the main document.
@@ -150,10 +153,22 @@ Using the following JSON:
         // A full Bootspec v1 document, _without_ the `"v1"` key.
         // Note that it is not valid for a specialisation to have further specialisations.
       }
+    },
+
+    // (Optional) User-specified metadata
+    "extensions": {
+      // <namespace> corresponds to a user-provided namespace
+      // to reduce the chances of collision when using
+      // multiple extensions at once
+      "<namespace>": {
+        // Any kind of representable JSON is valid here
+      }
     }
   }
 }
 ```
+
+An *optional* field means: a field that is either missing or present, but **never `null`**.
 
 ### Risks
 [risks]: #risks
@@ -207,8 +222,6 @@ Concretely, a user who enables memtest probably wants the most recent memtest, a
 
 # Open Questions
 [open-questions]: #open-questions
-
-- Should there be a general-purpose "meta" or "extensions" field which allows arbitrary extension of the data? What should this look like?
 
 # Future Work
 [future]: #future-work
