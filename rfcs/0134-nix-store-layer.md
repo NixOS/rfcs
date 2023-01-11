@@ -3,8 +3,8 @@ feature: nix-store-layer
 start-date: 2022-09-06
 author: John Ericson
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: edolstra, infinisil, tomberek, L-as, andir
+shepherd-leader: edolstra
 related-issues: (will contain links to implementation PRs)
 ---
 
