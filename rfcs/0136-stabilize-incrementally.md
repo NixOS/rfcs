@@ -95,6 +95,13 @@ Step 1 is technical work, with a self-imposed deadline so we can be sure it does
 The remaining steps are stabilization steps.
 For each of them, a separate RFC or other discussion medium will describe the new interfaces to be stabilized, and solicit feedback.
 
+## Step 0: Stabilize the store-only installable-free CLI
+
+There are certain commands like `nix store gc`, `nix store ping` that do not take any positional arguments.
+As @roberth elsewhere pointed out, because these commands have so few degrees of freedom, they are some of the easiest to stabilize --- there is simply less to pour over and possibly bikeshed.
+
+We can start stabilizing them right away, either in a batch, or one by one.
+
 ## Step 1: Split out a store-only Nix, with deadline
 
 This is the same as step one from [RFC 134](https://github.com/NixOS/rfcs/pull/134), upon which this RFC depends.
@@ -167,6 +174,8 @@ I therefore think that is a small and reasonable price to pay for the benefit of
 
 The second delays don't represent time "ideal" from a stabilization perspective.
 As long as we are making progress stabilizing features and having healthy discussions, I don't see any problem.
+
+**Step 0** is also designed to take the preasure off these this, giving us *something* to work on that is not blocked on RFC 134 or anything else.
 
 # Alternatives
 [alternatives]: #alternatives
