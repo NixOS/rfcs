@@ -13,11 +13,11 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/177272
 ## Summary
 [summary]: #summary
 
-Inspired by the various derivation checks like for broken and insecure packages, a new system called "problems" is introduced. It is planned to eventually replace the previously mentioned systems where possible, as well as the current – undocumented – "warnings" (which currently only prints a trace message for unmaintained packages). A `config.problemHandler` option is added to the nixpkgs configuration, with centralized and granular control over how to handle problems that arise: "throw" (fail evaluation), "trace" (print a warning message) or "ignore" (do nothing).
+Inspired by the various derivation checks like for broken and insecure packages, a new system called "problems" is introduced. It is planned to eventually replace the previously mentioned systems where possible, as well as the current – undocumented – "warnings" (which currently only prints a trace message for unmaintained packages). A `config.problemHandler` option is added to the nixpkgs configuration, with centralized and granular control over how to handle problems that arise: "error" (fail evaluation), "warn" (print a trace message) or "ignore" (do nothing).
 
 Additionally, `meta.problems` is added to derivations, which can be used to manually declare that a package has a certain problem. This will then be used to inform users about packages that are in need of maintenance, for example security vulnerabilities or deprecated dependencies.
 
-Using the newly introduced features, we may create a process for removing packages from nixpkgs that is easier to maintain and friendlier to users than just replacing packages with `throw`.
+Using the newly introduced features, we may create a process for removing packages from nixpkgs that is easier to maintain and friendlier to users than just replacing packages with `throw` directly.
 
 ## Motivation
 [motivation]: #motivation
@@ -82,13 +82,13 @@ Not all values make sense for declaration in `meta.problems`: Some may be automa
 
 The following new config option is added to nixpkgs: `config.problemHandler`. The (currently undocumented) option `config.showDerivationWarnings` will be removed.
 
-Handler values can be either `"throw"`, `"trace"` or `"ignore"`. Future values may be added in the future. The key is of the form `packageName.problemKind` or `packageName.problemName`, where `"*"` is allowed on either level as a wildcard.
+Handler values can be either `"error"`, `"warn"` or `"ignore"`. `"error"` maps to `throw`, `"warn"` maps to `trace`. Future values may be added in the future. The key is of the form `packageName.problemKind` or `packageName.problemName`, where `"*"` is allowed on either level as a wildcard.
 
 ```nix
 problemHandler = {
   "*" = {
-    "*" = "throw";
-    alias = "trace";
+    "*" = "error";
+    alias = "warn";
     maintainerless = "ignore";
   };
   myPackage.foo = "ignore";
@@ -110,9 +110,9 @@ The default value in nixpkgs might be something like:
 
 ```nix
 problemHandler."*" = {
-  "*" = "trace";
-  removal = "throw";
-  deprecated = "throw";
+  "*" = "warn";
+  removal = "error";
+  deprecated = "error";
   maintainerless = "ignore";
 };
 ```
@@ -136,7 +136,7 @@ New problems generally should not be added to stable branches if possible, and a
 
 ### Removal of packages
 
-The plan is to eventually remove packages with long outstanding problems. The details will be part of future work, but at the very least a package must have a problem whose kind defaults to "throw" for at least one full release cycle (so that stable users have sufficient time to be warned and intervene).
+The plan is to eventually remove packages with long outstanding problems. The details will be part of future work, but at the very least a package must have a problem whose kind defaults to "error" for at least one full release cycle (so that stable users have sufficient time to be warned and intervene).
 
 If a package needs to be removed for some other reason, the problem kind `removal` should be used instead:
 
