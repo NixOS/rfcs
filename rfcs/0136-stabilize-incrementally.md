@@ -175,14 +175,15 @@ I therefore think that is a small and reasonable price to pay for the benefit of
 The second delays don't represent time "ideal" from a stabilization perspective.
 As long as we are making progress stabilizing features and having healthy discussions, I don't see any problem.
 
-**Step 0** is also designed to take the preasure off these this, giving us *something* to work on that is not blocked on RFC 134 or anything else.
+**Step 0** is also designed to take the pressure off these possible sources of delay, giving us *something* to work on that is not blocked on RFC 134 or anything else.
 
 # Alternatives
 [alternatives]: #alternatives
 
-Of course, we could instead count on the magnitude of new years making the concerns of old users unimportant, but I think the plan here has little downsides; we can instead make everyone happy with only a small delay.
+We could, of course, just "rip off the band-aid" and stabilize everything at once.
+The argument for that would be that enough time has passed and the concerns of (less numerous) long-time users are not important.
+But I think the plan here has little downsides; we can instead make everyone happy with only a small delay.
 If that is true, why not do that instead!
-That is what this plan is trying to be.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
