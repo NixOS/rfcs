@@ -142,11 +142,6 @@ Making a stand-alone Nix store executable demonstrates we are serious about laye
 # Detailed design
 [design]: #detailed-design
 
-The goals motivated above a broken down into small steps that we can execute in isolation.
-This keeps the cost of this work initially lower, and generally reduces risk.
-
-## 1. The split itself
-
 Allow building a store-only version of Nix.
 This is a Nix executable that links `libstore` but not `libfetchers`, or `libexpr`.
 Plenty of commands like `nix daemon`, `nix log`, and the `nix store` sub-commands don't care about evaluation, fetching, or Flakes at all.
@@ -160,23 +155,12 @@ The store-only Nix and its tests should be built as part of CI, as "first class"
 That means both in the channel-blocking Hydra evaluation, and for each pull request.
 If we hit the limits of GitHub Actions in per-pull-request CI, we should consider using Hydra either instead or in addition to GitHub Actions, something that has already been discussed.
 
-## 2. Manual
-
-It should be possible to build a store-only manual without information on the other layers, too.
-This would be the manual that is distributed with the store-only Nix.
-Of course, store-only and full Nix can share sections, so we aren't duplicating work.
-
-## 3. Website
+For initial testing, we can run the regular nix as a client against the daemon from the store-only Nix.
+This will ensure the code is somewhat covered without requiring any new tests.
+(The infrastructure for testing with an arbitrary daemon already exists.)
 
 The full and store-only version of Nix should both be presented for download on the website.
 This should be just like how Plasma, Gnome, and headless installer images for NixOS are all offered.
-
-## 4. Store-specific Tests
-
-The current test suite uses Nix language for most tests of store-layer functionality.
-We should write new tests that don't use the Nix language.
-E.g. we might create a `read-derivation` complement of `show-derivation` that accepts a nicer JSON representation of a derivation as input.
-This will allow the store-only Nix to be tested in isolation, but these tests can also be used with full Nix.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -229,6 +213,19 @@ What should the store-only Nix be called?
 
 # Future work
 [future]: #future-work
+
+## Store-specific Tests
+
+The current test suite uses Nix language for most tests of store-layer functionality.
+We should write new tests that don't use the Nix language.
+E.g. we might create a `read-derivation` complement of `show-derivation` that accepts a nicer JSON representation of a derivation as input.
+This will allow the store-only Nix to be tested in isolation, but these tests can also be used with full Nix.
+
+## Manual
+
+It should be possible to build a store-only manual without information on the other layers, too.
+This would be the manual that is distributed with the store-only Nix.
+Of course, store-only and full Nix can share sections, so we aren't duplicating work.
 
 ## Nix Store Team
 
