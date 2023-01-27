@@ -57,8 +57,8 @@ For example, in earlier versions of Nix `nix search` worked without Flakes.
 ## A plan all sides can be happy with
 
 Stabilizing the new CLI and Flakes will end the saga of the past few years.
-It is a last good chance to sooth some of these tensions and put us on a good foot moving forward.
-The new NixOS Foundation gives me hope Nix is serious about addressing these sorts of governance issues, and thus would be a good way to further demonstrate we are turning a new leaf.
+It is a last good chance to soothe some of these tensions and put us on a good foot moving forward.
+The new NixOS Foundation gives the RFC authors hope Nix is serious about addressing these sorts of governance issues, and thus would be a good way to further demonstrate we are turning a new leaf.
 
 The plan below attempts to make all sides happy, despite their seemingly irreconcilable differences.
 The basic thrust is to proceed with stabilization in small steps.
@@ -66,7 +66,7 @@ Two benefits are envisioned:
 
 ### Benefit 1: Keep discussions on track.
 
-Threads on Flakes in the past have been impossible to follow because the sheer magnitude of different topics being discussed.
+Threads on Flakes in the past, such as that for the [original RFC](https://github.com/NixOS/rfcs/pull/49), have been impossible to follow because the sheer magnitude of different topics being discussed.
 Small stabilization steps are meant to yield *focused, bounded* discussions that actually read well.
 This also ensures any issues that do arise are actually brought to attention, and not lost within a deluge of other topics.
 
@@ -75,18 +75,18 @@ This also ensures any issues that do arise are actually brought to attention, an
 Flakes are obviously the most controversial, and so they are saved for last.
 The CLI is more broadly popular, but still is a lot of material to discuss.
 The store-only subcommands are Nix's "plumbing" as opposed to "porcelain" commands, and thus have the simplest (if not most user-friendly) purposes.
-This "dusty corner" off the new CLI is rather calm with a very constrained design space, and far less acrimony.
+This "dusty corner" of the new CLI is rather calm with a very constrained design space, and far less acrimony.
 
 ## Conclusion
 
-By starting with these relatively easy material to stabilize, we can prove we can all come together as a community to agree on a design after all.
+By starting with this relatively easy material to stabilize, we can prove we can all come together as a community to agree on a design after all.
 This should build trust between opposing individuals and factions, giving us a foundation upon which to tackle the more challenging material in subsequent steps.
 
 Since these features became very popular while they are still unstable, there is now both an urgency to stabilize them, and little ability to modify them.
 This is the opposite of how experimental features are supposed to leisurely incubate with both plenty of flexibility to change them, and little rush to stabilize them until they feel ready.
 But, there is little we can do about this at this point, an this RFC recognizes that fact and does *not* try to resist it.
 
-But, we have crossed that Rubicon and there is no turning back; this RFC *doesn't* attempt to change Flakes or the command line 
+But, we have crossed that Rubicon and there is no turning back; this RFC *doesn't* attempt to change Flakes or the command line.
 
 # Detailed design
 [design]: #detailed-design
@@ -117,7 +117,7 @@ Yet it will still offer some interesting topics to discus, such as:
 
 - logging
 - store paths on `stdout` at end of build?
-- Should commands like `show-derivation` should use `--json` by default
+- Should commands like `show-derivation` use `--json` by default?
 - Flat vs hierarchical commands
 - is `--derivation` a good flag?
 
@@ -125,8 +125,8 @@ Yet it will still offer some interesting topics to discus, such as:
 
 If the deadline for step 1 is *not* met, we jump directly to this step, skipping step 2.
 
-This is rest off the new CLI, without flakes.
-Unlike the store-only Nix command which has yet to be implemented, this is easy to visual today by enabling the `nix-command` feature without the `flakes` feature.
+This is the rest off the new CLI, without flakes.
+Unlike the store-only Nix command which has yet to be implemented, this is easy to visualize today by enabling the `nix-command` feature without the `flakes` feature.
 This is a chance to discuss topics like:
 
 - Is `--file` good, or should we be able to specify something like `file#attribute` to mix files and attributes? (Without using Flakes.)
@@ -159,7 +159,7 @@ That is the purpose of this RFC!
 We do *not* propose adding delay to once-again separate those features from Flakes, as that would introduce more feature work which would delay stabilization and be unacceptable to the pro-Flakes faction.
 
 That said, an ancillary incremental process of incremental stabilization is to bolster a *sense* of layering in Nix's user interface that has been, according to this camp, lost.
-Ensuring that the these two subsets of the new CLI --- without Flakes, and without Nix language support --- do in fact make sense in isolation will provide a "scaffolding" upon which interested parties can later introduce generalized features like search and pure eval without Flakes.
+Ensuring that these two subsets of the new CLI --- without Flakes, and without Nix language support --- do in fact make sense in isolation will provide a "scaffolding" upon which interested parties can later introduce generalized features like search and pure eval without Flakes.
 
 The hope is that such scaffolding will assuage this faction their concerns are heard without holding things up.
 
@@ -170,10 +170,10 @@ The main downside is a small delay from the splitting Nix process, and then dela
 
 The first delay has a guaranteed upper bound, thanks to its self-imposed deadline.
 That maximum delay should be dwarfed by duration of time we've spent "in limbo" without a clear plan to move forward.
-I therefore think that is a small and reasonable price to pay for the benefit of community harmony.
+We therefore think that is a small and reasonable price to pay for the benefit of community harmony.
 
 The second delays don't represent time "ideal" from a stabilization perspective.
-As long as we are making progress stabilizing features and having healthy discussions, I don't see any problem.
+As long as we are making progress stabilizing features and having healthy discussions, we don't see any problem.
 
 **Step 0** is also designed to take the pressure off these possible sources of delay, giving us *something* to work on that is not blocked on RFC 134 or anything else.
 
@@ -182,7 +182,7 @@ As long as we are making progress stabilizing features and having healthy discus
 
 We could, of course, just "rip off the band-aid" and stabilize everything at once.
 The argument for that would be that enough time has passed and the concerns of (less numerous) long-time users are not important.
-But I think the plan here has little downsides; we can instead make everyone happy with only a small delay.
+But we think the plan here has little downsides; we can instead make everyone happy with only a small delay.
 If that is true, why not do that instead!
 
 # Unresolved questions
