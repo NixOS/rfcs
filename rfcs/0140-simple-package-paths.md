@@ -105,7 +105,7 @@ pkgs
 - `git blame` locally and on GitHub is unaffected, since it follows file renames properly.
 - A commonly recommended way of building package directories in nixpkgs is to use `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
   Since the path changes `pkg-fun.nix` is now used, this becomes like `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/unit/he/hello/pkg-fun.nix {}'`, which is harder for users.
-  However, calling a path like this is an anti-pattern anyways, because it doesn't use the correct nixpkgs version and it doesn't use the correct argument overrides.
+  However, calling a path like this is an anti-pattern anyway, because it doesn't use the correct nixpkgs version and it doesn't use the correct argument overrides.
   The correct way of doing it was to add the package to `pkgs/top-level/all-packages.nix`, then calling `nix-build -A hello`.
   This `nix-build -E` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
   By teaching users that `pkgs/unit/*/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build -E` workarounds should disappear.
@@ -130,15 +130,12 @@ pkgs
 
 - Use a flat directory, e.g. `pkgs.hello` would be in `pkgs/unit/hello`.
   - Good because it's simpler, both for the user and for the code
-  - Good because it speeds up Nix evaluation since there's only a single directory to call `builtins.readDir` on instead of many
-    - With an optimized `readDir` this isn't much of a problem
   - Bad because the GitHub web interface only renders the first 1'000 entries (and we have about 10'000 that benefit from this transition, even given the restrictions)
-  - Bad because it makes `git` slower ([TODO: By how much?](https://github.com/nixpkgs-architecture/simple-package-paths/issues/18))
-  - Bad because directory listing slows down with many files
+  - Bad because it makes `git` and file listings slower
 - Use `substring 0 3 name` or `substring 0 4 name`. This was not done because it still leads to directories in `pkgs/unit` containing more than 1'000 entries, leading to the same problems.
 - Use multi-level structure, like a 2-level 2-prefix structure where `hello` is in `pkgs/unit/he/ll/hello`,
   if packages are less than 4 characters long, we will it out with `-`, e.g. `z` is in `pkgs/unit/z-/--/z`.
-  This is not great because it's more complicated and it would improve git performance only marginally.
+  This is not great because it's more complicated, longer to type and it would improve performance only marginally.
 - Use a dynamic structure where directories are rebalanced when they have too many entries.
   E.g. `pkgs.foobar` could be in `pkgs/unit/f/foobar` initially.
   But when there's more than 1'000 packages starting with `f`, all packages starting with `f` are distributed under 2-letter prefixes, moving `foobar` to `pkgs/unit/fo/foobar`.
@@ -146,11 +143,13 @@ pkgs
 
 ## Alternate `pkg-fun.nix` filename
 
-- `default.nix`: Bad because:
-  - Doesn't have its main benefits in this case:
+- `default.nix`:
+  - Bad because it doesn't have its main benefits here:
     - Removing the need to specify the file name in expressions, but this does not apply because this file will be imported automatically by the code that replaces definitions from `all-packages.nix`.
     - Removing the need to specify the file name on the command line, but this does not apply because a package function must be imported into an expression before it can be used, making `nix build -f pkgs/unit/hell/hello` equally broken regardless of file name.
-  - Not using `default.nix` frees up `default.nix` for a short expression that is actually buildable, e.g. `(import ../..).hello`, although at that point it might better be auto-generated or implicit in the CLI
+  - Not using `default.nix` frees up `default.nix` for a short expression that is actually buildable, e.g. `(import ../.. {}).hello`, although we don't yet have a use case for this that isn't covered by `nix-build ../.. -A $attrname`.
+  - Bad because using `default.nix` would tempt users to invoke `nix-build .` whereas making package functions auto-callable is a known anti-pattern as it duplicates the defaults.
+  - Good because `default.nix` is already a convention most people are used to
 - `package.nix`/`pkg.nix`: Bad, because it makes the migration to a non-function form of overridable packages harder in the future.
 
 ## Alternate `pkgs/unit` location
@@ -189,14 +188,14 @@ That said, we did identify risks:
  - We might not focus enough on the foundation, while we could more easily relax requirements later.
     - After more discussion, we feel confident that the manual `callPackage` calls are unlikely to cause issues that we wouldn't otherwise have.
 
-# Recommend a `callPackage` pattern with default arguments
+## Recommend a `callPackage` pattern with default arguments
 
 > - While this RFC doesn't address expressions where the second `callPackage` argument isn't `{}`, there is an easy way to transition to an argument of `{}`: For every attribute of the form `name = attrs.value;` in the argument, make sure `attrs` is in the arguments of the file, then add `name ? attrs.value` to the arguments. Then the expression in `all-packages.nix` can too be auto-called
 >   - Don't do this for `name = value` pairs though, that's an alias-like thing
 
 `callPackage` does not favor the default argument when both a default argument and a value in `pkgs` exist. Changing the semantics of `callPackage` is out of scope.
 
-# Allow `callPackage` arguments to be specified in `<unit>/args.nix`
+## Allow `callPackage` arguments to be specified in `<unit>/args.nix`
 
 The idea was to expand the auto-calling logic according to:
 
@@ -233,10 +232,3 @@ All of these questions are in scope to be addressed in future discussions in the
 - What to do about e.g. `libsForQt5.callPackage`? This goes into overrides, a different problem to fix
 - What about aliases like `jami-daemon = jami.jami-daemon`?
 - What about `recurseIntoAttrs`? Not single packages, package sets, another problem
-
-# Definitions
-
- - <a id="def-variant-attribute"/> *variant attribute*: an attribute that defines a package by invoking it with non-default arguments, for example:
-   ```
-     graphviz_nox = callPackage ../tools/graphics/graphviz { withXorg = false; };
-   ```
