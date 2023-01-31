@@ -33,36 +33,38 @@ For some use cases, like for packages without maintainers, we do not want to bre
 
 ### Package problems
 
-A new attribute is added to the `meta` section of a package: `problems`. If present, it is a list of attrsets which each have at least the following fields:
+A new attribute is added to the `meta` section of a package: `problems`. If present, it is a an attribute set of attrsets which each have at least the following fields:
 
-- `kind`: Required. If present, the resulting warning will be printed as `kind: message`.
+- `kind`: Required. The resulting warning will be printed as `kind: message`. Defaults to the attrset key if absent.
 - `message`: Required. A string message describing the issue with the package. The value should:
   - Start with the "This package", "The application" or equivalent, or simply with the package name.
   - Be capitalized (unless it starts with the package name).
   - Use a period at the end.
-- `name`: Required if there are multiple values of the same `kind`. Give the issue a custom name for more easy filtering
+- `name`: Inferred from the attrset key if `kind` is specified. Give the issue a custom name for more easy filtering.
 - `date`: Required. An ISO 8601 `yyyy-mm-dd`-formatted date from when the issue was added.
 - `urls`: Optional, list of strings. Can be used to link issues, pull requests and other related items.
 
 Other attributes are allowed. Some message kinds may specify additional required attributes.
+The keys in the attribute set are used to infer the `name` or `kind` values within, depending on which is present.
 
 Example values:
 
 ```nix
-meta.problems = [
-  {
-    name = "python2-eol";
+meta.problems = {
+  # This one will have the name "python2-eol"
+  python2-eol = {
     kind = "deprecated";
     message = "This package depends on Python 2, which has reached end of life.";
     date = "1970-01-01";
     urls = [ "https://github.com/NixOS/nixpkgs/issues/148779" ];
-  }
-  {
-    kind = "removal";
+  };
+  # This one will have no name
+  removal = {
+    # kind = "removal"; # Inferred from attribute key
     message = "The application has been abandoned upstream, use libfoo instead";
     date = "1970-01-01";
-  }
-];
+  };
+};
 ```
 
 ### Problem kinds
@@ -191,7 +193,7 @@ A few other sketches about how the declaration syntax might look like in differe
 
 ```nix
 {
-  # As proposed in the RFC
+  # Using a list instead of attribute set. Slightly less complexity, but also slightly more verbose.
   meta.issues = [{
     kind = "deprecated";
     name = "python2-eol";
