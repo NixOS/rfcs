@@ -209,7 +209,7 @@ But that feels to me like turning an ongoing shift in focus to a one-off change 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-What should the store-only Nix be called?
+None at this time
 
 # Future work
 [future]: #future-work
@@ -246,6 +246,12 @@ If we establish informal interoperability across store-layer implementations wit
 (Of course, implementations are free to implement features in excess of what the standard requires!)
 
 A new store team, per the above, could lead the process from our end, since the other parts of Nix are not shared with Guix and thus out of scope for this sort of cross-project standardization.
+
+### Naming
+
+A standard shared between Nix, Guix, and other such projects presumably shouldn't be called "Nix" or even "Nix Store".
+Otherwise those other projects' communities will feel like second-class stakeholders.
+We can find a "neutral" name for the store layer that doesn't bias one project over another as part of establishing the standard.
 
 ## Stabilization
 
