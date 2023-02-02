@@ -12,7 +12,7 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/211832
 [summary]: #summary
 
 Auto-generate trivial top-level attribute definitions in `pkgs/top-level/all-packages.nix` from a directory structure that matches the attribute name.
-This makes it much easier to contribute new packages packages, since there's no more guessing needed as to where the package should go, both in the ad-hoc directory categories and in `pkgs/top-level/all-packages.nix`.
+This makes it much easier to contribute new packages, since there's no more guessing needed as to where the package should go, both in the ad-hoc directory categories and in `pkgs/top-level/all-packages.nix`.
 
 # Motivation
 [motivation]: #motivation
@@ -27,14 +27,14 @@ This makes it much easier to contribute new packages packages, since there's no 
   - First one has to find the definition of it in all-packages.nix to see what file it refers to
     - On GitHub this is even more problematic, as the `all-packages.nix` file is [too big to be displayed by GitHub](https://github.com/NixOS/nixpkgs/blob/nixos-22.05/pkgs/top-level/all-packages.nix)
   - Then go to that file's definition, which takes quite some time for navigation (unless you have a plugin that can jump to it directly)
-    - It also slows down or even deadlocks editors due to the file size
+    - It also slows down or even locks up editors due to the file size
   - `nix edit -f . package-attr` works, though that's not yet stable (it relies on the `nix-command` feature being enabled) and doesn't work with packages that don't set `meta.position` correctly).
 - `all-packages.nix` frequently causes merge conflicts. It's a point of contention for all new packages
 
 # Detailed design
 [design]: #detailed-design
 
-This RFC establishes the standard of using `pkgs/unit/${shard}/${name}` "unit" directories for the definitions of the Nix packages `pkgs.${name}` in nixpkgs, where `shard = toLower (substring 0 2 name)`.
+This RFC establishes the standard of using `pkgs/unit/${shard}/${name}` "unit" directories for the definitions of the Nix packages `pkgs.${name}` in Nixpkgs, where `shard = toLower (substring 0 2 name)`.
 All unit directories are automatically discovered and incorporated into the `pkgs` set using `pkgs.${name} = pkgs.callPackage pkgs/unit/${shard}/${name}/pkg-fun.nix { }`.
 
 The following requirements will be checked by CI.
@@ -56,10 +56,10 @@ This ensures that people can expect the unit directories to correspond to builda
 
 ## Stable boundary
 
-Unit directories may only interact with the rest of nixpkgs via the stable `pkgs.${name}` attributes, not with file references:
+Unit directories may only interact with the rest of Nixpkgs via the stable `pkgs.${name}` attributes, not with file references:
 - Files inside a unit directory must not reference files outside that unit directory.
   Therefore all dependencies on other packages must come from `pkg-fun.nix` arguments injected by `callPackage`.
-  This ensures that files in nixpkgs can be moved around without breaking this package.
+  This ensures that files in Nixpkgs can be moved around without breaking this package.
 - Files outside a unit directory must not reference files inside that unit directory.
   Therefore other packages can only depend on this package via `pkgs.${name}`.
   This ensures that files within unit directories (except `pkg-fun.nix`) can be freely moved and changed without breaking any other packages.
@@ -75,7 +75,7 @@ This ensures that even if a package initially doesn't require a custom `args`, i
 ## Examples
 [examples]: #examples
 
-To add a new package `pkgs.foobar` to nixpkgs, one only needs to create the file `pkgs/unit/fo/foobar/pkg-fun.nix`.
+To add a new package `pkgs.foobar` to Nixpkgs, one only needs to create the file `pkgs/unit/fo/foobar/pkg-fun.nix`.
 No need to find an appropriate category nor to modify `pkgs/top-level/all-packages.nix` anymore.
 
 With many packages, the `pkgs/unit` directory may look like this:
@@ -103,9 +103,9 @@ pkgs
 
 - `nix edit` and search.nixos.org are unaffected, since they rely on `meta.position` to get the file to edit, which still works
 - `git blame` locally and on GitHub is unaffected, since it follows file renames properly.
-- A commonly recommended way of building package directories in nixpkgs is to use `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
+- A commonly recommended way of building package directories in Nixpkgs is to use `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
   Since the path changes `pkg-fun.nix` is now used, this becomes like `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/unit/he/hello/pkg-fun.nix {}'`, which is harder for users.
-  However, calling a path like this is an anti-pattern anyway, because it doesn't use the correct nixpkgs version and it doesn't use the correct argument overrides.
+  However, calling a path like this is an anti-pattern anyway, because it doesn't use the correct Nixpkgs version and it doesn't use the correct argument overrides.
   The correct way of doing it was to add the package to `pkgs/top-level/all-packages.nix`, then calling `nix-build -A hello`.
   This `nix-build -E` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
   By teaching users that `pkgs/unit/*/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build -E` workarounds should disappear.
@@ -130,15 +130,15 @@ pkgs
 
 - Use a flat directory, e.g. `pkgs.hello` would be in `pkgs/unit/hello`.
   - Good because it's simpler, both for the user and for the code
-  - Bad because the GitHub web interface only renders the first 1'000 entries (and we have about 10'000 that benefit from this transition, even given the restrictions)
+  - Bad because the GitHub web interface only renders the first 1 000 entries (and we have about 10 000 that benefit from this transition, even given the restrictions)
   - Bad because it makes `git` and file listings slower
-- Use `substring 0 3 name` or `substring 0 4 name`. This was not done because it still leads to directories in `pkgs/unit` containing more than 1'000 entries, leading to the same problems.
+- Use `substring 0 3 name` or `substring 0 4 name`. This was not done because it still leads to directories in `pkgs/unit` containing more than 1 000 entries, leading to the same problems.
 - Use multi-level structure, like a 2-level 2-prefix structure where `hello` is in `pkgs/unit/he/ll/hello`,
   if packages are less than 4 characters long, we will it out with `-`, e.g. `z` is in `pkgs/unit/z-/--/z`.
   This is not great because it's more complicated, longer to type and it would improve performance only marginally.
 - Use a dynamic structure where directories are rebalanced when they have too many entries.
   E.g. `pkgs.foobar` could be in `pkgs/unit/f/foobar` initially.
-  But when there's more than 1'000 packages starting with `f`, all packages starting with `f` are distributed under 2-letter prefixes, moving `foobar` to `pkgs/unit/fo/foobar`.
+  But when there's more than 1 000 packages starting with `f`, all packages starting with `f` are distributed under 2-letter prefixes, moving `foobar` to `pkgs/unit/fo/foobar`.
   This is not great because it's very complex to determine which directory to put a package in, making it bad for contributors.
 
 ## Alternate `pkg-fun.nix` filename
@@ -154,7 +154,7 @@ pkgs
 
 ## Alternate `pkgs/unit` location
 
-- Use `unit` (at the nixpkgs root) instead of `pkgs/unit`.
+- Use `unit` (at the Nixpkgs root) instead of `pkgs/unit`.
   This is future proof in case we want to make the directory structure more general purpose, but this is out of scope
 - Other name proposals were deemed worse: `pkg`, `component`, `part`, `mod`, `comp`
 
@@ -211,7 +211,7 @@ Pro:
  - It makes another class of packages uniform, by picking a solution with restricted expressive power.
 
 Con:
- - It does not solve the contributor experience problem of having to many rules.
+ - It does not solve the contributor experience problem of having too many rules.
  - `args.nix` is another pattern that contributors need to learn how to use, as we have seen that it is not immediately obvious to everyone how it works.
  - A CI check can mitigate the possible lack of uniformity, and we see a simple implementation strategy for it.
  - This keeps the contents of the unit directories simple and a bit more uniform than with optional `args.nix` files.
