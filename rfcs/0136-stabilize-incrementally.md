@@ -24,7 +24,7 @@ The tension between that desire and a lack of a clear plan has loomed over our h
 ## The situation so far
 
 There are a few facts that must be introduced to give context to this situation.
-We can't change these short of a time machine, so we must find a way to live wit them instead.x
+We can't change these short of a time machine, so we must find a way to live wit them instead.
 
 ### Flakes are very popular
 
