@@ -29,7 +29,11 @@ All of this can be prevented if we added the ability to make derivation outputs 
 # Detailed design
 [design]: #detailed-design
 
-We propose adding a `noReadAccess` option to `builtins.derivation`, which, when set to true, makes this derivation a private derivation. Relevant changes should also be made in nix-instantiate and nix-daemon to understand this attribute.
+We propose adding a `noReadAccess` option to `builtins.derivation`, which, when set to true, makes this derivation a private derivation.
+
+The only difference between a private derivation and a normal derivation, apart
+from the hash, is that upon instantiation and after building, the read bit of
+the `.drv` file and the output path will be removed.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
