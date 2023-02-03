@@ -61,7 +61,7 @@ An alternative would be to support more complicated ACLs as described in [this](
 How do we prevent the attacker from using `nix copy` to simply copy out the
 private derivation to another machine?
 
-What changes are needed in binary cache providers such as `nix-serve` to handle
+What changes are needed for binary cache providers such as `nix-serve` to handle
 private derivations?
 
 ## Content-Addressed paths
