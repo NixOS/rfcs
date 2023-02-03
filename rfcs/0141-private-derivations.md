@@ -34,7 +34,15 @@ We propose adding a `noReadAccess` option to `builtins.derivation`, which, when 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-TBA
+## Intended usage in NixOS modules
+On NixOS there are many modules where configurations that might contain sensitive
+information get written into nix store in plaintext (for example the wpa_supplicant module). Private derivations can solve this issue by
+
+1. Writing a helper function `writeTextPrivate` that functions similar to
+`writeText`, but instead outputs a private derivation
+2. Replace the `writeText` function with `writeTextPrivate` inside the module
+3. Use `LoadCredential=` to load the private derivation
+4. Replace the derivation output path with `%d/<credName>` (see systemd.exec)
 
 # Drawbacks
 [drawbacks]: #drawbacks
