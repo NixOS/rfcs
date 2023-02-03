@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-This RFC proposes to add a special type of derivation called private derivation, which, upon being built, will have their file permissions set to 000 instead of the usual 444.
+This RFC proposes to add a special type of derivation called private derivation, which, upon being built, will have their file permissions set to 000/111 instead of the usual 444/555.
 
 # Motivation
 [motivation]: #motivation
@@ -24,7 +24,7 @@ This is less than ideal because one needs to setup a key (which is stored as pla
 
 Furthermore, if encryption is done before the evaluation of the system configuration (as is the case with [agenix](https://github.com/ryantm/agenix) and [sops-nix](https://github.com/Mic92/sops-nix)), then the nixos module system cannot be utilized to generate configs that contain credentials and one must write them manually.
 
-All of this can be prevented if we added the ability to make derivation outputs as not readable by anyone other than root, by setting the file mode to 111 (directories) or 000 (files). We can then use a trustworthy credential manager, for example systemd with its `LoadCredential=`, to distribute these derivations to the consumers safely.
+All of this can be prevented if we added the ability to make derivation outputs as not readable by anyone other than root, by setting the file mode to 111 (directories and executables) or 000 (regular files). We can then use a trustworthy credential manager, for example systemd with its `LoadCredential=`, to distribute these derivations to the consumers safely.
 
 # Detailed design
 [design]: #detailed-design
