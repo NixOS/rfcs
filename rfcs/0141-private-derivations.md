@@ -56,7 +56,10 @@ information get written into nix store in plaintext (for example the wpa_supplic
 # Alternatives
 [alternatives]: #alternatives
 
-An alternative would be to support more complicated ACLs as described in [this](https://github.com/NixOS/nix/issues/8) Nix issue.
+- Supporting more complicated ACLs as described in [this](https://github.com/NixOS/nix/issues/8) Nix issue.
+- Storing private derivations in a separate store path, for example
+  `/nix/private-store` that have its executable bit removed so that the hashes
+  are not visible to non-root users.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
