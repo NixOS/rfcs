@@ -49,6 +49,14 @@ An alternative would be to support more complicated ACLs as described in [this](
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
+## Binary caches and copying
+How do we prevent the attacker from using `nix copy` to simply copy out the
+private derivation to another machine?
+
+What changes are needed in binary cache providers such as `nix-serve` to handle
+private derivations?
+
+## Content-Addressed paths
 It is not yet known how this might interact with content addressed paths.
 
 # Future work
