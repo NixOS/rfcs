@@ -64,6 +64,10 @@ private derivation to another machine?
 What changes are needed for binary cache providers such as `nix-serve` to handle
 private derivations?
 
+## Leaking metadata
+The hash is still exposed to the attacker, which opens up some possible attacks.
+How does this impact the security?
+
 ## Content-Addressed paths
 It is not yet known how this might interact with content addressed paths.
 
