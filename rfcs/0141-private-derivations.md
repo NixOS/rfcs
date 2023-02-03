@@ -18,7 +18,7 @@ This RFC proposes to add a special type of derivation called private derivation,
 
 In short: This RFC mainly concerns with how to safely store credentials on NixOS.
 
-The world readability of nix store means that, to safely store credentials, they must be first somehow be encrypted before written into the store. They also need to be decrypted before the services are started.
+The world readability of nix store means that, to safely store credentials, they must first somehow be encrypted before written into the store. They also need to be decrypted before the services are started.
 
 This is less than ideal because one needs to setup a key (which is stored as plaintext on disk) on every machine just to prevent unauthorized users from seeting the credentials.
 
