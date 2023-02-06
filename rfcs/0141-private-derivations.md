@@ -16,7 +16,7 @@ This RFC proposes to add a special type of derivation called private derivation,
 # Motivation
 [motivation]: #motivation
 
-In short: This RFC mainly concerns with how to safely store credentials on NixOS.
+In short: This RFC mainly concerns with how to safely manage credentials using nix (as opposed to using impure methods like manually copying them over) on NixOS.
 
 The world readability of nix store means that, to safely store credentials, they must first somehow be encrypted before written into the store. They also need to be decrypted before the services are started.
 
