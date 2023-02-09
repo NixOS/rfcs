@@ -33,7 +33,7 @@ We propose adding a `noReadAccess` option to `builtins.derivation`, which, when 
 
 The only difference between a private derivation and a normal derivation, apart
 from the hash, is that upon instantiation and after building, the read bit of
-the `.drv` file and the output path will be removed.
+the `.drv` file and the output path will be removed (recursively).
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
