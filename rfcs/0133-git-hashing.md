@@ -119,6 +119,8 @@ Note at the time of writing this guide uses our original 2020 fork of Nix.
 # Drawbacks
 [drawbacks]: #drawbacks
 
+## Complexity
+
 The main cost is more complexity to the store layer.
 For a few reason we think this is not so bad.
 
@@ -140,6 +142,18 @@ Even if we do end up adopting everything though, we think for the following two 
    That frees up "complexity budget" for project like this.
 
    We plan on more formally proposing this next.
+
+## Git and Nix's file system data models do not entirely coincide
+
+Nix puts the permission info of a file (executable bit for now) with that file, whereas Git puts it with the name and hash in the directory.
+The practical effect of this discrepancy is that a root file (as opposed to directory) in Nix has permission info, but does not in Git.
+
+If we are trying to convert existing Nix data into Git, this is a problem.
+Assuming we treat "no permission bits" as meaning "non-executable", we will have a partial conversion that will fail on executable bare files.
+Tricks like always wrapping everything in a directory get around this, but then we have to be careful the directory is exactly as expected when "unwrapping" in the other direction.
+
+For now, we only focus on ingesting data *from* Git *to* Nix, and this side-steps the issue.
+That conversation is total (though not surjective), and so there is no problem for now.
 
 # Alternatives
 [alternatives]: #alternatives
