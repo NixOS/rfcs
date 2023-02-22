@@ -3,7 +3,7 @@ feature: NixOS Code of Conduct
 start-date: 2021-11-03
 author: @jonringer
 co-authors:
-shepherd-team:
+shepherd-team: @edolstra @zimbatm @winterqt
 shepherd-leader:
 related-issues: #98 #102
 ---
