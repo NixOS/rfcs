@@ -3,8 +3,8 @@ feature: stabilize-incrementally
 start-date: 2022-09-15
 author: John Ericson
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @thufschmitt @tomberek @infinisil
+shepherd-leader: @tomberek
 related-issues: (will contain links to implementation PRs)
 ---
 
