@@ -141,6 +141,7 @@ This is a chance to discuss topics like:
 ## Step 5: Audit, refine, and stabilize Flakes itself
 
 Finally, with the other less controversial interfaces stabilized, we can tackle the Flakes itself, the one remainder.
+This will require future RFCs.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
