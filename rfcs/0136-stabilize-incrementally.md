@@ -121,7 +121,12 @@ Yet it will still offer some interesting topics to discus, such as:
 - Flat vs hierarchical commands
 - is `--derivation` a good flag?
 
-## Step 3: Audit, refine, and stabilize the rest of the CLI, without Flakes
+## Step 3: Attempt likewise splitting a nix lang without flakes Nix CLI
+
+For the same reason that a store-only Nix is useful for validating the store-only CLI, and ensuring it works with many *possible* higher layers, it is also useful to build a Store + Nix lang -only Nix without Flakes.
+Whether it or not it is possible to actually do this is left to the Nix Team to decide, but it should be at least considered/attempted.
+
+## Step 4: Audit, refine, and stabilize the rest of the CLI, without Flakes
 
 If the deadline for step 1 is *not* met, we jump directly to this step, skipping step 2.
 
@@ -133,7 +138,7 @@ This is a chance to discuss topics like:
 - Should all outputs be selected if one writes `foo.dev`?
 - How can `nix repl` have a more normal CLI?
 
-## Step 4: Audit, refine, and stabilize Flakes itself
+## Step 5: Audit, refine, and stabilize Flakes itself
 
 Finally, with the other less controversial interfaces stabilized, we can tackle the Flakes itself, the one remainder.
 
