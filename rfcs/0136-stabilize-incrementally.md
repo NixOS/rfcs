@@ -95,7 +95,7 @@ Step 1 is technical work, with a self-imposed deadline so we can be sure it does
 The remaining steps are stabilization steps.
 For each of them, a separate RFC or other discussion medium will describe the new interfaces to be stabilized, and solicit feedback.
 
-## Step 0: Stabilize the store-only installable-free CLI
+## Step 0: Audit, refine, and stabilize the store-only installable-free CLI
 
 There are certain commands like `nix store gc`, `nix store ping` that do not take any positional arguments.
 As @roberth elsewhere pointed out, because these commands have so few degrees of freedom, they are some of the easiest to stabilize --- there is simply less to pour over and possibly bikeshed.
@@ -108,7 +108,7 @@ This is the same as step one from [RFC 134](https://github.com/NixOS/rfcs/pull/1
 
 A deadline is imposed to get that complete, so agreement on this stabilization plan is guaranteed not to add more than a small bounded delay as opposed to stabilizing everything immediately.
 
-## Step 2: Stabilize the store-only Nix CLI
+## Step 2: Audit, refine, and stabilize the store-only Nix CLI
 
 If the deadline for step 1 is met, then we stabilize *just* the command-line interface of the store-only Nix command.
 
@@ -121,7 +121,7 @@ Yet it will still offer some interesting topics to discus, such as:
 - Flat vs hierarchical commands
 - is `--derivation` a good flag?
 
-## Step 3: Stabilize the rest of the CLI, without Flakes
+## Step 3: Audit, refine, and stabilize the rest of the CLI, without Flakes
 
 If the deadline for step 1 is *not* met, we jump directly to this step, skipping step 2.
 
@@ -133,7 +133,7 @@ This is a chance to discuss topics like:
 - Should all outputs be selected if one writes `foo.dev`?
 - How can `nix repl` have a more normal CLI?
 
-## Step 4: Stabilize Flakes itself
+## Step 4: Audit, refine, and stabilize Flakes itself
 
 Finally, with the other less controversial interfaces stabilized, we can tackle the Flakes itself, the one remainder.
 
