@@ -121,7 +121,7 @@ Yet it will still offer some interesting topics to discus, such as:
 - Flat vs hierarchical commands
 - is `--derivation` a good flag?
 
-## Step 3: Attempt likewise splitting a nix lang without flakes Nix CLI
+## Step 3: Attempt likewise splitting a nix lang without flakes Nix
 
 For the same reason that a store-only Nix is useful for validating the store-only CLI, and ensuring it works with many *possible* higher layers, it is also useful to build a Store + Nix lang -only Nix without Flakes.
 Whether it or not it is possible to actually do this is left to the Nix Team to decide, but it should be at least considered/attempted.
