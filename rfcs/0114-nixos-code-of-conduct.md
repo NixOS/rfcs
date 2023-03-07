@@ -11,7 +11,7 @@ related-issues: #98 #102
 # Summary
 [summary]: #summary
 
-The NixOS Community needs some foundation of shared values which can be used
+The Nix community needs some foundation of shared values which can be used
 to determine appropriate behavior when contributing and interacting with the community.
 We currently have a [community ethos](https://nixos.org/community/index.html), but
 this only states that we are an inclusive community, but doesn't define
