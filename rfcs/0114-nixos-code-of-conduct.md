@@ -24,7 +24,7 @@ This RFC does not intend to define moderation practices.
 # Motivation
 [motivation]: #motivation
 
-The NixOS community lacks a clearly defined way in which someone's behavior may
+The Nix community lacks a clearly defined way to determine if someone's behavior may
 be disruptive. A well-defined Code of Conduct gives an explicit
 set of expectations for all contributors, which will also make it easier to identify
 when behavior becomes disruptive.
