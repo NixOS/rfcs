@@ -70,7 +70,7 @@ and associated [block evasion discourse thread](https://discourse.nixos.org/t/gi
 heated discussions in [RFC #98](https://github.com/NixOS/rfcs/pull/98) and [RFC #111](https://github.com/NixOS/rfcs/pull/111).
 Each of these incidents have caused significant discussion on IRC (when it was still official),
 matrix, discourse, and would bleed over into github and even non-official platforms.
-These discussions are generally very polarizing, and causes an enormous amount
+These discussions are generally very polarizing, and cause an enormous amount
 of emotional and mental stress to those involved.
 These incidents are also very embarrassing for the greater nix community,
 and not having a way to identify disruptive before it becomes a heated
