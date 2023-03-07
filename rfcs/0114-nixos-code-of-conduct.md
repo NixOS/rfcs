@@ -26,8 +26,7 @@ This RFC does not intend to define moderation practices.
 
 The Nix community lacks a clearly defined way to determine if someone's behavior may
 be disruptive. A well-defined Code of Conduct gives an explicit
-set of expectations for all contributors, which will also make it easier to identify
-when behavior becomes disruptive.
+set of expectations for all contributors, and makes it easier to identify disruptive behavior.
 
 # Detailed design
 [design]: #detailed-design
