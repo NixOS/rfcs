@@ -19,8 +19,7 @@ inappropriate behavior when interacting with the community. This RFC aims
 to establish the shared values, so they can be used to identify behavior
 which is disruptive to the community.
 
-This RFC does not intend to define moderation practices. This is intended to only lay
-a framework of shared values for the community.
+This RFC does not intend to define moderation practices.
 
 # Motivation
 [motivation]: #motivation
