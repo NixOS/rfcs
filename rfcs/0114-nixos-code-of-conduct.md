@@ -31,7 +31,7 @@ set of expectations for all contributors, and makes it easier to identify disrup
 # Detailed design
 [design]: #detailed-design
 
-These statutes are taken from [rust-lang's Code of Conduct](https://www.rust-lang.org/policies/code-of-conduct),
+These statutes are taken from [Rust's Code of Conduct](https://www.rust-lang.org/policies/code-of-conduct),
 which provides a great compromise between explicit behaviors and subjective goals.
 Only minor changes have been made.
 
