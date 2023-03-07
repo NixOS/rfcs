@@ -1,5 +1,5 @@
 ---
-feature: NixOS Code of Conduct
+feature: Nix Community Code of Conduct
 start-date: 2021-11-03
 author: @jonringer
 co-authors:
