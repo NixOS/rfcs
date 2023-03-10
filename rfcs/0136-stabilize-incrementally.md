@@ -102,15 +102,18 @@ As @roberth elsewhere pointed out, because these commands have so few degrees of
 
 We can start stabilizing them right away, either in a batch, or one by one.
 
-## Step 1: Split out a store-only Nix, with deadline
+## Step 1: Split out a store-only Nix
 
-This is the same as step one from [RFC 134](https://github.com/NixOS/rfcs/pull/134), upon which this RFC depends.
+This is detailed design from (accepted) [RFC 134](./0134-nix-store-layer.md).
 
-A deadline is imposed to get that complete, so agreement on this stabilization plan is guaranteed not to add more than a small bounded delay as opposed to stabilizing everything immediately.
+The point of this step is not to re-open the already accepted decision to make the split, but to say it SHOULD be completed at this point.
+In other words, step 0 is free to begin immediately, but steps 2 and beyond are blocked on finishing this.
+
+The implementation of the split is already mostly complete, and preperatory improvements have already been merged, but if unforseen issues arise finishing it, we can reconsider the dependency on this step from step 2.
 
 ## Step 2: Audit, refine, and stabilize the store-only Nix CLI
 
-If the deadline for step 1 is met, then we stabilize *just* the command-line interface of the store-only Nix command.
+Stabilize *just* the command-line interface of the store-only Nix command.
 
 This is a small portion of the total amount of interface we have to stabilize, and that will hopefully yield a narrow and more focused discussion.
 Yet it will still offer some interesting topics to discus, such as:
@@ -127,8 +130,6 @@ For the same reason that a store-only Nix is useful for validating the store-onl
 Whether it or not it is possible to actually do this is left to the Nix Team to decide, but it should be at least considered/attempted.
 
 ## Step 4: Audit, refine, and stabilize the rest of the CLI, without Flakes
-
-If the deadline for step 1 is *not* met, we jump directly to this step, skipping step 2.
 
 This is the rest off the new CLI, without flakes.
 Unlike the store-only Nix command which has yet to be implemented, this is easy to visualize today by enabling the `nix-command` feature without the `flakes` feature.
@@ -153,7 +154,7 @@ Having laid out the plan, let us now return to how the current situation is char
 And they will be stabilized, with minimal delay.
 
 Firstly, there is no feature work proposed in the interim --- the splitting of Nix is just partitioning existing functionality, with some behind-the-scenes refactors needed to make that possible.
-The deadline placed on that work also assuages those concerned about the current "limbo" that stabilization will be gotten to no matter what, even if the splitting fails, after a set amount of time.
+The earlier steps have been carefully designed to be either easier or already started ("de-risked") to assuagee those that are concerned about the current "limbo" that stabilization will be gotten to no matter what, even if the splitting fails.
 
 ## Difficulties in the roll-out
 
@@ -174,8 +175,8 @@ The hope is that such scaffolding will assuage this faction their concerns are h
 
 The main downside is a small delay from the splitting Nix process, and then delay between the stabilization steps.
 
-The first delay has a guaranteed upper bound, thanks to its self-imposed deadline.
-That maximum delay should be dwarfed by duration of time we've spent "in limbo" without a clear plan to move forward.
+The fact that 134 is already mostly implemented, and in code review, is hopefully reason enough to believe it shouldn't take much longer.
+That maximum delay waiting for that to complete should be dwarfed by duration of time we've spent "in limbo" without a clear plan to move forward.
 We therefore think that is a small and reasonable price to pay for the benefit of community harmony.
 
 The second delays don't represent time "ideal" from a stabilization perspective.
@@ -194,7 +195,7 @@ If that is true, why not do that instead!
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-How long should the deadline for creating the store-only Nix be?
+None at this time.
 
 # Future work
 [future]: #future-work
