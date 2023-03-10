@@ -34,7 +34,7 @@ Ergo, Flakes is very popular among the Nix community as a whole.
 
 Like it or not, these users have been using Flakes as if it was stable, and we cannot make huge drastic changes that would break their code in hard-to-fix ways.
 
-Many Groups and individuals interested in the continued growth the Nix community see Flakes are popular, an also wish it to be stabilized to attract further still more users, since Flakes are already proven to be popular among users.
+Many Groups and individuals interested in the continued growth the Nix community see Flakes are popular, an also wish it to be stabilized to attract still more users, since Flakes are already proven to be popular among users.
 
 ### Difficulties in the roll-out
 
@@ -43,13 +43,14 @@ Graham Christensen's blog post [flakes-are-an-obviously-good-thing](https://grah
 
 Some people were upset the Flakes RFC was abandoned but the feature merged.
 Other people were fine with experimental features being merged without RFC, but were upset because Flakes never really *felt* experimental.
-Experimental features would be modified a lot subject to community design use, and, most importantly, *discouraged* from being used in production.
+Experimental features are expected to be subject to community feedback, modified a lot based upon that feedback, and, most importantly, *discouraged* from being used in production.
 
 ### Flakes are criticized for encroaching on other features
 
 There are many criticism about Flakes.
 But one of them especially relevant to stabilizing is a perception that Flakes have encroached on other new features, in the sense that it ought to be possible to use them without Flakes but isn't in practice.
-For example, there is no reason in theory pure eval requires Flakes, but without the ability to populate an initial whitelist of store paths that are safe to import it in practice does.
+For example, there is no reason in theory that pure evaluation if Nix expressions requires Flakes.
+But without the ability to populate some sort of initial list of store paths that are safe to import, pure evaluation in practice does require Flakes.
 
 This is especially noticeable for new CLI features that *previously did*, in fact, work without Flakes.
 For example, in earlier versions of Nix `nix search` worked without Flakes.
@@ -58,7 +59,7 @@ For example, in earlier versions of Nix `nix search` worked without Flakes.
 
 Stabilizing the new CLI and Flakes will end the saga of the past few years.
 It is a last good chance to soothe some of these tensions and put us on a good foot moving forward.
-The new NixOS Foundation gives the RFC authors hope Nix is serious about addressing these sorts of governance issues, and thus would be a good way to further demonstrate we are turning a new leaf.
+The new NixOS Foundation gives the RFC authors hope that the Nix community is serious about addressing these sorts of governance issues, and accepting this RFC would be a good way to further demonstrate we are turning a new leaf.
 
 The plan below attempts to make all sides happy, despite their seemingly irreconcilable differences.
 The basic thrust is to proceed with stabilization in small steps.
@@ -174,8 +175,8 @@ Yet it will still offer some interesting topics to discus, such as:
 
 ### Step 3: Attempt likewise splitting a nix lang without flakes Nix
 
-For the same reason that a store-only Nix is useful for validating the store-only CLI, and ensuring it works with many *possible* higher layers, it is also useful to build a Store + Nix lang -only Nix without Flakes.
-Whether it or not it is possible to actually do this is left to the Nix Team to decide, but it should be at least considered/attempted.
+For the same reason that a store-only Nix is useful for validating the store-only CLI, and ensuring it works with many *possible* higher layers, it is also useful to build a store-and-language-only Nix without Flakes.
+Whether or not it is possible to actually do this is left to the Nix Team to decide, but it should be at least considered.
 
 ### Step 4: Audit, refine, and stabilize the rest of the CLI, without Flakes
 
