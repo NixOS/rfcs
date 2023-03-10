@@ -91,18 +91,66 @@ But, we have crossed that Rubicon and there is no turning back; this RFC *doesn'
 # Detailed design
 [design]: #detailed-design
 
+First we describe how stabilization should work in general.
+Then we describe the order in which things are stabilized.
+Finally we combine both into a list of step.
+
+## The general stabilization process --- audit, refine, and *then* stabilze
+
+Stabilization is not a matter of just flipping a switch on an implementation that has accrued for a period of time.
+Because the moment before stabilization is our last chance to make major changes, it is crucial that we look over what is being stabilized.
+
+To stabilize a piece of function we must do these things:
+
+1. **Audit the functionality**
+
+   Making note of the current state.
+   Do this publicly so the Nix community writ large has a chance to weigh in.
+
+2. **Propose refinements of the functionality**
+
+   It is reasonable to notice things that were not noticed before the audit.
+   Features can either be changed, or they can be carefully carved out as ineligible for stabilization at this time, and left to be dealt with in a later round of this process.
+
+   Note that for large, complex, and controversial features, an RFC is also required (per usual) to advance to the next step.
+   The acceptance of the RFC concludes the "propose refinements" step.
+
+3. **Create a "release candidate"**
+
+   It should be possible to enable just the experimental that is ready for stabilization *in isolation*, without also enabling other unstable functionality.
+   This is important to allow users (and tests!) to try it out and make sure it is a meaningful feature in its own right, and not just a partially-complete things that relies on the further unstable features.
+
+   If we have an RFC, the release candidate experimental feature should match the RFC.
+
+4. **Actually stabilize**
+
+   Only this last step is "stabilization proper".
+
+## CLI in waves, then Flakes
+
+As discussed in the motivation, we want to stabilize the less controversial Flake-agnostic new CLI before Flakes.
+In addition, the CLI can itself be split up for more fine-grained rounds of stabilization.
+
+The rounds thus look like this:
+
+1. CLI
+   1. "installable"-free Store-only CLI
+   2. Rest of the Store-only CLI (includes "derived path" installables)
+   3. Rest of the flake-agnostic CLI
+2. Flakes
+
+## Combined plan
+
 Step 1 is technical work, with a self-imposed deadline so we can be sure it doesn't delay stabilization too long.
 The remaining steps are stabilization steps.
 For each of them, a separate RFC or other discussion medium will describe the new interfaces to be stabilized, and solicit feedback.
 
-## Step 0: Audit, refine, and stabilize the store-only installable-free CLI
+### Step 0: Audit, refine, and stabilize the store-only installable-free CLI
 
 There are certain commands like `nix store gc`, `nix store ping` that do not take any positional arguments.
-As @roberth elsewhere pointed out, because these commands have so few degrees of freedom, they are some of the easiest to stabilize --- there is simply less to pour over and possibly bikeshed.
+As @roberth elsewhere pointed out, because these commands have so few degrees of freedom, they are some of the easiest to stabilize --- there is simply less to pour over and possibly bike-shed.
 
-We can start stabilizing them right away, either in a batch, or one by one.
-
-## Step 1: Split out a store-only Nix
+### Step 1: Split out a store-only Nix
 
 This is detailed design from (accepted) [RFC 134].
 
@@ -111,7 +159,7 @@ In other words, step 0 is free to begin immediately, but steps 2 and beyond are 
 
 The implementation of the split is already mostly complete, and preparatory improvements have already been merged, but if unforeseen issues arise finishing it, we can reconsider the dependency on this step from step 2.
 
-## Step 2: Audit, refine, and stabilize the store-only Nix CLI
+### Step 2: Audit, refine, and stabilize the store-only Nix CLI
 
 Stabilize *just* the command-line interface of the store-only Nix command.
 
@@ -124,12 +172,12 @@ Yet it will still offer some interesting topics to discus, such as:
 - Flat vs hierarchical commands
 - is `--derivation` a good flag?
 
-## Step 3: Attempt likewise splitting a nix lang without flakes Nix
+### Step 3: Attempt likewise splitting a nix lang without flakes Nix
 
 For the same reason that a store-only Nix is useful for validating the store-only CLI, and ensuring it works with many *possible* higher layers, it is also useful to build a Store + Nix lang -only Nix without Flakes.
 Whether it or not it is possible to actually do this is left to the Nix Team to decide, but it should be at least considered/attempted.
 
-## Step 4: Audit, refine, and stabilize the rest of the CLI, without Flakes
+### Step 4: Audit, refine, and stabilize the rest of the CLI, without Flakes
 
 This is the rest off the new CLI, without flakes.
 Unlike the store-only Nix command which has yet to be implemented, this is easy to visualize today by enabling the `nix-command` feature without the `flakes` feature.
@@ -139,7 +187,7 @@ This is a chance to discuss topics like:
 - Should all outputs be selected if one writes `foo.dev`?
 - How can `nix repl` have a more normal CLI?
 
-## Step 5: Audit, refine, and stabilize Flakes itself
+### Step 5: Audit, refine, and stabilize Flakes itself
 
 Finally, with the other less controversial interfaces stabilized, we can tackle the Flakes itself, the one remainder.
 This will require future RFCs.
