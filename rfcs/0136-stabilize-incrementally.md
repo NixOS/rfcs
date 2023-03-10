@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Stabilize the new command line interface and Flakes in an incremental fashion, leveraging [RFC 134](https://github.com/NixOS/rfcs/pull/134).
+Stabilize the new command line interface and Flakes in an incremental fashion, leveraging [RFC 134].
 This plan is designed to still efficiently end the current "limbo" era of these unstable yet widely-used features, yet also soothe the longstanding tensions in the Nix community over how we got here.
 
 # Motivation
@@ -104,12 +104,12 @@ We can start stabilizing them right away, either in a batch, or one by one.
 
 ## Step 1: Split out a store-only Nix
 
-This is detailed design from (accepted) [RFC 134](./0134-nix-store-layer.md).
+This is detailed design from (accepted) [RFC 134].
 
 The point of this step is not to re-open the already accepted decision to make the split, but to say it SHOULD be completed at this point.
 In other words, step 0 is free to begin immediately, but steps 2 and beyond are blocked on finishing this.
 
-The implementation of the split is already mostly complete, and preperatory improvements have already been merged, but if unforseen issues arise finishing it, we can reconsider the dependency on this step from step 2.
+The implementation of the split is already mostly complete, and preparatory improvements have already been merged, but if unforeseen issues arise finishing it, we can reconsider the dependency on this step from step 2.
 
 ## Step 2: Audit, refine, and stabilize the store-only Nix CLI
 
@@ -175,14 +175,16 @@ The hope is that such scaffolding will assuage this faction their concerns are h
 
 The main downside is a small delay from the splitting Nix process, and then delay between the stabilization steps.
 
-The fact that 134 is already mostly implemented, and in code review, is hopefully reason enough to believe it shouldn't take much longer.
+The fact that [RFC 134] is already mostly implemented, and in code review, is hopefully reason enough to believe it shouldn't take much longer.
 That maximum delay waiting for that to complete should be dwarfed by duration of time we've spent "in limbo" without a clear plan to move forward.
 We therefore think that is a small and reasonable price to pay for the benefit of community harmony.
 
-The second delays don't represent time "ideal" from a stabilization perspective.
+An addition, in the detailed design there is an escape hatch saying that blocking on the implementation of [RFC 134] can be reconsidered things do indeed take longer than foreseen.
+
+The delay of "auditing and refining" and shouldn't represent time "idle" from a stabilization perspective.
 As long as we are making progress stabilizing features and having healthy discussions, we don't see any problem.
 
-**Step 0** is also designed to take the pressure off these possible sources of delay, giving us *something* to work on that is not blocked on RFC 134 or anything else.
+**Step 0** is also designed to take the pressure off these possible sources of delay, giving us *something* to work on that is not blocked on [RFC 134] or anything else.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -204,3 +206,5 @@ Generalization features to work without Flakes, like pure eval and search, might
 
 We could have a no-Flakes Nix just as we have a no-eval Nix, given every step of stabilization an minimal Nix executable with just the stabilized commands implemented.
 This is also left as future work to avoid controversy and minimize delay.
+
+[RFC 134]: ./0134-nix-store-layer.md
