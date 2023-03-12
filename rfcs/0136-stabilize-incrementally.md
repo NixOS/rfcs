@@ -108,6 +108,8 @@ To stabilize a piece of function we must do these things:
    Making note of the current state.
    Do this publicly so the Nix community writ large has a chance to weigh in.
 
+   The features to be stabilized should "stand alone", meaning that they should make sense and work both with and without further unstable features not yet undergoing the stabilization process.
+
 2. **Propose refinements of the functionality**
 
    It is reasonable to notice things that were not noticed before the audit.
@@ -167,11 +169,11 @@ Stabilize *just* the command-line interface of the store-only Nix command.
 This is a small portion of the total amount of interface we have to stabilize, and that will hopefully yield a narrow and more focused discussion.
 Yet it will still offer some interesting topics to discus, such as:
 
-- logging
-- store paths on `stdout` at end of build?
+- Logging
+- Store paths on `stdout` at end of build?
 - Should commands like `show-derivation` use `--json` by default?
 - Flat vs hierarchical commands
-- is `--derivation` a good flag?
+- is `--derivation` a good flag? ([Nix issue #7261](https://github.com/NixOS/nix/issues/7261))
 
 ### Step 3: Attempt likewise splitting a nix lang without flakes Nix
 
@@ -185,7 +187,7 @@ Unlike the store-only Nix command which has yet to be implemented, this is easy 
 This is a chance to discuss topics like:
 
 - Is `--file` good, or should we be able to specify something like `file#attribute` to mix files and attributes? (Without using Flakes.)
-- Should all outputs be selected if one writes `foo.dev`?
+- ~~Should all outputs be selected if one writes `foo.dev`?~~ Since fixed.
 - How can `nix repl` have a more normal CLI?
 
 ### Step 5: Audit, refine, and stabilize Flakes itself
