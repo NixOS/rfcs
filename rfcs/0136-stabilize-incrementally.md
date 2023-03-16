@@ -173,14 +173,14 @@ Yet it will still offer some interesting topics to discus, such as:
 - Flat vs hierarchical commands
 - is `--derivation` a good flag? ([Nix issue #7261](https://github.com/NixOS/nix/issues/7261))
 
-### Step 3: Attempt likewise splitting a nix lang without flakes Nix
+### Step 3: Attempt likewise splitting a store-and-language-only Nix
 
-For the same reason that a store-only Nix is useful for validating the store-only CLI, and ensuring it works with many *possible* higher layers, it is also useful to build a store-and-language-only Nix without Flakes.
+For the same reason that a store-only Nix is useful for validating the store-only CLI, and ensuring it works with many *possible* higher layers, it is also useful to build a store-and-language-only Nix, without Flakes.
 Whether or not it is possible to actually do this is left to the Nix Team to decide, but it should be at least considered.
 
-### Step 4: Audit, refine, and stabilize the rest of the CLI, without Flakes
+### Step 4: Audit, refine, and stabilize the store-and-language-only Nix CLI
 
-This is the rest off the new CLI, without flakes.
+This is the rest off the new CLI, without Flakes.
 Unlike the store-only Nix command which has yet to be implemented, this is easy to visualize today by enabling the `nix-command` feature without the `flakes` feature.
 This is a chance to discuss topics like:
 
