@@ -255,7 +255,4 @@ None at this time.
 
 Generalization features to work without Flakes, like pure eval and search, might be desired by the Flake-skeptic faction, but is purposely left as future work in order to not delay stabilization.
 
-We could have a no-Flakes Nix just as we have a no-eval Nix, given every step of stabilization an minimal Nix executable with just the stabilized commands implemented.
-This is also left as future work to avoid controversy and minimize delay.
-
 [RFC 134]: ./0134-nix-store-layer.md
