@@ -32,8 +32,6 @@ As measured in the community polls, Nix has a lot of new users, dwarfing the num
 Flakes is very popular among these new users.
 Ergo, Flakes is very popular among the Nix community as a whole.
 
-Like it or not, these users have been using Flakes as if it was stable, and we cannot make huge drastic changes that would break their code in hard-to-fix ways.
-
 Many Groups and individuals interested in the continued growth the Nix community see Flakes are popular, an also wish it to be stabilized to attract still more users, since Flakes are already proven to be popular among users.
 
 ### Difficulties in the roll-out
