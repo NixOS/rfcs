@@ -85,20 +85,22 @@ This proposal is specifically to deal with the collection of bootables and impro
 - Supporting SecureBoot.
   The authors of this RFC have done work in this regard, but this RFC is not about SecureBoot.
 - Integrating Bootspec into an existing bootloader backend is not expected to perfectly produce the exact same result. For example, it is likely that the text describing the entries in the menu may differ.
+- Specifying how to discover generations. This is desirable, but should not be tied to bootspec directly since bootspec may be useful with diverse discovery mechanisms.
 
 # Proposed Solution
 [proposed-solution]: #proposed-solution
 
 - Each NixOS generation will have a bootspec (a JSON document) at `$out/boot.json` containing all of the boot properties for that generation.
   NixOS's bootloader backends will read these files as inputs to the bootloader installation phase.
-  A bootspec document named `boot.json` must have a `"v1"` key that contains the body of the specification.
-  Generally, the key must follow the format of `v${schemaVersion}`.
+  A v1 bootspec document must have a key `"org.nixos.bootspec.v1"` that describes a bootable NixOS configuration.
     - The bootloader installation phase is relatively unchanged from the way it is now.
       The bootloader backend will have an executable that is run against a collection of generations, and the backend is any of the currently supported backends plus an "external" backend which the user can define.
 - The bootloader backends will avoid reading data from the other files and directories when possible, preferring the information in the bootspec.
 - A bootspec synthesizing tool will be used to synthesize a bootspec for generations which don't already have one.
   This tool will be shared across all of the bootloader backends, helping produce more uniform behavior.
 - Existing bootloader backends will be updated to read properties from the bootspec, removing most if not all of their filesystem-spelunking code.
+- The file paths referred to in the bootspec document should be references to Nix store paths, so that the presence of the bootspec document in the store (assuming no breakage of the Nix store invariants through modifications outside Nix or bugs in Nix) guarantees the presence of the files required for boot.
+  Bootspec documents should not be copied out of the store to avoid breaking this invariant.
 
 ### Bootspec Format v1
 [format-v1]: #format-v1
@@ -109,17 +111,21 @@ Using the following JSON:
 ```json5
 {
   // Toplevel key describing the version of the specification used in the document
-  "v1": {
+  "org.nixos.bootspec.v1": {
     // (Required) System type the bootspec is intended for (e.g. `x86_64-linux`, `aarch64-linux`)
     "system": "x86_64-linux",
 
-    // (Required) Path to the stage-2 init, executed by the initrd
+    // (Required) Path to the stage-2 init, executed by the initrd (if present)
     "init": "/nix/store/xxx-nixos-system-xxx/init",
 
     // (Optional) Path to the initrd
     "initrd": "/nix/store/xxx-initrd-linux/initrd",
 
-    // (Optional) Path to a tool to dynamically add secrets to an initrd
+    // (Optional) Path to a tool to dynamically add secrets to an initrd.
+    // Consumers of a bootspec document should copy the file referenced by the "initrd" key to a writable location, ensure that the file is writable, invoke this tool with the path to the initrd as its only argument, and use the initrd as modified by the tool for booting.
+    // This may be used to add files from outside the Nix store to the initrd.
+    // This tool is expected to run on the system whose boot specification is being set up, and may thus fail if used on a system where the expected stateful files are not in place or whose CPU does not support the instruction set of the system to be booted.
+    // If this field is present and the tool fails, no boot configuration should be generated for the system.
     "initrdSecrets": "/nix/store/xxx-append-secrets/bin/append-initrd-secrets",
 
     // (Required) Path to the kernel image
@@ -144,27 +150,26 @@ Using the following JSON:
 
     // (Required) Top level path of the closure, in case some spelunking is required
     "toplevel": "/nix/store/xxx-nixos-system-xxx",
+  },
+  // The top-level object may contain arbitrary further keys ("extensions"), whose semantics may be defined by third parties.
+  // The use of reverse-domain-name namespacing is recommended in order to avoid name collisions.
 
-    // (Optional) Mapping of specialisation names to their bootspec document
-    "specialisation": {
-      // <name> corresponds to <name> in specialisation.<name>.configuration.
-      // Note that it is not valid for a specialisation to be a different version than the main document.
-      "<name>": {
-        // A full Bootspec v1 document, _without_ the `"v1"` key.
-        // Note that it is not valid for a specialisation to have further specialisations.
-      }
-    },
-
-    // (Optional) User-specified metadata
-    "extensions": {
-      // <namespace> corresponds to a user-provided namespace
-      // to reduce the chances of collision when using
-      // multiple extensions at once
-      "<namespace>": {
-        // Any kind of representable JSON is valid here
+  // (Optional) Specialisations are an extension to the specification which allows bundling multiple variants of a NixOS configuration with a single parent.
+  // These are shaped like the top level; to be precise:
+  //  - Each entry in the toplevel "org.nixos.specialisation.v1" object represents a specialisation.
+  //  - In order for the top-level document to be a valid v1 bootspec, each specialisation must have a valid "org.nixos.bootspec.v1" key whose value conforms to the same schema as the toplevel "org.nixos.bootspec.v1" object.
+  //  - The behaviour of nested specialisations (i.e. entries in "org.nixos.specialisation.v1" which themselves contain the "org.nixos.specialisation.v1" key) is not defined.
+  //  - In particular, there is no expectation that such nested specialisations will be handled by consumers of bootspec documents.
+  //  - Each specialisation document may contain arbitrary further keys (extensions), like the top-level document.
+  //  - The semantics of these should be the same as when these keys are used at the top level, but only apply for the given specialisation.
+  "org.nixos.specialisation.v1": {
+    // Each key in this object corresponds to a specialisation as defined by the `specialisation.<name>` NixOS option.
+    "<name>": {
+      "org.nixos.bootspec.v1": {
+        // See above
       }
     }
-  }
+  },
 }
 ```
 
@@ -229,3 +234,4 @@ Concretely, a user who enables memtest probably wants the most recent memtest, a
 - Completing the migration from filesystem-spelunking into using the bootspec data.
 - Implementing a NixOS module for supporting externalized bootloader backends.
 - Implementing a base level of SecureBoot support.
+- Addressing the known weaknesses of this specification (no support for multiple initrds, janky initrd secrets mechanism, lack of device tree support) in a later version of the spec.
