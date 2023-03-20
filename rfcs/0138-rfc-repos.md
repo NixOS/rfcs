@@ -3,8 +3,8 @@ feature: rfc-repos
 start-date: 2022-01-10
 author: Silvan Mosberger
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @winterqt, @lheckemann 
+shepherd-leader: @lheckemann 
 related-issues: (will contain links to implementation PRs)
 ---
 
@@ -42,7 +42,14 @@ It should contain the following contents describing the process:
 > This issue may only be used for RFC meta-discussions, such as shepherd nominations, FCP periods, meeting schedules, etc.
 
 The FCP must be initiated on a specific commit of the repository.
-When the FCP passes, the repositories contents are committed to the [rfcs](https://github.com/NixOS/rfcs) repository by the [RFC steering committee](https://github.com/NixOS/rfcs#rfc-steering-committee) via a pull request that closes the original issue.
+When the FCP passes, the repositories contents are committed to the [rfcs](https://github.com/NixOS/rfcs) repository by the [RFC steering committee](https://github.com/NixOS/rfcs#rfc-steering-committee) with a commit that closes the original issue.
+
+## Workflow to get RFC updates
+To get updates for RFC's, instead of subscribing to the PR, one has to watch the repository.
+
+## Repository transfer
+
+Once the RFC is merged, the repository has to be transferred to the NixOS organization under https://github.com/NixOS/rfc-NUMBER. This is to ensure the discussions aren't lost in the future. The repository will then be archived.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -50,11 +57,25 @@ When the FCP passes, the repositories contents are committed to the [rfcs](https
 
 # Drawbacks
 [drawbacks]: #drawbacks
-
+- There's no line-comment view anymore (the "Files changed" tab for PR's), where you can see the entire proposal and all (up-to-date) line comments.
+- Commenting on an RFC won't automatically subscribe you to updates anymore.
 
 # Alternatives
 [alternatives]: #alternatives
 
+## Optional instead of required
+
+Instead of requiring this process, it could be opt-in for "bigger" RFCs.
+- (-) It's not clear how to decide whether an RFC should have a repository, there's no way to know how big discussions become in advance.
+
+## Fork branch instead of separate repository
+
+Instead of creating a new repository for each RFC, a new branch in a fork can be created instead.
+- (-) Means that a single GitHub user/organization can't have more than one RFC open at a time without mixing of issues/PRs occurring (since GitHub only supports having a single fork of a repository).
+  - (+) For time-distinct RFCs it can be worked around by [detaching the old fork](https://support.github.com/request/fork) and creating a new one
+- (+) Simplifies the RFC process, since one can just create a PR to upstream it
+  - (-) However this may again lead to the original problem of having too long PR discussions
+  - (-) It's also confusing about whether a PR is needed
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
@@ -62,4 +83,11 @@ When the FCP passes, the repositories contents are committed to the [rfcs](https
 
 # Future work
 [future]: #future-work
+
+- More RFC automation is possible in the future:
+  - Creating repositories for discussing issues created in the rfcs repository
+  - Assigning the shepherd team and requiring them to review PRs to the repository
+  - Announce FCP when all issues/PRs are closed
+  - Commit contents to rfcs repository once FCP passed without any new issues/PRs
+
 
