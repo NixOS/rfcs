@@ -93,7 +93,7 @@ Flake reference | The tag it points to | The `upgrade`ed flake reference
 [drawbacks]: #drawbacks
 
 - This is impossible with some types of flake references, such as `path`s and
-  `git+` URLs, which will make the flake interface less consistent.
+  tarballs, which will make the flake interface less consistent.
 - This adds extra complexity to `nix flake update`.
 - The difference between `update` and `upgrade` might cause confusion.
 
