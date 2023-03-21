@@ -36,7 +36,7 @@ If a user needs to be able to access some store paths without having access to t
 ## Local store
 
 For a local store, we keep a list of local (POSIX) users who have access to each store path as path metadata.
-When the relevant config option (perhaps `acl`) is enabled, this ACL (access control list) is enforced, meaning that only users on that list can read the store path, execute files from it, or use it as a dependency in their derivations.
+When the relevant config option (perhaps `acl`) is enabled, this ACL (access control list) is enforced, meaning that only users on that list, or belonging to groups on that list, can read the store path, execute files from it, or use it as a dependency in their derivations.
 We also add a less strict mode (`selective-acl`) in which derivations are only protected if they are marked as such.
 
 For paths external to the Nix sandbox (added via `nix store add-{file,path}`, paths in the Nix language, `builtins.fetch*`, or flake sources), we add the user to the list when they send the path to the daemon.
@@ -49,12 +49,12 @@ For derivation outputs, we add user to the list when the user requests to realis
 When `selective-acl` is enabled, protected paths should not be readable by anyone during the build.
 Necessary permissions are granted after the build.
 
-There also should be a way to enable the protection for selective ACLs (perhaps `nix store access protect`), and explicitly grant (`nix store access grant`) or revoke (`nix store access revoke`) access of certain user to each individual path.
-Naturally, this should only be available to `trusted-user`s and users who have access to this path already.
+There also should be a way to enable the protection for selective ACLs (perhaps `nix store access protect`), and explicitly grant (`nix store access grant`) or revoke (`nix store access revoke`) access of certain user or group to each individual path.
+Naturally, this should only be available to `trusted-user`s and users who have access to this path already (either because they are on the ACL, or they belong to a group on the ACL).
 
 ### `db.sqlite`
 
-The `ValidPaths` table should get a new field, something like `allowed-users`, which should list the users who have either provided proof of source for this derivation or had been explicitly granted access.
+The `ValidPaths` table should get a new field, something like `allowed-users`, which should list the users and groups who have either provided proof of source for this derivation or had been explicitly granted access.
 When `selective-acl` is enabled, there should be a field like `protected` to mark a derivation as protected.
 
 ### Changes to the system
@@ -62,14 +62,14 @@ When `selective-acl` is enabled, there should be a field like `protected` to mar
 We should implement a way to restrict access to all the store paths for users.
 A first "line of defense" could be something like [RFC 97], which makes the store non-world-listable.
 However, it is separate from this RFC, and is not required.
-On top of that, we must enforce a stricter access control, using [POSIX ACLs](https://man7.org/linux/man-pages/man5/acl.5.html) to only allow users access to store paths if they are part of the ACL for that path.
+On top of that, we must enforce a stricter access control, using [POSIX ACLs](https://man7.org/linux/man-pages/man5/acl.5.html) to only allow users access to store paths if they are part of the ACL (or belong to a group on the ACL) for that path.
 Nix daemon (or other local store implementations) should execute the appropriate `setfacl` calls whenever a path is added to store or gets different permissions in the db.
 
 [RFC 97]: https://github.com/NixOS/rfcs/pull/97
 
 ### Nix language
 
-We change the `derivation` and `path` builtins, such that a `__permissions` attribute, when set, is expected to be a list of strings, representing the users who should be granted access to the store path (or the derivation outputs, in the case of `derivation`).
+We change the `derivation` and `path` builtins, such that a `__permissions` attribute, when set, is expected to be a list of strings, representing the users and groups who should be granted access to the store path (or the derivation outputs, in the case of `derivation`).
 
 If this list is set, the Nix daemon (or other store implementation) should be notified that the path/derivation is supposed to be protected (perhaps using a new worker protocol command), and after the build is completed, the ACLs should be set appropriately (only the users specified in the `__permissions` list should have access to the path).
 
