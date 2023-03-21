@@ -103,7 +103,8 @@ Flake reference | The tag it points to | The `upgrade`ed flake reference
 - Using a different syntax for the placeholders
 - Using a version scheme other than semantic versioning
 - Adding flags to `nix flake update` instead of creating a new `upgrade` command
-- Not having an `upgrade` command or a `--upgrade-input` flag
+- Update to incompatible versions with regard to `flake.lock` instead of mutating
+  `flake.nix` directly
 - Not adding the feature, manually update the flake references
 
 # Unresolved questions
