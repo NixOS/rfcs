@@ -36,7 +36,7 @@ This makes it much easier to contribute new packages, since there's no more gues
 [design]: #detailed-design
 
 This RFC establishes the standard of using `pkgs/unit/${shard}/${name}` "unit" directories for the definitions of the Nix packages `pkgs.${name}` in Nixpkgs, where `shard = toLower (substring 0 2 name)`.
-All unit directories are automatically discovered and incorporated into the `pkgs` set using `pkgs.${name} = pkgs.callPackage pkgs/unit/${shard}/${name}/pkg-fun.nix { }`.
+All unit directories are automatically discovered and incorporated into the `pkgs` set using `pkgs.${name} = pkgs.callPackage pkgs/unit/${shard}/${name}/package.nix { }`.
 
 The following requirements will be checked by CI.
 This standard must be followed for newly added packages that can satisfy these requirements.
@@ -45,7 +45,7 @@ A treewide migration to this standard will be performed for existing packages th
 ## Structure
 
 The `pkgs/unit` directory must only contain unit directories, and only in subdirectories of the form `${shard}/${name}`.
-Each unit directory must contain at least a `pkg-fun.nix` file, but may contain arbitrary other files and directories.
+Each unit directory must contain at least a `package.nix` file, but may contain arbitrary other files and directories.
 
 This ensures that maintainers don't have to verify this structure manually, which is prone to mistakes.
 
@@ -59,24 +59,24 @@ This ensures that people can expect the unit directories to correspond to builda
 
 Unit directories may only interact with the rest of Nixpkgs via the stable `pkgs.${name}` attributes, not with file references:
 - Files inside a unit directory must not reference files outside that unit directory.
-  Therefore all dependencies on other packages must come from `pkg-fun.nix` arguments injected by `callPackage`.
+  Therefore all dependencies on other packages must come from `package.nix` arguments injected by `callPackage`.
   This ensures that files in Nixpkgs can be moved around without breaking this package.
 - Files outside a unit directory must not reference files inside that unit directory.
   Therefore other packages can only depend on this package via `pkgs.${name}`.
-  This ensures that files within unit directories (except `pkg-fun.nix`) can be freely moved and changed without breaking any other packages.
+  This ensures that files within unit directories (except `package.nix`) can be freely moved and changed without breaking any other packages.
 
-The only notable exception to this rule is the `pkgs/top-level/all-packages.nix` file which may reference the `pkg-fun.nix` file according to the next requirement.
+The only notable exception to this rule is the `pkgs/top-level/all-packages.nix` file which may reference the `package.nix` file according to the next requirement.
 
 ## Custom arguments
 
-If `pkgs/top-level/all-packages.nix` contains a definition for the attribute `${name}` and the unit directory `pkgs/unit/${shard}/${name}` exists, then the attribute value must be defined as `pkgs.callPackage pkgs/unit/${shard}/${name}/pkg-fun.nix args`, where `args` may be a freely chosen expression.
+If `pkgs/top-level/all-packages.nix` contains a definition for the attribute `${name}` and the unit directory `pkgs/unit/${shard}/${name}` exists, then the attribute value must be defined as `pkgs.callPackage pkgs/unit/${shard}/${name}/package.nix args`, where `args` may be a freely chosen expression.
 
 This ensures that even if a package initially doesn't require a custom `args`, if it later does, it doesn't have to be moved out of the `pkgs/unit` directory to pass custom arguments.
 
 ## Examples
 [examples]: #examples
 
-To add a new package `pkgs.foobar` to Nixpkgs, one only needs to create the file `pkgs/unit/fo/foobar/pkg-fun.nix`.
+To add a new package `pkgs.foobar` to Nixpkgs, one only needs to create the file `pkgs/unit/fo/foobar/package.nix`.
 No need to find an appropriate category nor to modify `pkgs/top-level/all-packages.nix` anymore.
 
 With many packages, the `pkgs/unit` directory may look like this:
@@ -105,7 +105,7 @@ pkgs
 - `nix edit` and search.nixos.org are unaffected, since they rely on `meta.position` to get the file to edit, which still works
 - `git blame` locally and on GitHub is unaffected, since it follows file renames properly.
 - A commonly recommended way of building package directories in Nixpkgs is to use `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
-  Since the path changes `pkg-fun.nix` is now used, this becomes like `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/unit/he/hello/pkg-fun.nix {}'`, which is harder for users.
+  Since the path changes `package.nix` is now used, this becomes like `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/unit/he/hello/package.nix {}'`, which is harder for users.
   However, calling a path like this is an anti-pattern anyway, because it doesn't use the correct Nixpkgs version and it doesn't use the correct argument overrides.
   The correct way of doing it was to add the package to `pkgs/top-level/all-packages.nix`, then calling `nix-build -A hello`.
   This `nix-build -E` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
@@ -142,7 +142,7 @@ pkgs
   But when there's more than 1 000 packages starting with `f`, all packages starting with `f` are distributed under 2-letter prefixes, moving `foobar` to `pkgs/unit/fo/foobar`.
   This is not great because it's very complex to determine which directory to put a package in, making it bad for contributors.
 
-## Alternate `pkg-fun.nix` filename
+## Alternate `package.nix` filename
 
 - `default.nix`:
   - Bad because it doesn't have its main benefits here:
@@ -203,9 +203,9 @@ The idea was to expand the auto-calling logic according to:
 Unit directories are automatically discovered and transformed to a definition of the form
 ```
 # If args.nix doesn't exist
-pkgs.${name} = pkgs.callPackage ${unitDir}/pkg-fun.nix {}
+pkgs.${name} = pkgs.callPackage ${unitDir}/package.nix {}
 # If args.nix does exists
-pkgs.${name} = pkgs.callPackage ${unitDir}/pkg-fun.nix (import ${unitDir}/args.nix pkgs);
+pkgs.${name} = pkgs.callPackage ${unitDir}/package.nix (import ${unitDir}/args.nix pkgs);
 ```
 
 Pro:
