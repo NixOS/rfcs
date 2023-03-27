@@ -2,7 +2,8 @@
 feature: simple-package-paths
 start-date: 2022-09-02
 author: Silvan Mosberger
-co-authors: Nixpkgs Architecture Team
+co-authors: Robert Hensing
+pre-RFC reviewers: Thomas Bereknyei, John Ericson, Alex Ameen
 shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: https://github.com/NixOS/nixpkgs/pull/211832
