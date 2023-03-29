@@ -24,9 +24,9 @@ The community offers tools and methods (such as nixdoc, nix-doc, etc.) to write 
 We are currently utilizing this functionality to build a subset of documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
 Also, [noogle](https://noogle.dev) indexes subsets of nixpkgs based on multiline comments.
 
-However, the format of that __docs-strings__ needs to be better documented and standardized.
+However, the format of that __doc-strings__ needs to be better documented and standardized.
 
-This RFC aims to achieve consistency for docs-strings and allows for differentiation between regular comments and doc-strings.
+This RFC aims to achieve consistency for doc-strings and allows for differentiation between regular comments and doc-strings.
 
 We could envision native nix support, a documentation team, or community-driven solutions for automatically generating documentation from them.
 
@@ -104,7 +104,7 @@ Proposed Solution (0,0) => `##` For docstring body and markdown headings `# H1`
 
 ### Format Rules
 
-- [F100] - Docs-string are all comments. That start with `##` or `#!` e.g. `## {content}`
+- [F100] - doc-string are all comments. That start with `##` or `#!` e.g. `## {content}`
 
 This RFC is a significant change to the existing documentation convention. This is because it is better to do it right when always being downward compatible holds you back. We created a pro-con list in the [alternatives](#alternatives) section below.
 
@@ -173,7 +173,7 @@ The following example illustrates the structure of doc-strings
 ##    <- Type ->
 ```
 
-Example: old docs-strings. (To be changed by this RFC)
+Example: old doc-strings. (To be changed by this RFC)
 
 ```nix
 # lib/attrsets.nix
@@ -214,7 +214,7 @@ First of all: There are no actual block specifiers within nix or nixpkgs. The ex
 
 The sequence `Example:` has some drawbacks when it comes to syntax:
 
-1. It is possible that this sequence occurs in a natural text without the intention to start a new docs-string block.
+1. It is possible that this sequence occurs in a natural text without the intention to start a new doc-string block.
 2. It doesn't visually stand out.
 3. It is bad that the line needs to start with `Example:` to be valid syntax. Although it is a good practice while writing comments. This shouldn't be syntactically required. > (`nixdoc` requires it).
 
