@@ -65,16 +65,18 @@ foo:
 ```nix
 # somefile.nix
 
-    ## <Description or Tagline>
-    ## 
-    ## # Example
-    ##
-    ## <Comprehensive code>
-    ## 
-    ## # Type
-    ##    
-    ## <Type Signature>
-    mapAttrs = f: s: #...
+{
+  ## <Description or Tagline>
+  ## 
+  ## # Example
+  ##
+  ## <Comprehensive code>
+  ## 
+  ## # Type
+  ##    
+  ## <Type Signature>
+  mapAttrs = f: s: <...>;
+}
 ```
 
 We considered this possible solution because the following reasons:
