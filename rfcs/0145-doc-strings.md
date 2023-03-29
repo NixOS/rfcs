@@ -131,7 +131,7 @@ This allows for quick writing without the need to use sections.
 
 - [S022] - Headings H1 are reserved markdown headings. Which are specified in [this list](#keywords). Users are allowed to only use H2 (or higher) headings for their free use.
 
-H1 headings start a section to keep it extendable in the future. Users do not use them, so we keep track of all allowed H1 headings.
+H1 headings start a section to keep it extendable in the future. Users do not choose them freely, so we keep track of all allowed H1 headings.
 
 - [S012] - Every [optional] section started by an H1 heading is continued until the next heading starts. To the very end of the comment, otherwise.
 - [S014] - Every section defines its own rules. They must be compatible with the formal requirements of doc-strings (this RFC) that can override formal rules locally. (e.g., disable Markdown, use custom syntax, etc.)
