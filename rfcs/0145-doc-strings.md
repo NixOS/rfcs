@@ -13,41 +13,82 @@ related-issues: (will contain links to implementation PRs)
 
 Standard for Doc-strings
 
+Finally distinguish between doc-strings and comments.
+
 # Motivation
 [motivation]: #motivation
 
-This RFC aims at improving quality and consistency of in code documentation. (aka Doc-strings)
+This RFC aims at improving consistency of in code documentation. (aka Doc-strings)
 
-The community offers tools and methods to write in-code documentation for functions and other code related atomic expressions.
-This functionality is currently utilized to build a subset of documentation for nix functions. (e.g. nixpkgs.lib documentation via tool: `nixdoc`)
+The community offers tools and methods (such as nixdoc, nix-doc, etc.) to write and process in-code documentation for functions and other code related atomic expressions.
+This functionality is currently utilized to build a subset of documentation for nix functions. (e.g. nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
+There is also [noogle](https://noogle.dev) that indexes subsets of nixpkgs based on the current comments.
 
-However the quality and consistency of that __docs-strings__ is itself neither well documented nor standardized.
+However the format of that __docs-strings__ is itself neither well documented nor standardized.
 
-This RFC aims at achieving better quality and consistency for docs-strings. Because they carry great documentation potential and allow additional documentation improvements.
+This RFC aims at achieving consistency for docs-strings and allow to differentiate between regular comments and doc-strings.
 
-That would allow native nix support, documentation-team or community-driven solutions for automatically generating documentation from them.
-
-This RFC is intended to be the central place where doc-strings are specified.
+We could envision native nix support, documentation-team or community-driven solutions for automatically generating documentation from them.
 
 __Current issue__
 
 > The existing doc-strings heavily depend on a tool called `nixdoc` and not vice versa.
 >
-> Instead I want to provide a common standard that every nix user can refer to.
+> Instead we want to provide a common standard that every nix user can refer to.
 
 Everything until now is just a draft if you can provide better ideas e.g. using different formats or syntax please let me know.
 
+## Example of the current format:
+
+```nix
+/*
+  <Description
+  Example:
+  <Code Examples>
+  Type:
+  <Some Type information>
+*/
+expr = 
+# Describes 'arg'
+arg:
+# Describes 'foo'
+foo: 
+```
+
 > This RFC aims for general rules for doc-strings.
-> Features like: "what different sections exist" and if the might have complex rules (e.g. type: syntax) is not specified. 
+> Features like: "what different sections exist" and if the might have complex rules (e.g. type: syntax) is not specified.
 >
-> This RFC aims at providing a formal skeleton, where sections can be extended by the nix community
+> Providing a formal skeleton, where sections can be extended by the nix community
+
+## Proposed solution
+
+```nix
+# somefile.nix
+
+    ## <Description or Tagline>
+    ## 
+    ## # Example
+    ##
+    ## <Comprehensive code>
+    ## 
+    ## # Type
+    ##    
+    ## <Type Signature>
+    mapAttrs = f: s: #...
+```
+
+This is considered a possible solution because the following reasons:
+
+- Good visual distinction between doc-strings and comments
+- Clear rules and structure
+- Saves vertical space
+- Doesn't need termination (*/)
+- Clear indentation rules. Following the __markdown__ convention.
 
 # Detailed design
 [design]: #detailed-design
 
 The following abstract rules describe how to write doc-strings.
-
-The rules are partially derived from the sections below where alternative solutions are considered. So make sure to read them as well.
 
 > I'am very happy if you comment about whether we should use `## {content}` or `/** {content} */`
 > I did write this RFC tailored towards `##` but using `/** */` is still an open discussion.
@@ -57,7 +98,7 @@ We must find one solution out of the following:
 |  | 0 `##` | 1 `/** */`   |
 |---|---|---|
 | 0 `# {Keyword}` | `## # Example` | `/** # Example */` |
-| 1 `@{Keyword}:`  | `# @Exmaple:` |`/** @Example: */` |
+| 1 `@{Keyword}:`  | `# @Example:` |`/** @Example: */` |
 
 Proposed Solution (0,0) => `##` For docstring body and markdown headings `# H1`
 
@@ -65,22 +106,40 @@ Proposed Solution (0,0) => `##` For docstring body and markdown headings `# H1`
 
 - [F100] - Docs-string are all comments. That start with `##` or `#!` e.g. `## {content}`
 
-- [F200] - Doc-strings always document / relate to an expression. 
-- [F201] - Doc-strings starting with `##` relate to the expression in the next line / or more precisely to the next node in the AST. (Details follow, as this might be non-trivial)
-- [F202] - Doc-strings that are at the top of a file and that start with `#!` describe the expression exported from the whole file. (Previous node in AST)
+This is a quite big change to the existing documentation convention. The reason behind this: Better do it right when always being downwards compatible holds you back. We created a pro-con list in the [alternatives](#alternatives) section below.
 
-- [F300] - The docstring is continued in the next line if it starts with `##` as well. Leading whitespace are allowed.
+This provides distinction between regular comments and those who are actually doc-strings.
+
+- [F200] - Doc-strings always document / relate to an expression.
+
+- [F201] - Doc-strings starting with `##` relate to the expression in the next line / or more precisely to the next node in the AST. (Details follow, as this might be non-trivial)
+- [F202] - Doc-strings that are at the top of a file and that start with `##?` describe the expression exported from the whole file. (Previous node in AST)
+
+- [F300] - The docstring is continued in the next line if it starts with `##` as well. Leading whitespace is allowed.
 
 ### Structural Rules
 
 - [S010] - The content of a doc-string is Markdown.
 
+Allows for intuitive usage without knowledge of complex syntax rules.
+
 - [S021] - Content before the first [optional] section is called `description`.
 
+This allows for quick writing without the need to use sections.
+
 - [S022] - Headings H1 are reserved markdown headings. Which are specified in [this list](#keywords). Users are allowed to only use H2 (or higher) headings to their free use.
+
+H1 headings start a section to keep it extendable in the future. Users do not use them so we keep track of all used H1 headings.
+
 - [S012] - Every [optional] section started by an H1 heading is continued until the next heading starts. To the very end of the comment otherwise.
 - [S014] - Every section defines its own rules while they must be compatible with the formal requirements of doc-strings (this RFC) the can override formal rules locally. (e.g. disable markdown, use custom syntax etc.)
-- [S017] - Only the H1-sections (`Keywords`) described in in this RFC do exist. (See [the list](#keywords))
+- [S017] - Only the H1-sections (`Keywords`) described in [this list](#keywords) are valid.
+
+e.g.
+
+```nix
+```
+
 - [S018] - In case of extension, every new section `Keyword` must be added to this RFC first.
 - [S030] - If sections follow complex logic it is embraced to specify that logic in an separate sub-RFC.
 - [S040] - Usage of the described sections is totally OPTIONAL.
@@ -89,30 +148,12 @@ Proposed Solution (0,0) => `##` For docstring body and markdown headings `# H1`
 ## Keywords
 [keywords]: #keywords
 
-I wanted to keep the list of initial keywords short. So by the time this RFC focuses on the formal aspects of doc-strings first. More keywords and features for them can be added later on. 
+We wanted to keep the list of initial keywords short. So by the time this RFC focuses on the formal aspects of doc-strings first. More keywords and features for them can be added later on.
 
 | Keyword     |  Description  | Note |
 | ---         |  ---          | --- |
 | `Example`   | Starts the Example-block. Often contains comprehensive code examples | |
 | `Type`      | Start the Type-block, it is any free text | Syntax may eventually be specified in the future. [preview](https://typednix.dev). |
-
-## Decision reasons
-
-### Why use `##` ?
-
-This is a quite big change to the existing documentation convention. The reason behind this: Better do it right when always being downwards compatible holds you back. We created a pro-con list in the sections below.
-
-### Additional `#`
-
-This provides distinction between regular comments and those who are actually doc-strings.
-
-### Start with description
-
-This allows for quick writing without the need for any complex block building
-
-### Block continuation
-
-This works like `Markdown` and allows for intuitive usage without knowledge of complex syntax rules.
 
 ### Blocks appear only once
 
@@ -139,11 +180,10 @@ The following example illustrates the structure of doc-strings
 ```nix
 # Example - structure
 
-
 ##    <- Description content->
-##    @Example:
+##    # Example
 ##    <- Some comprehensive code examples ->
-##    @Type:
+##    # Type:
 ##    <- Type ->
 ```
 
@@ -210,13 +250,13 @@ Also this affects only the `lib` folder and few other places that are currently 
 # Alternatives
 [alternatives]: #alternatives
 
-- By not implementing this feature, nix looses the ability for tool generated documentation.
+- By not implementing this feature, nix loses the ability for tool generated documentation.
 
 - Documentation within code will remain unstable / only determined by nixdoc.
 
-## Alternative formats
+## Pros-Cons for the different formats
 
-`##` inspired from rust's `///`. There is the alternative Format using `##`
+### `##` inspired from rust's `///`
 
 Example:
 
@@ -244,6 +284,9 @@ Example:
 | Block continuation is more intuitive (With autocomplete properly setup) |  |
 | Uses less punctuations and special characters thus is visually more clear and requires less finger spread movements for reaching / and * and @ (for sections) |  |
 | Works nicely with Markdown content as indentation is visually more clear | Many `#` symbols might be confusing  |
+| | Starting every line with `##` creates visual conflicts with markdown headings `# {Heading}` |
+
+### `/** */` inspired from the current multiline strings
 
 `/** */` In comparison arguments for using `/** */` together with `@{keyword}:` to start sections
 
@@ -264,14 +307,13 @@ Example:
     mapAttrs = f: s: #...
 ```
 
-
 | Pro | Con |
 |---|---|
 | Clear termination | Takes up more vertical space |
 | Doesn't change the existing convention by much | doesn't visually stand out by much (just one more `*` ) |
 | Mostly stays compatible with existing implementations | Multiple blocks are not concatenated. They need to be continued |
 | No configuration required (LSP for autocompletion on newlines) |  |
-|  | Indentation is not clear / more complex. e.g. The indentation of the first contentfull line is defined as 0, this is how "Noogle" currently works) LSPs could highlight this or show \| (vertical lines) |
+|  | Indentation is not clear / more complex. |
 
 ## Candidates not considered
 
@@ -291,15 +333,15 @@ Javadoc style
 
 Although this has already sneaked into some nix comments. This format is not considered best practice for a variety of good reasons.
 
-1. Starting every line with `*` creates visual conflicts with markdown bullet list also starting with `*`
+1. Essentially combines the cons of both worlds.
 2. Takes up more space and needs autocompletion to fill missing `*` beginnings when extended.
-3. Pro: Indentation within is clear.
-4. Most nix users cannot identify with java or javascript. They like predictable behavior.
-5. Essentially combines the cons of both worlds.
+3. Starting every line with `*` creates visual conflicts with markdown bullet list also starting with `*`.
+4. Pro: Indentation within is clear.
+5. Most nix users cannot identify with java or javascript. They like predictable behavior.
 
-## Alternative section headings
+## Pros-Cons for section headings
 
-### Use markdown headings instead
+### Markdown headings
 
 Example:
 
@@ -323,8 +365,9 @@ Example:
 | Markdown is simple | doesn't visually distinguish from `##` starting the doc-string |
 | Using headings feels natural | Users may accidentally use those headings within natural language |
 | | Markdown recommends using newlines before and after headings which takes up a lot of vertical space |
+| | Markdown headings do not visually stand out from lines that already started with `##` |
 
-### Use custom headings instead
+### Custom headings `@{Keyword}:`
 
 Example:
 
@@ -352,6 +395,8 @@ Example:
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
+
+- `nixodc` offers doc-strings to describe function arguments. This is currently not compatible until some section for `args` are defined.
 
 - Will `nix` itself implement native support like in rust -> `cargo doc`
 
