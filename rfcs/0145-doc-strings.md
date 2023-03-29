@@ -125,6 +125,7 @@ We finally need to distinguish between regular comments and doc strings. We foun
 
 It allows for intuitive usage without knowledge of complex syntax rules.
 
+- [S011] - predefined heading `keywords` may start a section.
 - [S021] - Content before the first [optional] section is called `description`.
 
 This allows for quick writing without the need to use sections.
