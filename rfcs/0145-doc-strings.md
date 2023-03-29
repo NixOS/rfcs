@@ -137,12 +137,7 @@ H1 headings start a section to keep it extendable in the future. Users do not ch
 - [S012] - Every [optional] section started by an H1 heading is continued until the next heading starts. To the very end of the comment, otherwise.
 - [S014] - Every section defines its own rules. They must be compatible with the formal requirements of doc-strings (this RFC) that can override formal rules locally. (e.g., disable Markdown, use custom syntax, etc.)
 - [S017] - Only the H1-sections (`Keywords`) described in [this list](#keywords) are valid.
-
-e.g.
-
-```nix
-```
-
+  
 - [S018] - In case of extension, every new section `Keyword` must first be added to this RFC.
 - [S030] - If sections follow complex logic, it is embraced to specify that logic in a separate sub-RFC.
 - [S040] - Usage of the described sections is OPTIONAL.
