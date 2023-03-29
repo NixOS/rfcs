@@ -56,7 +56,7 @@ foo:
 ```
 
 > This RFC aims for general rules for doc-strings.
-> Features like: "what different sections exist" and if the might have complex rules (e.g. type: syntax) is not specified.
+> Features like: "what different sections exist" and if they might have complex rules (e.g. type: syntax) is not specified.
 >
 > Providing a formal skeleton, where sections can be extended by the nix community
 
