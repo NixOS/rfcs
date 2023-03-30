@@ -454,3 +454,8 @@ The following is an idea for a problem that will arise if tools try to track doc
 - `NixOS/nix` should implement native support for doc-strings. That way our users don't have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but it should be natively possible to document your nix expressions.
 
 - Every existing and future tool can implement against this RFC and rely on it.
+
+# References
+
+- [Rustdoc](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html)
+- [Nixdoc](https://github.com/nix-community/nixdoc)
