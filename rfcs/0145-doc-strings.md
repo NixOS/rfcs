@@ -38,7 +38,7 @@ __Current issue__
 
 Everything until now is just a draft; if you can provide better ideas e.g. using different formats or syntax please let me know.
 
-## Example of the current format:
+## Example of the current format
 
 ```nix
 /*
@@ -115,9 +115,44 @@ We finally need to distinguish between regular comments and doc strings. We foun
 - [F200] - Doc-strings always document / relate to an expression.
 
 - [F201] - Doc-strings starting with `##` relate to the expression in the following line / or, more precisely, to the next node in the AST. (Details follow, as this might be non-trivial)
-- [F202] - Doc-strings that are at the top of a file and that start with `##?` describe the expression exported from the whole file. (Previous node in AST)
+- [F202] - Doc-strings that are at the top of a file and that start with `#|` describe the expression exported from the whole file. (Previous node in AST)
 
-- [F300] - The docstring is continued in the following line if it also starts with `##`. Leading whitespace is allowed.
+In comparison; rustdoc uses `//!`. But using `#!` is considered a bead idea, as it can be confused with identical bash shebangs `#!`.
+
+> This is not final yet. If you have any ideas let us know in the comments.
+
+Example of a comment referring to the whole file:
+
+```nix
+#| <Description>
+#| <Description more>
+#| # Example
+#| <Some comprehensive code>
+#| # Type
+#| The Type of the expression returned by the file
+{
+  id = x: x
+}
+```
+
+- [F300] - The docstring is continued in the following line if it also starts with `##` / `#|`. Leading whitespace is allowed.
+
+Example: docstring continuation
+
+```nix
+## Doc-string A
+##  ....
+## This block has no expression in the next line. 
+## Therefore it doesn't have any effect
+##  ....
+## Doc-string A
+
+
+## Doc-string B
+## -- this block documents the purpose of '1'
+## Doc-string B
+1
+```
 
 ### Structural Rules
 
@@ -153,56 +188,7 @@ We wanted to keep the list of initial keywords short. So by the time this RFC fo
 | `Example`   | Starts the Example-block. Often contains comprehensive code examples | |
 | `Type`      | Start the Type-block; it is any free text | Syntax may eventually be specified in the future. [preview](https://typednix.dev). |
 
-# Examples and Interactions
-[examples-and-interactions]: #examples-and-interactions
-
-The following example illustrates the structure of doc-strings
-
-- starting with `##`
-- doesn't change the nix syntax
-
-```nix
-# Example - structure
-
-## <- Description content->
-## # Example
-## <- Some comprehensive code examples ->
-## # Type:
-## <- Type ->
-```
-
-Example: old doc-strings. (To be changed by this RFC)
-
-```nix
-# lib/attrsets.nix
-
-/* Create a new attribute set with `value` set at the nested attribute location specified in `attrPath`.
-     Example:
-       setAttrByPath ["a" "b"] 3
-       => { a = { b = 3; }; }
-     Type:
-       setAttrByPath :: [String] -> Any -> AttrSet
-  */
-  setAttrByPath
-```
-
-Example: After changes.
-
-```nix
-# lib/attrsets.nix
-
-## Create a new attribute set with `value` set at the nested attribute location specified in `attrPath`.
-##
-## # Example
-##  setAttrByPath ["a" "b"] 3
-##    => { a = { b = 3; }; }
-##
-## # Type
-##  setAttrByPath :: [String] -> Any -> AttrSet
-  setAttrByPath 
-```
-
-## Why change the existing block specifiers?
+## Why change the existing section specifiers?
 
 First of all: There are no actual block specifiers within nix or nixpkgs. The existing blocks heavily depend on a tool called `nixdoc` and not vice versa.
 
@@ -212,7 +198,7 @@ First of all: There are no actual block specifiers within nix or nixpkgs. The ex
 
 The sequence `Example:` has some drawbacks when it comes to syntax:
 
-1. It is possible that this sequence occurs in a natural text without the intention to start a new doc-string block.
+1. It is possible that this sequence occurs in a natural text without the intention to start a new doc-string section.
 2. It doesn't visually stand out.
 3. It is bad that the line needs to start with `Example:` to be valid syntax. Although it is a good practice while writing comments. This shouldn't be syntactically required. > (`nixdoc` requires it).
 
@@ -221,6 +207,11 @@ The sequence `Example:` has some drawbacks when it comes to syntax:
 Why doc-strings are valuable
 
 Doc-strings can be attached to AST nodes without affecting the actual compile-, evaluation- or build-time because they are just comments. Specialized tools can handle those comments and create static documentation from them. Also, integration with LSP is possible.
+
+Many files within nixpkgs contain detailed comments we cannot currently use.
+An example: [make-disk-image.nix](https://github.com/NixOS/nixpkgs/blob/master/nixos/lib/make-disk-image.nix)
+
+Following this RFC means refactoring for existing comments, but it also means that we can finally use all comments that were intended to be doc-strings
 
 # Drawbacks
 [drawbacks]: #drawbacks
