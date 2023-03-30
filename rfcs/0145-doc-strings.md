@@ -11,9 +11,11 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Standard for Doc-strings
+Standard for Docstring format
 
-Finally, distinguish between doc-strings and comments.
+Wikipedia states:
+
+> In programming, a docstring is a string literal specified in source code that is used, like a comment, to document a specific segment of code. Unlike conventional source code comments, or even specifically formatted comments like docblocks, docstrings are not stripped from the source tree when it is parsed and are retained throughout the runtime of the program. This allows the programmer to inspect these comments at run time, for instance as an interactive help system, or as metadata.
 
 # Motivation
 [motivation]: #motivation
@@ -30,13 +32,20 @@ This RFC aims to achieve consistency for doc-strings and allows for differentiat
 
 We could envision native nix support, a documentation team, or community-driven solutions for automatically generating documentation from them.
 
+More specifically, we envision the following possible features: (Long term)
+
+- Automatically build documentation - At most atomic things that directly relate to one specific piece of code (e.g., mkDerivation, make-disk-image, lib-functions, etc.)
+- Hover information in IDEs
+- Autocomplete in IDEs
+- Detect broken code/misuse of specific functionality.
+
 __Current issue__
 
-> The existing doc-strings heavily depend on a tool called `nixdoc` and not vice versa.
+> The existing doc-strings heavily depend on a tool called `nixdoc` not vice versa.
 >
 > Instead, we want to provide a common standard that every nix user can refer to.
 
-Everything until now is just a draft; if you can provide better ideas e.g. using different formats or syntax please let me know.
+Everything until now is just a draft; if you can provide better ideas, e.g. using different formats or syntax, please let me know.
 
 ## Example of the current format
 
@@ -62,6 +71,10 @@ foo:
 
 ## Proposed solution
 
+In general we propose two kinds of doc-strings
+
+## Doc-string referencing the subsequent expression
+ 
 ```nix
 # somefile.nix
 
@@ -75,6 +88,25 @@ foo:
   ## # Type
   ##    
   ## <Type Signature>
+  mapAttrs = f: s: <...>;
+}
+```
+
+## Doc-string referencing the file expression
+ 
+```nix
+#| <Description or Tagline>
+#| 
+#| # Example
+#|
+#| <Comprehensive code>
+#| 
+#| # Type
+#|    
+#| <Type Signature>
+
+{...}:
+{
   mapAttrs = f: s: <...>;
 }
 ```
@@ -117,9 +149,9 @@ We finally need to distinguish between regular comments and doc strings. We foun
 - [F201] - Doc-strings starting with `##` relate to the expression in the following line / or, more precisely, to the next node in the AST. (Details follow, as this might be non-trivial)
 - [F202] - Doc-strings that are at the top of a file and that start with `#|` describe the expression exported from the whole file. (Previous node in AST)
 
-In comparison; rustdoc uses `//!`. But using `#!` is considered a bead idea, as it can be confused with identical bash shebangs `#!`.
+In comparison, rustdoc uses `//!`. But using `#!` is considered a bad idea, as it can be confused with identical bash shebangs `#!`.
 
-> This is not final yet. If you have any ideas let us know in the comments.
+> This is still being determined. If you have any ideas, let us know in the comments.
 
 Example of a comment referring to the whole file:
 
@@ -255,10 +287,10 @@ Example:
 | Saves vertical space | Needs Autocompletion (Language Server) to continue the next line. Hustle otherwise to start every line by hand |
 |  | Changes the existing convention |
 | Doesn't need termination (e.g. */) | Can break when interrupted with newlines / non-docstring line beginnings |
-| Easier to read / indentation is clear | Multiple comment tokens must be concatenated (Might be more complex) |
-| Block continuation is more intuitive (With autocomplete properly setup) |  |
-| Uses fewer punctuations and special characters thus is visually more clear and requires less finger spread movements for reaching / and * and @ (for sections) |  |
-| Works nicely with Markdown content as indentation is visually more clear | Many `#` symbols might be confusing  |
+| Easier to read / Indentation is clear | Multiple comment tokens must be concatenated (Might be more complex) |
+| Block continuation is more intuitive (With autocomplete setup properly) |  |
+| Uses fewer punctuations and special characters; thus is visually more clear and requires less finger spread movements for reaching / and * and @ (for sections) |  |
+| Works nicely with Markdown content as Indentation is visually more clear | Many `#` symbols might be confusing  |
 | | Starting every line with `##` creates visual conflicts with markdown headings `# {Heading}` |
 
 ### `/** */` inspired by the current multiline strings
@@ -288,7 +320,7 @@ Example:
 | Doesn't change the existing convention by much | doesn't visually stand out by much (just one more `*` ) |
 | Mostly stays compatible with existing implementations | Multiple blocks are not concatenated. They need to be continued |
 | No configuration required (LSP for autocompletion on newlines) |  |
-|  | Indentation is not clear / more complex. |
+|  | Indentation needs to be clarified / more complex. |
 
 ## Candidates not considered
 
@@ -309,7 +341,7 @@ Javadoc style
 Although this has already sneaked into some nix comments. This format is not considered best practice for a variety of good reasons.
 
 1. Essentially combines the cons of both worlds.
-2. Takes up more space and needs autocompletion to fill missing `*` beginnings when extended.
+2. It Takes up more space and needs autocompletion to fill missing `*` beginnings when extended.
 3. Starting every line with `*` creates visual conflicts with the markdown bullet list also starting with `*`.
 4. Pro: Indentation within is clear.
 5. Most nix users cannot identify with java or javascript. They like predictable behavior.
@@ -363,35 +395,37 @@ Example:
 
 | Pro | Con |
 |---|---|
-| Visually stands out | Is new syntax. Where Markdown could be more intuitive. doc-strings already are Markdown. So why not use markdown |
+| Visually stands out | Is new syntax. Where Markdown could be more intuitive. Doc-strings already are Markdown. So why not use markdown |
 | Follows more closely the current convention |  |
 | Needs less vertical space | |
 | doesn't need newlines, everything could be even within a single line, allowing compression (may not be needed ?) | |
 
+## Alternative approach - just comments
+
+There is the idea from python that doc-strings are just strings, not even special ones. Comments will be docstrings if they follow specific placement rules. However, we thought this was a bad idea to follow. Such complex placement rules require the users to understand where those places are; with nix syntax, this is slightly more complex than with python. Because we don't have keywords such as `class MyClass():` or `def function():` where placement would be obvious
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-- `nixodc` offers doc-strings to describe function arguments. This is currently not compatible until some sections for `args` are defined.
+- `nixodc` offers comments to describe function arguments. This is currently not compatible until some sections for `args` are defined.
 
 - Will `nix` itself implement native support like in rust -> `cargo doc`
 
 - How can a tool keep the connection from where a docstring was defined and where the attribute was exposed (lib/default.nix exposes mapAttrs which is defined at lib/attrsets.nix)
   - There are more complicated things.
 
--> Answer: A Tool might be able to keep track of a percentage of expressions. Sometimes it may be very hard or impossible. For that case, the doc-string can offer a dedicated Keyword that allows overriding the scope.
+-> Answer: A Tool might be able to keep track of a percentage of expressions, and sometimes it may be very hard or impossible. For that case, the doc-string can offer a dedicated Keyword to override the scope.
 
 e.g.
 
-The following is just an idea for a problem that will arise if tools try to track the positions of doc-strings and the location in the nixpkgs tree. (Although this problem is not nixpkgs specific)
+The following is an idea for a problem that will arise if tools try to track doc-strings' positions and the location in the nixpkgs tree. (Although this problem is not nixpkgs specific)
 
 ```nix
-#untrackable.nix
-/*!
-    This file is called somewhere that cannot be automatically tracked/is impossible to analyze statically.
-    The 'TreePath' override can be used by the docstring author to set a fixed path in the nixpkgs expression.
-    (This behavior will not be specified in this RFC)
-    @TreePath: pkgs.stdenv 
-*/
+#| This file is called somewhere that cannot be automatically tracked/is impossible to analyze statically.
+#| The 'TreePath' override can be used by the docstring author to set a fixed path in the nixpkgs expression.
+#| (This behavior will not be specified in this RFC)
+#| @TreePath: pkgs.stdenv 
+
 {...}:
 {
     # returns something
