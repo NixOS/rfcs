@@ -24,9 +24,16 @@ This RFC aims to improve the consistency of in-code documentation. (aka Doc-stri
 
 The community offers tools and methods (such as nixdoc, nix-doc, etc.) to write and process in-code documentation for functions and other code-related atomic expressions.
 We are currently utilizing this functionality to build a subset of documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
-Also, [noogle](https://noogle.dev) indexes subsets of nixpkgs based on multiline comments.
 
-However, the format of that __doc-strings__ needs to be better documented and standardized.
+Other tools that work directly with the nix AST and comments:
+
+- [noogle](https://noogle.dev) - Nix API search engine. It allows you to search functions and other expressions.
+- [nix-doc](https://github.com/lf-/nix-doc) - A Nix developer tool leveraging the rnix Nix parser for intelligent documentation search and tags generation
+- [manix](https://github.com/mlvzk/manix) - A fast CLI documentation searcher for Nix. 
+
+All those tools would profit from the proposed changes.
+
+So the format of that __doc-strings__ needs to be better documented and standardized.
 
 This RFC aims to achieve consistency for doc-strings and allows for differentiation between regular comments and doc-strings.
 
@@ -67,7 +74,7 @@ foo:
 > This RFC aims for general rules for doc-strings.
 > Features like: "what different sections exist" and if they might have complex rules (e.g., type: syntax) are not specified.
 >
-> Providing a formal skeleton where the nix community can extend sections
+> Providing a formal skeleton where the nix community can extend sections.
 
 ## Proposed solution
 
@@ -75,11 +82,14 @@ In general we propose two kinds of doc-strings
 
 ## Doc-string referencing the subsequent expression
  
+Uses `##` to create visual blocks and draw attention to documentation.
+ 
 ```nix
 # somefile.nix
 
 {
   ## <Description or Tagline>
+  ## Documentation for 'mapAttrs'
   ## 
   ## # Example
   ##
@@ -93,6 +103,8 @@ In general we propose two kinds of doc-strings
 ```
 
 ## Doc-string referencing the file expression
+
+Uses `#|` instead of `##` to reference the whole file. Must be at top of the file.
  
 ```nix
 #| <Description or Tagline>
