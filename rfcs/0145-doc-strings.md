@@ -164,11 +164,11 @@ The following example illustrates the structure of doc-strings
 ```nix
 # Example - structure
 
-##    <- Description content->
-##    # Example
-##    <- Some comprehensive code examples ->
-##    # Type:
-##    <- Type ->
+## <- Description content->
+## # Example
+## <- Some comprehensive code examples ->
+## # Type:
+## <- Type ->
 ```
 
 Example: old doc-strings. (To be changed by this RFC)
