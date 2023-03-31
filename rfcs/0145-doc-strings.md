@@ -150,7 +150,7 @@ Proposed Solution (0,0) => `##` For docstring body and markdown headings `# H1`
 
 ### Format Rules
 
-- [F100] - doc-string are all comments. That start with `##` or `#!` e.g. `## {content}`
+- [F100] - doc-string are all comments. That start with `##` or `#|` e.g. `## {content}`
 
 This RFC is a significant change to the existing documentation convention. This is because it is better to do it right when always being downward compatible holds you back. We created a pro-con list in the [alternatives](#alternatives) section below.
 
