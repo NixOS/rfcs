@@ -1,5 +1,5 @@
 ---
-feature: doc-strings
+feature: docblock-standard
 start-date: 2023-03-27
 author: hsjobeki
 co-authors: (find a buddy later to help out with the RFC)
