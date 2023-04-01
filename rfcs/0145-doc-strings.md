@@ -13,9 +13,6 @@ related-issues: (will contain links to implementation PRs)
 
 Standard for Docstring format
 
-Wikipedia states:
-
-> In programming, a docstring is a string literal specified in source code that is used, like a comment, to document a specific segment of code. Unlike conventional source code comments, or even specifically formatted comments like docblocks, docstrings are not stripped from the source tree when it is parsed and are retained throughout the runtime of the program. This allows the programmer to inspect these comments at run time, for instance as an interactive help system, or as metadata.
 
 # Motivation
 [motivation]: #motivation
