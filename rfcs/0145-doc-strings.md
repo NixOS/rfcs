@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Standard for Docstring format
+Propose a standard format for Docblocks
 
 
 # Motivation
