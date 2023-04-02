@@ -23,7 +23,7 @@ This RFC aims to improve the consistency of in-code documentation. (aka Doc-stri
 
 ## Current State
 
-We are currently utilizing the doc-string functionality to build a subset of documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
+We are currently utilizing a `doc-string`-like functionality to build a subset of documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
 
 Currently there are many inconsistently written comments that document specific parts of nixpkgs and other nix-frameworks. (see [references](#references))
 We use some of them to generate documentation automatically. (e.g., nixpkgs/lib via [nixdoc](https://github.com/nix-community/nixdoc)
