@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Propose a standard format for Docblocks
+Propose a standard format for Docblocks.
 
 
 # Motivation
@@ -19,21 +19,21 @@ Propose a standard format for Docblocks
 
 This RFC aims to improve the consistency of in-code documentation. (aka Doc-strings/Doc-blocks)
 
-> Doc-strings and Doc-blocks aren't technicially indentical. But for simplicity the phrase `Doc-string` is used througout this document.
+> Doc-strings and Doc-blocks are technically different. But for simplicity, the phrase `Doc-string` is used in this document for clarity.
 
 ## Current State
 
-We are currently utilizing a `doc-string`-like functionality to build a subset of documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
+We currently utilize a `doc-string`-like functionality to build a subset of documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
 
-Currently there are many inconsistently written comments that document specific parts of nixpkgs and other nix-frameworks. (see [references](#references))
+Many inconsistently written comments document specific parts of nixpkgs and other nix-frameworks. (see [references](#references))
 We use some of them to generate documentation automatically. (e.g., nixpkgs/lib via [nixdoc](https://github.com/nix-community/nixdoc)
 
-This solution requires a lot of handwork to setup, more specifically *nixdoc* is a custom tool, that works only for that purpose.
+This solution requires a lot of handworks; more specifically, *nixdoc* is a custom tool that works only for that purpose.
 
-Here is an example how the format used in *nixdoc* works:
+Here is an example of how the format used in *nixdoc* works:
 
 ```nix
-#attrsets.nix (simplified)
+#attrsets. nix (simplified)
 
 { lib }:
 # Operations on attribute sets.
@@ -62,31 +62,29 @@ in
 
 ##### Unspecified format
 
-The format for writing documentation-strings in general is **not specified**. The only place where it is applied is: *nixpkgs/lib/**
+In general, the format for writing documentation strings is **not specified**. The only place where it is applied is: *nixpkgs/lib/**
 
-*nixdoc* only applies to places in nixpkgs/lib. But extending the scope of *nixdoc* is not the primary goal. Instead we should find formal rules how to write *doc-strings*. Tools like *nixdoc* can then implement against this rfc. Instead of the format relying on nixdoc implementation details.
+*nixdoc* only applies to places in nixpkgs/lib. But extending the scope of *nixdoc* is not the primary goal. Instead, we should find formal rules for writing *doc-strings*. Tools like *nixdoc* can then implement against this RFC instead of the format relying on nixdoc implementation details.
 
 ##### Only specific places
 
-The placement of those comments requires to be exactly at the attribute-set that contains the function declarations. Which is not usable for general purpose documentation-strings. 
+The placement of those comments requires precisely looking at the attribute set containing the function declarations, which is not usable for general-purpose documentation strings. 
 
 e.g., 
 
-- file that directly exports the lib-function without wrapping it in an attribute-set.
+- file that directly exports the lib-function without wrapping it in an attribute set.
 - file that exports a constant
 - files outside of lib are not / cannot be rendered
 
 ##### Differentiate from regular comments
 
-The format doesnt allow any distinction between doc-strings or regular comments.
+The format doesn't allow any distinction between doc-strings or regular comments.
 
-Having a distinction would allow to
+Having a distinction would allow us to
 
 1. Find all comments that are part of the documentation
-2. Render them into the documentation format
-3. Connect the documentation to exact places in the nix-code. This is already done, but only for nixpkgs/lib.
-
-##### 
+2. Render them in the documentation format
+3. Connect the documentation to the exact places in the nix code. This is already done, but only for nixpkgs/lib.
 
 ##### References 
 
@@ -96,13 +94,13 @@ Having a distinction would allow to
 - [trivial-builders](https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders.nix)
 - [stdenv/mkDerivation](https://github.com/NixOS/nixpkgs/blob/master/pkgs/stdenv/generic/make-derivation.nix)
 - [nixos/lib/make-disk-image](https://github.com/NixOS/nixpkgs/blob/master/nixos/lib/make-disk-image.nix)
-- more ...
+- more...
 
 ###### frameworks
 
 - [dream2nix/utils](https://github.com/nix-community/dream2nix/blob/main/src/utils/config.nix)
 - [dream2nix/templates/builder](https://github.com/nix-community/dream2nix/blob/main/src/templates/builders/default.nix)
-- more ... 
+- more... 
 
 ###### Other tools
 
@@ -110,13 +108,13 @@ Other tools that work directly with the nix AST and comments:
 
 - [noogle](https://noogle.dev) - Nix API search engine. It allows you to search functions and other expressions.
 - [nix-doc](https://github.com/lf-/nix-doc) - A Nix developer tool leveraging the rnix Nix parser for intelligent documentation search and tags generation
-- [manix](https://github.com/mlvzk/manix) - A fast CLI documentation searcher for Nix. 
+- [manix](https://github.com/mlvzk/manix) - A fast CLI documentation searcher for nix. 
 
 ## Proposed Improvement - Doc-blocks
 
-In general I thought we do need two kinds of doc-strings:
+In general, I thought we do need two kinds of doc-strings:
 
-> The format is not final yet. Discussion may still ongoing.
+> The format is not final yet. Discussion may still be ongoing.
 
 #### A doc-string referencing the subsequent expression
 
@@ -142,7 +140,7 @@ Example:
 
 #### A Doc-string referencing the file expression
 
-Example: Uses `#|` instead of `##` to reference the whole file. Must be at top of the file.
+Example: Uses `#|` instead of `##` to reference the whole file. It must be at the top of the file.
  
 ```nix
 #| <Description or Tagline>
@@ -164,17 +162,17 @@ Example: Uses `#|` instead of `##` to reference the whole file. Must be at top o
 # Alternatives
 [alternatives]: #alternatives
 
-In general we need:
+In general, we need the following:
 
 1. General format for doc-strings.
 2. Format for headings and the allowed content.
 
-> It would be nice if this can be close to the markdown format.
-> Because markdown is considered the easiest and most accepted format 
-> for writing and rednering documentation.
+> It would be nice if this could be close to the markdown format.
+> Markdown is the most straightforward and most accepted format 
+> for writing and rendering documentation.
 
 
-#### Find a suitable decision in - the follwing matrix
+#### Find a suitable decision in - the following matrix
 
 | General / Section | 0 `##` | 1 `/** */`   | 2 `other`   |
 |---|---|---|---|
@@ -182,7 +180,7 @@ In general we need:
 | 1 `@{Keyword}:`  | `# @Example:` |`/** @Example: */` | `?` |
 | 2 `other`  | `?` | `?` | `?` |
 
-It is also possible to not implement this rfc:
+It is also possible to not implement this RFC:
 
 - By not implementing this feature, nix loses the ability for tool-generated documentation.
 - Documentation within code will remain unstable / only determined by nixdoc.
@@ -266,13 +264,13 @@ Javadoc style
     }
 ```
 
-Although this has already sneaked into some nix comments. This format is not considered best practice for a variety of good reasons.
+Although this has already sneaked into some nix comments, this format is not considered best practice for various reasons.
 
 1. Essentially combines the cons of both worlds.
 2. It Takes up more space and needs autocompletion to fill missing `*` beginnings when extended.
 3. Starting every line with `*` creates visual conflicts with the markdown bullet list also starting with `*`.
 4. Pro: Indentation within is clear.
-5. Most nix users cannot identify with java or javascript. They like predictable behavior.
+5. Most nix users cannot identify with java or javascript and like predictable behavior.
 
 ## Section headings considered
 
@@ -326,7 +324,7 @@ Example:
 | Visually stands out | Is new syntax. Where Markdown could be more intuitive. Doc-strings already are Markdown. So why not use markdown |
 | Follows more closely the current convention |  |
 | Needs less vertical space | |
-| doesn't need newlines, everything could be even within a single line, allowing compression (may not be needed ?) | |
+| doesn't need newlines; everything could be even within a single line, allowing compression (may not be needed ?) | |
 
 ## Alternative approach - just comments
 
@@ -346,7 +344,7 @@ The following abstract rules describe how to write doc-strings.
 
 - [F100] - doc-string are all comments. That start with `##` or `#|` e.g. `## {content}`
 
-This RFC is a significant change to the existing documentation convention. This is because it is better to do it right when always being downward compatible holds you back. We created a pro-con list in the [alternatives](#alternatives) section below.
+This RFC is a significant change to the existing documentation convention. It is better to do it right when always being downward compatible holds you back. 
 
 We finally need to distinguish between regular comments and doc strings. We found this format to be the most distinguishable.
 
@@ -357,7 +355,7 @@ We finally need to distinguish between regular comments and doc strings. We foun
 
 In comparison, rustdoc uses `//!`. But using `#!` is considered a bad idea, as it can be confused with identical bash shebangs `#!`. 
 
-The `|` (pipe) is also avaiable in symbols used for the nix grammar. 
+The `|` (pipe) is also available in symbols used for the nix grammar. 
 
 > This is still being determined. If you have any ideas, let us know in the comments.
 
@@ -382,14 +380,14 @@ Example: docstring continuation
 ```nix
 ## Doc-string A
 ##  ....
-## This block has no expression in the next line. 
-## Therefore it doesn't have any effect
+## This block has no expression in the following line. 
+## Therefore, it doesn't have any effect
 ##  ....
 ## Doc-string A
 
 
 ## Doc-string B
-## -- this block documents the purpose of '1'
+## -- This block documents the purpose of '1'
 ## Doc-string B
 1
 ```
@@ -409,7 +407,7 @@ This allows for quick writing without the need to use sections.
 
 H1 headings start a section to keep it extendable in the future. Users are not allowed to choose them freely, so we keep track of all allowed H1 headings.
 
-This may also be checked from the doc-tool that may evolve from this rfc (e.g. future versions of nixdoc)
+This may also be checked from the doc-tool that may evolve from this RFC (e.g. future versions of nixdoc)
 
 - [S012] - Every [optional] section started by an H1 heading is continued until the next heading starts. To the very end of the comment, otherwise.
 - [S014] - Every section may define its own rules. They must be compatible with the formal requirements of doc-strings (this RFC) that can override formal rules locally. (e.g., disable Markdown, use custom syntax, etc.)
@@ -418,12 +416,12 @@ This may also be checked from the doc-tool that may evolve from this rfc (e.g. f
 - [S018] - In case of [future] extensions, every new section `Keyword` must first be added to this RFC.
 - [S030] - If sections follow complex logic, it is embraced to specify that logic in a separate sub-RFC.
 - [S040] - Usage of the described sections is OPTIONAL.
-- ... more tbd.
+- more tbd.
 
 ## Keywords
 [keywords]: #keywords
 
-We wanted to keep the list of initial keywords short. So by the time this RFC focuses on the formal aspects of doc-strings first. More keywords and features for them can be added later on.
+We wanted to keep the list of initial keywords short. So by the time this RFC focuses on the formal aspects of doc-strings first. More keywords and features for them may be added later on.
 
 | Keyword     |  Description  | Note |
 | ---         |  ---          | --- |
@@ -432,7 +430,7 @@ We wanted to keep the list of initial keywords short. So by the time this RFC fo
 
 ## Why change the existing section specifiers?
 
-First of all: There are no actual block specifiers within nix or nixpkgs. The existing blocks heavily depend on a tool called `nixdoc` and not vice versa.
+First, there are no actual block specifiers within nix or nixpkgs. The existing blocks heavily depend on a tool called `nixdoc` and not vice versa.
 
 -> See [github:nix-community/nixdoc](https://github.com/nix-community/nixdoc)
 
@@ -442,8 +440,8 @@ The sequence `Example:` has some drawbacks when it comes to syntax:
 
 1. It is possible that this sequence occurs in a natural text without the intention to start a new doc-string section.
 2. It doesn't visually stand out.
-3. It is bad that the line needs to start with `Example:` to be valid syntax. Although it is a good practice while writing comments. This shouldn't be syntactically required. > (`nixdoc` requires it).
-4. It neither follows the `@param` (c/c++/java,...) convention nor the markdown headings convention (rust), instead is nixdoc-home-cooked.
+3. It is terrible that the line needs to start with `Example:` to be valid syntax. However, it is a good practice while writing comments; it should be optional.
+4. It neither follows the `@param` (c/c++/java,...) convention nor the markdown headings convention (rust); instead is nixdoc-home-cooked.
 
 ## Interactions
 
@@ -472,7 +470,7 @@ Also, this affects only the `lib` folder and a few other places that are current
 
 - Will `nix` itself implement native support like in rust -> `cargo doc`
 
-- How can a tool keep the connection from where a docstring was defined and where the attribute was exposed (lib/default.nix exposes mapAttrs which is defined at lib/attrsets.nix)
+- How can a tool keep the connection from where a docstring was defined and where the attribute was exposed (lib/default. nix exposes mapAttrs which is defined at lib/attrsets. nix)
   - There are more complicated things.
 
 -> Answer: A Tool might be able to keep track of a percentage of expressions, and sometimes it may be very hard or impossible. For that case, the doc-string can offer a dedicated Keyword to override the scope.
@@ -496,11 +494,11 @@ The following is an idea for a problem that will arise if tools try to track doc
 # Future work
 [future]: #future-work
 
-- When extending nixdoc and/or writing dedicated parsers the following persons can assist: [@hsjobeki]
+- When extending nixdoc or writing dedicated parsers, the following persons can assist: [@hsjobeki]
 
-- There is an RFC under construction, that specifies the used syntax within the `Type`-Block. It depends on this RFC, as this RFC is the groundwork to provide a standardized field where additional rules can apply. Core-Team: [@hsjobeki]
+- An RFC under construction specifies the used syntax within the `Type`-Block. It depends on this RFC, as it is the groundwork to provide a standardized field where additional rules can apply.
 
-- `NixOS/nix` should implement native support for doc-strings. That way our users don't have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but it should be natively possible to document your nix expressions.
+- `NixOS/nix` should implement native support for doc-strings so that our users don't have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but documenting your nix expressions should be natively possible.
 
 - Every existing and future tool can implement against this RFC and rely on it.
 
