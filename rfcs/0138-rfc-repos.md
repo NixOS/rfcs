@@ -59,6 +59,7 @@ Once the RFC is merged, the repository has to be transferred to the NixOS organi
 [drawbacks]: #drawbacks
 - There's no line-comment view anymore (the "Files changed" tab for PR's), where you can see the entire proposal and all (up-to-date) line comments.
 - Commenting on an RFC won't automatically subscribe you to updates anymore.
+- Less separation between RFC authors and reviewers with edit suggestions, making it harder to decide who may be a shepherd, since authors can't be shepherds.
 
 # Alternatives
 [alternatives]: #alternatives
