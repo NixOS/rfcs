@@ -485,12 +485,18 @@ The following is an idea for a problem that will arise if tools try to track doc
 - [Rustdoc](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html)
 - [Nixdoc](https://github.com/nix-community/nixdoc)
 
-## 
+## People that I discussed with 
 
-We considered this possible solution because the following reasons:
+About doc-strings in general
 
-- Good visual distinction between doc-strings and comments
-- Clear rules and structure
-- Saves vertical space
-- Doesn't need termination (*/)
-- Clear indentation rules. Following the __markdown__ convention.
+- [@flokli](https://github.com/flokli) - one of the [tvix](https://tvl.fyi/blog/rewriting-nix) authors
+- [@tazjin](https://github.com/tazjin) - Original Author of `nixdoc`, one of the `tvix` authors
+
+About documenation approaches on independent framworks
+
+- [@davHau](https://github.com/davHau) - Author of [dream2nix](https://github.com/nix-community/dream2nix)
+
+About defining weakly typed-interfaces for nix with doc-strings
+
+- [@roberth](https://github.com/roberth) - nixpkgs Architecture Team
+- [@aakropotkin](https://github.com/aakropotkin/) - nixpkgs Architecture Team
