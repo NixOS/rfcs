@@ -494,7 +494,7 @@ About doc-strings in general
 
 About documenation approaches on independent framworks
 
-- [@davHau](https://github.com/davHau) - Author of [dream2nix](https://github.com/nix-community/dream2nix)
+- [@davHau](https://github.com/davHau) - Author of [dream2nix](https://github.com/nix-community/dream2nix), (And many other nix-frameworks)
 
 About defining weakly typed-interfaces for nix with doc-strings
 
