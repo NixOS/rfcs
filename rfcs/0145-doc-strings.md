@@ -315,7 +315,9 @@ Also, this affects only the `lib` folder and a few other places that are current
 # Alternatives
 [alternatives]: #alternatives
 
-In general, we need the following:
+While designing this RFC multiple alternative formats where considered. They can be found in the following section to understand the overall decisions that where made in the sections earlier.
+
+In general, we needed the following:
 
 1. General format for doc-strings.
 2. Format for headings and the allowed content.
