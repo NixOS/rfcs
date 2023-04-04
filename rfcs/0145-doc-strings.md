@@ -489,6 +489,9 @@ The following is an idea for a problem that will arise if tools try to track doc
 
 ## People that I discussed with 
 
+> People mentioned here might be not yet aware of this rfc.
+> I'll ping them in the next few days to make sure they are okay with beeing mentioned here.
+
 About doc-strings in general
 
 - [@flokli](https://github.com/flokli) - one of the [tvix](https://tvl.fyi/blog/rewriting-nix) authors
