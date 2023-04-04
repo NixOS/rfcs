@@ -19,7 +19,7 @@ Propose a standard format for Docblocks.
 
 This RFC aims to improve the consistency of in-code documentation. (aka Doc-strings/Doc-blocks)
 
-> Doc-strings and Doc-blocks are technically different. But for simplicity, the phrase `Doc-string` is used in this document for clarity.
+> Doc-strings and Doc-blocks are technically different. But for simplicity, the phrase `Doc-string` is used in this document for clarity. Because it is more common.
 
 ## Current State
 
@@ -64,7 +64,7 @@ in
 
 In general, the format for writing documentation strings is **not specified**. The only place where it is applied is: *nixpkgs/lib/**
 
-*nixdoc* only applies to places in nixpkgs/lib. But extending the scope of *nixdoc* is not the primary goal. Instead, we should find formal rules for writing *doc-strings*. Tools like *nixdoc* can then implement against this RFC instead of the format relying on nixdoc implementation details.
+*nixdoc* only applies to places in nixpkgs/lib. But extending the scope of *nixdoc* does not work and thus is not the primary goal. Instead, we should find formal rules for writing *doc-strings*. Tools like *nixdoc* can then implement against this RFC instead of the format relying on nixdoc implementation details. 
 
 ### Only specific placements work
 
