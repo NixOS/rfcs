@@ -474,11 +474,40 @@ The following is an idea for a problem that will arise if tools try to track doc
 # Future work
 [future]: #future-work
 
+## Editor support
+
+When starting hitting {enter} inside a doc-block the new line, should be automatically prefixed with `##` or `#|` accordingly.
+This is done in rust similarily. Nix already offers a bunch of LSP's e.g. [nil](https://github.com/oxalica/nil), [rnix-lsp](https://github.com/nix-community/rnix-lsp) are the most common ones. 
+Those LSP's should implement the simple "line continuation" feature. (I dont know the exact name here)
+
+## Nixodc
+
+Nixdoc needs to be changed in order to differentiate between regular comment and doc-blocks.
+There might be an intermediate phase of transition, where the old syntax and features is supported for a while.
+
 - When extending nixdoc or writing dedicated parsers, the following persons can assist: [@hsjobeki]
+
+## Documentation generators
+
+Generating documentation from doc-blocks is still a challenge.
+If we'd like the fully automated approach, we definetly need something that can also evaluate nix expressions. 
+(We have such a module in `tvix` which needs to be investigated more here)
+
+Alternatively we can use the future nixdoc together with a static `map.json` that contains the scope for every discovery file/path in nixpkgs.
+
+As this second approach is much easier I propose this is how we should initially start to extend the scope.
+
+## More specialized section headings
+
+### Type
 
 - An RFC under construction specifies the used syntax within the `Type`-Block. It depends on this RFC, as it is the groundwork to provide a standardized field where additional rules can apply.
 
+## Native support in nix
+
 - `NixOS/nix` should implement native support for doc-strings so that our users don't have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but documenting your nix expressions should be natively possible.
+
+## Provide a stable and reliable format
 
 - Every existing and future tool can implement against this RFC and rely on it.
 
