@@ -1,5 +1,5 @@
 ---
-feature: docblock-standard
+feature: doc-comment-standard
 start-date: 2023-03-27
 author: hsjobeki
 co-authors: (find a buddy later to help out with the RFC)
@@ -11,37 +11,32 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Propose a standard format for Docblocks.
+Propose a standard format for Doc-comments.
 
 
 # Motivation
 [motivation]: #motivation
 
-This RFC aims to improve the consistency of in-code documentation. (aka Doc-strings/Doc-blocks)
+The following are my proposed goals
 
-> Doc-strings and Doc-blocks are technically different. But for simplicity, the phrase `Doc-string` is used in this document for clarity. Because it is more common.
+- Be able to find all documentation related comments
+- Be able to generate documentation from code for any nix expression.
+- Avoid reading source code unnecssary. Imagine your first time reading nix source code to understand internal functions when beeing totally new to nix.
 
 ## Current State
 
-We currently utilize a `doc-string`-like functionality to build a subset of documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
-
+We currently utilize a `doc-comment`-like functionality to build a subset of documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
 Many inconsistently written comments document specific parts of nixpkgs and other nix-frameworks (see [references-to-this](#references-to-the-problems-above)).
 
 We use some of them to generate documentation automatically. (e.g., nixpkgs/lib via [nixdoc](https://github.com/nix-community/nixdoc) )
 
 This solution requires a lot of handworks; more specifically, *nixdoc* is a custom tool that works only for that purpose.
 
-Here is an example of how the format used in *nixdoc* works:
+Here is an example of the format understood by *nixdoc*:
 
 ```nix
-#attrsets. nix (simplified)
+# nixpkgs/lib/attrsets.nix
 
-{ lib }:
-# Operations on attribute sets.
-
-let
-# ...
-in
 {
   /* <Description Field>
      Example:
@@ -61,11 +56,17 @@ in
 
 ## Current problems
 
+### Inconsistend usage outside /lib folder
+
+Those comments are only used and parsed consistently in the /lib folder. Outside of this folder the format doesn't follow the convention strictly. Also the comments outside /lib are not used to generate any output. Thus users dont have feedback if the for   
+
 ### Unspecified format
 
-In general, the format for writing documentation strings is **not specified**. The only place where it is applied is: *nixpkgs/lib/**
+In general, the format for writing documentation strings is **not specified**.
 
-*nixdoc* only applies to places in nixpkgs/lib. But extending the scope of *nixdoc* does not work and thus is not the primary goal. Instead, we should find formal rules for writing *doc-strings*. Tools like *nixdoc* can then implement against this RFC instead of the format relying on nixdoc implementation details. 
+The *nixdoc*-tool enforces a somewhat consistent format but the actual format was never specified and is not enforced in parts of nixpkgs where nixdoc is currently not applied.
+
+Extending the scope of *nixdoc* is not the primary goal. Instead, we should find formal rules for writing *doc-comments*. Tools like *nixdoc* can then implement against this RFC instead of the format relying on nixdoc implementation details. 
 
 ### Only specific placements work
 
@@ -79,7 +80,7 @@ e.g.,
 
 ### Differentiate from regular comments
 
-The format doesn't allow any distinction between doc-strings or regular comments.
+The format doesn't allow any distinction between doc-comments or regular comments.
 
 Having a distinction would allow us to
 
@@ -116,22 +117,20 @@ Other tools that work directly with the nix AST and comments:
 
 **Proposed Solution:** 
 
-Use `##` For doc-string body and markdown headings `# H1`
+Use `##` For doc-comment body and markdown headings `# H1`
 
-The content of all doc-strings is markdown. 
+The content of all doc-comments is markdown. 
 Following the [commonmark-specification](https://spec.commonmark.org/)
 
-## Doc-blocks
+## Doc-comments
 
-In general, I thought we do need two kinds of doc-strings:
+In general, I thought we do need two kinds of doc-comments:
 
-### A doc-string referencing the subsequent expression
+### A doc-comment referencing the subsequent expression
 
-Example:
- 
+`somefile.nix`
+
 ```nix
-# somefile.nix
-
 {
   ## <Description or Tagline>
   ## Documentation for 'mapAttrs'
@@ -387,11 +386,9 @@ This section contains examples for the different formats to visualize them and e
 
 with `Markdown` Headings
 
-Example:
+`somefile.nix`
 
 ```nix
-# somefile.nix
-
     ## <Description or Tagline>
     ## 
     ## # Example
@@ -407,8 +404,6 @@ Example:
 ### `/** */` inspired by the current multiline strings 
 
 With `@{keyword}:` Headings
-
-Example:
 
 ```nix
     /** 
@@ -442,7 +437,7 @@ Example:
 
 ## Alternative approach - just comments
 
-There is the idea from python that doc-strings are just strings, not even special ones. Comments will be docstrings if they follow specific placement rules. However, we thought this was a bad idea to follow. Such complex placement rules require the users to understand where those places are; with nix syntax, this is slightly more complex than with python. Because we don't have keywords such as `class MyClass():` or `def function():` where placement would be obvious
+There is the idea from python that doc-strings are just strings, not even special ones. Strings will be docstrings if they follow specific placement rules. However, we thought this was a bad idea to follow. Such complex placement rules require the users to understand where those places are; with nix syntax, this is slightly more complex than with python. Because we don't have keywords such as `class MyClass():` or `def function():` where placement would be obvious
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
@@ -454,11 +449,11 @@ There is the idea from python that doc-strings are just strings, not even specia
 - How can a tool keep the connection from where a docstring was defined and where the attribute was exposed (lib/default. nix exposes mapAttrs which is defined at lib/attrsets. nix)
   - There are more complicated things.
 
--> Answer: A Tool might be able to keep track of a percentage of expressions, and sometimes it may be very hard or impossible. For that case, the doc-string can offer a dedicated Keyword to override the scope.
+-> Answer: A Tool might be able to keep track of a percentage of expressions, and sometimes it may be very hard or impossible. For that case, the doc-comment can offer a dedicated Keyword to override the scope.
 
 e.g.
 
-The following is an idea for a problem that will arise if tools try to track doc-strings' positions and the location in the nixpkgs tree. (Although this problem is not nixpkgs specific)
+The following is an idea for a problem that will arise if tools try to track doc-comments' positions and the location in the nixpkgs tree. (Although this problem is not nixpkgs specific)
 
 ```nix
 #| This file is called somewhere that cannot be automatically tracked/is impossible to analyze statically.
@@ -483,14 +478,14 @@ Those LSP's should implement the simple "line continuation" feature. (I dont kno
 
 ## Nixodc
 
-Nixdoc needs to be changed in order to differentiate between regular comment and doc-blocks.
+Nixdoc needs to be changed in order to differentiate between regular comment and doc-comments.
 There might be an intermediate phase of transition, where the old syntax and features is supported for a while.
 
 - When extending nixdoc or writing dedicated parsers, the following persons can assist: [@hsjobeki]
 
 ## Documentation generators
 
-Generating documentation from doc-blocks is still a challenge.
+Generating documentation from doc-comments is still a challenge.
 If we'd like the fully automated approach, we definetly need something that can also evaluate nix expressions. 
 (We have such a module in `tvix` which needs to be investigated more here)
 
@@ -506,7 +501,7 @@ As this second approach is much easier I propose this is how we should initially
 
 ## Native support in nix
 
-- `NixOS/nix` should implement native support for doc-strings so that our users don't have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but documenting your nix expressions should be natively possible.
+- `NixOS/nix` should implement native support for doc-comments so that our users don't have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but documenting your nix expressions should be natively possible.
 
 ## Provide a stable and reliable format
 
@@ -522,7 +517,7 @@ As this second approach is much easier I propose this is how we should initially
 > People mentioned here might be not yet aware of this rfc.
 > I'll ping them in the next few days to make sure they are okay with beeing mentioned here.
 
-About doc-strings in general
+About doc-comments/doc-strings in general
 
 - [@flokli](https://github.com/flokli) - one of the [tvix](https://tvl.fyi/blog/rewriting-nix) authors
 - [@tazjin](https://github.com/tazjin) - Original Author of `nixdoc`, one of the `tvix` authors
@@ -531,7 +526,7 @@ About documenation approaches on independent framworks
 
 - [@davHau](https://github.com/davHau) - Author of [dream2nix](https://github.com/nix-community/dream2nix), (And many other nix-frameworks)
 
-About defining weakly typed-interfaces for nix with doc-strings
+About defining weakly typed-interfaces for nix with doc-comments
 
 - [@roberth](https://github.com/roberth) - nixpkgs Architecture Team
 - [@aakropotkin](https://github.com/aakropotkin/) - nixpkgs Architecture Team
