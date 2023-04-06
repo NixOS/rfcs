@@ -326,7 +326,7 @@ Use markdown headings `# <Heading>`. This allows best compatibility with the alr
 
 ## Consequences to not implementing this
 
-- By not implementing this feature, nix loses the ability for tool-generated documentation.
+- By not implementing this feature, nix gains no ability for tool-generated documentation.
 - Documentation will not defined by nixdoc, instead the community-implementation solution to the standard.
 
 ## Examples
