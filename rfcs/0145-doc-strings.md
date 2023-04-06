@@ -124,7 +124,7 @@ Following the [commonmark-specification](https://spec.commonmark.org/)
 
 ## Doc-comments
 
-In general, I thought we do need two kinds of doc-comments:
+To explain the concrete usage secnario i'd like to start with a concrete example.
 
 ### A doc-comment referencing the subsequent expression
 
@@ -146,46 +146,25 @@ In general, I thought we do need two kinds of doc-comments:
 }
 ```
 
-### A Doc-string referencing the file expression
-
-Example: Uses `#|` instead of `##` to reference the whole file. It must be at the top of the file.
- 
-```nix
-#| <Description or Tagline>
-#| 
-#| # Example
-#|
-#| <Comprehensive code>
-#| 
-#| # Type
-#|    
-#| <Type Signature>
-
-{...}:
-{
-  mapAttrs = f: s: <...>;
-}
-```
-
-The following abstract rules describe how to write doc-strings.
+The following abstract rules describe how to write doc-comments.
 
 > I would be pleased if you comment about whether we should use `## {content}` or `/** {content} */`
 > I did write this RFC tailored towards `##` but using `/** */` may still be an open discussion.
 
 ### Format Rules
 
-- doc-string are all comments. That start with `##` or `#|` e.g. `## {content}`
+- doc-comments are all comments. That start with `##` e.g. `## {content}`
 
 This RFC is a significant change to the existing documentation convention
 but we finally need to distinguish between regular comments and doc strings. We found this format to be the most distinguishable.
 
-- Doc-strings always document / relate to an expression. 
+- Doc-comments always document / relate to an expression. 
 
-In detail: `##` relates to the next AST-Node `#|` to the previous one. However technical details for tracking names and aliases is not part of this document. 
+In detail: `##` relates to the next AST-Node. However technical details for tracking names and aliases is not part of this document. 
 
 > Vision: Implement a custom evaluator that specializes in tracking references of doc-strings within the nix expression tree. This is however a technical concrete solution that may be build after this rfc is accepted. 
 
-- Doc-strings starting with `##` relate to the expression in the following line / or, more precisely, to the next node in the AST. (Implementation Details are not considered yet, maybe future versions need to narrow the scope here)
+- Doc-comments starting with `##` relate to the expression in the following line / or, more precisely, to the next node in the AST. (Implementation Details are not considered yet, maybe future versions need to narrow the scope here)
 
 > I wont go into details here as this is would already be an implementation specification, but this is how i thought it could technically make sense. 
 > 
