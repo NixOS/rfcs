@@ -24,7 +24,10 @@ The following are the envisioned goals
 - be able to parse and render doc comments nicely
 - standardize a format for doc comments that can be extended by further RFCs
 
-> Hint: Generating static documentation is controvert topic in nixpkgs. It was found that is impossible to generate accurate documentation statically. A correct solution would involve evaluation of expressions in some way. This already goes deeply into implementation details and is thus not further discussed in this document.
+This RFC is a significant change to the existing documentation convention
+but allows to distinguish between regular comments and doc comments. This is important because arbitrary code comments should not end up in generated documentation.
+
+> Hint: Generating static documentation is controvert topic in nixpkgs. It was found that is impossible to generate accurate documentation statically. A correct solution would involve evaluation of expressions in some way. This already goes deeply into implementation details and is thus not further discussed in this document. Although we envision solutions to solve this issue.
 
 ## Current State
 
@@ -155,8 +158,11 @@ The following abstract rules describe how to write doc-comments.
 
 ### doc-comments are all comments. That start with `##` e.g. `## {content}`
 
-This RFC is a significant change to the existing documentation convention
-but allows to distinguish between regular comments and doc comments. This is important because arbitrary code comments should not end up in generated documentation.
+```nix
+## Documentation
+## follows simple rules
+## and can span multiple lines
+```
 
 ### Doc-comments always document / relate to an expression
 
@@ -233,8 +239,6 @@ The following keywords start new markdown sections
 
 First, there are no actual block specifiers within nix or nixpkgs. The existing blocks heavily depend on a tool called `nixdoc` and not vice versa.
 
--> See [github:nix-community/nixdoc](https://github.com/nix-community/nixdoc)
-
 > `nixdoc` MUST be changed to support this RFC. (See [Future work](#future-work))
 
 The sequence `Example:` has some drawbacks when it comes to syntax:
@@ -284,10 +288,10 @@ In general, we needed the following:
 | Needs Termination | No | Yes | Yes |
 | Indentation | Clear | Poor | Poor |
 | Needs vertical space  | No | Yes | Yes |
-| Visual distinction from comments | High | Low | Intermediate |
+| Visual distinction from comments | High | Low | Medium |
 | Needs Autocompletion (Language Server) to continue the next line. | Yes | No | Yes |
 | Punctuation Variations / Amount of different special characters | Less | More | More |
-| Markdown compatibility (also depends on indentation clarity) | Good, but visual conflicts with headings` #` | Poor | Intermediate |
+| Markdown compatibility (also depends on indentation clarity) | Good, but visual conflicts with headings` #` | Poor | Medium |
 | breaks when interrupted with newlines | Yes | No | ? |
 
 **Proposed format:**
