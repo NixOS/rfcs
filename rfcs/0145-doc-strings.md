@@ -13,19 +13,22 @@ related-issues: (will contain links to implementation PRs)
 
 Propose a standard format for Doc-comments.
 
-
 # Motivation
 [motivation]: #motivation
 
-The following are my proposed goals
+The following are the envisioned goals
 
-- Be able to find all documentation related comments
-- Be able to generate documentation from code for any nix expression.
-- Avoid reading source code unnecssary. Imagine your first time reading nix source code to understand internal functions when beeing totally new to nix.
+- be able to generate documentation from code for any nix expression.
+- be able to distinuish between documentation-relevant comments and unrelated comments.
+- make doc comments easy to write and read
+- be able to parse and render doc comments nicely
+- standardize a format for doc comments that can be extended by further RFCs
+
+> Hint: Generating static documentation is a controverse topic in nixpkgs. It was found that is impossible to generate accurate documentation statically. A correct solution would involve evalution of expressions in some way. This already goes deeply into implementation details and is thus not further discussed in this document.
 
 ## Current State
 
-We currently utilize a `doc-comment`-like functionality to build a subset of documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
+We currently utilize a `doc-comment`-like functionality to build a subset of static documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
 Many inconsistently written comments document specific parts of nixpkgs and other nix-frameworks (see [references-to-this](#references-to-the-problems-above)).
 
 We use some of them to generate documentation automatically. (e.g., nixpkgs/lib via [nixdoc](https://github.com/nix-community/nixdoc) )
@@ -58,7 +61,7 @@ Here is an example of the format understood by *nixdoc*:
 
 ### Inconsistend usage outside /lib folder
 
-Those comments are only used and parsed consistently in the /lib folder. Outside of this folder the format doesn't follow the convention strictly. Also the comments outside /lib are not used to generate any output. Thus users dont have feedback if the for   
+Those comments are only used and parsed consistently in the /lib folder. Outside of this folder the format doesn't follow the convention strictly. Also the comments outside /lib are not used to generate any output. 
 
 ### Unspecified format
 
@@ -70,7 +73,7 @@ Extending the scope of *nixdoc* is not the primary goal. Instead, we should find
 
 ### Only specific placements work
 
-The placement of those comments requires precisely commenting at the attribute set containing the function declarations, which is not usable for general-purpose documentation strings. 
+The placement of those comments requires precisely commenting at the attribute set containing the function declarations, which is not usable for general-purpose documentation strings.
 
 e.g., 
 
@@ -108,7 +111,7 @@ Having a distinction would allow us to
 
 Other tools that work directly with the nix AST and comments:
 
-- [noogle](https://noogle.dev) - Nix API search engine. It allows you to search functions and other expressions.
+- [noogle](https://noogle.dev) - Nix API search engine. It allows to search functions and other expressions.
 - [nix-doc](https://github.com/lf-/nix-doc) - A Nix developer tool leveraging the rnix Nix parser for intelligent documentation search and tags generation
 - [manix](https://github.com/mlvzk/manix) - A fast CLI documentation searcher for nix. 
 
@@ -117,14 +120,14 @@ Other tools that work directly with the nix AST and comments:
 
 **Proposed Solution:** 
 
-Use `##` For doc-comment body and markdown headings `# H1`
+Use `##` For doc-comment body and markdown within
 
-The content of all doc-comments is markdown. 
+The content of all doc-comments is rednered using markdown. 
 Following the [commonmark-specification](https://spec.commonmark.org/)
 
 ## Doc-comments
 
-To explain the concrete usage secnario i'd like to start with a concrete example.
+The following exampple demonstrates the concrete usage scenario.
 
 ### A doc-comment referencing the subsequent expression
 
@@ -146,112 +149,85 @@ To explain the concrete usage secnario i'd like to start with a concrete example
 }
 ```
 
+## Format Rules
+
 The following abstract rules describe how to write doc-comments.
 
-> I would be pleased if you comment about whether we should use `## {content}` or `/** {content} */`
-> I did write this RFC tailored towards `##` but using `/** */` may still be an open discussion.
-
-### Format Rules
-
-- doc-comments are all comments. That start with `##` e.g. `## {content}`
+### doc-comments are all comments. That start with `##` e.g. `## {content}`
 
 This RFC is a significant change to the existing documentation convention
-but we finally need to distinguish between regular comments and doc strings. We found this format to be the most distinguishable.
+but allows to distinguish between regular comments and doc comments. This is important because arbitrary code comments should not end up in generated documentation.
 
-- Doc-comments always document / relate to an expression. 
+### Doc-comments always document / relate to an expression.
 
 In detail: `##` relates to the next AST-Node. However technical details for tracking names and aliases is not part of this document. 
 
-> Vision: Implement a custom evaluator that specializes in tracking references of doc-strings within the nix expression tree. This is however a technical concrete solution that may be build after this rfc is accepted. 
+> Vision: Implement a custom evaluator that specializes in tracking references of doc-comments within the nix expression tree. This is however a technical concrete solution that may be build after this rfc is accepted.
 
-- Doc-comments starting with `##` relate to the expression in the following line / or, more precisely, to the next node in the AST. (Implementation Details are not considered yet, maybe future versions need to narrow the scope here)
+### Doc-comments start with `##`
 
-> I wont go into details here as this is would already be an implementation specification, but this is how i thought it could technically make sense. 
-> 
-> E.g. a "documentation generator":
-> The referenced expression might be an IDENT_NODE or an expression that can be assigned to an IDENT_NODE.
-> The doc-string may then be yielded from the IDENT_NODE, or from the expression that was assigned to the NODE. (Precendence is -1, which means a doc-string is always the last assignment)
-> ```nix
-> ## Refences the whole thing
-> ## (foo bar baz) 
-> foo bar baz
-> ```
-> Expressions would thus need a meta-wrapper that hold the necessary doc-string and preserves it during the evaluation. While rendering out the whole nix expression (recursion need to be considered e.g. in Derivation, etc.!) All references are preserved and can then be mapped into a list for each identifier in the tree.
-> e.g. `foo.bar.baz` holds a refernce to the docstring that was asigned to the expression in `baz.nix`
->
-> BUT this is a very concrete documentation generator, that makes eventually sense to be built after this RFC.
+Doc-comments start with `##` (leading whitespaces are allowed).
 
-- Doc-strings that are at the top of a file and that start with `#|` describe the expression exported from the whole file. (Previous node in AST)
+Doc-comments relate to the expression in the following line or, more precisely, to the next node in the AST.
 
-In comparison, rustdoc uses `//!`. But using `#!` is considered a bad idea, as it can be confused with identical bash shebangs `#!`. 
-
-The `|` (pipe) is also available in symbols used for the nix grammar. 
-
-> This is still being determined. If you have any ideas, let us know in the comments.
-
-Example of a comment referring to the whole file:
-
-```nix
-#| <Description>
-#| <Description more>
-#| # Example
-#| <Some comprehensive code>
-#| # Type
-#| The Type of the expression returned by the file
-{
-  id = x: x
-}
-```
-
-- The docstring is continued in the following line if it also starts with `##` / `#|`. Leading whitespace is allowed.
+The docstring is continued in the following line if it also starts with `##`.
+Leading whitespace is allowed.
 
 Example: docstring continuation
 
 ```nix
-## Doc-string A
+## doc-comment A
 ##  ....
 ## This block has no expression in the following line. 
 ## Therefore, it doesn't have any effect
 ##  ....
-## Doc-string A
+## doc-comment A
 
 
-## Doc-string B
+## doc-comment B
 ## -- This block documents the purpose of '1'
-## Doc-string B
+## doc-comment B
 1
 ```
 
-- The content of a doc-string is Markdown.
+It is common using the same indentation as the referenced expression.
 
-It allows for intuitive usage without knowledge of complex syntax rules.
+```nix
 
-- predefined heading `keywords` may start a section.
-- Content before the first [optional] section is called `description`.
+```
 
-This allows for quick writing without the need to use sections.
+### The content of a doc-comment is Markdown.
 
-- Headings H1 are reserved markdown headings. Which are specified in [this list](#keywords). Users are allowed to only use H2 (or higher) headings for their free use.
+The content of a doc-comment is parsed using Markdown following the commonmark specification. Thus it allows for intuitive usage without knowledge of complex syntax rules.
 
-H1 headings start a section to keep it extendable in the future. Users are not allowed to choose them freely, so we keep track of all allowed H1 headings.
+Top level H1 headings, starting with a single `#`, indicate sections. Some of which might be spcified in future rfcs.
 
-This may also be checked from the doc-tool that may evolve from this RFC (e.g. future versions of nixdoc)
+Common Sections:
 
-- Every [optional] section started by an H1 heading is continued until the next heading starts. To the very end of the comment, otherwise.
-- Every section may define its own rules. They must be compatible with the formal requirements of doc-strings (this RFC) that can override formal rules locally. (e.g., disable Markdown, use custom syntax, etc.)
-- Only the H1-sections (`Keywords`) described in [this list](#keywords) are valid.
-  
-- In case of [future] extensions, every new section `Keyword` must first be added to this RFC.
-- If sections follow complex logic, it is embraced to specify that logic in a separate sub-RFC.
-- Usage of the described sections is OPTIONAL.
-- more tbd.
+- `# Examples`
+- `# Type`
+
+Sections that might be specified in future rfcs:
+
+- `# Type` 
+- `# Arguments`
+- `# Meta`
+
+Until they are actually specified.
+
+Future RFCs may specify sub-headings of `# Meta`. Usage is reserved.
+
+Possible sub-headings:
+
+- `## AttrPath`
+- `## `
 
 ## Keywords
 [keywords]: #keywords
 
 The following keywords start new markdown sections
 
-> I wanted to keep the list of initial keywords short. So by the time this RFC focuses on the formal aspects of doc-strings first. More keywords and features for them may be added later on.
+> I wanted to keep the list of initial keywords short. So by the time this RFC focuses on the formal aspects of doc-comments first. More keywords and features for them may be added later on.
 
 | Keyword     |  Description  | Note |
 | ---         |  ---          | --- |
@@ -268,16 +244,16 @@ First, there are no actual block specifiers within nix or nixpkgs. The existing 
 
 The sequence `Example:` has some drawbacks when it comes to syntax:
 
-1. It is possible that this sequence occurs in a natural text without the intention to start a new doc-string section.
+1. It is possible that this sequence occurs in a natural text without the intention to start a new doc-comment section.
 2. It doesn't visually stand out.
 3. It is terrible that the line needs to start with `Example:` to be valid syntax. However, it is a good practice while writing comments; it should be optional.
 4. It neither follows the `@param` (c/c++/java,...) convention nor the markdown headings convention (rust); instead is nixdoc-home-cooked.
 
 ## Interactions
 
-Doc-strings can be attached to AST nodes without affecting the actual compile-, evaluation- or build-time because they are just comments. Specialized tools can handle those comments and create static documentation from them. Also, integration with LSP is possible. (See [@flokli's nix lsp-whishlist](https://hackmd.io/@geyA7YL_RyiWJO6d5TbC-g/Sy6lVrgW3) for inspirations)
+doc-comments can be attached to AST nodes without affecting the actual compile-, evaluation- or build-time because they are just comments. Specialized tools can handle those comments and create static documentation from them. Also, integration with LSP is possible. (See [@flokli's nix lsp-whishlist](https://hackmd.io/@geyA7YL_RyiWJO6d5TbC-g/Sy6lVrgW3) for inspirations)
 
-Following this RFC means refactoring for existing comments, but it also means that **we can finally use all comments (automated!) that were intended to be doc-strings**
+Following this RFC means refactoring for existing comments, but it also means that **we can finally use all comments (automated!) that were intended to be doc-comments**
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -298,7 +274,7 @@ While designing this RFC multiple alternative formats where considered. They can
 
 In general, we needed the following:
 
-1. General format for doc-strings.
+1. General format for doc-comments.
 2. Format for headings and the allowed content.
 
 > It would be nice if this could be close to the markdown format.
@@ -322,7 +298,7 @@ In general, we needed the following:
 
 **Proposed format:**
 
-Use `##` to start a doc-string. This allows clear visual seperation from regular comments.
+Use `##` to start a doc-comment. This allows clear visual seperation from regular comments.
 And provides a good compatibiliy with the strived markdown content.
 
 ### Refactoring note:
@@ -416,7 +392,7 @@ With `@{keyword}:` Headings
 
 ## Alternative approach - just comments
 
-There is the idea from python that doc-strings are just strings, not even special ones. Strings will be docstrings if they follow specific placement rules. However, we thought this was a bad idea to follow. Such complex placement rules require the users to understand where those places are; with nix syntax, this is slightly more complex than with python. Because we don't have keywords such as `class MyClass():` or `def function():` where placement would be obvious
+There is the idea from python that doc-comments are just strings, not even special ones. Strings will be docstrings if they follow specific placement rules. However, we thought this was a bad idea to follow. Such complex placement rules require the users to understand where those places are; with nix syntax, this is slightly more complex than with python. Because we don't have keywords such as `class MyClass():` or `def function():` where placement would be obvious
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
@@ -480,7 +456,7 @@ As this second approach is much easier I propose this is how we should initially
 
 ## Native support in nix
 
-- `NixOS/nix` should implement native support for doc-comments so that our users don't have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but documenting your nix expressions should be natively possible.
+- `NixOS/nix` should implement native support for doc-comments so that our users don't have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but documenting nix expressions should be natively possible.
 
 ## Provide a stable and reliable format
 
@@ -496,7 +472,7 @@ As this second approach is much easier I propose this is how we should initially
 > People mentioned here might be not yet aware of this rfc.
 > I'll ping them in the next few days to make sure they are okay with beeing mentioned here.
 
-About doc-comments/doc-strings in general
+About doc-comments/doc-comments in general
 
 - [@flokli](https://github.com/flokli) - one of the [tvix](https://tvl.fyi/blog/rewriting-nix) authors
 - [@tazjin](https://github.com/tazjin) - Original Author of `nixdoc`, one of the `tvix` authors
