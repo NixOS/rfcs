@@ -25,8 +25,9 @@ This RFC aims to improve the consistency of in-code documentation. (aka Doc-stri
 
 We currently utilize a `doc-string`-like functionality to build a subset of documentation for nix functions. (e.g., nixpkgs.lib documentation via: [nixdoc](https://github.com/nix-community/nixdoc))
 
-Many inconsistently written comments document specific parts of nixpkgs and other nix-frameworks. (see [references](#references))
-We use some of them to generate documentation automatically. (e.g., nixpkgs/lib via [nixdoc](https://github.com/nix-community/nixdoc)
+Many inconsistently written comments document specific parts of nixpkgs and other nix-frameworks (see [references-to-this](#references-to-the-problems-above)).
+
+We use some of them to generate documentation automatically. (e.g., nixpkgs/lib via [nixdoc](https://github.com/nix-community/nixdoc) )
 
 This solution requires a lot of handworks; more specifically, *nixdoc* is a custom tool that works only for that purpose.
 
@@ -511,7 +512,7 @@ As this second approach is much easier I propose this is how we should initially
 
 - Every existing and future tool can implement against this RFC and rely on it.
 
-# References
+# Related Tools
 
 - [Rustdoc](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html)
 - [Nixdoc](https://github.com/nix-community/nixdoc)
