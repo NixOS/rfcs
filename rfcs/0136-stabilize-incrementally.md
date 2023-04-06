@@ -17,6 +17,11 @@ This plan is designed to still efficiently end the current "limbo" era of these 
 # Motivation
 [motivation]: #motivation
 
+Rewrite:
+Nix currently has a somewhat layered interface, but this is a mere implementation detail.
+Users of Nix could easily never know this.
+
+Old:
 For the past few years, we've accumulated a massive backlog of unstable features in the form of the new command-line interface and flakes.
 There is now a growing desire to stabilize those features, but as of yet no plan on exactly how to do so.
 The tension between that desire and a lack of a clear plan has loomed over our heads for a while; this RFC aims to dispel it by providing a concrete plan, an plan that hopefully will mitigate the lingering controversies and tensions around Flakes.
@@ -45,13 +50,13 @@ Experimental features are expected to be subject to community feedback, modified
 
 ### Flakes are criticized for encroaching on other features
 
-There are many criticism about Flakes.
+There are many criticisms about Flakes.
 But one of them especially relevant to stabilizing is a perception that Flakes have encroached on other new features, in the sense that it ought to be possible to use them without Flakes but isn't in practice.
 For example, there is no reason in theory that pure evaluation if Nix expressions requires Flakes.
 But without the ability to populate some sort of initial list of store paths that are safe to import, pure evaluation in practice does require Flakes.
 
 This is especially noticeable for new CLI features that *previously did*, in fact, work without Flakes.
-For example, in earlier versions of Nix `nix search` worked without Flakes.
+For example, in earlier versions of Nix, `nix search` worked without Flakes.
 
 ## A plan all sides can be happy with
 
@@ -90,9 +95,61 @@ But, we have crossed that Rubicon and there is no turning back; this RFC *doesn'
 # Detailed design
 [design]: #detailed-design
 
-First we describe how stabilization should work in general.
+> TODO out of date summary
+
+~~First we describe how stabilization should work in general.
 Then we describe the order in which things are stabilized.
-Finally we combine both into a list of step.
+Finally we combine both into a list of step.~~
+
+This RFC consists of these parts:
+- Establishing basic layering principles
+- Define the different layers of Nix
+- Make Nix conform to these layers
+
+## Layering principles
+
+These basic layering principles will be added to the [Nix architecture documentation](https://nixos.org/manual/nix/stable/architecture/architecture.html):
+
+- **Public-ity**
+
+  Layers are not just an implementation detail, instead they are publically exposed to the user via stable interfaces
+  - All exposed interfaces in Nix, both for computers or humans, must be matched to layers
+    - TODO: Move these to a stability section
+      - These exposed interfaces must conform to stability guarantees
+      - Functionality of layers must be either be stable or be marked as experimental, in which case breaking changes may happen
+  - The user has the option (it need not be mandatory!) to be aware of the layering and use it to learn Nix
+  - Both perspectives are equally valid, and neither is prioritized over the other
+  - While not going so far as to *insist* users are aware of layering and care about it, the layered archicture of Nix should be exposed to anyone that cares, and it shouldn't suddenly dissapear (as a mere implementation detail might).
+
+- **Clarity of purpose**
+
+  layers should not be too thick.
+  layers should "do one thing, and do it well".
+
+- **Modularity**
+
+  One can replace the implementation of the layer with a different one, while using the same implemenations of any layers above and below.
+
+  This is desirable but not currently required. E.g.:
+
+   - There does exist multiple stores, that should continue to work (and work better than it does today)
+   - We don't care about being able to swap out the evaluator in C++ Nix, however we *do* care that the language is defined well enough that other implementation of the Nix language is possible.
+
+- **Gravity**
+
+  features should be in the lowest layer it makes sense to have them
+
+- **Compositionality**
+
+  layers should stand the alone:
+  - They should work as the top layer
+  - They should work expose a clear interface so it is possible to build multiple possible layers on top.
+
+### Implementation
+
+Nix currently marks experimental features in a formal way, which is excellent.
+Nix should likewise mark deprecated features in a formal way.
+It is good to be able to disable deprecated features before they removed to *prepare* for future breaking changes.
 
 ## The general stabilization process --- audit, refine, and *then* stabilze
 
@@ -131,6 +188,7 @@ To stabilize a piece of function we must do these things:
 
 As discussed in the motivation, we want to stabilize the less controversial Flake-agnostic new CLI before Flakes.
 In addition, the CLI can itself be split up for more fine-grained rounds of stabilization.
+According to the layering principles, the CLI in fact *must* be split in order to abide by the **publicity** principle.
 
 The rounds thus look like this:
 
@@ -188,15 +246,47 @@ This is a chance to discuss topics like:
 - ~~Should all outputs be selected if one writes `foo.dev`?~~ Since fixed.
 - How can `nix repl` have a more normal CLI?
 
+Following the **gravity** principle, we will eventually want to pure eval and eval caching to be possible and easy to use without flakes; they should become part of this layer.
+The stabilized CLI must "make room" for these features becoming part of this layer.
+
 ### Step 5: Audit, refine, and stabilize Flakes itself
 
 Finally, with the other less controversial interfaces stabilized, we can tackle the Flakes itself, the one remainder.
 This will require future RFCs.
 
+As stated in the previous step, following the **gravity**, pure eval and eval caching should be possible and easy to use without flakes.
+Ideally, by the time we get to this step, that is accomplished.
+If it isn't, we should at least make sure that it will be possible to do so later.
+It is OK to stabilize features that violate the layering principles, *only* so long as their stability does not impede fixing those violations later.
+
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
 Having laid out the plan, let us now return to how the current situation is characterized and see if the various facts that the factions orient themselves are respected.
+
+
+### Layering principles
+
+Some examples of ways t principles are upheld:
+
+- It is possible to use store without Nix lang
+  - (**publicity**, **compositionality**)
+  - Need `nix add-derivation` or similar to make this true!
+
+- It possible to use other languages with the store
+  - (**compositionality**)
+  - Guix able to use Nix daemon is a possible way to demonstrate this is true.
+- It is possible to use the Nix language without Flakes
+  - (**compositionality**)
+  - True already
+- It is possible to use pure eval without flakes
+  - (**gravity**, because "pure eval" is a feature not a layer)
+  - 95% true, but some "last mile" functionality is needed to make this "ergonomic enough for people to beleive it"
+
+Also, because public aspects of Nix are subject to a (nebulous) stability promise, exposing layering publically necessarily means stabilizing aspects of that layering too.
+The precise details are not formally worked about, but one example would be:
+
+ - We shouldn't collapse layers that were distinct such that people that are using the former lower layer in isolation are suddenly forced to "pay" for something they aren't using (the former upper layer).
 
 ## Flakes are very popular
 
@@ -222,7 +312,7 @@ The hope is that such scaffolding will assuage this faction their concerns are h
 # Drawbacks
 [drawbacks]: #drawbacks
 
-The main downside is a small delay from the splitting Nix process, and then delay between the stabilization steps.
+The main downside is a delay from the splitting Nix process, and then a delay between the stabilization steps.
 
 The fact that [RFC 134] is already mostly implemented, and in code review, is hopefully reason enough to believe it shouldn't take much longer.
 That maximum delay waiting for that to complete should be dwarfed by duration of time we've spent "in limbo" without a clear plan to move forward.
@@ -240,7 +330,7 @@ As long as we are making progress stabilizing features and having healthy discus
 
 We could, of course, just "rip off the band-aid" and stabilize everything at once.
 The argument for that would be that enough time has passed and the concerns of (less numerous) long-time users are not important.
-But we think the plan here has little downsides; we can instead make everyone happy with only a small delay.
+But we think the plan here has little downsides; we can instead make everyone happy with only some delay.
 If that is true, why not do that instead!
 
 # Unresolved questions
@@ -252,5 +342,7 @@ None at this time.
 [future]: #future-work
 
 Generalization features to work without Flakes, like pure eval and search, might be desired by the Flake-skeptic faction, but is purposely left as future work in order to not delay stabilization.
+
+General feature stability lifecycle: https://discourse.nixos.org/t/potential-rfc-idea-stability/27055
 
 [RFC 134]: ./0134-nix-store-layer.md
