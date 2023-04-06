@@ -215,7 +215,7 @@ Common Sections:
 
 Sections that might be specified in future rfcs:
 
-- `# Type` 
+- `# Type`
 - `# Arguments`
 - `# Meta`
 
@@ -226,14 +226,16 @@ Future RFCs may specify sub-headings of `# Meta`. Its usage is reserved.
 ## Keywords
 [keywords]: #keywords
 
-The following keywords start new markdown sections
+The following keywords start reserved markdown sections
 
 > I wanted to keep the list of initial keywords short. So by the time this RFC focuses on the formal aspects of doc-comments first. More keywords and features for them may be added later on.
 
 | Keyword     |  Description  | Note |
 | ---         |  ---          | --- |
-| `Example`   | Starts the Example-block. Often contains comprehensive code examples | |
-| `Type`      | Start the Type-block; it is any free text | Syntax may eventually be specified in the future. [preview](https://typednix.dev). |
+| `# Examples`   | Starts the Example-block. Often contains comprehensive code examples | |
+| `# Type`      | Start the Type-block; Just any free text; but we recommend following the existing convention of the current `Type:` field | Syntax may eventually be specified in the future. |
+| `# Meta`   | Under this section future rfcs may specify their sub-sections. | Sub-sections within meta will avoid namespace collisions in future RFCs |
+| `# Arguments`   | Needed for describing the functions arguments. Is just any free text until specified | |
 
 ## Why change the existing section specifiers?
 
@@ -460,6 +462,15 @@ As this second approach is much easier I propose this is how we should initially
 
 - [Rustdoc](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html)
 - [Nixdoc](https://github.com/nix-community/nixdoc)
+
+## Further
+
+We envision gradual type checking for nix.
+
+A weak source of type constraint could be the `# Type` field in doc-comments until nix may introduce its own native type system.
+Very concrete doc-typing-syntax may allow gradual type checking.
+
+- see a [preview](https://typednix.dev) of an eventual future doc-type-syntax.
 
 ## People that I discussed with
 
