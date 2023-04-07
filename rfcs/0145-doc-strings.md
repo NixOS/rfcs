@@ -327,7 +327,8 @@ Use markdown headings `# <Heading>`. This allows best compatibility with the alr
 ## Consequences to not implementing this
 
 - By not implementing this feature, nix gains no ability for tool-generated documentation.
-- Documentation will not defined by nixdoc, instead the community-implementation solution to the standard.
+- Documentation will be defined by nixdoc, not by the nix community itself.
+- Many existing comments written for documentation will remain un-discoverable.
 
 ## Examples
 
@@ -407,10 +408,14 @@ e.g.
 The following is an idea for a problem that will arise if tools try to track doc-comments' positions and the location in the nixpkgs tree. (Although this problem is not nixpkgs specific)
 
 ```nix
-#| This file is called somewhere that cannot be automatically tracked/is impossible to analyze statically.
-#| The 'TreePath' override can be used by the docstring author to set a fixed path in the nixpkgs expression.
-#| (This behavior will not be specified in this RFC)
-#| @TreePath: pkgs.stdenv 
+## This file is called somewhere that cannot be automatically tracked/is impossible to analyze statically.
+## The 'TreePath' override can be used by the docstring author to set fixed paths in the nixpkgs expression.
+## This tells the doc-tool that the expression is available in two aliases: `pkgs.stdenv` and `lib.sth` 
+## (This behavior will not be specified in this RFC)
+## # Meta
+## ## TreePath
+## - pkgs.stdenv
+## - lib.sth
 
 {...}:
 {
