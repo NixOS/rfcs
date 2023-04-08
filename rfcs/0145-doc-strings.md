@@ -199,7 +199,8 @@ Example: docstring continuation
 It is common using the same indentation as the referenced expression.
 
 ```nix
-
+    ## The function foo makes us happy
+    foo = arg: #...
 ```
 
 ### The content of a doc-comment is Markdown
@@ -428,9 +429,11 @@ The following is an idea for a problem that will arise if tools try to track doc
 
 ## Editor support
 
-When starting hitting {enter} inside a doc-block the new line, should be automatically prefixed with `##` or `#|` accordingly.
+When starting hitting {enter} inside a doc-block the new line, should be automatically prefixed with `##` accordingly.
 This is done in rust similarly. Nix already offers a bunch of LSP's e.g. [nil](https://github.com/oxalica/nil), [rnix-lsp](https://github.com/nix-community/rnix-lsp) are the most common ones.
-Those LSP's should implement the simple "line continuation" feature. (I don't know the exact name here)
+
+- Those LSP's should implement the simple "line continuation" feature. (I don't know the exact name here)
+- Implement displaying the related documentation when hovering over an expression. (lspAction/hover)
 
 ## Nixodc
 
