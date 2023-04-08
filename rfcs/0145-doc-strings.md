@@ -36,7 +36,7 @@ Many inconsistently written comments document specific parts of nixpkgs and othe
 
 We use some of them to generate documentation automatically. (e.g., nixpkgs/lib via [nixdoc](https://github.com/nix-community/nixdoc) )
 
-This solution requires a lot of handworks; more specifically, *nixdoc* is a custom tool that works only for that purpose.
+This solution requires a lot of manual work; more specifically, *nixdoc* is a custom tool that works only for that purpose.
 
 Here is an example of the format understood by *nixdoc*:
 
