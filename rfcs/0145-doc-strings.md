@@ -470,6 +470,10 @@ As this second approach is much easier I propose this is how we should initially
 
 ## Further
 
+There is an actual but rather old PR that uses just comments to show documentation in the nix repl for functions.
+
+- https://github.com/NixOS/nix/pull/1652
+
 We envision gradual type checking for nix.
 
 A weak source of type constraint could be the `# Type` field in doc-comments until nix may introduce its own native type system.
