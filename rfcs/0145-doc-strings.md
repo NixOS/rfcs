@@ -206,7 +206,7 @@ It is common using the same indentation as the referenced expression.
 
 The content of a doc-comment is parsed using Markdown following the commonmark specification. Thus it allows for intuitive usage without knowledge of complex syntax rules.
 
-Top level H1 headings, starting with a single `#`, indicate sections. Some of which might be specified in future rfcs.
+Top level H1 headings, starting with a single `#`, indicate sections. Sections might be specified in future rfcs.
 
 Common Sections:
 
