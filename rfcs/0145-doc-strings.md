@@ -123,7 +123,7 @@ Other tools that work directly with the nix AST and comments:
 
 **Proposed Solution:**
 
-Use `##` For doc-comment body and markdown within
+Each line of a doc-comment starts with `##`.
 
 The content of all doc-comments is rendered using markdown.
 Following the [commonmark-specification](https://spec.commonmark.org/)
