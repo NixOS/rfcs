@@ -170,11 +170,9 @@ In detail: `##` relates to the next AST-Node. However technical details for trac
 
 > Vision: Implement a custom evaluator that specializes in tracking references of doc-comments within the nix expression tree. This is however a technical concrete solution that may be build after this rfc is accepted.
 
-### Doc-comments start with `##`
+### Doc-comments continue with `##`
 
 Doc-comments start with `##` (leading whitespaces are allowed).
-
-Doc-comments relate to the expression in the following line or, more precisely, to the next node in the AST.
 
 The docstring is continued in the following line if it also starts with `##`.
 Leading whitespace is allowed.
@@ -196,7 +194,7 @@ Example: docstring continuation
 1
 ```
 
-It is common using the same indentation as the referenced expression.
+> Hint: It is common to use the same indentation as the referenced expression.
 
 ```nix
     ## The function foo makes us happy
@@ -205,7 +203,7 @@ It is common using the same indentation as the referenced expression.
 
 ### The content of a doc-comment is Markdown
 
-The content of a doc-comment is parsed using Markdown following the commonmark specification. Thus it allows for intuitive usage without knowledge of complex syntax rules.
+The content of a doc-comment is parsed using Markdown following the [commonmark specification](https://commonmark.org/). Thus it allows for intuitive usage without knowledge of complex syntax rules.
 
 Top level H1 headings, starting with a single `#`, indicate sections. Sections might be specified in future rfcs.
 
@@ -229,7 +227,7 @@ Future RFCs may specify sub-headings of `# Meta`. Its usage is reserved.
 
 The following keywords start reserved markdown sections
 
-> I wanted to keep the list of initial keywords short. So by the time this RFC focuses on the formal aspects of doc-comments first. More keywords and features for them may be added later on.
+> We wanted to keep the list of initial keywords short. So by the time this RFC focuses on the formal aspects of doc-comments first. More keywords and features for them may be added later on.
 
 | Keyword     |  Description  | Note |
 | ---         |  ---          | --- |
@@ -331,13 +329,17 @@ Use markdown headings `# <Heading>`. This allows best compatibility with the alr
 - Documentation will be defined by nixdoc, not by the nix community itself.
 - Many existing comments written for documentation will remain un-discoverable.
 
+## Enforcing lsp support is not great
+
+Single-line comments `##` require using a Language Server (LSP) to make developers work productively. It is desirable to have a doc-comment format that works nicely without an LSP. To achieve this with a variant of the multiline comment `/**{content}*/` as the format for doc-comments to be the respective subset of multiline comments
+
 ## Examples
 
 This section contains examples for the different formats to visualize them and emphasize the previously discussed characteristics.
 
 ### `##` inspired from rust's `///` 
 
-with `Markdown` Headings
+Example of the proposed `##` format; with `Markdown` Headings.
 
 `somefile.nix`
 
@@ -356,25 +358,32 @@ with `Markdown` Headings
 
 ### `/** */` inspired by the current multiline strings 
 
-With `@{keyword}:` Headings
+Example of an alternative multiline`/** */` format; with `Markdown` Headings.
+
+TODO: Work out the details for multiline doc comments together with documentation-team. This section might be removed and included into the "detailed design" section.
 
 ```nix
     /** 
-        <Description or Tagline>
+        mapAttrs is a function in lib
      
-        @Example:
+        # Example
     
-        <Comprehensive code>
+        ```
+        comprehensive example
+        shows how to use this
+        ```
      
-        @Type:
+        # Type
         
-        <Type Signature> 
+        foo -> bar 
     */
     mapAttrs = f: s: #...
 ```
 
 
 ## Javadoc style
+
+Example of the discarded `javadoc` format.
 
 ```java
   /**
@@ -450,7 +459,7 @@ If we'd like the fully automated approach, we definitely need something that can
 
 Alternatively we can use the future nixdoc together with a static `map.json` that contains the scope for every discovery file/path in nixpkgs.
 
-As this second approach is much easier I propose this is how we should initially start to extend the scope.
+As this second approach is much easier; We propose this is how we should initially start to extend the scope.
 
 ## More specialized section headings
 
@@ -484,7 +493,7 @@ Very concrete doc-typing-syntax may allow gradual type checking.
 
 - see a [preview](https://typednix.dev) of an eventual future doc-type-syntax.
 
-## People that I discussed with
+## People discussed with
 
 > People mentioned here might be not yet aware of this rfc.
 > I'll ping them in the next few days to make sure they are okay with being mentioned here.
