@@ -3,7 +3,7 @@ feature: doc-comment-standard
 start-date: 2023-03-27
 author: hsjobeki
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
+shepherd-team: @DavHau, ? (If you are interested please PM the author on matrix or comment)
 shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: (will contain links to implementation PRs)
 ---
@@ -12,6 +12,13 @@ related-issues: (will contain links to implementation PRs)
 [summary]: #summary
 
 Propose a standard format for Doc-comments.
+
+This RFC includes two separate concerns:
+
+- Outer format rules to allow distinction between regular comments and doc-comments
+- Inner format rules that describe the required format of the content. 
+
+However, both concerns relate closely to each other; We thought it made sense and reduced bureaucracy to address that in a single RFC.
 
 # Motivation
 [motivation]: #motivation
