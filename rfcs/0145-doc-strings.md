@@ -88,8 +88,16 @@ The placement of those comments requires precisely commenting at the attribute s
 e.g.,
 
 - file that directly exports the lib-function without wrapping it in an attribute set.
-- file that exports a constant expression
-- files outside of lib cannot be rendered due to missing conventions
+- file that exports a constant expression.
+- files outside of lib cannot be rendered due to missing conventions.
+
+### some multiline comments are doc-comments (implicitly)
+
+Currently many places (outside /lib) utilize the multiline comment `/* */` to write multiline comment documentation.
+However this is also not consistent across nixpkgs and was never specified as the doc-comment format.
+
+- There is no respective single line comment, that would allow documentation rendering
+- Inconsistent usage of multiline comments prevents us from using them directly.
 
 ### Differentiate from regular comments
 
@@ -128,7 +136,7 @@ Other tools that work directly with the nix AST and comments:
 # Detailed design
 [design]: #detailed-design
 
-**Proposed Solution:**
+**Proposed Solution**
 
 Each line of a doc-comment starts with `##`.
 
@@ -163,7 +171,7 @@ The following exampple demonstrates the concrete usage scenario.
 
 The following abstract rules describe how to write doc-comments.
 
-### doc-comments are all comments. That start with `##` e.g. `## {content}`
+### doc-comments are all comments. That start with and additional prefix `##` e.g. `## {content}`
 
 ```nix
 ## Documentation
