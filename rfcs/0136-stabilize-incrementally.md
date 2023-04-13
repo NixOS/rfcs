@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Stabilize the new command line interface and Flakes in an incremental fashion, leveraging [RFC 134].
+Decide how to stabilize the new command line interface and Flakes: in an incremental fashion, leveraging [RFC 134].
 This plan is designed to still efficiently end the current "limbo" era of these unstable yet widely-used features, yet also soothe the longstanding tensions in the Nix community over how we got here.
 
 # Motivation
