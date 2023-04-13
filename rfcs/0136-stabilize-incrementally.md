@@ -83,73 +83,55 @@ This "dusty corner" of the new CLI is rather calm with a very constrained design
 
 ## Conclusion
 
-By starting with this relatively easy material to stabilize, we can prove we can all come together as a community to agree on a design after all.
+By starting with this relatively easy material to stabilize (The CLI, in waves), we can prove we can all come together as a community to agree on a design after all.
 This should build trust between opposing individuals and factions, giving us a foundation upon which to tackle the more challenging material in subsequent steps.
 
-Since these features became very popular while they are still unstable, there is now both an urgency to stabilize them, and little ability to modify them.
-This is the opposite of how experimental features are supposed to leisurely incubate with both plenty of flexibility to change them, and little rush to stabilize them until they feel ready.
-But, there is little we can do about this at this point, an this RFC recognizes that fact and does *not* try to resist it.
-
-But, we have crossed that Rubicon and there is no turning back; this RFC *doesn't* attempt to change Flakes or the command line.
+We recognize that Flakes is widely used and will take precautions to ensure users are reasonably informed of any breaking changes that might occur from the stabilization.
 
 # Detailed design
 [design]: #detailed-design
 
-> TODO out of date summary
+While we could just move along and stabilize flakes bit-by-bit, in order to ensure a good Nix architecture now and for the future we start by establishing principles Nix should be guided by.
+These principles should prevent similar problems from happening in the future and give us a target to strive for with the existing Nix.
 
-~~First we describe how stabilization should work in general.
-Then we describe the order in which things are stabilized.
-Finally we combine both into a list of step.~~
+The detailed design of this RFC consists of these parts:
 
-This RFC consists of these parts:
-- Establishing basic layering principles
-- Define the different layers of Nix
-- Make Nix conform to these layers
+- Establishing Principles
+    - Basic layering principles
+
+    - Basic stabilization process principles
+
+- Plan brining Nix into compliance with the principles, and specifying the order the outstanding unstable CLI and Flakes features will be tackled.
 
 ## Layering principles
 
 These basic layering principles will be added to the [Nix architecture documentation](https://nixos.org/manual/nix/stable/architecture/architecture.html):
 
-- **Public-ity**
+### For Nix as as a whole
+
+- **Public Interfaces**
 
   Layers are not just an implementation detail, instead they are publically exposed to the user via stable interfaces
-  - All exposed interfaces in Nix, both for computers or humans, must be matched to layers
-    - TODO: Move these to a stability section
-      - These exposed interfaces must conform to stability guarantees
-      - Functionality of layers must be either be stable or be marked as experimental, in which case breaking changes may happen
-  - The user has the option (it need not be mandatory!) to be aware of the layering and use it to learn Nix
-  - Both perspectives are equally valid, and neither is prioritized over the other
-  - While not going so far as to *insist* users are aware of layering and care about it, the layered archicture of Nix should be exposed to anyone that cares, and it shouldn't suddenly dissapear (as a mere implementation detail might).
+  All exposed interfaces in Nix, both for computers or humans, must be matched to layers
+
+### For each layer
 
 - **Clarity of purpose**
 
-  layers should not be too thick.
-  layers should "do one thing, and do it well".
-
-- **Modularity**
-
-  One can replace the implementation of the layer with a different one, while using the same implemenations of any layers above and below.
-
-  This is desirable but not currently required. E.g.:
-
-   - There does exist multiple stores, that should continue to work (and work better than it does today)
-   - We don't care about being able to swap out the evaluator in C++ Nix, however we *do* care that the language is defined well enough that other implementation of the Nix language is possible.
-
-- **Gravity**
-
-  features should be in the lowest layer it makes sense to have them
+  Layers should not be too "thick".
+  Layers should "do one thing, and do it well".
 
 - **Compositionality**
 
-  layers should stand the alone:
+  Layers should stand alone:
+
   - They should work as the top layer
-  - They should work expose a clear interface so it is possible to build multiple possible layers on top.
+  - They should also work *not* as the top layer, and with multiple possible layers above them
+  - They should expose a clear interface, which is what makes the previous point possible.
 
-### Implementation
+- **Gravity**
 
-Nix currently marks experimental features in a formal way, which is excellent.
-Nix should likewise mark deprecated features in a formal way.
-It is good to be able to disable deprecated features before they removed to *prepare* for future breaking changes.
+  Features should be in the lowest layer it makes sense to have them.
 
 ## The general stabilization process --- audit, refine, and *then* stabilze
 
@@ -196,7 +178,10 @@ The rounds thus look like this:
    1. "installable"-free Store-only CLI
    2. Rest of the Store-only CLI (includes "derived path" installables)
    3. Rest of the flake-agnostic CLI
+
 2. Flakes
+   - Define the different layers of Nix?
+   - Make Nix conform to these layers?
 
 ## Combined plan
 
@@ -265,9 +250,17 @@ It is OK to stabilize features that violate the layering principles, *only* so l
 Having laid out the plan, let us now return to how the current situation is characterized and see if the various facts that the factions orient themselves are respected.
 
 
-### Layering principles
+## Layering principles
 
-Some examples of ways t principles are upheld:
+Rammifications to the user experience from layering being public:
+
+  - The user has the option (it need not be mandatory!) to be aware of the layering and use it to learn Nix
+
+  - Both perspectives are equally valid, and neither is prioritized over the other
+
+  - While not going so far as to *insist* users are aware of layering and care about it, the layered archicture of Nix should be exposed to anyone that cares, and it shouldn't suddenly dissapear (as a mere implementation detail might).
+
+Some examples of ways the principles are upheld:
 
 - It is possible to use store without Nix lang
   - (**publicity**, **compositionality**)
@@ -287,6 +280,12 @@ Also, because public aspects of Nix are subject to a (nebulous) stability promis
 The precise details are not formally worked about, but one example would be:
 
  - We shouldn't collapse layers that were distinct such that people that are using the former lower layer in isolation are suddenly forced to "pay" for something they aren't using (the former upper layer).
+
+In the future, we might build atop this principles for a deeper notion of modularity: one should be able to replace the implementation of the layer with a different one, while using the same implementations of any layers above and below.
+This is desirable but not currently required. E.g.:
+
+   - There does exist multiple stores, that should continue to work (and work better than it does today)
+   - We don't care about being able to swap out the evaluator in C++ Nix, however we *do* care that the language is defined well enough that other implementation of the Nix language is possible.
 
 ## Flakes are very popular
 
