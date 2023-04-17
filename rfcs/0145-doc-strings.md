@@ -229,7 +229,7 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 ## Single-line doc-comments (do not exist)
 
-**Observing**: Nix offers two variants of comments; single- and multi-line comments. There may be use cases where it is desirable to have a form of single-line comments subtyped for doc-comment purposes. 
+**Observing**: Nix offers two variants of comments; single- (`#`) and multi-line comments (`/* */`). There may be use cases where it is desirable to have a form of single-line comments subtyped for doc-comment purposes. 
 
 **Considering**: Single-line comment for documentation.
 
