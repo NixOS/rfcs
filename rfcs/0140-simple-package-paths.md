@@ -18,7 +18,7 @@ This makes it much easier to contribute new packages, since there's no more gues
 # Motivation
 [motivation]: #motivation
 
-- (Especially new) package contributors are having a hard time figuring out which files to add or edit. These are very common questions:
+- It is not obvious to package contributors where to add files or which ones to edit. These are very common questions:
   - Which directory should my package definition go in?
   - What are all the categories and do they matter?
   - What if the package has multiple matching categories?
@@ -35,43 +35,51 @@ This makes it much easier to contribute new packages, since there's no more gues
 # Detailed design
 [design]: #detailed-design
 
-This RFC establishes the standard of using `pkgs/unit/${shard}/${name}` "unit" directories for the definitions of the Nix packages `pkgs.${name}` in Nixpkgs, where `shard = toLower (substring 0 2 name)`.
-All unit directories are automatically discovered and incorporated into the `pkgs` set using `pkgs.${name} = pkgs.callPackage pkgs/unit/${shard}/${name}/package.nix { }`.
+This RFC consists of two parts, each of which is implemented with a PR to Nixpkgs.
 
-The following requirements will be checked by CI.
-This standard must be followed for newly added packages that can satisfy these requirements.
-A treewide migration to this standard will be performed for existing packages that can satisfy these requirements.
+## PR 1: The unit directory standard
 
-## Structure
+This part establishes the new _unit directory standard_ in Nixpkgs.
+This standard is internal to Nixpkgs and not exposed as public interface.
+This standard must be documented in the Nixpkgs manual.
 
-The `pkgs/unit` directory must only contain unit directories, and only in subdirectories of the form `${shard}/${name}`.
-Each unit directory must contain at least a `package.nix` file, but may contain arbitrary other files and directories.
+### File structure
 
-This ensures that maintainers don't have to verify this structure manually, which is prone to mistakes.
+Create the initially-empty directory `pkgs/unit`, called _unit base directory_, in Nixpkgs.
 
-## Only derivations
+Check the following using CI:
+- The unit base directory must only contain subdirectories of the form `pkgs/unit/${shard}/${name}`, called _unit directories_.
+- `name` is a string only consisting of the ASCII characters a-z, A-Z, 0-9, `-` or `_`.
+- `shard` is the lowercased first two letters of `name`, expressed in Nix: `shard = toLower (substring 0 2 name)`.
+- Each unit directory must contain a `package.nix` file and may contain arbitrary other files.
 
-If `pkgs/unit/${shard}/${name}` exists, `pkgs.${name}` must be a derivation that can be built directly with `nix-build`.
+### Semantics
 
-This ensures that people can expect the unit directories to correspond to buildable packages and not functions like `pkgs.fetchFromGitHub` or `pkgs.buildRustCrate`.
+Introduce code to automatically define `pkgs.${name}` for each unit directory as a value equivalent to
+```nix
+pkgs.callPackage pkgs/unit/${shard}/${name}/package.nix { }`
+```
 
-## Stable boundary
+Check the following using CI for each unit directory:
+- The only definition for `pkgs.${name}` is the automatically generated one from the unit directory
+- `pkgs.${name}` must evaluate to a [derivation](https://nixos.org/manual/nix/stable/glossary.html#gloss-derivation).
+- The `package.nix` file must not transitively refer to files outside its unit directory.
 
-Unit directories may only interact with the rest of Nixpkgs via the stable `pkgs.${name}` attributes, not with file references:
-- Files inside a unit directory must not reference files outside that unit directory.
-  Therefore all dependencies on other packages must come from `package.nix` arguments injected by `callPackage`.
-  This ensures that files in Nixpkgs can be moved around without breaking this package.
-- Files outside a unit directory must not reference files inside that unit directory.
-  Therefore other packages can only depend on this package via `pkgs.${name}`.
-  This ensures that files within unit directories (except `package.nix`) can be freely moved and changed without breaking any other packages.
+## PR 2: Migration
 
-The only notable exception to this rule is the `pkgs/top-level/all-packages.nix` file which may reference the `package.nix` file according to the next requirement.
+Automatically migrate to the unit directory standard for all definitions `pkgs.${name}` that can be migrated by
+- Only moving files
+- Not changing the evaluation result
 
-## Custom arguments
+This will cause merge conflicts with all existing PRs that modify such moved files, however they can trivially be rebased using `git rebase && git push -f`.
+However, to have the least amount of conflicts, this migration should be performed soon after a release when ZHF is over and the PR rate slows down.
+This also gives a lot of time to fix any potential problems before the next release.
 
-If `pkgs/top-level/all-packages.nix` contains a definition for the attribute `${name}` and the unit directory `pkgs/unit/${shard}/${name}` exists, then the attribute value must be defined as `pkgs.callPackage pkgs/unit/${shard}/${name}/package.nix args`, where `args` may be a freely chosen expression.
+Manual updates may also be done to ensure further non-evaluation validity, such as
+- [CODEOWNERS](https://github.com/NixOS/nixpkgs/blob/master/.github/CODEOWNERS)
+- Update scripts like [this](https://github.com/NixOS/nixpkgs/blob/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/applications/version-management/cz-cli/generate-dependencies.sh)
 
-This ensures that even if a package initially doesn't require a custom `args`, if it later does, it doesn't have to be moved out of the `pkgs/unit` directory to pass custom arguments.
+Due to the strict limitations of standard, this PR will not start enforcing it for new packages.
 
 ## Examples
 [examples]: #examples
@@ -79,7 +87,7 @@ This ensures that even if a package initially doesn't require a custom `args`, i
 To add a new package `pkgs.foobar` to Nixpkgs, one only needs to create the file `pkgs/unit/fo/foobar/package.nix`.
 No need to find an appropriate category nor to modify `pkgs/top-level/all-packages.nix` anymore.
 
-With many packages, the `pkgs/unit` directory may look like this:
+With some packages, the `pkgs/unit` directory may look like this:
 
 ```
 pkgs
@@ -102,14 +110,35 @@ pkgs
 # Interactions
 [interactions]: #interactions
 
-- `nix edit` and search.nixos.org are unaffected, since they rely on `meta.position` to get the file to edit, which still works
+## Migration size
+Due to the limitations of the standard, only a limited set of top-level attributes can be migrated:
+- No attributes that aren't derivations like `pkgs.fetchFromGitHub` or `pkgs.python3Packages`
+- No attributes that share common files with other attributes like [`pkgs.readline`](https://github.com/NixOS/nixpkgs/tree/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/development/libraries/readline)
+- No attributes that references files from other packages like [`pkgs.gettext`](https://github.com/NixOS/nixpkgs/blob/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/development/libraries/gettext/default.nix#L60)
+
+A good estimation of this based on [a trial PR](https://github.com/NixOS/nixpkgs/pull/211832) on commit [287b071e9a71](https://github.com/nixos/nixpkgs/commit/287b071e9a7130cacf7664e5c69ec3a889b800f8):
+- 18136 (100.0%) total top-level attributes
+- 16319 (90.0%) are derivations (`lib.isDerivation`)
+- 10763 (59.3%) are derivations and don't violate any other conditions
+
+## Package locations
+
+`nix edit` and search.nixos.org will automatically point to the new location without problems, since they rely on `meta.position` to get the file to edit, which still works.
+
+## Git and NixOS release problems
+
+- The migration will cause merge conflicts for a lot of PRs, but they are trivially resolvable using `git rebase && git push -f` due to Git's file rename tracking.
+- Commits that change moved files in `pkgs/unit` can be cherry-picked to the previous file location without problems for the same reason.
 - `git blame` locally and on GitHub is unaffected, since it follows file renames properly.
-- A commonly recommended way of building package directories in Nixpkgs is to use `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
-  Since the path changes `package.nix` is now used, this becomes like `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/unit/he/hello/package.nix {}'`, which is harder for users.
-  However, calling a path like this is an anti-pattern anyway, because it doesn't use the correct Nixpkgs version and it doesn't use the correct argument overrides.
-  The correct way of doing it was to add the package to `pkgs/top-level/all-packages.nix`, then calling `nix-build -A hello`.
-  This `nix-build -E` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
-  By teaching users that `pkgs/unit/*/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build -E` workarounds should disappear.
+
+## `callPackage` with `nix-build -E`
+
+A commonly recommended way of building package directories in Nixpkgs is to use `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
+Since the path changes `package.nix` is now used, this becomes like `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/unit/he/hello/package.nix {}'`, which is harder for users.
+However, calling a path like this is an anti-pattern anyway, because it doesn't use the correct Nixpkgs version and it doesn't use the correct argument overrides.
+The correct way of doing it was to add the package to `pkgs/top-level/all-packages.nix`, then calling `nix-build -A hello`.
+This `nix-build -E` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
+By teaching users that `pkgs/unit/*/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build -E` workarounds should disappear.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -126,6 +155,17 @@ pkgs
 
 # Alternatives
 [alternatives]: #alternatives
+
+TODO: This needs updating
+
+## A different unit base directory
+
+Context: `pkgs/unit` is the unit base directory
+
+Alternatives:
+- Use `unit` (at the Nixpkgs root) instead of `pkgs/unit`.
+  - This is future proof in case we want to make the directory structure more general purpose, but this is out of scope
+- Other name proposals were deemed worse: `pkg`, `component`, `part`, `mod`, `comp`
 
 ## Alternate `pkgs/unit` structure
 
@@ -151,13 +191,7 @@ pkgs
   - Not using `default.nix` frees up `default.nix` for a short expression that is actually buildable, e.g. `(import ../.. {}).hello`, although we don't yet have a use case for this that isn't covered by `nix-build ../.. -A $attrname`.
   - Bad because using `default.nix` would tempt users to invoke `nix-build .` whereas making package functions auto-callable is a known anti-pattern as it duplicates the defaults.
   - Good because `default.nix` is already a convention most people are used to
-- `package.nix`/`pkg.nix`: Bad, because it makes the migration to a non-function form of overridable packages harder in the future.
-
-## Alternate `pkgs/unit` location
-
-- Use `unit` (at the Nixpkgs root) instead of `pkgs/unit`.
-  This is future proof in case we want to make the directory structure more general purpose, but this is out of scope
-- Other name proposals were deemed worse: `pkg`, `component`, `part`, `mod`, `comp`
+- `pkg-fun.nix`/`pkg-func.nix`: The idea with this proposal was to make it easier to potentially transition to a non-function form of packages in the future, but there's no problem with introducing versioning later if needed in case we want to reuse `pkg.nix`/`package.nix`. We also don't even know if we actually want to have a non-function form of packages. Also the abbreviations are a bit jarring.
 
 ## Filepath backwards-compatibility
 
@@ -225,6 +259,7 @@ Con:
 
 All of these questions are in scope to be addressed in future discussions in the [Nixpkgs Architecture Team](https://nixos.org/community/teams/nixpkgs-architecture.html):
 
+- Add a meta tagging system to packages as a replacement for the package categories. Maybe `meta.tags` with `search.nixos.org` integration.
 - Making the filetree more human-friendly by grouping files together by "topic" rather than technical delineations.
   For instance, having a package definition, changelog, package-specific config generator and perhaps even NixOS module in one directory makes work on the package in a broad sense easier.
 - This RFC only addresses the top-level attribute namespace, aka packages in `pkgs.<name>`, it doesn't do anything about package sets like `pkgs.python3Packages.<name>`, `pkgs.haskell.packages.ghc942.<name>`, which may or may not also benefit from a similar auto-calling
