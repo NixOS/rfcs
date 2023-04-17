@@ -500,19 +500,6 @@ We solve such concerns in `tvix` or in `nix`, which could provide a `nix-analyze
 
 ## Related discussions
 
-### About doc-comments/doc-comments in general.
-
 - [@documentation-team (meet @ 13.Apr 2023)](https://discourse.nixos.org/t/2023-04-13-documentation-team-meeting-notes-41/27264)
-- [@flokli](https://github.com/flokli) - one of the [tvix](https://tvl.fyi/blog/rewriting-nix) authors
-- [@tazjin](https://github.com/tazjin) - Original Author of `nixdoc`, one of the `tvix` authors
 
 - There is an actual but rather old PR (@roberth) that uses just comments to show documentation in the nix repl for functions. -> https://github.com/NixOS/nix/pull/1652
-
-### About documentation approaches on independent frameworks.
-
-- [@davHau](https://github.com/davHau) - Author of [dream2nix](https://github.com/nix-community/dream2nix), (And many other nix-frameworks)
-
-### About using comments as weak sources for typed Nix.
-
-- [@roberth](https://github.com/roberth) - nixpkgs Architecture Team / nix core team ?
-- [@aakropotkin](https://github.com/aakropotkin/) - nixpkgs Architecture Team
