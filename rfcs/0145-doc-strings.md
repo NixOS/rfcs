@@ -207,7 +207,7 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 **Decision**: Doc-comments always relate to the expression in the next Abstract Syntax Tree Node (AST). 
 
-> Note: Precedence is unnecessary as the AST already decided upon that while parsing. In terms of precedence, a doc-comment virtually always has the lowest possible value (e.g., 1). However, this RFC will not define precedence. 
+> Note: Precedence is unnecessary as the AST already decided upon that while parsing. In terms of precedence, a doc-comment virtually always has the lowest possible value (e.g., -1). However, this RFC will not define precedence. 
 > 
 > Also Tool specific implementation questions must be resolved separately. Future RFCs to restrict or alter the behavior specified by this decision are valid if they present rational reasoning.
 
@@ -227,15 +227,13 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 </details>
 
-## Single doc-comments (do not exist)
+## Single-line doc-comments (do not exist)
 
 **Observing**: Nix offers two variants of comments; single- and multi-line comments. There may be use cases where it is desirable to have a form of single-line comments subtyped for doc-comment purposes. 
 
 **Considering**: Single-line comment for documentation.
 
 **Decision**: Single-line comments **cannot be used** in any form for documentation puposes.
-
-> This decision was not easy and may still be controversial
 
 <details>
 <summary>Arguments</summary>
