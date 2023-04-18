@@ -128,6 +128,30 @@ The team has the authority to remove and add members as needed.
 
 [examples-and-interactions]: #examples-and-interactions
 
+TODO sort that in somewhere else
+```nix
+[
+  "--some-flag" "some-value"
+]
+```
+
+is formatted as
+
+```
+[
+  "--some-flag"
+  "some-value"
+]
+```
+
+workaround:
+
+```
+lib.cli.toGNUCommandLine {} {
+  some-flag = "some-value";
+}
+```
+
 ### Documentation
 
 Update [Section 20.1 (Coding conventiones → Syntax)](https://nixos.org/manual/nixpkgs/stable/#sec-syntax) of the Nixpkgs manual. All formatting-specific guidance is removed and replaced with instructions on how to automatically format Nixpkgs instead.
@@ -185,11 +209,11 @@ Nevertheless, deviations should be documented and explained.*
   - Brackets and braces are generally written with a space on the inside, like `[ `, ` ]`, `{ ` and ` }`.
   - `[]` is written as `[ ]`, same for `{ }`.
   - Exception: Parentheses are written *without* a space on the inside
-- Statements are either written on one line, or maximally spread out across lines, with no in-between (e.g. grouping).
+- Expressions are either written on one line, or maximally spread out across lines, with no in-between (e.g. grouping).
   - Multi-line statements increment the indentation level in the statement's "body".
   - Grouping should be done by adding blank lines or comments.
-- Where ~~possible~~ sensible indentation depth should be minimized, "double-indentations" should be avoided.
-  - Examples are `… in {` and `… else if`
+  - If there is more than one element in a list or attribute set, it should be expanded to put each on its own line
+    - Rationale: singleton lists are common
 
 ## Appendix B: Formatting rules
 
@@ -391,16 +415,29 @@ inherit
 ✅ Good:
 
 ```nix
+if predicate then
+  foo
+else
+  bar
+```
+
+- "Pulling up" the `then` keyword is consistent with other similar syntax constructs
+- The bodies are always indented
+
+❌ Bad (old):
+
+```nix
 if predicate
 then foo
 else bar
 ```
 
-- The keyword at the beginning of the line
-  states clearly the meaning of the content that follows.
-- Produces a clean diff when you add more code.
+- TODO explain why bad
+- ~~The keyword at the beginning of the line
+  states clearly the meaning of the content that follows.~~
+- ~~Produces a clean diff when you add more code.
   For example: adding content to the `else`
-  only produces a diff in the `else`.
+  only produces a diff in the `else`.~~
 
 ❌ Bad:
 
@@ -416,21 +453,27 @@ if predicate then foo else bar
 ✅ Good:
 
 ```nix
-if something <= 2.0
-then
-  if somethingElse
-  then foo
-  else bar
-else if something <= 4.0
-then {
-  foo = 10;
-}
-else if something <= 6.0
-then [
-  10
-  20
-]
-else bar
+if something <= 2.0 then
+  if somethingElse then
+    foo
+  else
+    bar
+else if something <= 4.0 then
+  {
+    foo = 10;
+  }
+else if something <= 6.0 then
+  [
+    10
+    20
+  ]
+else if something <= 7.0 then
+  let
+    …
+  in
+    …
+else
+  bar
 ```
 
 - It's easy to follow that there are many conditionals.
@@ -453,6 +496,50 @@ else bar
 
 - It's complex to distinguish the parent `if-then-else`
   from the child `if-then-else`
+
+❌ Bad:
+
+```nix
+if cond1 then [
+  foo
+] else if cond2 then
+  bar
+else if cond3 then {
+  baz = "…";
+} else if cond4 then let
+  qux = "…";
+in 
+  qux
+else
+  true
+```
+
+- Inconsistent start of line
+- if/else keywords not aligned: the first `else` is indented like if it was nested
+- Easy to miss the opening brace/bracket, especially when the closing one is far below
+- No clear distinction whether items are in a list or not
+
+✅ Good:
+
+```nix
+if
+  multiline
+    && condition
+then
+  content
+else if
+  myPredicate [
+    multi
+    line
+  ]
+then
+  other content
+else
+  more
+```
+
+- If the condition does not fit one line, expand with indentation, and put the `then` keyword on a new line
+- Recommendation: avoid long conditions
 
 ### Lists
 
