@@ -11,8 +11,19 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Decide how to stabilize the new command line interface and Flakes: in an incremental fashion, leveraging [RFC 134].
-This plan is designed to still efficiently end the current "limbo" era of these unstable yet widely-used features, yet also soothe the longstanding tensions in the Nix community over how we got here.
+Ever since the closing of [RFC 49](https://github.com/NixOS/rfcs/pull/49), we've had the new CLI and Flakes marked as experimental, with no clear plan forward.
+
+With the goal of ending this current limbo and soothe longstanding tensions in the Nix community, this RFC does two things:
+
+1. Establish general principles about Nix's architecture and evolution in order to ensure we do not get in this situation again.
+
+   Notably we are allowed to make breaking changes to experimental features, which includes both the new CLI and Flakes, until they are stable.
+
+2. Establish an incremental plan adhering to the principles deciding on the order and priority in which to stabilize these features:
+
+   - First, the non-Flakes CLI wll be stabilized, in phases.
+
+   - Afterwards, Flakes itself and its CLI components can be stabilized. The final design of Flakes will also require another RFC.
 
 # Motivation
 [motivation]: #motivation
@@ -292,7 +303,7 @@ This is desirable but not currently required. E.g.:
 And they will be stabilized, with minimal delay.
 
 Firstly, there is no feature work proposed in the interim --- the splitting of Nix is just partitioning existing functionality, with some behind-the-scenes refactors needed to make that possible.
-The earlier steps have been carefully designed to be either easier or already started ("de-risked") to assuagee those that are concerned about the current "limbo" that stabilization will be gotten to no matter what, even if the splitting fails.
+The earlier steps have been carefully designed to be either easier or already started ("de-risked") to do our best to convince those that are concerned about the current "limbo" that stabilization will be gotten to no matter what, even if the splitting fails.
 
 ## Difficulties in the roll-out
 
