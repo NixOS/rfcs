@@ -205,11 +205,9 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 **Considering**: General reference logic between doc-comments and expressions.
 
-**Decision**: Doc-comments always relate to the expression in the next Abstract Syntax Tree Node (AST). 
+**Decision**: Doc-comments refer to the **immediately** preceded expression. Only whitespaces are allowed in between.
 
-> Note: Precedence is unnecessary as the AST already decided upon that while parsing. In terms of precedence, a doc-comment virtually always has the lowest possible value (e.g., -1). However, this RFC will not define precedence. 
-> 
-> Also Tool specific implementation questions must be resolved separately. Future RFCs to restrict or alter the behavior specified by this decision are valid if they present rational reasoning.
+> Note: We are working on a generic example implementation that covers about 90% of all documentation use cases.
 
 <details>
 <summary>Arguments</summary>
