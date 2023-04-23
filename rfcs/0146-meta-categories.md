@@ -187,6 +187,8 @@ The most immediate drawbacks are:
 
 1. Do nothing
 
+   This will exacerbate the problems already listed.
+
 2. Ignore/nuke the categorization completely
 
    This is not an idea as bad as it appear. After all, categorization has a
