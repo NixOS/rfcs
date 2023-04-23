@@ -193,18 +193,47 @@ The most immediate drawbacks are:
 
    This is not an idea as bad as it appear. After all, categorization has a
    non-negligible propensity to bikeshedding. Removing it removes all problems.
-   
-   Nonetheless, other good software collections do this just fine, and we can
-   easily imitate them. Indeed, we can follow/take a peek at how Repology keeps
-   the categorizations defined by those software collections.
+
+   However, there are good reasons to keep the categorization:
+
+   - The categorization is already present; this RFC proposes to expose it to a
+     higher level, in a more discoverable, structured format.
+
+   - Categorization is very traditional among software collections. Many of them
+     are doing this just fine for years on end, and we can easily imitate them -
+     and even better, given we have Nix language machinery available.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
 Still unsolved is what data structure is better suited to represent a category.
+For now we stick to a set `{ name, description }`.
 
 # Future work
 [future]: #future-work
 
 - Curation of categories.
 - Update documentation.
+
+# References
+[references]: #references
+
+- [Desktop Menu
+  Specification](https://specifications.freedesktop.org/menu-spec/latest/);
+  specifically,
+  - [Main
+    categories](https://specifications.freedesktop.org/menu-spec/latest/apa.html)
+  - [Additional
+    categories](https://specifications.freedesktop.org/menu-spec/latest/apas02.html)
+  - [Reserved
+    categories](https://specifications.freedesktop.org/menu-spec/latest/apas03.html)
+
+- [NetBSD pkgsrc guide](https://www.netbsd.org/docs/pkgsrc/)
+  - Especially, [Chapter 12, Section
+    1](https://www.netbsd.org/docs/pkgsrc/components.html#components.Makefile)
+    contains a short list of CATEGORIES.
+
+- [FreeBSD Porters
+  Handbook](https://docs.freebsd.org/en/books/porters-handbook/makefiles/#porting-categories)
+  - Especially
+    [Categories](https://docs.freebsd.org/en/books/porters-handbook/makefiles/#porting-categories)
