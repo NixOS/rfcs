@@ -177,6 +177,11 @@ The most immediate drawbacks are:
 
    How many and which categories we should create? Can we expand them later?
 
+   For start, we can follow/take inspiration from many of the already existing
+   categories sets and add extra ones when the needs arise. Indeed, it is way
+   easier to create such categories using Nix language when compared to other
+   software collections.
+
 # Alternatives
 [alternatives]: #alternatives
 
