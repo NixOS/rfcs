@@ -61,7 +61,7 @@ However this system of categorization has serious problems:
 
 4. There is no convenient way to use multivalued categorization.
 
-   A piece of software can fulfill many categories; e.g. 
+   A piece of software can fulfill many categories; e.g.
    - an educational game
    - a console emulator (vs. a PC emulator)
    - and a special-purpose programming language (say, a smart-contracts one).
@@ -172,10 +172,10 @@ The most immediate drawbacks are:
 1. A huge treewide edit of Nixpkgs
 
    On the other hand, this is easily sprintable and amenable to automation.
-   
+
 2. Bikeshedding
 
-   How many and which categories we should create? Can we expand them later? 
+   How many and which categories we should create? Can we expand them later?
 
 # Alternatives
 [alternatives]: #alternatives
@@ -201,4 +201,3 @@ Still unsolved is what data structure is better suited to represent a category.
 
 - Curation of categories.
 - Update documentation.
-
