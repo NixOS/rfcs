@@ -13,7 +13,7 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/177272
 ## Summary
 [summary]: #summary
 
-Inspired by the various derivation checks like for broken and insecure packages, a new system called "problems" is introduced. It is planned to eventually replace the previously mentioned systems where possible, as well as the current – undocumented – "warnings" (which currently only prints a trace message for unmaintained packages). A `config.problemHandler` option is added to the nixpkgs configuration, with centralized and granular control over how to handle problems that arise: "error" (fail evaluation), "warn" (print a trace message) or "ignore" (do nothing).
+Inspired by the various derivation checks like for broken and insecure packages, a new system called "problems" is introduced. It is planned to eventually replace the previously mentioned systems where possible, as well as the current – undocumented – "warnings" (which currently only prints a trace message for unmaintained packages). A `config.problemHandler` and `problemHandlerDefaultMatchers` option is added to the nixpkgs configuration, with centralized and granular control over how to handle problems that arise: "error" (fail evaluation), "warn" (print a trace message) or "ignore" (do nothing).
 
 Additionally, `meta.problems` is added to derivations, which can be used to manually declare that a package has a certain problem. This will then be used to inform users about packages that are in need of maintenance, for example security vulnerabilities or deprecated dependencies.
 
@@ -82,44 +82,46 @@ Not all values make sense for declaration in `meta.problems`: Some may be automa
 
 ### Nixpkgs configuration
 
-The following new config option is added to nixpkgs: `config.problemHandler`. The (currently undocumented) option `config.showDerivationWarnings` will be removed.
+The following new config options are added to nixpkgs: `config.problemHandler` and `config.problemHandlerDefaultMatchers`. The (currently undocumented) option `config.showDerivationWarnings` will be removed.
 
-Handler values can be either `"error"`, `"warn"` or `"ignore"`. `"error"` maps to `throw`, `"warn"` maps to `trace`. Future values may be added in the future. The key is of the form `packageName.problemKind` or `packageName.problemName`, where `"*"` is allowed on either level as a wildcard.
+Handler values can be either `"error"`, `"warn"` or `"ignore"`. `"error"` maps to `throw`, `"warn"` maps to `trace`. Future values may be added in the future.
 
-```nix
-problemHandler = {
-  "*" = {
-    "*" = "error";
-    alias = "warn";
-    maintainerless = "ignore";
-  };
-  myPackage.foo = "ignore";
-};
-```
-
-If multiple rules match a given problem of a package, the most specific handler will be called:
-
-1. `pkgName.problemName`
-2. `pkgName.problemKind`
-3. `pkgName."*"`
-4. `"*".problemName`
-5. `"*".problemKind`
-6. `"*"."*"`
-
-So for example the value of `myPackage.*` would override the one in `*.maintainerless` if both matched, as it is more specific.
-
-The default value in nixpkgs might be something like:
+`config.problemHandlers` is the simple and most user-facing configuration value. It is a simple doubly-nested attribute set, of style `pkgName.problemName`.
 
 ```nix
-problemHandler."*" = {
-  "*" = "warn";
-  removal = "error";
-  deprecated = "error";
-  maintainerless = "ignore";
-};
+config.problemHandlers = {
+  myPackage.maintainerless = "warn";
+  otherPackage.CVE1234 = "ignore";
+}
 ```
 
-It may also be expanded by values from other configuration options as part of a migration scheme from the other mechanisms.
+Some times, there is the need to set the handler for multiple problems on a package, or for one problem kind across all packages. For this,  `config.problemHandlerDefaultMatchers` exists. It is a list of matchers (currently package name, problem name or problem kind), with an associated handler. If multiple matchers match a single package, the one with the highest level (error > warn > ignore) will be used. Since the user configuration is merged with the default configuration, this means that one can not decrease the handler level below the default value. This is to protect users against accidentally disabling entire classes of notifications. Values from `config.problemHandlers` take precedence.
+
+```nix
+config.problemHandlerDefaultMatchers = [
+  { # Wildcard matcher for everything
+    handler = "warn";
+  }
+  { # Match all security warnings on "hello"
+    package = "hello";
+    kind = "insecure";
+    handler = "error";
+  }
+  { # Match all packages affected by the python2 deprecation
+    name = "python2-eol";
+    handler = "error";
+  }
+  { # Has no effect: the default value is higher
+    kind = "insecure";
+    handler = "ignore";
+  }
+  { # Disallowed: use problemHandlers instead
+    pkgName = "hello";
+    name = "CVE1234";
+    handler = "ignore";
+  }
+]
+```
 
 ## Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -129,8 +131,6 @@ It may also be expanded by values from other configuration options as part of a 
 When a package has a problem that `throw`s, all packages that depend on it will fail to evaluate until that problem is ignored or resolved. Most of the time, this is sufficient.
 
 When the problem requires actions on dependents however, it does not sufficiently inform about all packages that need action. Multiple packages may be annotated with the same problem, in that case it should be given a name and the name should be the same across all instances. Other values like the message or the URL list do not need to be the same and may be adapted sensibly.
-
-For the example of Python 2 deprecation, all problems would have `name = "python2-eol"` and then a user may set `config."*".python2-eol = "ignore";` to ignore them.
 
 ### Backwards compatbility, Backporting and stable releases
 
@@ -143,11 +143,12 @@ The plan is to eventually remove packages with long outstanding problems. The de
 If a package needs to be removed for some other reason, the problem kind `removal` should be used instead:
 
 ```nix
-meta.problems = [{
-  kind = "removal";
-  message = "We don't want this in nixpkgs anymore";
-  date = "1970-01-01";
-}];
+meta.problems = {
+  removal = {
+    message = "We don't want this in nixpkgs anymore";
+    date = "1970-01-01";
+  };
+};
 ```
 
 ## Drawbacks
@@ -255,6 +256,8 @@ On the nixpkgs configuration side, the first iteration used a generic "predicate
 
 A second approach used a list type: `list of ("packageName.warningKind" or "packageName.*" or "*.warningKind" or "*.*")`. This was a binary choice (compared to the ternary value today), with an additional boolean `traceIgnoredWarnings` option. One downside is that it does not allow granular control over warnings, only evaluation failures. A bigger issue is that due to how the merge rules on lists work, it would have been difficult to provide good default values for the nixpkgs confinguration while keeping backwards compatibility.
 
+A third approach used a two-level attribute set, similarly to the list above, but with the value setting the handler instead of it being a binary choice. `"*"."*" = "error";`, `myPackage."*" = "ignore";`, `"*".maintainerless = "ignore";`, etc. This provides better merging behavior than a list, while also being more granular. However, people voiced concerns about people accidentally wildcard-ignoring everything. Also, it is ambiguous on matching problem name vs problem kind, which mostly works fine but might lead to weird things happening in the case where new kinds are introduced.
+
 ## Unresolved questions
 [unresolved]: #unresolved-questions
 
@@ -264,11 +267,12 @@ A second approach used a list type: `list of ("packageName.warningKind" or "pack
     - Properly implementing this turned out to be non-trivial, so this feature was cut for the sake of simplicity as it was not of high importance anyways.
   - The ignore mechanism has been refined so that there is less risk of missing future warnings.
 - ~~Should issues be a list or an attrset?~~·
-  - We are using a list ~~for now, there is always the possibility to also allow attrsets in the future.~~
+  - ~~We are using a list for now, there is always the possibility to also allow attrsets in the future.~~
+  - Current design uses an attribute set
 - Currently, many of the relevant nixpkgs configuration options can also be set impurely via environment variables. The `config.problemHandler` option does however not easily map to some environment variable.
   - When merging existing features into the problems system, existing environment variable will keep working in the future.
   - Maybe using less environment variables is all for the better?
-  - We may always add specific environment variables for specific use cases where needed without having to expose the full expression power of `config.problemHandler`.
+  - We may always add specific environment variables for specific use cases where needed without having to expose the full expression power of the configuration options.
 
 ## Future work
 [future]: #future-work
@@ -282,4 +286,3 @@ A second approach used a list type: `list of ("packageName.warningKind" or "pack
 - > If the advisories were a list, and we also added them for modules, maybe we could auto-generate most release notes, and move release notes closer to the code they change. [[source]](https://discourse.nixos.org/t/pre-rfc-package-advisories/19509/4)
   - Issues can certainly be automatically integrated into the release notes somehow. However, this alone would not allow us to move most of our release notes into the packages, because for many release entries breaking eval would be overkill.
 - There has been discussion about introducing "tracing aliases", aliases that don't `throw` by default. Such an implementation may make use of the problem infrastructure.
-
