@@ -41,7 +41,7 @@ It allows distinguishing between regular and doc comments. Having distinction is
 Currently, Nix does not have doc comments. Over time there evolved certain conventions, but they were never formally specified.
 Within this RFC, we want to clarify which convention we should use, harmonize and improve the format for doc-comments to achieve the envisioned goals.
 
-We use a tool called [nixdoc](https://github.com/nix-community/nixdoc) to use a `doc-comment'- like functionality, which allows us to build a subset of static documentation of the `nixpkgs.lib` functions.
+We use a tool called [nixdoc](https://github.com/nix-community/nixdoc) to use a 'doc-comment'- like functionality, which allows us to build a subset of static documentation of the `nixpkgs.lib` functions.
 
 The format of a doc-comment was, however, never specified. The nix community does not understand the rules enforced by `nixdoc`, which we believe is one of the reasons for its lack of adoption.
 
