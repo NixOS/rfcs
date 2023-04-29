@@ -69,7 +69,7 @@ Here is an example of the format understood by *nixdoc*:
 
 ## Current problems
 
-### Lack of having an agreed Format
+### Lack of having an agreed format
 
 The Nix community interprets the outer format and content of doc-comments differently. Within nixpkgs, several conventions and patterns still need to be harmonized. Some are compatible with nixdoc, while others do not and decide upon their conventions. We immediately observe one clear thing: Most of them utilize some form of markdown, even if the content is not rendered.
 
