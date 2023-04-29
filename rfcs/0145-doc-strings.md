@@ -75,7 +75,7 @@ The Nix community interprets the outer format and content of doc-comments differ
 
 In general, the format for writing documentation strings is **not specified**.
 
-The *nixdoc*-tool enforces a somewhat consistent format, but the basic format was never specified and cannot be enforced in parts of nixpkgs where nixdoc is currently not applied.
+The *nixdoc*-tool requires a somewhat consistent format, but the basic format was never specified and cannot be enforced in parts of nixpkgs where nixdoc is currently not applied.
 
 Extending the scope of *nixdoc* is not the primary goal. Instead, we should find formal rules for writing *doc-comments*. Tools like *nixdoc* can then implement against this RFC instead of the format relying on nixdoc implementation details.
 
