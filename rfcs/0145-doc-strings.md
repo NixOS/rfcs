@@ -122,7 +122,7 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 ## Discontinue nixdoc's custom format
 
-**Observing**: Nixdoc currently provides some format that can generate documentation from a small fraction of files in nixpkgs, Namely the files for `.lib` functions. The folder provides a consistent community convention that allows the building of static documentation. Applying nixdoc to files outside that directory is only partially possible due to the lack of a standard doc-comment format.
+**Observing**: Nixdoc currently provides some format that can generate documentation from a small fraction of files in nixpkgs, Namely the files for `.lib` functions. The directory provides a consistent community convention that allows the building of static documentation. Applying nixdoc to files outside that directory is only partially possible due to the lack of a standard doc-comment format.
 
 **Considering**: Should we propose the `nixdoc` format as a community standard?
 
@@ -132,7 +132,7 @@ Each subsection here contains a decision along with arguments and counter-argume
 <summary>Arguments</summary>
 
 - (+) Stays primarily compatible with the currently used comments in lib.
-    - (-) Outside the ./lib folder, nixodc is not a convention.
+    - (-) Outside the ./lib directory, nixodc is not a convention.
 - (-) Is not widely understood.
 - (-) The format is specific, should be more generic, and follow established conventions. (e.g., Markdown, Doxygen, JSdoc, Haddock)
 - (-) The format is too complex and needs a whole list of complex rules to describe the exact format and content rules; this can also be observed in many false-formatted comments that do not render correctly.
@@ -140,8 +140,7 @@ Each subsection here contains a decision along with arguments and counter-argume
     - (-) The predefined section headers/keywords are very close to natural language and may accidentally be used.
         - (-) Syntax to start new sections does not follow conventions (e.g., `Example:`) In contrast JSdoc defines `@Example`; Markdown `# Example`; Doxygen `@example`; Haskell-Haddock `>>>`
     - (-) The content is implicitly rendered differently depending on predefined rules. Those rules need to be understood/feel natural.
-- (+) Is already quite established in /lib.
-- (+) Some usages outside of /lib indicate the process of adoption.
+- (+) Some usages outside of /lib directory indicate the process of adoption.
 - (-) Some multiline comments become doc-comments, but it is unclear which comments have such a property.
     
 </details>
@@ -448,7 +447,7 @@ Some more
 
 This could be automated. (e.g., via codemod)
 
-Also, this affects only the `lib` folder and a few other places currently used to build the documentation.
+Also, this affects only the `lib` directory and a few other places currently used to build the documentation.
 
 ## Changes in the `nixdoc` tooling are required
 
