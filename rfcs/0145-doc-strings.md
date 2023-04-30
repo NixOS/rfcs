@@ -90,7 +90,7 @@ Having a distinction would allow us to build reliable and correct documentation
 
 > Note: That specific collection of links should show the amout of inconsistency within the Nix ecosystem, which is a target of this RFC.
 > 
-> The "Current tools" section contains links to some more creative tooling solutions that eveloped, while still not providing the user experience that developers are used from other ecosystems.
+> The "Current tools" section contains links to more creative tooling solutions that developed while still not providing the user experience that developers are used to from other ecosystems.
 
 #### nixpkgs - Dosctrings examples
 
