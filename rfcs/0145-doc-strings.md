@@ -26,10 +26,9 @@ However, both concerns relate closely to each other; It makes sense and reduces 
 The following are the envisioned goals.
 
 - Be able to generate documentation from code for any nix expression.
-- Be able to distinguish between documentation-relevant comments and unrelated comments.
 - Make doc comments easy to write and read
-- Be able to parse and render doc comments nicely
 - Standardize a format for doc comments that further RFCs can extend
+  - E.g. extend with code examples that can be converted to tests (aka doctests).
 
 This RFC is a significant change to existing documentation conventions.
 It allows distinguishing between regular and doc comments. Having distinction is essential because arbitrary code comments should not end up in generated documentation.
