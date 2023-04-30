@@ -57,7 +57,7 @@ Here is an example of the format understood by *nixdoc*:
      <Type signature>
   */
   AttrFunc =
-    # <Desribe arg1>
+    # <Describe arg1>
     arg1:
     # <Describe arg2>
     arg2:
