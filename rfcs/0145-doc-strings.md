@@ -42,7 +42,7 @@ Within this RFC, we want to clarify which convention we should use, harmonize an
 
 We use a tool called [nixdoc](https://github.com/nix-community/nixdoc) to use a 'doc-comment'- like functionality, which allows us to build a subset of static documentation of the `nixpkgs.lib` functions.
 
-The format of a doc-comment was, however, never specified. The nix community does not understand the rules enforced by `nixdoc`, which we believe is one of the reasons for its lack of adoption.
+The format of a doc-comment was, however, never specified. The nix community does not understand the rules required by `nixdoc`, which we believe is one of the reasons for its lack of adoption.
 
 Here is an example of the format understood by *nixdoc*:
 
