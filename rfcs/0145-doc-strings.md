@@ -84,11 +84,7 @@ Extending the scope of *nixdoc* is not the primary goal. Instead, we should find
 
 The format does not allow any distinction between doc comments and regular comments.
 
-Having a distinction would allow us to
-
-1. Find all comments that are part of the documentation
-2. Render them in the documentation format
-3. Connect the documentation to the exact places in the Nix code. 
+Having a distinction would allow us to build reliable and correct documentation
 
 ### References to the problems above
 
