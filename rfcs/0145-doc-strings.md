@@ -50,13 +50,15 @@ Here is an example of the format understood by *nixdoc*:
 # nixpkgs/lib/attrsets.nix
 
 {
-  /* <Description Field>
-     Example:
-     <Comprehensive Code example>
+  /* <Attr Description>
+  
      Type:
      <Type signature>
+     
+     Example:
+     <Comprehensive Code example>
   */
-  AttrFunc =
+  Attr =
     # <Describe arg1>
     arg1:
     # <Describe arg2>
