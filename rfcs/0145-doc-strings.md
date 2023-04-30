@@ -92,6 +92,10 @@ Having a distinction would allow us to
 
 ### References to the problems above
 
+> Note: That specific collection of links should show the amout of inconsistency within the Nix ecosystem, which is a target of this RFC.
+> 
+> The "Current tools" section contains links to some more creative tooling solutions that eveloped, while still not providing the user experience that developers are used from other ecosystems.
+
 #### nixpkgs - Dosctrings examples
 
 - [lib/attrsets](https://github.com/NixOS/nixpkgs/blob/master/lib/attrsets.nix)
@@ -182,7 +186,7 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 - (+) It is mostly compatible with the currently used multiline comments.
 - (+) Is a strict subset of multiline comments, which allows multiline documentation natively.
-- (+) Does not need Language Server (LSP) support for productive usage. (In contrast to, e.g., `##`)
+- (+) Does not need editor support for productive usage. (In contrast to, e.g., `##`)
 - (+) Allows copy-pasting content without the need for re-formatting.
   - (-) Partially re-formatting just like in multiline Nix strings (`''`) might still be needed.
 - (-) Is visually less distinctive.
@@ -227,7 +231,7 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 **Considering**: General reference logic between doc-comments and expressions.
 
-**Decision**: Doc-comments refer to the **immediately** preceded expression. Only whitespaces are allowed in between.
+**Decision**: Doc-comment refer to the expression that is **immediately** next to it. Only whitespaces are allowed between doc-comment and following expression.
 
 > Note: We are working on a generic example implementation that covers about 90% of all documentation use cases.
 
