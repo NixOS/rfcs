@@ -71,7 +71,7 @@ Here is an example of the format understood by *nixdoc*:
 
 ### Lack of having an agreed format
 
-The Nix community interprets the outer format and content of doc-comments differently. Within nixpkgs, several conventions and patterns still need to be harmonized. Some are compatible with nixdoc, while others do not and decide upon their conventions. We immediately observe one clear thing: Most of them utilize some form of markdown, even if the content is not rendered.
+The Nix community interprets the outer format and content of doc-comments differently. Within nixpkgs, several conventions and patterns need to be harmonized. It seems every directory decides upon their own convention; Or doesn't follow any. We immediately observe one clear thing: Most of comments utilize some form of markdown, even if they are not rendered.
 
 In general, the format for writing documentation strings is **not specified**.
 
@@ -123,8 +123,7 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 ## Discontinue nixdoc's custom format
 
-**Observing**: Nixdoc currently provides some format that can generate documentation from a small fraction of files in nixpkgs, Namely the files for `.lib` functions. The folder provides a consistent community convention that allows the building of static documentation. Applying nixdoc to files outside that directory is only partially possible due to the lack of a standard doc-comment format. 
-
+**Observing**: Nixdoc currently provides some format that can generate documentation from a small fraction of files in nixpkgs, Namely the files for `.lib` functions. The folder provides a consistent community convention that allows the building of static documentation. Applying nixdoc to files outside that directory is only partially possible due to the lack of a standard doc-comment format.
 
 **Considering**: Should we propose the `nixdoc` format as a community standard?
 
@@ -134,16 +133,16 @@ Each subsection here contains a decision along with arguments and counter-argume
 <summary>Arguments</summary>
 
 - (+) Stays primarily compatible with the currently used comments in lib.
-    - (-) Outside the ./lib folder, nixodc is not a convention. 
+    - (-) Outside the ./lib folder, nixodc is not a convention.
 - (-) Is not widely understood.
-- (-) Is not widely used. (e.g., Outside the /lib folder)
 - (-) The format is specific, should be more generic, and follow established conventions. (e.g., Markdown, Doxygen, JSdoc, Haddock)
 - (-) The format is too complex and needs a whole list of complex rules to describe the exact format and content rules; this can also be observed in many false-formatted comments that do not render correctly.
     - (-) The sections are implicitly continued.
     - (-) The predefined section headers/keywords are very close to natural language and may accidentally be used.
         - (-) Syntax to start new sections does not follow conventions (e.g., `Example:`) In contrast JSdoc defines `@Example`; Markdown `# Example`; Doxygen `@example`; Haskell-Haddock `>>>`
     - (-) The content is implicitly rendered differently depending on predefined rules. Those rules need to be understood/feel natural.
-- (+) It Is already quite established and has some adoptions outside the `/lib` folder.
+- (+) Is already quite established in /lib.
+- (+) Some usages outside of /lib indicate the process of adoption.
 - (-) Some multiline comments become doc-comments, but it is unclear which comments have such a property.
     
 </details>
@@ -156,6 +155,29 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 **Decision**: use `/** {content} */` as the outer format.
 
+`Example`
+
+````nix
+{
+  /**
+  The identity function
+
+  Describes in every detail why 
+  this function is important and how to use it.
+
+  # Examples
+
+  ```
+  id "foo"
+  ->
+  "foo"
+  ```
+
+  */
+  id = x: x; 
+}
+````
+
 <details>
 <summary>Arguments</summary>
 
@@ -163,6 +185,7 @@ Each subsection here contains a decision along with arguments and counter-argume
 - (+) Is a strict subset of multiline comments, which allows multiline documentation natively.
 - (+) Does not need Language Server (LSP) support for productive usage. (In contrast to, e.g., `##`)
 - (+) Allows copy-pasting content without the need for re-formatting.
+  - (-) Partially re-formatting just like in multiline Nix strings (`''`) might still be needed.
 - (-) Is visually less distinctive.
 - (-) Indentation is more complex and visually less present.
     - (+) It would be most intuitive if its indentation logic implements Nix's magic multiline strings.
@@ -195,11 +218,11 @@ Each subsection here contains a decision along with arguments and counter-argume
 - (-) Strictly binding doc comments content to commonMark might restrict users.
     - (+) Users/Tools can still use regular comments or develop alternative solutions.
 - (-) CommonMark does not specify the current rich features from nixdoc, such as predefined sections and structures that could be used as a source for automated toolings. Such as types for type-checking or examples to run automated-tests
-    - (+) Future tools can still build their conventions on top of this RFC. They might not directly specify them in an RFC but be a tool developers choose for a specific codebase. However, we have yet to get that tools. So it is good when rich features remain unspecified.    
+    - (+) Future tools can still build their conventions on top of this RFC. They might not directly specify them in an RFC but be a tool developers choose for a specific codebase. However, we have yet to get that tools. So it is good when rich features remain unspecified.
   
 </details>
 
-## Place doc-comments before the referenced expression 
+## Place doc-comments before the referenced expression
 
 **Observing**: Doc-comments currently are placed above the expression they document. More precisely, only named attribute bindings `foo = <expr>` can be documented. There is also the need to support documentation for anonymous functions. More generally, there is the need to document anonymous expressions where they are defined.
 
@@ -227,11 +250,11 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 ## Single-line doc-comments (do not exist)
 
-**Observing**: Nix offers two variants of comments; single- (`#`) and multi-line comments (`/* */`). There may be use cases where it is desirable to have a form of single-line comments subtyped for doc-comment purposes. 
+**Observing**: Nix offers two variants of comments; single- (`#`) and multi-line comments (`/* */`). There may be use cases where it is desirable to have a form of single-line comments subtyped for doc-comment purposes.
 
-**Considering**: Single-line comment for documentation.
+**Considering**: Single-line comment for documentation. (Starting a doc-comment with `#`)
 
-**Decision**: Single-line comments **cannot be used** in any form for documentation puposes.
+**Decision**: Single-line comments (starting with `#`) **cannot be used** in any form for documentation puposes.
 
 <details>
 <summary>Arguments</summary>
@@ -251,11 +274,11 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 ## Doc-comment examples
 
-The following examples demonstrate the concrete usage scenarios:
+This section contains examples for the different use cases we would end up with; Visualize them and emphasize the previously discussed characteristics.
 
 `somefile.nix`
 
-~~~nix
+````nix
 {
   /**
   Documentation for mapAttrs
@@ -275,38 +298,90 @@ The following examples demonstrate the concrete usage scenarios:
   */
   mapAttrs = f: s: <...>;
 }
-~~~
+````
 
-## Examples
-
-This section contains examples for the different use cases we would end up with; Visualize them and emphasize the previously discussed characteristics.
-
-### Attribute bindings 
+### Attribute bindings
 
 `somefile.nix`
 
-~~~nix
-{
-  /**
-  mapAttrs is a well-known function 
-  
-  # Examples
-  
-  "`Nix
-  some code examples
-  ```
-  
-  */
-  mapAttrs = f: s: #...
-}
-~~~
+````nix
+  {
+    /**
 
-### NixOS Module documentation 
+      mapAttrs is a well-known function 
+
+      # Examples
+
+      ```Nix
+      some code examples
+      ```
+    
+    */
+    mapAttrs = f: s: #...
+  }
+````
+
+### Indentation follows know nix's `''` behavior
+
+````nix
+  {
+    /**
+    Line 1
+      Line 2
+    */
+    id = f: s: #...
+  }
+````
+->
+```markdown
+Line 1
+  Line 2
+```
+
+Or with commonmark
+
+````nix
+  {
+    /**
+    # Title
+
+    Some foo bar
+
+    ## Subtitle
+
+    Some more 
+
+      indented 1
+
+        indented 2
+
+    */
+    id = f: s: #...
+  }
+````
+->
+```markdown
+# Title
+
+Some foo bar
+
+## Subtitle
+
+Some more 
+
+  indented 1
+
+    indented 2
+
+```
+
+
+### NixOS Module documentation
 
 > Note: NixOS Modules also can produce documentation from their interface declarations. However, this does not include a generic description and usage examples.
 
 `myModule.nix`
-~~~nix
+````nix
 /**
   This is a custom module.
   
@@ -316,18 +391,17 @@ This section contains examples for the different use cases we would end up with;
   
   Different use case scenarios
   how to use this module
-  
 */
 {config, ...}:
 {
   config = f: s: f s;
 }
-~~~
+````
 
-### Anonymous function documentation 
+### Anonymous function documentation
 
 `function.nix`
-~~~nix
+````nix
 /**
   This is an anonymous function implementation.
   
@@ -336,7 +410,7 @@ This section contains examples for the different use cases we would end up with;
   
   The name gets assigned later:
   
-  "`Nix
+  ```nix
   {
      plus = import ./function.nix;
   }
@@ -352,12 +426,12 @@ This section contains examples for the different use cases we would end up with;
 {
   sum = a + b;
 }
-~~~
+````
 
-### Anonymous expression documentation 
+### Anonymous expression documentation
 
 `exp.nix`
-~~~nix
+````nix
 /**
   This is an anonymous string.
  
@@ -366,19 +440,18 @@ This section contains examples for the different use cases we would end up with;
   Although this example is relatively superficial, there might be use cases.
 */
 "-p=libxml2/include/libxml2"
-~~~
+````
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-
-## Changes the existing comments inside the code base.
+## Changes the existing comments inside the code base
 
 This could be automated. (e.g., via codemod)
 
 Also, this affects only the `lib` folder and a few other places currently used to build the documentation.
 
-## Changes in the `nixdoc' tooling are required. 
+## Changes in the `nixdoc` tooling are required
 
 It remains an open question that needs to be tried;
 
@@ -397,14 +470,14 @@ Can we still build the current Nixos manuals with the new standard?
 | Inspired by | Rust | Current nixpkgs.lib | C++/Java/Javascript | Haskell Haddock |
 | Changes the existing code by | Much | Less | Even More | Less |
 | Needs Termination | No | Yes | Yes | Yes |
-| Indentation | Clear | like Nix's multiline strings, thus **Intuitive** | Poor | ? |
-| Needs vertical space  | No | Yes | Yes | Yes | 
+| Indentation | Clear | like Nix's multiline strings, thus **Intuitive** | Clear | ? |
+| Needs vertical space  | No | Yes | Yes | Yes |
 | Visual distinction from comments | High | Low | Medium | Medium |
 | Needs Autocompletion (Language Server) to continue the next line. | Yes | No | Yes | No |
 | Punctuation Variations / Amount of different special characters | 1 (Less) | 2 (Medium) | 2 (Medium) | 3 (More) |
-| Markdown compatibility (also depends on indentation clarity) | Good, but visual conflicts with headings` #` | Good | Medium | Good |
+| Markdown compatibility (also depends on indentation clarity) | Good, but visual conflicts with headings `# Title` | Good | Medium | Good |
 | breaks when interrupted with newlines | Yes | No | ? | No |
-| Simplicity (Brainload) | Medium | Simple | Complex | More Complex | 
+| Simplicity (Brainload) | Medium | Simple | Complex | More Complex |
     
 ### Refactoring note
     
@@ -416,15 +489,14 @@ nixpkgs comments:
 - `#` ~20k usages
 - `/*` ~6k usages
 - `/**` 160 usages (most empty ?)
-    
-Choosing `/**` or subsets would cause minor conflicts within current nixpkgs. While this is NOT the main reason for the final decision, it MUST be considered.
 
+Choosing `/**` or subsets would cause minor conflicts within current nixpkgs. While this is NOT the main reason for the final decision, it MUST be considered.
 
 ## Just free text as a content format
 
-While this allows the most freedom, it is usually considered the best option, not creating any restrictions. 
+While this allows the most freedom, it is usually considered the best option, not creating any restrictions.
 
-However, nix/rfc72 defines commonMark as the official documentation format. 
+However, nix/rfc72 defines commonMark as the official documentation format.
 This is why we decided to follow this convention.
 
 ## Consequences of not implementing this
@@ -452,22 +524,23 @@ This is why we decided to follow this convention.
 
 Nix already offers a bunch of LSPs, e.g., [nil](https://github.com/oxalica/nil), [rnix-lsp](https://github.com/nix-community/rnix-lsp) are the most common ones.
 
-
 ## Nixdoc
 
-Nixdoc must be changed to differentiate between regular comments and doc-comments.
+Nixdoc may be changed to differentiate between regular comments and doc-comments.
 There might be an intermediate phase of transition, where the old Syntax and features are supported in parallel to allow a phase of transition and refactoring of existing documentation comments.
 
 ## Documentation generators
 
-- Future nixdoc could have a static `map.json` that contains the scope for every discovery file/path in nixpkgs.
+We think that a future documentation tool could be out of one of the two following categories.
 
-As this second approach is much easier, we propose that we initially start to extend the scope.
+- (1) Tools that utilize static code analysis and configuration files.
 
-Generating static documentation from doc-comments would still be excellent but remains a challenge if generated from Nix dynamically.
-If we want the fully automated approach, we need something to evaluate nix expressions. 
+- (2) Tools that use dynamic evaluation to solve for tracking down name and value relationships and provide more accurate documentation with less configuration overhead.
 
-We solve such concerns in `tvix` or in `nix`, which could provide a `nix-analyzer` that pre-evaluates expressions and their respective documentation. 
+  > We could solve such concerns in [`tvix`](https://tvix.dev/) or in `nix`, which could vend a tool that pre-evaluates expressions and gathers their respective documentation.
+
+For the beginning it seems promising to start with the static approach (1). In the long term dynamic approach (2) seems more promising and accurate but requires a much deeper understanding of compilers and evaluators.
+However the border between those two variants is not strict and the community might even build tools that live in between.  
 
 ## Type
 
@@ -478,17 +551,17 @@ We solve such concerns in `tvix` or in `nix`, which could provide a `nix-analyze
 
 ## Native support in Nix
 
-- `NixOS/nix` should implement native support for doc-comments so that our users do not have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but documenting nix expressions should be natively possible.
+- `NixOS/nix` could implement native support for doc-comments so that our users do not have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but documenting nix expressions should be natively possible.
 
-# References
+## References
 
-## Other Conventions
+### Other Conventions
 
 - [Rust](https://doc.rust-lang.org/stable/reference/comments.html#doc-comments)
 - [Python](https://peps.python.org/pep-0257/)
 - [JSDoc](https://jsdoc.app/)
 
-## Related tools
+### Related tools
 
 - [Nixdoc](https://github.com/nix-community/nixdoc)
 - [Rustdoc](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html)
