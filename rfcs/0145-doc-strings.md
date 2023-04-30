@@ -101,7 +101,6 @@ Having a distinction would allow us to
 
 - [dream2nix/utils](https://github.com/nix-community/dream2nix/blob/main/src/utils/config.nix)
 - [dream2nix/templates/builder](https://github.com/nix-community/dream2nix/blob/main/src/templates/builders/default.nix)
-- more
 
 #### Current tools
 
