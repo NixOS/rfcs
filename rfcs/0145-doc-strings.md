@@ -148,7 +148,7 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 ## `/**` to start a doc-comment
 
-**Observing**: Doc-comments' outer format should be a distinctive subset of regular comments. Nevertheless, it should allow native writing without an ide or full-blown-language servers.
+**Observing**: Doc-comments' outer format should be a distinctive subset of regular comments. Nevertheless, it should allow native writing without an IDE or editor support.
 
 **Considering**: `/** {content} */` where `{content}` is the inner format which is discussed later.
 
