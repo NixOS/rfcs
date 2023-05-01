@@ -494,7 +494,7 @@ Choosing `/**` or subsets would cause minor conflicts within current nixpkgs. Wh
 
 While this allows the most freedom, it is usually considered the best option, not creating any restrictions.
 
-However, nix/rfc72 defines commonMark as the official documentation format.
+However, [RFC72](https://github.com/NixOS/rfcs/blob/master/rfcs/0072-commonmark-docs.md) defines commonMark as the official documentation format.
 This is why we decided to follow this convention.
 
 ## Consequences of not implementing this
