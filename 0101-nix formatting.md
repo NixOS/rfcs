@@ -203,14 +203,17 @@ Nevertheless, deviations should be documented and explained.*
 
 - When deciding between two *equally good* options, currently prevalent formatting style in `nixpkgs` should be followed.
 - On the top level (indentation zero), special rules may apply.
+  - TODO: Is this still relevant?
 - Two spaces are used for each indentation level, there is no vertical alignment
 - Consistency across language features is important. Syntax that behaves similarly should be formatted similarly.
 - The Nix formatting style is space heavy. Where there can be a space, there should be a space.
   - Brackets and braces are generally written with a space on the inside, like `[ `, ` ]`, `{ ` and ` }`.
   - `[]` is written as `[ ]`, same for `{ }`.
   - Exception: Parentheses are written *without* a space on the inside
+- Any two expressions that are fully on a single line must have a common (transitive) parent expression which is also fully on that line.
+  - Equivalently: If a maximally parenthesized form of a line fully contains a parenthesis pair, there must be a single outermost pair on that line, meaning it contains all of the others.
+  - TODO: Consider moving this
 - Expressions are either written on one line, or maximally spread out across lines, with no in-between (e.g. grouping).
-  - Multi-line statements increment the indentation level in the statement's "body".
   - Grouping should be done by adding blank lines or comments.
   - If there is more than one element in a list or attribute set, it should be expanded to put each on its own line
     - Rationale: singleton lists are common
@@ -389,7 +392,6 @@ inherit (attrs)
 
 - Inherit expressions can have their symbols either all on the same line as the `inherit`, or one line per element each.
 - The `(attrs)` is always on the same line as the `inherit` statement. There are no spaces on the inside of its parentheses.
-  - TODO what if attrs is long like in https://github.com/kamadorueda/alejandra/issues/367 ?
 
 ❌ Bad:
 ```nix
@@ -399,9 +401,7 @@ inherit (attrs) foo
   ;
 ```
 
-TODO
-
-Bad???
+❌ Bad:
 ```nix
 inherit
   (attrs)
@@ -409,6 +409,27 @@ inherit
   bar
   ;
 ```
+
+✅ Good:
+
+```nix
+{
+  inherit
+    (mkFruit {
+      a = "apple";
+      b = "banana";
+      c = "cherry";
+      d = "date";
+      e = "elderberry";
+    })
+    feijoa
+    grape
+    honeydew
+    ;
+}
+```
+
+- Technically this is inconsistent because the attribute set is sometimes on the same line as the `inherit` and other times not. However, this is a really niche use case and generally you won't need to write such code anyways so we are willing to sacrifice consistency for a better default.
 
 ### If-Then-Else
 
@@ -633,3 +654,19 @@ callPackage ./some/path {
 TODO https://github.com/kamadorueda/alejandra/issues/242
 
 Find a solution which is friendly to formatter implementations
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
