@@ -1,117 +1,633 @@
 ---
 feature: nix-language-version
 start-date: 2022-12-12
-author: @fricklerhandwerk
-co-authors: @thufschmitt @Ericson2314
-shepherd-team: 
-shepherd-leader: 
+author: @fricklerhandwerk @yorickvp
+co-authors: @thufschmitt @Ericson2314 @infinisil
+shepherd-team:
+shepherd-leader:
 related-issues: https://github.com/NixOS/nix/issues/7255
 ---
+
+# RFC 137 – Nix language versioning
 
 # Summary
 [summary]: #summary
 
-Introduce a convention to determine which version of the Nix language grammar to use for parsing a Nix file.
+Introduce a convention to determine which version of the Nix language grammar to use for parsing and evaluating Nix expressions.
+
+Add parameters to the Nix language evaluator, controlling the behavior of deprecation warnings and errors.
 
 # Motivation
 [motivation]: #motivation
 
-Currently it's impossible to introduce backwards-incompatible changes to the Nix language without breaking existing setups.
-This proposal is first step towards overcoming that limitation.
+The stability of Nix language has been praised on multiple occasions, e.g. [Nix and legacy enterprise software development: an unlikely match made in heaven](https://talks.nixcon.org/nixcon-2022/talk/QQPBFW/).
+Yet, as with any software system, in order to accommodate new insights, we want to allow the Nix language to evolve.
+This sometimes involves backward-incompatible ("breaking") changes that currently cannot be made without significant downstream disruption.
 
-# Detailed design
-[design]: #detailed-design
+Therefore we propose a mechanims and policies to introduce changes to the Nix language in a controlled and deliberate manner.
+It aims to avoid breaking existing setups, and to minimise maintenance burden for implementors and users.
+The goal is for new versions of the Nix language evaluator to stay backward compatible with existing Nix expressions, but not necessarily for new Nix expressions to stay forward compatible with existing evaluators.
 
-Introduce a magic comment in the first line of a Nix file:
+Regardless, changes to the language, especially breaking changes, should remain a rare exception.
 
-    #? Nix <version>
+## Motivating examples
 
-where `<version>` is a released version of Nix the given file is intended to work with.
+Incompatible changes from the past:
 
-If no magic comment is present, Nix 2.12 – the stable release at the time this RFC was accepted – is assumed.
+- [A changelog of Nix (language) versions](https://code.tvl.fyi/about/tvix/docs/lang-version.md), as reflected in `builtins.langVersion`
+- There have been other, sometimes breaking changes to the language that have not resulted in an increment of the language version (e.g. the recent `fetchGit` changes).
+- The `builtins.toJSON 1.000001` output [changed in Nix 2.12](https://github.com/NixOS/nix/issues/8259).
 
-Add an appropriate parameter to commands that allow encoding the same information where where files are not involved.
+Possbile future changes that are in discussion:
+
+- Remove URL literals (currently implemented via experimental-features)
+- Remove the old `let { body = ... }` syntax
+- Disallow leading zeroes in integer literals (such as `umask = 0022`)
+- Disallow `a.x or y` if `a` is not an attribute set
+- Simplifying semantics of `builtins.toString` and string interpolation
+- Remove the `let { body }` syntax
+- `__functor` and `__toString`, probably
+- Remove `__overrides`
+- [Make `builtins` more consistent](https://github.com/NixOS/nix/issues/7290), e.g. not exposing `map`, `removeAttrs`, `fetchGit` and and others in the global scope
+- Fix [imprecision in string representation of floating point numbers](https://github.com/NixOS/nix/pull/6238)
+- Make the `@`-pattern consistent with destructuring
+- A syntax to index into lists, e.g. `[ 1 2 3 ].0 == 1`
+- Use `,` to delimit elements of a list expression, like `[ 1, 2, 3 ]`
+- Do something about `?` meaning two different things depending on where it occurs (`{ x ? "" }:` vs `x ? ""`)
+- Better support for static analysis
+- [Syntax for hexadecimal numbers](https://github.com/NixOS/nix/pull/7695)
+
+Other discussions around language changes:
+
+- [Make path semantics less surprsing](https://github.com/NixOS/nix/issues/7338)
+- [RFC 110](https://github.com/NixOS/rfcs/pull/110) proposing a alternatives to the `with` expression
+- [Nix 2 – a hypothetical syntax](https://md.darmstadt.ccc.de/s/nix2)
+- [Nix language changes](https://gist.github.com/edolstra/29ce9d8ea399b703a7023073b0dbc00d)
+
+## Alternatives
+
+- Keep the language as implemented by Nix compatible, but socially restrict the usage of undesirable features.
+    - (+) Roughly matches the current practice, no technical change needed
+    - (+) Maintains usability of old Nixpkgs versions (up to availability of fixed-output artifacts)
+    - (+) Does not break third-party codebases before making a decision, keeping Nix a dependable upstream
+        - (-) This proposal does not allow for breakages unless there is some eventual phase-out of support
+    - (-) Strict enforcement requires extra tooling that this proposal would obviate
+    - (-) The implementation of the features that are no longer desirable still incur complexity and maintenance cost
+        - (-) It's still not really possible to make changes to the language
+
+- Introduce changes to the language with language extensions or feature flags
+  - (-) Combinatorial explosion
+      - See [Haskell language extensions] for real-world experience
+  - (-) Even more maintenance overhead
+  - (+) Allows gradual adoption of features
+      - (-) We already have experimental feature flags as an orthogonal mechanism, with the added benefit that they don't incur support costs and can be dropped without loss
+
+- Never make breaking changes to the language
+    - (+) No additional maintenance effort required
+    - (-) Blocks improvements
+    - (-) Requires additions to be made very carefully
+        - (-) Even incremental changes are really expensive that way
+    - (-) Makes solving some well-known problems impossible
+
+- Continue current practice
+    - (-) There is no process for breaking changes
+    - (-) Breaking changes are not always announced
+    - (-) There are no means of determining compatibility between expressions and evaluator versions
+
+# Detailed Design
+
+## Language versioning
+
+1. The language version is a natural number.
+
+   <details><summary>Arguments</summary>
+
+   - (+) Formally decouples the Nix language version from the Nix version
+     - (+) The Nix language is supposed to change much less often than the rest of Nix
+     - (-) There are two version numbers to keep track of
+     - (-) Makes more evident that the Nix language is a distinct architectural component of the Nix ecosystem
+   - (+) It's currently handled that way, no change needed apart from documentation
+        - See [`builtins.langVersion`] (currently undocumented)
+   - (+) Simple and unambiguous
+   - (+) Concise, even in the long term, since the language is supposed to change very rarely
+
+   [`builtins.langVersion`]: https://github.com/NixOS/nix/blob/26c7602c390f8c511f326785b570918b2f468892/src/libexpr/primops.cc#L3952-L3957
+
+   </details>
+
+   <details><summary>Alternatives</summary>
+
+   - [Calendar Versioning](https://calver.org/)
+       - (+) Provides information on when changes happened
+           - (-) This is not needed because only compatibility information is needed
+       - (-) Requires a minimum amount of characters
+           - This may be relevant depending on where it has to be encoded
+       - (+) Restricting to only the year would force language changes to be rare
+           - (+) This would allow obvious synchronisation points with Nixpkgs releases
+           - (-) It may be too much policy encoded in a mechanism
+   - [Semantic Versioning](https://semver.org/)
+       - (+) Can distinguish additions from other changes
+           - (-) This is not needed for our use case, since any addition to an expression will break for older evaluators even if the major version matches
+       - (-) Requires more characters to account for the added expressiveness
+           - This may be relevant depending on where it has to be encoded
+   - Use version numbers of Nix stable releases for specifying the version of the Nix language
+      - (+) More obvious to see for users what the current Nix version is rather than `builtins.langVersion`
+      - (-) Would tie alternative Nix language evaluators to the rest of Nix
+        - (-) One can add a command line option such that it is not more effort than `nix --version`
+          - (+) That requires adding another built-in to the public API
+        - (-) Using a language feature requires an additional steps from users to determine the current version
+            - (-) Requires adding another command line option to the public API
+      - (+) The Nix language version is decoupled Nix version numbering
+        - (+) It changes less often than the Nix version
+          - (-) That was probably due to making changes being so hard
+            - (+) The language changing slowly is a desirable property for wider adoption
+        - (-) There are two version numbers to keep track of
+
+   </details>
+
+1. The language version for Nix files is denoted in the file extension.
+
+   <details><summary>Arguments</summary>
+
+   - (+) Sidesteps misinterpretation keeping metadata out of the actual data
+   - (-) Will introduce a proliferation of syntax highlighters and other tooling
+       - (+) this is correct though, because a syntax highligher has to know the syntax if it changes with the language version
+   - (+) Makes accidental mixing of versions impossible
+       - Have to specify the file extension when importing a file
+       - (-) have to rename all files in a project to change the version
+   - (-) Makes filenames longer, introduces visual noise
+       - This is the cost of being explicit
+   - (-) `default.nix` resolving needs specification:
+       - If for `import ./foo`, all of `./foo/default.nix{6,7,8}` exist, pick the one matching the version used by the evaluator, otherwise fail
+           - Then you'd have to specify a file using a different version explicitly
+
+   </details>
+
+   <details><summary>Alternatives</summary>
+
+   - Use a magic comment at the beginning of the file
+       - (+) Makes explicit what can be expected to work
+       - (+) Enables communicating language changes systematically
+       - (+) Backwards-compatible
+         - (+) Allows for gradual adoption: opt-in until semantics is implemented in Nix *and* the first backwards-incompatible change to the language is introduced
+       - (+) Visually unintrusive
+       - (+) Self-describing and human-readable
+       - (+) Follows a well-known convention of using [magic numbers in files](https://en.m.wikipedia.org/wiki/Magic_number_(programming)#In_files)
+       - (-) May make the appearance that changing the language is harmless
+         - (+) The convention itself is harmless and independent of the development culture around the language
+       - (-) The syntax of the magic comment is arbitrary
+       - (-) There is a chance of abusing the magic comment for more metadata in the future. Let's avoid that.
+       - (-) At least one form of comment is forever bound to begin with `#` to maintain compatibility
+       - (-) Editor support is made harder, since it requires switching the language based on file contents
+       - (-) Requires significant additional effort to implement and maintain an appropriate system to make use of the version information
+       - (-) Raises the question if the new syntax should be a breaking change to the language
+           - Use a magic string that is incompatible with evaluators prior to the feature, e.g. `%? Nix <version>`
+             - (+) Makes clear that the file is not intended to be used without explicit handling of compatibility
+               - (-) Cannot be introduced gradually
+             - (+) Such a breaking change could also be reserved for later iterations of the Nix language
+
+   - Language versioning per "project"
+       - (+) This would easily allow inheriting the language version across imports (solving a lot of issues in this proposal)
+       - (-) There is currently no notion of "project"
+         - (-) Attempting to establish one would be a large undertaking and not immediately help solving the problem at hand
+       - (-) It would require a separate language to encode project metadata such as the language version
+           - The `edition` field was [removed from the flakes schema](https://github.com/NixOS/nix/commit/e5ea01c1a8bbd328dcc576928bf3e4271cb55399) for that reason, as it not not allow distinguishing data from metadata
+           - (+) Other languages do the same (Python, Haskell, Rust, JavaScript, ...)
+             - (-) Recursive (albeit smaller) problem of managing the additional langauge for project metadata
+
+   </details>
+
+1. The file extension consists of the language version followed by `.nix`.
+   Example:
+
+   ```
+   default.7.nix
+   ```
+
+   <details><summary>Arguments</summary>
+
+   - (+) Consistent with the convention of file extensions carrying soft meaning as metadata
+   – (-) A conflicting convention is for denoting nested file types, such as `tar.gz`
+   - (+) Visually least intrusive
+
+   </details>
+
+   <details><summary>Alternatives</summary>
+
+   - No separator
+       – (-) Hard to discern visually
+   - `^`
+       – (-) Overlaps with derivation output syntax
+   - `-`
+       - (+) Visually not intrusive
+   - `_`
+       – (-) Visually more intrusive
+   - All of the following characters will interfere with some tooling:
+       - `!` - shells
+       - `"` - shells
+       - `#` - URLs
+       - `$` - shells
+       - `%` - URLs
+       - `&` - shells, URLs
+       - `+` - URLs
+       - `,` - natural language
+       - `/` - paths, URLs
+       - `:` - URLs
+       - `;` - shells
+       - `=` - URLs, Nix language
+       - `?` - URLs
+       - `@` - URLs, Nix language
+       - `\` - Windows paths
+
+   </details>
+
+1. The language version for bare Nix expressions is specified with a parameter to the evaluator.
+
+1. If no language version is specified in the file name, assume version 6.
+   This is the version implemented in the stable release of Nix at the time of writing this RFC.
+
+   <details><summary>Arguments</summary>
+
+   - (+) Backwards compatible with existing evaluators
+   - (+) Does not require changing any existing code
+
+   </details>
+
+   <details><summary>Alternatives</summary>
+
+   - Assume the evaluator's current version
+       - (-) When the evaluator advances in language version, evaluation may fail on existing code
+       - (-) Defeats the purpose of explicit versioning: Which evaluator to use for a given file is left unspecified
+           - (-) Following the latest evaluator version may inadvertently break the code for older evaluators
+       - (+) Don't have to look up the latest version of the Nix language when writing code
+       - (+) Does not clutter the file names for what is supposed to be the latest version of the code
+
+   </details>
+
+1. If no version is specified when invoking the evaluator on a bare Nix expression, assume the most recent language version supported by the evaluator.
+
+1. Language versions prior to 6 are not supported.
+
+   <details><summary>Arguments</summary>
+
+   - (+) Does not require additional development effort
+   - (+) Prior langauge versions are not fully supported by current code already, and the rest of this proposal argues to deprecate old versions in the future in order to keep the implementation manageable
+   - (-) Legacy code will not get support for managing compatibility
+
+   </details>
+
+1. The Nix language evaluator provides a command to output the latest Nix language version.
+   This command provides options to list all Nix language versions supported by the evaluator.
+
+   <details><summary>Arguments</summary>
+
+   - (+) This is for convenience to determine which features are available
+
+   </details>
+
+1. `builtins.langVersion` returns the language version used for evaluating the given expression.
+
+   <details><summary>Arguments</summary>
+
+   - (+) Could make use of it for generating Nix expressions programmatically and annotating them with the correct version
+   - (+) `builtins.langVersion` is already part of the stable interface, this way we can make it pure
+   - (-) Requires maintaining more API surface without a clear use case
+
+   </details>
+
+   <details><summary>Alternatives</summary>
+
+   - Return the latest language version instead
+
+      - (-) Doesn't help to determine what is used for evaluating the current expression
+          - (+) Might provide opportunities for forward-compatible Nix code
+          - (-) Brittle and defeats the purpose of this RFC
+      - (-) Impure, the value depends on the environment
+
+   - Don't expose `builtins.langVersion` at all
+
+      - (+) No need to have this if the Nix files are versioned
+      - (+) `builtins.langVersion` is not documented and not widely used
+      - (-) Requires a Nix language version bump to implement this RFC
+
+   </details>
+
+1. Each time the language specification (currently as embodied by the Nix language evaluator) is changed, the language version must be incremented.
+
+   <details><summary>Arguments</summary>
+
+     - (+) The principled solution: guarantees reproducibility given a fixed language version
+     - (-) Implies additional overhead in development effort:
+       - Either for Nix maintainers to accommodate that practice in the release lifecycle
+         - For example, one would have to batch language changes for a version bump to limit the number of increments
+           - (+) This would be beneficial for alternative implementations in terms of churn and effort to keep up
+       - Or implementors of alternative evaluators catching up with changes
+         - (+) Specifying the language precisely via the version actually offers alternative implementations an alternative to catching up: only support a given language version
+     - (+) This essentially nudges one to organise Nix language (specification or evaluator implementation ) development to be more independent of the rest of Nix
+       This is good, since it in turn forces stronger separation of concerns and more architectural clarity
+     - (-) Prohibits best-effort attempts at evaluating expressions with possibly incompatible evaluators
+       - (+) With the proposed level of strictness, one doesn't have to rely on best effort but can instead be explicit
+     - (-) Fixing evaluator bugs (i.e., clearly unintended behavior) after releases would technically require a version bump and therefore (theoretically) cooperation by expression authors
+       - This could be communicated with an increment in the Nix patch-level version, as is already practice
+
+   </details>
+
+   <details><summary>Alternatives</summary>
+
+   - Bump version only when evaluation result on prior version evaluators would be *substantially* different
+     - (+) Leaves room for judgement by developers
+       - (+) Allows controlling progression of versions to some degree
+     - (-) Conversely, leaves room for sneaking in breaking changes unannounced
+       - (-) This loses compatibility guarantees we'd get from a stricter paradigm
+       - (-) Deprives expression authors of ability to be selective with evaluator versions
+     - (-) Due to hashing this is often not much different from taking *any* change into account
+   - Bump version when prior evaluators would fail
+     - (-) Derivation hashes may change between evaluator versions if different evaluation results were allowed within one version
+       - This amounts to giving up on specifying the language exhaustively using a version label
+     - (+) Fewer version increments or precautions required given current development practice
+
+   </details>
+
+1. Whenever Nix drops support for evaluating prior language versions, a major version bump is required.
+
+   Example: Assuming the current language version is 8, the Nix release version is 2.20, and support for language version 6 is dropped, the next Nix release must be version 3.0
+
+   <details><summary>Arguments</summary>
+
+   - (+) This enforces that existing code that works will not break inadvertently when upgrading Nix
+
+   </details>
+
+1. Semantics are preserved across file boundaries for past language versions.
+
+   Example: [Best-effort interoperability](#best-effort-interoperability)
+
+   <details><summary>Arguments</summary>
+
+   - (+) This allow for incremental evolution of code bases without having to change existing code at all.
+   - (+) Expressions that are valid today will still be valid as long as a given evaluator supports the language version they are written in
+   - (+) The root of evaluation is always at a language version determined by the user, and authors of expressions in newer language versions are responsible (and made aware of the fact by the file name signaling proposed here) to interoperate with existing code
+   - (-) Passing around incompatible values (e.g. builtins or data types) between language versions can lead to surprising errors
+     - (+) We can postpone dealing with particular issues as they arise, but the general setup should support most cases on a best(-and-minimal)-effort basis
+     - (+) In any case, such breakages will only happen when adding new code, and will never break existing code
+
+   </details>
+
+   <details><summary>Alternatives</summary>
+
+   - Do not support version interoperability at all
+     - (+) Avoids any unforseen issues at no cost
+     - (-) Prohibits incremental changes, as any language update will require updating all files involved
+   - Do not support passing values to functions from older language versions
+     - (-) Calling functions is the most common use case, and you can hardly do anything without it
+
+   </details>
+
+1. It is not possible to import expressions written in newer versions.
+
+   Example: [Expressions are not forward compatible](#expressions-are-not-forward-compatible)
+
+1. The Nix evaluator provides options to issue deprecation warnings and errors against a language version newer than the one under evaluation.
+   A detailed design is provided in the next section.
+
+   <details><summary>Arguments</summary>
+
+   - (+) This allows systematic migration of existing code written for prior evaluators to the most recent language version
+   - (+) It will notify users about what's going on instead of just breaking
+   </details>
+
+## Deprecation warnings and errors
+
+1. Each language construct to deprecate relative to a prior version is given a symbolic name.
+   There is a way to refer to all language constructs.
+
+   Examples: `url-literal`, `let-body`, `int-leading-zeros`
+
+   These symbolic names must not be reused in future versions.
+   Names for experimental language constructs of prior versions can be reused.
+
+   <details><summary>Arguments</summary>
+
+   - (+) Disallowing reuse precludes dealing with change of meaning across versions
+   - (+) Not considering experimental features simplifies their handling and is not required by them being exempt from compatibility guarantees.
+
+   </details>
+
+1. The following options for issuing warning and errors are supported:
+
+  - Default:
+      - Issue warnings on deprecated language constructs without considering imported expressions written in prior versions
+  - Don't warn (selection):
+      - Do not issue warnings for selected language constructs
+  - Errors instead of warnings (selection):
+      - Throw an error instead of a warning for selected language constructs
+      - The error setting overrides the warning setting
+  - Recursive (version bound):
+      - Issue warnings or errors on imported expressions written in prior versions (higher or equal than the version bound)
+  - Verbose mode. During evaluation:
+    - In non-verbose mode, issue a message once for each deprecated construct
+    - In verbose mode, issue a message for each occurrence
+
+   For example, this can be exposed as the following flags:
+
+   ```
+   --lang-no-warn=all
+   --lang-no-warn="url-literal let-body int-leading-zeroes non-attr-select"
+   --lang-error=all
+   --lang-error="url-literal let-body int-leading-zeroes non-attr-select"
+   --lang-warn-recursive=6
+   --lang-warn-verbose
+   ```
+
+   The naming may need some bikeshedding. For example, one could use the same syntax as with C-compilers (probably not though):
+
+   - `-Wall`
+   - `-Wno-`
+   - `-Werror=`
+
+   <details><summary>Arguments</summary>
+
+   - (+) Disallowing reuse avoids dealing with change of meaning across versions
+   - (+) Not considering experimental features simplifies their handling and is not required by them being exempt from compatibility guarantees.
+   - (-) Maintenance burden for everyone using these old constructs, or evaluating old revisions of Nixpkgs.
+   
+   </details>
+
+   <details><summary>Alternatives</summary>
+
+   - Opt-in warnings
+     - (-) Can't really make breaking changes as people won't be warned ahead of time
+   - No warnings, just errors
+     - (-) Doesn't offer a transition window to users
+     - (+) Easier to implement
+
+   </details>
+
+1. A the end of the evaluation, print statistics and explanations.
+   The specifics of displaying warnings and errors is up to implementation, but should include the symbolic name of the langauge construct in question.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-```nix
-#? Nix 2.12
-"nothing"
+## Show the current Nix language version
+
+```console
+nix --language-version
+7
 ```
 
-# Arguments
-[advantages]: #advantages
+```console
+nix --supported-language-versions
+6
+7
+```
 
-* (+) Makes explicit what can be expected to work.
-* (+) Enables communicating language changes systematically.
-* (+) Backwards-compatible
-  * (+) Allows for gradual adoption: opt-in until semantics is implemented in Nix *and* the first backwards-incompatible change to the language is introduced.
-* (+) Visually unintrusive
-* (+) Self-describing and human-readable
-* (+) Follows a well-known convention of using [magic numbers in files](https://en.m.wikipedia.org/wiki/Magic_number_(programming)#In_files)
-* (-) May make the appearance that changing the language is harmless.
-  * (+) The convention itself is harmless and independent of the development culture around the language.
-* (-) The syntax of the magic comment is arbitrary.
-* (-) There is a chance of abusing the magic comment for more metadata in the future. Let's avoid that.
-* (-) At least one form of comment is forever bound to begin with `#` to maintain compatibility.
-* (-) It requires significant additional effort to implement and maintain an appropriate system to make use of the version information.
+## Version interoperability
 
-# Alternatives
-[alternatives]: #alternatives
+### Versioned built-ins can be passed across file boundaries
 
-- Never introduce backwards-incompatible changes to the language.
+```nix
+# a.6.nix
+builtins.langVersion
+```
 
-  * (+) No additional effort required.
-  * (-) Requires additions to be made very carefully.
-  * (-) Makes solving some well-known problems impossible.
+```nix
+# b.7.nix
+[ (import ./a.6.nix) builtins.langVersion ]
+```
 
-- Use the output of [`builtins.langVersion`] for specifying the version of the Nix language.
+```console
+$ nix-instantiate --eval b.7.nix
+[ 6 7 ]
+```
 
-  * (+) This would serve other Nix language evaluators which are not and should not be tied to the rest of Nix.
-  * (-) `builtins.langVersion` is currently only internal and undocumented.
-    * (+) Documentation is easy to add.
-      * (-) Requires adding another built-in to the public API.
-    * (-) Using a language feature requires an additional steps from users to determine the current version.
-      * (+) We can add a command line option such that it is not more effort than `nix --version`.
-        * (-) Requires adding another command line option to the public API.
-  * (+) The Nix language version is decoupled Nix version numbering.
-    * (+) It changes less often than the Nix version.
-      * (-) That was probably due to making changes being so hard.
-    * (-) There are two version numbers to keep track of.
-  * (-) The magic comment should reflect that it's specifying the *Nix language* version, which would make it longer.
-    * (-) Renaming the Nix language will be impossible once the mechanism is part of stable Nix.
+### `default.nix` handling is version-sensitive
 
-[`builtins.langVersion`]: https://github.com/NixOS/nix/blob/26c7602c390f8c511f326785b570918b2f468892/src/libexpr/primops.cc#L3952-L3957
+```nix
+# default.6.nix
+builtins.langVersion
+```
 
-- Use a magic string that is incompatible with evaluators prior to the feature, e.g. `%? Nix <version>`.
+```nix
+# foo.7.nix
+import ./.
+```
 
-  * (+) Makes clear that the file is not intended to be used without explicit handling of compatibility.
-    * (-) Cannot be introduced gradually.
-  * (+) Such a breaking change could also be reserved for later iterations of the Nix language.
+```console
+$ nix-instantiate --eval foo.7.nix
+error: getting status of '/home/$USER/default.7.nix': No such file or directory
+```
+
+### Expressions are not forward compatible
+
+```nix
+# a.7.nix
+builtins.langVersion
+```
+
+```nix
+# b.6.nix
+import ./a.7.nix
+```
+
+```console
+$ nix-instantiate --eval foo.7.nix
+error: unsupported Nix language version 7
+```
+
+
+### Best-effort interoperability
+
+```nix
+# a.6.nix
+{ increment }:
+increment 1
+```
+
+```nix
+# b.7.nix
+import ./a.6.nix { increment = x: x + 1 }
+```
+
+Since `increment` written in version 7 carries its own implementation with it, forcing it within an expression written in version 6 just works:
+
+```console
+$ nix-instantiate --eval b.7.nix
+2
+```
+
+### Pathological example
+
+Usually existing code will be interacted with by calling functions.
+When passing values from newer versions to functions from older versions of the language, interoperatbility can only be supported on a best-effort basis.
+
+```nix
+# a.6.nix
+{ value }:
+value + 1
+```
+
+Here we pretend that langauge version 7 introduced a new value type and syntax for complex numbers:
+
+```nix
+# b.7.nix
+import ./a.6.nix { value = %5 + 7i%; }
+```
+
+```console
+$ nix-instantiate --eval b.7.nix
+error: unsupported value type `complex` at built-in operator `+`
+```
+
+## Deprecation warnings
+
+```
+nix eval --json ./test.nix
+warning: URL literals are deprecated (url-literal)
+         please replace this with a string: "https://nixos.org"
+
+       at test.nix:1:1:
+
+            1| https://nixos.org
+             | ^
+
+"https://nixos.org"
+
+warning: The following deprecated features were used:
+  - url-literal (httsp://nixos.org), 1 time
+
+  Add `--lang-warn-verbose` to show all occurrences
+  Use `--lang-no-warn=url-literal` to disable this warning.
+  Use `--lang-error=url-literal` to issue errors instead of warnings.
+```
 
 # Prior art
 
 - [Rust `edition` field]
 
-  Rust has an easier problem to solve. Cargo files are written in TOML, so the `edition` information does not have to be part of Rust itself.
+  Rust has an easier problem to solve.
+  Cargo files are written in TOML, so the `edition` information does not have to be part of Rust itself.
+
+  [Rust `edition` field]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-edition-field
+
+- [Haskell language extensions]
+
+  Haskell allows enabling separate language features per file.
+
+  [Haskell language extensions]: https://downloads.haskell.org/ghc/latest/docs/users_guide/exts/intro.html
+
+- JaveScript modules
+    - .cjs and .mjs extensions for commonjs/es-modules syntax variants
+    - `function() { "use strict"; return 10 }`
 
 - [Flakes `edition` field]
 
   There had been an attempt to include an `edition` field into the Flakes schema.
   It did not solve the problem of having to evaluate the Nix expression using *some* version of the grammar.
 
-[Rust `edition` field]: https://doc.rust-lang.org/cargo/reference/manifest.html#the-edition-field
-[Flakes `edition` field]: https://discourse.nixos.org/t/nix-2-8-0-released/18714/6
-
-# Unresolved questions
-[unresolved]: #unresolved-questions
-
-- Is the proposed magic number already in use in [other file formats](https://en.m.wikipedia.org/wiki/Magic_number_(programming)#In_files)?
-- Should we allow multiple known-good versions in one line?
+  [Flakes `edition` field]: https://discourse.nixos.org/t/nix-2-8-0-released/18714/6
 
 # Future work
 [future]: #future-work
 
-- Define semantics, that is, what exactly to do with the information given in the magic comment.
-- Define rules deciding when a change to the language is appropriate to avoid proliferation and limit complexity of implementation.
+- Define rules deciding when a change to the language is appropriate, to avoid version proliferation and limit complexity of implementations.
