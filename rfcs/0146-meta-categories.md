@@ -164,6 +164,19 @@ stdenv.mkDerivation {
 
 ```
 
+In a `nix repl`:
+
+```
+nix-repl> :l <nixpkgs>
+Added XXXXXX variables.
+
+nix-repl> pkgs.bochs.meta.categories
+[ { ... } ]
+
+nix-repl> map (z: z.name) pkgs.bochs.meta.categories
+[ "debugger" "emulator" ]
+```
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
