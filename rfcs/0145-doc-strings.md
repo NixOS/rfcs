@@ -16,7 +16,7 @@ Propose a standard format specification for Doc-comments.
 This RFC includes two concerns that define a doc-comment:
 
 - Outer format rules to allow distinction between regular comments and doc-comments
-- Inner format rules that describe the required format of the content. 
+- Inner format rules that describe the required format of the content.
 
 However, both concerns relate closely to each other; It makes sense and reduces bureaucracy to address that in a single RFC.
 
@@ -33,7 +33,12 @@ The following are the envisioned goals.
 This RFC is a significant change to existing documentation conventions.
 It allows distinguishing between regular and doc comments. Having distinction is essential because arbitrary code comments should not end up in generated documentation.
 
-> Hint: Generating static documentation is controvert topic in nixpkgs. We found that it is impossible to generate accurate documentation statically. A correct solution would involve the evaluation of expressions in some way.
+> Note: Generating static documentation is a controversial topic in nixpkgs.[^1][^2][^3][^4] We found that it is very hard to generate accurate documentation statically. A correct solution would involve the evaluation of expressions in some way.
+
+[^1]: [Unmerged PR: nix repl doc-comments](https://github.com/NixOS/nix/pull/1652), 2017
+[^2]: [Unmerged PR: doc-strings for functors](https://github.com/NixOS/nix/pull/5527), 2021
+[^3]: [discourse: users asking how to obtain documentation](https://discourse.nixos.org/t/how-to-generate-documentation-from-arbitrary-nix-code/22292), 2022
+[^4]: [discourse: aksing for consensus on documentation](https://discourse.nixos.org/t/any-consensus-on-documentation-generation-tool-for-nixpkgs-manual/15550), 2021
 
 ## Current State
 
@@ -88,26 +93,19 @@ Having a distinction would allow us to build reliable and correct documentation
 
 ### References to the problems above
 
-> Note: That specific collection of links should show the amout of inconsistency within the Nix ecosystem, which is a target of this RFC.
-> 
-> The "Current tools" section contains links to more creative tooling solutions that developed while still not providing the user experience that developers are used to from other ecosystems.
+> Note: That specific collection of links should show the amount of inconsistency within the Nix ecosystem, which is a target of this RFC.
 
-#### nixpkgs - Dosctrings examples
+#### nixpkgs - doc-comment examples
 
 - [lib/attrsets](https://github.com/NixOS/nixpkgs/blob/master/lib/attrsets.nix)
 - [trivial-builders](https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders.nix)
 - [stdenv/mkDerivation](https://github.com/NixOS/nixpkgs/blob/master/pkgs/stdenv/generic/make-derivation.nix)
 - [nixos/lib/make-disk-image](https://github.com/NixOS/nixpkgs/blob/master/nixos/lib/make-disk-image.nix)
 
-#### frameworks
-
-- [dream2nix/utils](https://github.com/nix-community/dream2nix/blob/main/src/utils/config.nix)
-- [dream2nix/templates/builder](https://github.com/nix-community/dream2nix/blob/main/src/templates/builders/default.nix)
-
 #### Current tools
 
-Other tools that work directly with the nix AST and comments.
-Those would strategically benefit from this RFC, even if it means refactoring and migration efforts.
+We collected some Tools that work directly with the nix AST and comments.
+Those would benefit from a standardized doc-comment.
 
 - [noogle](https://noogle.dev) - Nix API search engine. It allows searching functions and other expressions.
 - [nix-doc](https://github.com/lf-/nix-doc) - A Nix developer tool leveraging the rnix Nix parser for intelligent documentation search and tags generation
@@ -272,29 +270,31 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 ## Doc-comment examples
 
-This section contains examples for the different use cases we would end up with; Visualize them and emphasize the previously discussed characteristics.
+This section contains many examples for some different use cases we; Visualize them and emphasize the previously discussed characteristics.
 
 `somefile.nix`
 
 ````nix
 {
   /**
-  Documentation for mapAttrs
+  Documentation for the fundamental 'id' function
   
-  # Example
+  # Examples
   
   ```
-  mapAttrs {attr = "foo"; } ...
+  id 1
+  =>
+  1
   ```
   
   # Type
   
   ```
-  mapAttrs :: a -> b -> c
+  id :: a -> a 
   ```
   
   */
-  mapAttrs = f: s: <...>;
+  id = x: x;
 }
 ````
 
@@ -310,8 +310,8 @@ This section contains examples for the different use cases we would end up with;
 
       # Examples
 
-      ```Nix
-      some code examples
+      ```
+      # some code examples
       ```
     
     */
@@ -320,6 +320,9 @@ This section contains examples for the different use cases we would end up with;
 ````
 
 ### Indentation follows know nix's `''` behavior
+
+Indentation follows the know `''`-nix multiline strings behavior.
+Making usage more intuitive and and one point less to think about.
 
 ````nix
   {
@@ -336,7 +339,7 @@ Line 1
   Line 2
 ```
 
-Or with commonmark
+Or more advanced
 
 ````nix
   {
@@ -357,7 +360,7 @@ Or with commonmark
     id = f: s: #...
   }
 ````
-->
+=>
 ```markdown
 # Title
 
@@ -406,19 +409,7 @@ Some more
   It does not have a name yet. 
   Nevertheless, documentation can be right next to the implementation.
   
-  The name gets assigned later:
-  
-  ```nix
-  {
-     plus = import ./function.nix;
-  }
-  ```
-  
-  (Future) native Nix or community tools provide 
-  implementations to track doc-comments within the Nix evaluator.
-  Documentation of `sum` can then be inferred. 
-  This still needs to be specified/implemented!
-
+  The name gets assigned later.
 */
 {a, b}:
 {
@@ -462,7 +453,7 @@ Can we still build the current Nixos manuals with the new standard?
 [alternatives]: #alternatives
 
 ## All considered outer formats
-    
+
 | Property / Approach | `##` | `/** */` | `Javadoc` | `/*\|` or `/*^`  |
 |---|---|---|---|---|
 | Inspired by | Rust | Current nixpkgs.lib | C++/Java/Javascript | Haskell Haddock |
@@ -476,11 +467,11 @@ Can we still build the current Nixos manuals with the new standard?
 | Markdown compatibility (also depends on indentation clarity) | Good, but visual conflicts with headings `# Title` | Good | Medium | Good |
 | breaks when interrupted with newlines | Yes | No | ? | No |
 | Simplicity (Brainload) | Medium | Simple | Complex | More Complex |
-    
+
 ### Refactoring note
-    
+
 **Observing**: From a refactoring perspective, it might also be interesting to see how many conflicts the different formats would cause.
-    
+
 nixpkgs comments:
 
 - `##` ~4k usages (most of them for visual separation, e.g., `###########`)
@@ -508,13 +499,12 @@ This is why we decided to follow this convention.
 
 - Will `nix` itself implement native support like in rust -> `cargo doc`?
 
-- How can a tool keep the connection from where a docstring was defined and where the attribute was exposed (lib/default. Nix exposes mapAttrs which is defined at lib/attrsets. Nix)
-  - There are more complicated things.
-
-**Possible answer**: This is a tooling question; implementation details will not be discussed in detail. It is possible to track comments in the AST. As shown before in this PR: [nix/#1652](https://github.com/NixOS/nix/pull/1652)
-
 # Future work
 [Future]: #future-work
+
+## Migrate the existing comments
+
+Reformating existing doc-comments but also filtering out those who are not part of a documentation. e.g., Whether they are just empty or contain irrelevant information.
 
 ## Editor support
 
@@ -522,23 +512,22 @@ This is why we decided to follow this convention.
 
 Nix already offers a bunch of LSPs, e.g., [nil](https://github.com/oxalica/nil), [rnix-lsp](https://github.com/nix-community/rnix-lsp) are the most common ones.
 
-## Nixdoc
+## nixpkgs Manual tooling
 
-Nixdoc may be changed to differentiate between regular comments and doc-comments.
-There might be an intermediate phase of transition, where the old Syntax and features are supported in parallel to allow a phase of transition and refactoring of existing documentation comments.
+The current tooling needs to be adopted to this change. With supporting the new format the currently existing scope can be retained to build the nixpkgs manual.
 
-## Documentation generators
+## Enhanced Documentation generators
 
 We think that a future documentation tool could be out of one of the two following categories.
 
-- (1) Tools that utilize static code analysis and configuration files.
+- (1) Tools that utilize static code analysis and configuration files. (This is the current approach)
 
-- (2) Tools that use dynamic evaluation to solve for tracking down name and value relationships and provide more accurate documentation with less configuration overhead.
+- (2) Tools that use dynamic evaluation to attach name and value relationships and provides more accurate documentation with less configuration overhead.
 
   > We could solve such concerns in [`tvix`](https://tvix.dev/) or in `nix`, which could vend a tool that pre-evaluates expressions and gathers their respective documentation.
 
-For the beginning it seems promising to start with the static approach (1). In the long term dynamic approach (2) seems more promising and accurate but requires a much deeper understanding of compilers and evaluators.
-However the border between those two variants is not strict and the community might even build tools that live in between.  
+For the beginning it seems promising to start with the static approach (1). In the long term a dynamic approach (2) seems more promising and accurate but requires a much deeper understanding of compilers and evaluators.
+However the border between those two variants is not strict and we might find future tools that fit our needs just perfectly.
 
 ## Type
 
@@ -558,6 +547,7 @@ However the border between those two variants is not strict and the community mi
 - [Rust](https://doc.rust-lang.org/stable/reference/comments.html#doc-comments)
 - [Python](https://peps.python.org/pep-0257/)
 - [JSDoc](https://jsdoc.app/)
+- [Go Doc Comments](https://go.dev/doc/comment)
 
 ### Related tools
 
