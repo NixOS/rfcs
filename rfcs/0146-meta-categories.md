@@ -214,6 +214,7 @@ For now we stick to a set `{ name, description }`.
 
 - Curation of categories.
 - Update documentation.
+- Update Continuous Integration.
 
 # References
 [references]: #references
