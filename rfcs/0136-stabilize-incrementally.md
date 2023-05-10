@@ -21,18 +21,13 @@ With the goal of ending this current limbo and soothe longstanding tensions in t
 
 2. Establish an incremental plan adhering to the principles deciding on the order and priority in which to stabilize these features:
 
-   - First, the non-Flakes CLI wll be stabilized, in phases.
+   - First, the non-Flakes CLI will be stabilized, in phases corresponding to Nix's architecture.
 
    - Afterwards, Flakes itself and its CLI components can be stabilized. The final design of Flakes will also require another RFC.
 
-# Motivation
-[motivation]: #motivation
+# Problem statement
+[problem-statement]: #problem-statement
 
-Rewrite:
-Nix currently has a somewhat layered interface, but this is a mere implementation detail.
-Users of Nix could easily never know this.
-
-Old:
 For the past few years, we've accumulated a massive backlog of unstable features in the form of the new command-line interface and flakes.
 There is now a growing desire to stabilize those features, but as of yet no plan on exactly how to do so.
 The tension between that desire and a lack of a clear plan has loomed over our heads for a while; this RFC aims to dispel it by providing a concrete plan, an plan that hopefully will mitigate the lingering controversies and tensions around Flakes.
@@ -69,6 +64,8 @@ But without the ability to populate some sort of initial list of store paths tha
 This is especially noticeable for new CLI features that *previously did*, in fact, work without Flakes.
 For example, in earlier versions of Nix, `nix search` worked without Flakes.
 
+# High-level design
+
 ## A plan all sides can be happy with
 
 Stabilizing the new CLI and Flakes will end the saga of the past few years.
@@ -92,6 +89,25 @@ The CLI is more broadly popular, but still is a lot of material to discuss.
 The store-only subcommands are Nix's "plumbing" as opposed to "porcelain" commands, and thus have the simplest (if not most user-friendly) purposes.
 This "dusty corner" of the new CLI is rather calm with a very constrained design space, and far less acrimony.
 
+## A plan so we don't get in this situation again
+
+We could just make up a plan for the CLI and Flakes --- everything discussed so far.
+But that begs the question, where is that plan coming from?
+Is it is ad-hoc reasoning just for this case, or following from some larger principles?
+
+We want to get out of the current situation, but we also want to make sure that we don't get in this situation again.
+So this RFC also tries to come up with a set of larger principles that are meant to "show where the current plan is coming from", and and also set up ways of working so that these issues shouldn't arrive again.
+
+The more narrow of these principles is about how experimental features are developed and stabilized.
+This hopefully is fairly uncontroversial and dovetails with the [experimental feature lifecycle documentation](https://nixos.org/manual/nix/stable/contributing/experimental-features.html) that was recently added to Nix.
+
+The broader of these principles is about Nix's architecture and a renewed commitment to layering.
+It is the opinion of the author and shepherds (?) that lying behind some process woes is architectural uncertainty
+--- Flakes being relatively big and addressing many things at once made it a somewhat unavoidable magnet for controversy even if the process we wanted was perfectly followed.
+
+Together this gives us a good "defense in depth":
+we enshrine a process which should keep tensions down, and we seek to avoid features/behavior which would tempt us by its scope to veer from that process the first place.
+
 ## Conclusion
 
 By starting with this relatively easy material to stabilize (The CLI, in waves), we can prove we can all come together as a community to agree on a design after all.
@@ -102,9 +118,6 @@ We recognize that Flakes is widely used and will take precautions to ensure user
 # Detailed design
 [design]: #detailed-design
 
-While we could just move along and stabilize flakes bit-by-bit, in order to ensure a good Nix architecture now and for the future we start by establishing principles Nix should be guided by.
-These principles should prevent similar problems from happening in the future and give us a target to strive for with the existing Nix.
-
 The detailed design of this RFC consists of these parts:
 
 - Establishing Principles
@@ -112,7 +125,7 @@ The detailed design of this RFC consists of these parts:
 
     - Basic stabilization process principles
 
-- Plan brining Nix into compliance with the principles, and specifying the order the outstanding unstable CLI and Flakes features will be tackled.
+- Plan bringing Nix into compliance with the principles, and specifying the order the outstanding unstable CLI and Flakes features will be tackled.
 
 ## Layering principles
 
@@ -146,10 +159,14 @@ These basic layering principles will be added to the [Nix architecture documenta
 
 ## The general stabilization process --- audit, refine, and *then* stabilze
 
-Stabilization is not a matter of just flipping a switch on an implementation that has accrued for a period of time.
+See the [current documentation on experimental features and their lifecyle](https://nixos.org/manual/nix/stable/contributing/experimental-features.html).
+
+**TODO perhaps cut this down to be more of a diff against the above, rather than redundant in many ways.8**
+
+Stabilization of any feature, not just the CLI or Flakes, is not a matter of just flipping a switch on an implementation that has accrued for a period of time.
 Because the moment before stabilization is our last chance to make major changes, it is crucial that we look over what is being stabilized.
 
-To stabilize a piece of function we must do these things:
+To stabilize a piece of functionality we must do these things:
 
 1. **Audit the functionality**
 
@@ -166,9 +183,9 @@ To stabilize a piece of function we must do these things:
    Note that for large, complex, and controversial features, an RFC is also required (per usual) to advance to the next step.
    The acceptance of the RFC concludes the "propose refinements" step.
 
-3. **Create a "release candidate"**
+3. **Ensure the candidate feature to be stabilized is just under one flag**
 
-   It should be possible to enable just the experimental that is ready for stabilization *in isolation*, without also enabling other unstable functionality.
+   It should be possible to enable just the experimental that is ready for stabilization *in isolation*, without also enabling other unstable functionality that is not ready for stabilization.
    This is important to allow users (and tests!) to try it out and make sure it is a meaningful feature in its own right, and not just a partially-complete things that relies on the further unstable features.
 
    If we have an RFC, the release candidate experimental feature should match the RFC.
@@ -259,7 +276,6 @@ It is OK to stabilize features that violate the layering principles, *only* so l
 [examples-and-interactions]: #examples-and-interactions
 
 Having laid out the plan, let us now return to how the current situation is characterized and see if the various facts that the factions orient themselves are respected.
-
 
 ## Layering principles
 
