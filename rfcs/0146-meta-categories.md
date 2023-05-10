@@ -232,7 +232,7 @@ For now we stick to a set `{ name, description }`.
 # Future work
 [future]: #future-work
 
-- Curation of categories.
+- Curate the categories.
 - Update documentation.
 - Update Continuous Integration.
 
