@@ -227,7 +227,10 @@ The most immediate drawbacks are:
 [unresolved]: #unresolved-questions
 
 Still unsolved is what data structure is better suited to represent a category.
-For now we stick to a set `{ name, description }`.
+
+- For now we stick to a set `{ name, description }`.
+- Given the redundancy of the option above, another possibility is something
+  like `nameOfCategory = { description = ""; . . . }`
 
 # Future work
 [future]: #future-work
