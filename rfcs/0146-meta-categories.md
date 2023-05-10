@@ -216,6 +216,13 @@ The most immediate drawbacks are:
      are doing this just fine for years on end, and we can easily imitate them -
      and even better, given we have Nix language machinery available.
 
+     - A well-made categorization is useful for specialized search engines,
+       adding a new field for narrowing searches.
+
+   - The complete removal of categorization is too harsh. A solution that keeps
+     and enhances the categorization is way more preferrable than one that nukes
+     it completely.
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
