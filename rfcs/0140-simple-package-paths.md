@@ -13,7 +13,7 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/211832
 [summary]: #summary
 
 Auto-generate trivial top-level attribute definitions in `pkgs/top-level/all-packages.nix` from a directory structure that matches the attribute name.
-This makes it much easier to contribute new packages, since there's no more guessing needed as to where the package should go, both in the ad-hoc directory categories and in `pkgs/top-level/all-packages.nix`.
+This makes it much easier to contribute new packages, since there's no more guessing needed as to where the package should go, both in the ad-hoc directory categories and in `all-packages.nix`.
 
 # Motivation
 [motivation]: #motivation
@@ -23,9 +23,9 @@ This makes it much easier to contribute new packages, since there's no more gues
   - What are all the categories and do they matter?
   - What if the package has multiple matching categories?
   - Why can't I build my package after adding the package file?
-  - Where in all-packages.nix should my package go?
+  - Where in `all-packages.nix` should my package go?
 - Figuring out where an attribute is defined is a bit tricky:
-  - First one has to find the definition of it in all-packages.nix to see what file it refers to
+  - First one has to find the definition of it in `all-packages.nix` to see what file it refers to
     - On GitHub this is even more problematic, as the `all-packages.nix` file is [too big to be displayed by GitHub](https://github.com/NixOS/nixpkgs/blob/nixos-22.05/pkgs/top-level/all-packages.nix)
   - Then go to that file's definition, which takes quite some time for navigation (unless you have a plugin that can jump to it directly)
     - It also slows down or even locks up editors due to the file size
@@ -36,6 +36,7 @@ This makes it much easier to contribute new packages, since there's no more gues
 [design]: #detailed-design
 
 This RFC consists of two parts, each of which is implemented with a PR to Nixpkgs.
+These PR's should be done after a release to maximize the testing period and minimize merge conflicts.
 
 ## PR 1: The unit directory standard
 
@@ -49,7 +50,7 @@ Create the initially-empty directory `pkgs/unit`, called _unit base directory_, 
 
 Check the following using CI:
 - The unit base directory must only contain subdirectories of the form `pkgs/unit/${shard}/${name}`, called _unit directories_.
-- `name` is a string only consisting of the ASCII characters a-z, A-Z, 0-9, `-` or `_`.
+- `name` is a string only consisting of the ASCII characters `a-z`, `A-Z`, `0-9`, `-` or `_`.
 - `shard` is the lowercased first two letters of `name`, expressed in Nix: `shard = toLower (substring 0 2 name)`.
 - Each unit directory must contain a `package.nix` file and may contain arbitrary other files.
 
@@ -70,33 +71,29 @@ with an arbitrary `args`.
 Check the following using CI for each unit directory:
 - `pkgs.${name}` is defined as above, either automatically or with some `args` in `pkgs/top-level/all-packages.nix`.
 - `pkgs.${name}` is a [derivation](https://nixos.org/manual/nix/stable/glossary.html#gloss-derivation).
-- <a id="req-ref"> The `package.nix` file must not transitively refer to files outside its unit directory.
+- <a id="req-ref"> The `package.nix` file evaluated from `pkgs.${name}` must not access files outside its unit directory.
 
 ## PR 2: Automated migration
 
-When possible, automatically migrate to the unit directory standard for all _satisfiying definitions_ `pkgs.${name}`, meaning derivations defined as above using `callPackage`.
+Automatically migrate to the unit directory standard for all _satisfiying definitions_ `pkgs.${name}`, meaning derivations defined as above using `callPackage`.
 
-Automatic migration is only possible if:
-- Files only need to be moved, not changed, with the exception of `pkgs/top-level/all-packages.nix`
+However automatic migration is only possible if:
+- Files don't need to be changed, only moved, with the exception of `pkgs/top-level/all-packages.nix`
 - The Nixpkgs package evaluation result does not change
 
 All satisfying definitions that can't be automatically migrated due to the above restrictions will be added to a CI exclusion list.
 CI is added to ensure that all satisfying definitions except the CI exclusion list must be using the unit directory standard.
 This means that the unit directory standard becomes mandatory for new satisfying definitions after this PR.
 
-This PR will cause merge conflicts with all existing PRs that modify moved files, however they can trivially be rebased using `git rebase && git push -f`.
-However, to have the least amount of conflicts, this migration should be performed soon after a release when ZHF is over and the PR rate slows down.
-This also gives a lot of time to fix any potential problems before the next release.
-
-Manual updates may also be done to ensure further correctness, such as
-- [CODEOWNERS](https://github.com/NixOS/nixpkgs/blob/master/.github/CODEOWNERS)
+Non-automatic updates may also be done to ensure further correctness, such as
+- [GitHub's CODEOWNERS](https://github.com/NixOS/nixpkgs/blob/master/.github/CODEOWNERS)
 - Update scripts like [this](https://github.com/NixOS/nixpkgs/blob/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/applications/version-management/cz-cli/generate-dependencies.sh)
 
 ## Examples
 [examples]: #examples
 
 To add a new package `pkgs.foobar` to Nixpkgs, one only needs to create the file `pkgs/unit/fo/foobar/package.nix`.
-No need to find an appropriate category nor to modify `pkgs/top-level/all-packages.nix` anymore.
+No need to find an appropriate category nor to modify `all-packages.nix` anymore.
 
 With some packages, the `pkgs/unit` directory may look like this:
 
@@ -120,37 +117,6 @@ pkgs
 
 # Interactions
 [interactions]: #interactions
-
-## Package variants
-
-Sometimes there's a need to create a variant of a package with different `callPackage` arguments. This can be achieved using `.override` as follows:
-```nix
-{
-  graphviz_nox = graphviz.override { withXorg = false; };
-}
-```
-
-However this can cause problems with an overlay that tries to make the variant the default as follows:
-```nix
-self: super: {
-  # Oops, infinite recursion!
-  graphviz = self.graphviz_nox;
-}
-```
-
-Because of this, there's the pattern of duplicating the `callPackage` call with the custom arguments as such:
-```nix
-{
-  graphviz_nox = callPackage ../tools/graphics/graphviz { withXorg = false; };
-}
-```
-
-The semantics of how unit directories are checked by CI do allow the definition of package variants from unit directories:
-```nix
-{
-  graphviz_nox = callPackage ../unit/gr/graphviz/package.nix { withXorg = false; };
-}
-```
 
 ## Shard distribution
 
@@ -184,8 +150,8 @@ These attributes will need to be moved to the standard manually with some arguab
 
 ## Git and NixOS release problems
 
-- The migration will cause merge conflicts for a lot of PRs, but they are trivially resolvable using `git rebase && git push -f` due to Git's file rename tracking.
-- Commits that change moved files in `pkgs/unit` can be cherry-picked to the previous file location without problems for the same reason.
+- The migration PR will cause merge conflicts with all existing PRs that modify moved files, however they can trivially be rebased using `git rebase && git push -f`.
+- Commits that change moved files in `pkgs/unit` can be cherry-picked to the previous file location without problems.
 - `git blame` locally and on GitHub is unaffected, since it follows file moves properly.
 
 ## `callPackage` with `nix-build -E`
@@ -193,17 +159,48 @@ These attributes will need to be moved to the standard manually with some arguab
 A commonly recommended way of building package directories in Nixpkgs is to use `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
 Since the path changes `package.nix` is now used, this becomes like `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/unit/he/hello/package.nix {}'`, which is harder for users.
 However, calling a path like this is an anti-pattern anyway, because it doesn't use the correct Nixpkgs version and it doesn't use the correct argument overrides.
-The correct way of doing it was to add the package to `pkgs/top-level/all-packages.nix`, then calling `nix-build -A hello`.
+The correct way of doing it was to add the package to `all-packages.nix`, then calling `nix-build -A hello`.
 This `nix-build -E` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
 By teaching users that `pkgs/unit/<shard>/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build -E` workarounds should disappear.
 
-## Limited manual removal of custom arguments
+## Manual removal of custom arguments
 
-While this RFC allows passing custom arguments, doing so means that `pkgs/top-level/all-packages.nix` will have to be maintained for that package.
+While this RFC allows passing custom arguments, doing so means that `all-packages.nix` will have to be maintained for that package.
 In specific cases where attributes of custom arguments are of the form `name = value` and `name` isn't a package attribute, they can be avoided without breaking the API.
 To do so, ensure that the function in the called file has `value` as an argument and set the default of the `name` argument to `value`.
 
 This notably doesn't work when `name` is already a package attribute, because then the default is never used and instead overridden.
+
+## Package variants
+
+Sometimes there's a need to create a variant of a package with different `callPackage` arguments. This can be achieved using `.override` as follows:
+```nix
+{
+  graphviz_nox = graphviz.override { withXorg = false; };
+}
+```
+
+However this can cause problems with an overlay that tries to make the variant the default as follows:
+```nix
+self: super: {
+  # Oops, infinite recursion!
+  graphviz = self.graphviz_nox;
+}
+```
+
+Because of this, there's the pattern of duplicating the `callPackage` call with the custom arguments as such:
+```nix
+{
+  graphviz_nox = callPackage ../tools/graphics/graphviz { withXorg = false; };
+}
+```
+
+The semantics of how unit directories are checked by CI do allow the definition of package variants from unit directories:
+```nix
+{
+  graphviz_nox = callPackage ../unit/gr/graphviz/package.nix { withXorg = false; };
+}
+```
 
 # Drawbacks
 [drawbacks]: #drawbacks
