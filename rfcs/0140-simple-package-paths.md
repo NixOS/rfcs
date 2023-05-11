@@ -57,29 +57,40 @@ Check the following using CI:
 
 Introduce code to automatically define `pkgs.${name}` for each unit directory as a value equivalent to
 ```nix
-pkgs.callPackage pkgs/unit/${shard}/${name}/package.nix { }`
+pkgs.callPackage pkgs/unit/${shard}/${name}/package.nix { }
 ```
 
+Optionally there may also be an overriding definition of `pkgs.${name}` in `pkgs/top-level/all-packages.nix` equivalent to
+```nix
+pkgs.callPackage pkgs/unit/${shard}/${name}/package.nix args
+```
+
+with an arbitrary `args`.
+
 Check the following using CI for each unit directory:
-- The only definition for `pkgs.${name}` is the automatically generated one from the unit directory
-- `pkgs.${name}` must evaluate to a [derivation](https://nixos.org/manual/nix/stable/glossary.html#gloss-derivation).
+- `pkgs.${name}` is defined as above, either automatically or with some `args` in `pkgs/top-level/all-packages.nix`.
+- `pkgs.${name}` is a [derivation](https://nixos.org/manual/nix/stable/glossary.html#gloss-derivation).
 - The `package.nix` file must not transitively refer to files outside its unit directory.
 
-## PR 2: Migration
+## PR 2: Automated migration
 
-Automatically migrate to the unit directory standard for all definitions `pkgs.${name}` that can be migrated by
-- Only moving files
-- Not changing the evaluation result
+When possible, automatically migrate to the unit directory standard for all _satisfiying definitions_ `pkgs.${name}`, meaning derivations defined as above using `callPackage`.
 
-This will cause merge conflicts with all existing PRs that modify such moved files, however they can trivially be rebased using `git rebase && git push -f`.
+Automatic migration is only possible if:
+- Files only need to be moved, not changed, with the exception of `pkgs/top-level/all-packages.nix`
+- The Nixpkgs package evaluation result does not change
+
+All satisfying definitions that can't be automatically migrated due to the above restrictions will be added to a CI exclusion list.
+CI is added to ensure that all satisfying definitions except the CI exclusion list must be using the unit directory standard.
+This means that the unit directory standard becomes mandatory for new satisfying definitions after this PR.
+
+This PR will cause merge conflicts with all existing PRs that modify moved files, however they can trivially be rebased using `git rebase && git push -f`.
 However, to have the least amount of conflicts, this migration should be performed soon after a release when ZHF is over and the PR rate slows down.
 This also gives a lot of time to fix any potential problems before the next release.
 
-Manual updates may also be done to ensure further non-evaluation validity, such as
+Manual updates may also be done to ensure further correctness, such as
 - [CODEOWNERS](https://github.com/NixOS/nixpkgs/blob/master/.github/CODEOWNERS)
 - Update scripts like [this](https://github.com/NixOS/nixpkgs/blob/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/applications/version-management/cz-cli/generate-dependencies.sh)
-
-Due to the strict limitations of standard, this PR will not start enforcing it for new packages.
 
 ## Examples
 [examples]: #examples
@@ -111,15 +122,17 @@ pkgs
 [interactions]: #interactions
 
 ## Migration size
-Due to the limitations of the standard, only a limited set of top-level attributes can be migrated:
+Due to the limitations of the standard, only a limited set of top-level attributes can be automatically migrated:
 - No attributes that aren't derivations like `pkgs.fetchFromGitHub` or `pkgs.python3Packages`
+- No attributes defined using non-`pkgs.callPackage` functions like `pkgs.python3Packages.callPackage` or `pkgs.haskellPackages.callPackage`.
+In the future we might consider having a separate namespace for such definitions.
+
+Concretely this [can be computed](https://gist.github.com/infinisil/4f2bd165c2603fc28ab536f39ac2fd27) to be 81.2% (14036) attributes out of the 17280 total non-alias top-level Nixpkgs attributes in revision [6948ef4deff7](https://github.com/nixos/nixpkgs/commit/6948ef4deff7a72ebe5242244bd3730e8542b925).
+
+And the initial automatic migration will be a bit more limited due to the additional constraints:
 - No attributes that share common files with other attributes like [`pkgs.readline`](https://github.com/NixOS/nixpkgs/tree/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/development/libraries/readline)
 - No attributes that references files from other packages like [`pkgs.gettext`](https://github.com/NixOS/nixpkgs/blob/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/development/libraries/gettext/default.nix#L60)
-
-A good estimation of this based on [a trial PR](https://github.com/NixOS/nixpkgs/pull/211832) on commit [287b071e9a71](https://github.com/nixos/nixpkgs/commit/287b071e9a7130cacf7664e5c69ec3a889b800f8):
-- 18136 (100.0%) total top-level attributes
-- 16319 (90.0%) are derivations (`lib.isDerivation`)
-- 10763 (59.3%) are derivations and don't violate any other conditions
+These attributes will need to be moved to the standard manually with some arguably-needed refactoring to improve reusability of common files.
 
 ## Package locations
 
