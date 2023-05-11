@@ -121,6 +121,37 @@ pkgs
 # Interactions
 [interactions]: #interactions
 
+## Package variants
+
+Sometimes there's a need to create a variant of a package with different `callPackage` arguments. This can be achieved using `.override` as follows:
+```nix
+{
+  graphviz_nox = graphviz.override { withXorg = false; };
+}
+```
+
+However this can cause problems with an overlay that tries to make the variant the default as follows:
+```nix
+self: super: {
+  # Oops, infinite recursion!
+  graphviz = self.graphviz_nox;
+}
+```
+
+Because of this, there's the pattern of duplicating the `callPackage` call with the custom arguments as such:
+```nix
+{
+  graphviz_nox = callPackage ../tools/graphics/graphviz { withXorg = false; };
+}
+```
+
+The semantics of how unit directories are checked by CI do allow the definition of package variants from unit directories:
+```nix
+{
+  graphviz_nox = callPackage ../unit/gr/graphviz/package.nix { withXorg = false; };
+}
+```
+
 ## Shard distribution
 
 The shard structure nesting unit directories under their lowercased two-letter prefix [leads to a distribution](https://gist.github.com/infinisil/95c7013db62e9f23ab2bc92165a37221) into shards as follows:
@@ -166,7 +197,7 @@ The correct way of doing it was to add the package to `pkgs/top-level/all-packag
 This `nix-build -E` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
 By teaching users that `pkgs/unit/<shard>/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build -E` workarounds should disappear.
 
-## Removing custom arguments
+## Limited manual removal of custom arguments
 
 While this RFC allows passing custom arguments, doing so means that `pkgs/top-level/all-packages.nix` will have to be maintained for that package.
 In specific cases where attributes of custom arguments are of the form `name = value` and `name` isn't a package attribute, they can be avoided without breaking the API.
@@ -205,7 +236,6 @@ Alternatives:
 
 Context: The structure is `pkgs/unit/${shard}/${name}` with `shard` being the lowercased two-letter prefix of `name`.
 
-
 Alternatives:
 - A flat directory, where `pkgs.hello` would be in `pkgs/unit/hello`.
   - (+) Simpler for the user and code.
@@ -229,6 +259,9 @@ Alternatives:
 
 ## Alternate `package.nix` filename
 
+Context: The only file that has to exist in unit directories is `package.nix`, it must contain a function suitable for `callPackage`.
+
+Alternatives:
 - `default.nix`
   - (+) `default.nix` is already a convention most people are used to.
   - (-) We don't benefit from the usual `default.nix` benefits:
@@ -253,43 +286,27 @@ Alternative:
   - (-) It would give precedent to file paths being a stable API interface, which definitely shouldn't be the case (bar some exceptions).
   - (-) Leads to worse merge conflicts as the transition is happening, since Git would have to resolve a merge conflict between a symlink and a changed file.
 
+## Don't allow custom arguments
+
+Context: It's possible to override the default `{ }` argument to `callPackage` by manually specifying the full definition in `all-packages.nix`
+
+The alternative is to not allow that, requiring that `pkgs.${name}` corresponds directly to `callPackage pkgs/unit/${shard}/${name}/package.nix { }`.
+- (-) It's harder to explain to beginners whether their package can use the unit directory standard or not
+- (+) The direct correspondance ensures that the unit directory contains all information about the package, which is very intuitive
+  - (-) We're not at the point where we can have that though, custom arguments don't have a good replacement yet
+- (-) If a package previously didn't need custom arguments, it would be moved to a unit directory. But then there's a need for a custom argument, which then requires moving it out from the unit directory and into the freeform structure of `pkgs/` again.
+- (+) It's easier to relax restrictions than to impose new ones
+
 ## Reference check
 
 Context: There's a [requirement](#user-content-req-ref) to check that unit directories can't access paths outside themselves.
 
-Alternatives:
-- Don't have this requirement
-  - (-) Doesn't discourage the use of file paths as an API.
-  - (-) Makes further migrations to different file structures harder.
-- Make the requirement also apply the other way around: Files outside the unit directory cannot access files inside it, with `package.nix` being the only exception
-  - (-) Enforcing this requires a global view of Nixpkgs, which is hard to implement
-
-## Restrict design to try delay issues like "package variants" {#no-variants}
-
-TODO: This section might be outdated, it's a bit ambiguous
-
-- <a id="def-variant-attribute"/> *variant attribute*: an attribute that defines a package by invoking it with non-default arguments, for example:
- ```
-   graphviz_nox = callPackage ../tools/graphics/graphviz { withXorg = false; };
- ```
-
-We perceived some uncertainty around [package variants](#def-package-variant) that led us to scope these out at first, but we did not identify a real problem that would arise from allowing non-auto-called attributes to reference `pkgs/unit` files. However, imposing unnecessary restrictions would be counterproductive because:
-
- - The contributor experience would suffer, because it won't be obvious to everyone whether their package is allowed to go into `pkgs/unit`. This means that we'd fail to solve the goal "Which directory should my package definition go in?", leading to unnecessary requests for changes in pull requests.
-
- - Changes in dependencies can require dependents to add an override, causing packages to be moved back and forth between unit directories and the general `pkgs` tree, worsening the problem as people have to decide categories *again*.
-
- - When lifting the restriction, the reviewers have to adapt, again leading to unnecessary requests for changes in pull requests.
- 
- - We'd be protracting the migration by unnecessary gatekeeping or discovering some problem late.
-
-That said, we did identify risks:
-
- - We might get something wrong, and while we plan to incrementally migrate Nixpkgs to this new system anyway, starting with fewer units is good.
-    - Mitigation: only automate the renames of simple (`callPackage path { }`) calls, to keep the initial change small
- 
- - We might not focus enough on the foundation, while we could more easily relax requirements later.
-    - After more discussion, we feel confident that the manual `callPackage` calls are unlikely to cause issues that we wouldn't otherwise have.
+Alternatives: Don't have this requirement
+- (-) Doesn't discourage the use of file paths as an API.
+- (-) Makes further migrations to different file structures harder.
+- Make the requirement also apply the other way around: Files outside the unit directory cannot access files inside it, with `package.nix` being the only exception, and only for the one attribute in `all-packages.nix`
+- (-) Enforcing this requires a global view of Nixpkgs, which is nasty to implement
+- (-) [Package variants](#package-variants) would not be possible to define
 
 ## Allow `callPackage` arguments to be specified in `<unit>/args.nix`
 
