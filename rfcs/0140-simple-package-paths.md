@@ -268,6 +268,11 @@ Alternatives:
 
 TODO: This section might be outdated, it's a bit ambiguous
 
+- <a id="def-variant-attribute"/> *variant attribute*: an attribute that defines a package by invoking it with non-default arguments, for example:
+ ```
+   graphviz_nox = callPackage ../tools/graphics/graphviz { withXorg = false; };
+ ```
+
 We perceived some uncertainty around [package variants](#def-package-variant) that led us to scope these out at first, but we did not identify a real problem that would arise from allowing non-auto-called attributes to reference `pkgs/unit` files. However, imposing unnecessary restrictions would be counterproductive because:
 
  - The contributor experience would suffer, because it won't be obvious to everyone whether their package is allowed to go into `pkgs/unit`. This means that we'd fail to solve the goal "Which directory should my package definition go in?", leading to unnecessary requests for changes in pull requests.
