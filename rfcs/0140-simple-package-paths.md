@@ -70,7 +70,7 @@ with an arbitrary `args`.
 Check the following using CI for each unit directory:
 - `pkgs.${name}` is defined as above, either automatically or with some `args` in `pkgs/top-level/all-packages.nix`.
 - `pkgs.${name}` is a [derivation](https://nixos.org/manual/nix/stable/glossary.html#gloss-derivation).
-- The `package.nix` file must not transitively refer to files outside its unit directory.
+- <a id="req-ref"> The `package.nix` file must not transitively refer to files outside its unit directory.
 
 ## PR 2: Automated migration
 
@@ -121,6 +121,19 @@ pkgs
 # Interactions
 [interactions]: #interactions
 
+## Shard distribution
+
+The shard structure nesting unit directories under their lowercased two-letter prefix [leads to a distribution](https://gist.github.com/infinisil/95c7013db62e9f23ab2bc92165a37221) into shards as follows:
+- There's 17305 total non-alias top-level attribute names in Nixpkgs revision [6948ef4deff7](https://github.com/nixos/nixpkgs/commit/6948ef4deff7a72ebe5242244bd3730e8542b925)
+- These are split into 726 shards
+- The top three shards are:
+  - "li": 1092 values, coming from the common `lib` prefix
+  - "op": 260 values
+  - "co": 252 values
+- There's only a single directory with over 1 000 entries, which is notably GitHub's display limit, so this means only 92 attributes would be harder to see on GitHub
+
+These stats are also similar for other package sets for if this standard were to be adopted for them in the future.
+
 ## Migration size
 Due to the limitations of the standard, only a limited set of top-level attributes can be automatically migrated:
 - No attributes that aren't derivations like `pkgs.fetchFromGitHub` or `pkgs.python3Packages`
@@ -142,7 +155,7 @@ These attributes will need to be moved to the standard manually with some arguab
 
 - The migration will cause merge conflicts for a lot of PRs, but they are trivially resolvable using `git rebase && git push -f` due to Git's file rename tracking.
 - Commits that change moved files in `pkgs/unit` can be cherry-picked to the previous file location without problems for the same reason.
-- `git blame` locally and on GitHub is unaffected, since it follows file renames properly.
+- `git blame` locally and on GitHub is unaffected, since it follows file moves properly.
 
 ## `callPackage` with `nix-build -E`
 
@@ -151,13 +164,23 @@ Since the path changes `package.nix` is now used, this becomes like `nix-build -
 However, calling a path like this is an anti-pattern anyway, because it doesn't use the correct Nixpkgs version and it doesn't use the correct argument overrides.
 The correct way of doing it was to add the package to `pkgs/top-level/all-packages.nix`, then calling `nix-build -A hello`.
 This `nix-build -E` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
-By teaching users that `pkgs/unit/*/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build -E` workarounds should disappear.
+By teaching users that `pkgs/unit/<shard>/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build -E` workarounds should disappear.
+
+## Removing custom arguments
+
+While this RFC allows passing custom arguments, doing so means that `pkgs/top-level/all-packages.nix` will have to be maintained for that package.
+In specific cases where attributes of custom arguments are of the form `name = value` and `name` isn't a package attribute, they can be avoided without breaking the API.
+To do so, ensure that the function in the called file has `value` as an argument and set the default of the `name` argument to `value`.
+
+This notably doesn't work when `name` is already a package attribute, because then the default is never used and instead overridden.
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
+- This standard can only be used for top-level packages using `callPackage`, so not for e.g. `python3Packages.requests` or a package defined using `haskellPackages.callPackage`
+- It's not possible anymore to be a [GitHub code owner](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) of category directories.
 - The existing categorization of packages gets lost. Counter-arguments:
-  - It was never that useful to begin with
+  - It was never that useful to begin with.
     - The categorization was always incomplete, because packages defined in the language package sets often don't get their own categorized file path.
     - It was an inconvenient user interface, requiring a checkout or browsing through GitHub
     - Many packages fit multiple categories, leading to multiple locations to search through instead of one
@@ -169,54 +192,81 @@ By teaching users that `pkgs/unit/*/<name>` corresponds to `nix-build -A <name>`
 # Alternatives
 [alternatives]: #alternatives
 
-TODO: This needs updating
-
 ## A different unit base directory
 
 Context: `pkgs/unit` is the unit base directory
 
 Alternatives:
-- Use `unit` (at the Nixpkgs root) instead of `pkgs/unit`.
+- Don't nest the directory under `pkgs`
   - This is future proof in case we want to make the directory structure more general purpose, but this is out of scope
-- Other name proposals were deemed worse: `pkg`, `component`, `part`, `mod`, `comp`
+- Another name than `unit`, proposed were `auto`, `pkg`, `mod`, `component`, `part`, `comp`, `app`, `simple`, 
 
 ## Alternate `pkgs/unit` structure
 
-- Use a flat directory, e.g. `pkgs.hello` would be in `pkgs/unit/hello`.
-  - Good because it's simpler, both for the user and for the code
-  - Bad because the GitHub web interface only renders the first 1 000 entries (and we have about 10 000 that benefit from this transition, even given the restrictions)
-  - Bad because it makes `git` and file listings slower
-- Use `substring 0 3 name` or `substring 0 4 name`. This was not done because it still leads to directories in `pkgs/unit` containing more than 1 000 entries, leading to the same problems.
-- Use multi-level structure, like a 2-level 2-prefix structure where `hello` is in `pkgs/unit/he/ll/hello`,
-  if packages are less than 4 characters long, we will it out with `-`, e.g. `z` is in `pkgs/unit/z-/--/z`.
-  This is not great because it's more complicated, longer to type and it would improve performance only marginally.
+Context: The structure is `pkgs/unit/${shard}/${name}` with `shard` being the lowercased two-letter prefix of `name`.
+
+
+Alternatives:
+- A flat directory, where `pkgs.hello` would be in `pkgs/unit/hello`.
+  - (+) Simpler for the user and code.
+  - (-) The GitHub web interface only renders the first 1 000 entries when browsing directories, which would make most packages inaccessible in this way.
+    - (+) This feature is not used often.
+      - (-) [A poll](https://discourse.nixos.org/t/poll-how-often-do-you-navigate-through-directories-on-github-to-get-to-a-nixpkgs-package-file/21641) showed that about 41% of people rely on this feature every week.
+  - (-) Bad because it makes `git` and file listings slower.
+- Use three-letter or hour-letter prefixes.
+  - (-) Also leads to directories containing more than 1 000 entries, see above.
+- Use multi-level structure, e.g. a two-level two-letter prefix structure where `hello` is in `pkgs/unit/he/ll/hello`
+  - (+) This would virtually a unlimited number of packages without performance problems
+  - (-) It's hard to understand, type and implement, needs a special case for packages with few characters
+    - E.g. `x` could go in `pkgs/unit/x-/--/x`
+  - (-) There's not enough packages even in Nixpkgs that a two-level structure would make sense. Most of the structure would only be filled by a couple entries.
+  - (-) Even Git only uses 2-letter prefixes for its objects hex hashes
 - Use a dynamic structure where directories are rebalanced when they have too many entries.
   E.g. `pkgs.foobar` could be in `pkgs/unit/f/foobar` initially.
   But when there's more than 1 000 packages starting with `f`, all packages starting with `f` are distributed under 2-letter prefixes, moving `foobar` to `pkgs/unit/fo/foobar`.
-  This is not great because it's very complex to determine which directory to put a package in, making it bad for contributors.
+  - (-) The structure depends not only on the name of the package then, making it harder to find packages again and figure out where they should go
+  - (-) Complex to implement
 
 ## Alternate `package.nix` filename
 
-- `default.nix`:
-  - Bad because it doesn't have its main benefits here:
+- `default.nix`
+  - (+) `default.nix` is already a convention most people are used to.
+  - (-) We don't benefit from the usual `default.nix` benefits:
     - Removing the need to specify the file name in expressions, but this does not apply because this file will be imported automatically by the code that replaces definitions from `all-packages.nix`.
+      - (+) But there's still some support for `all-packages.nix` for custom arguments, which requires people to type out the name
+        - (-) This is hopefully only temporary, in the future we should fully get rid of `all-packages.nix`
     - Removing the need to specify the file name on the command line, but this does not apply because a package function must be imported into an expression before it can be used, making `nix build -f pkgs/unit/hell/hello` equally broken regardless of file name.
-  - Not using `default.nix` frees up `default.nix` for a short expression that is actually buildable, e.g. `(import ../.. {}).hello`, although we don't yet have a use case for this that isn't covered by `nix-build ../.. -A $attrname`.
-  - Bad because using `default.nix` would tempt users to invoke `nix-build .` whereas making package functions auto-callable is a known anti-pattern as it duplicates the defaults.
-  - Good because `default.nix` is already a convention most people are used to
-- `pkg-fun.nix`/`pkg-func.nix`: The idea with this proposal was to make it easier to potentially transition to a non-function form of packages in the future, but there's no problem with introducing versioning later if needed in case we want to reuse `pkg.nix`/`package.nix`. We also don't even know if we actually want to have a non-function form of packages. Also the abbreviations are a bit jarring.
+  - (-) Not using `default.nix` frees up `default.nix` for an expression that is actually buildable, e.g. `(import ../.. {}).hello`, although we don't yet have a use case for this that isn't covered by `nix-build ../.. -A <attrname>`.
+  - (-) Using `default.nix` would tempt users to invoke `nix-build .`, which wouldn't work and making package functions auto-callable is a known anti-pattern.
+- `pkg-fun[c].nix`
+  - (+) Makes a potentially transition to a non-function form of packages in the future easier.
+    - (-) There's no problem with introducing versioning later with different filenames.
+    - (-) We don't even know if we actually want to have a non-function form of packages.
+  - (-) Abbreviations are a bit jarring.
 
 ## Filepath backwards-compatibility
 
-Additionally have a backwards-compatibility layer for moved paths, such as a symlink pointing from the old to the new location, or for Nix files even a `builtins.trace "deprecated" (import ../new/path)`.
-- We are not doing this because it would give precedent to file paths being a stable API interface, which definitely shouldn't be the case (bar some exceptions).
-- It would also lead to worse merge conflicts as the transition is happening, since Git would have to resolve a merge conflict between a symlink and a changed file.
+Context: The migration moves files around without providing any backwards compatibility for those moved paths.
 
-## Not having the [reference requirement](#user-content-req-ref)
+Alternative:
+- Have a backwards-compatibility layer for moved paths, such as a symlink pointing from the old to the new location, or for Nix files even a `builtins.trace "deprecated" (import ../new/path)`.
+  - (-) It would give precedent to file paths being a stable API interface, which definitely shouldn't be the case (bar some exceptions).
+  - (-) Leads to worse merge conflicts as the transition is happening, since Git would have to resolve a merge conflict between a symlink and a changed file.
 
-The reference requirement could be removed, which would allow unit directories to reference files outside themselves, and the other way around. This is not great because it encourages the use of file paths as an API, rather than explicitly exposing functionality from Nix expressions.
+## Reference check
+
+Context: There's a [requirement](#user-content-req-ref) to check that unit directories can't access paths outside themselves.
+
+Alternatives:
+- Don't have this requirement
+  - (-) Doesn't discourage the use of file paths as an API.
+  - (-) Makes further migrations to different file structures harder.
+- Make the requirement also apply the other way around: Files outside the unit directory cannot access files inside it, with `package.nix` being the only exception
+  - (-) Enforcing this requires a global view of Nixpkgs, which is hard to implement
 
 ## Restrict design to try delay issues like "package variants" {#no-variants}
+
+TODO: This section might be outdated, it's a bit ambiguous
 
 We perceived some uncertainty around [package variants](#def-package-variant) that led us to scope these out at first, but we did not identify a real problem that would arise from allowing non-auto-called attributes to reference `pkgs/unit` files. However, imposing unnecessary restrictions would be counterproductive because:
 
@@ -236,17 +286,12 @@ That said, we did identify risks:
  - We might not focus enough on the foundation, while we could more easily relax requirements later.
     - After more discussion, we feel confident that the manual `callPackage` calls are unlikely to cause issues that we wouldn't otherwise have.
 
-## Recommend a `callPackage` pattern with default arguments
-
-> - While this RFC doesn't address expressions where the second `callPackage` argument isn't `{}`, there is an easy way to transition to an argument of `{}`: For every attribute of the form `name = attrs.value;` in the argument, make sure `attrs` is in the arguments of the file, then add `name ? attrs.value` to the arguments. Then the expression in `all-packages.nix` can too be auto-called
->   - Don't do this for `name = value` pairs though, that's an alias-like thing
-
-`callPackage` does not favor the default argument when both a default argument and a value in `pkgs` exist. Changing the semantics of `callPackage` is out of scope.
-
 ## Allow `callPackage` arguments to be specified in `<unit>/args.nix`
 
-The idea was to expand the auto-calling logic according to:
+Context: Custom `callPackage` arguments have to be added to `all-packages.nix`
 
+Alternative:
+Expand the auto-calling logic according to:
 Unit directories are automatically discovered and transformed to a definition of the form
 ```
 # If args.nix doesn't exist
@@ -255,14 +300,11 @@ pkgs.${name} = pkgs.callPackage ${unitDir}/package.nix {}
 pkgs.${name} = pkgs.callPackage ${unitDir}/package.nix (import ${unitDir}/args.nix pkgs);
 ```
 
-Pro:
- - It makes another class of packages uniform, by picking a solution with restricted expressive power.
-
-Con:
- - It does not solve the contributor experience problem of having too many rules.
- - `args.nix` is another pattern that contributors need to learn how to use, as we have seen that it is not immediately obvious to everyone how it works.
- - A CI check can mitigate the possible lack of uniformity, and we see a simple implementation strategy for it.
- - This keeps the contents of the unit directories simple and a bit more uniform than with optional `args.nix` files.
+- (+) It makes another class of packages uniform, by picking a solution with restricted expressive power.
+- (-) It does not solve the contributor experience problem of having too many rules.
+      `args.nix` is another pattern that contributors need to learn how to use, as we have seen that it is not immediately obvious to everyone how it works.
+  - (+) A CI check can mitigate the possible lack of uniformity, and we see a simple implementation strategy for it.
+- (-) Complicates the unit directory structure with an optional file
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
@@ -272,11 +314,13 @@ Con:
 
 All of these questions are in scope to be addressed in future discussions in the [Nixpkgs Architecture Team](https://nixos.org/community/teams/nixpkgs-architecture.html):
 
-- Add a meta tagging system to packages as a replacement for the package categories. Maybe `meta.tags` with `search.nixos.org` integration.
+- Expose an API to get access to the package functions directly, without calling them
+- Add a meta tagging or categorization system to packages as a replacement for the package categories. Maybe `meta.tags` with `search.nixos.org` integration. Maybe https://repology.org/ integration. See also https://github.com/NixOS/rfcs/pull/146.
 - Making the filetree more human-friendly by grouping files together by "topic" rather than technical delineations.
   For instance, having a package definition, changelog, package-specific config generator and perhaps even NixOS module in one directory makes work on the package in a broad sense easier.
 - This RFC only addresses the top-level attribute namespace, aka packages in `pkgs.<name>`, it doesn't do anything about package sets like `pkgs.python3Packages.<name>`, `pkgs.haskell.packages.ghc942.<name>`, which may or may not also benefit from a similar auto-calling
 - Improve the semantics of `callPackage` and/or apply a better solution, such as a module-like solution
+- Potentially establish an updateScript standard to avoid problems like, relates to Flakes too
 - What to do with different versions, e.g. `wlroots = wlroots_0_14`? This goes into version resolution, a different problem to fix
 - What to do about e.g. `libsForQt5.callPackage`? This goes into overrides, a different problem to fix
 - What about aliases like `jami-daemon = jami.jami-daemon`?
