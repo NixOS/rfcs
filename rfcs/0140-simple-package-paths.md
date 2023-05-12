@@ -43,6 +43,7 @@ These PR's should be done after a release to maximize the testing period and min
 This part establishes the new _unit directory standard_ in Nixpkgs.
 This standard is internal to Nixpkgs and not exposed as public interface.
 This standard must be documented in the Nixpkgs manual.
+This PR will be backported to the stable release in order to ensure that backports of new packages work.
 
 ### File structure
 
@@ -84,10 +85,14 @@ However automatic migration is only possible if:
 All satisfying definitions that can't be automatically migrated due to the above restrictions will be added to a CI exclusion list.
 CI is added to ensure that all satisfying definitions except the CI exclusion list must be using the unit directory standard.
 This means that the unit directory standard becomes mandatory for new satisfying definitions after this PR.
+The CI exclusion list should be removed eventually once the non-automatically-migratable satisfying definitions have been manually migrated.
+Only in very limited circumstances is it allowed to add new entries to the CI exclusion list.
 
 Non-automatic updates may also be done to ensure further correctness, such as
 - [GitHub's CODEOWNERS](https://github.com/NixOS/nixpkgs/blob/master/.github/CODEOWNERS)
 - Update scripts like [this](https://github.com/NixOS/nixpkgs/blob/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/applications/version-management/cz-cli/generate-dependencies.sh)
+
+Since this migration should be widely announced with a pinned issue on the Nixpkgs issue tracker and a Discourse post.
 
 ## Examples
 [examples]: #examples
