@@ -220,6 +220,13 @@ The most immediate drawbacks are:
      are doing this just fine for years on end, and Nixpkgs can imitate them
      easily - and even better, given we have Nix language machinery available.
 
+   - Categorization is useful in many scenarios and use cases - indeed they
+     are ubiquitous in software world:
+     - specialized search engines as Repology
+     - code forges, from Sourceforge to Gitlab
+     - as said above, software collections from pkgsrc to slackbuilds
+     - to organization and preservation
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
