@@ -212,16 +212,13 @@ The most immediate drawbacks are:
    - The categorization is already present; this RFC proposes to expose it to a
      higher level, in a more discoverable, structured format.
 
-   - Categorization is very traditional among software collections. Many of them
-     are doing this just fine for years on end, and we can easily imitate them -
-     and even better, given we have Nix language machinery available.
-
-     - A well-made categorization is useful for specialized search engines,
-       adding a new field for narrowing searches.
-
    - The complete removal of categorization is too harsh. A solution that keeps
      and enhances the categorization is way more preferrable than one that nukes
      it completely.
+
+   - Categorization is very traditional among software collections. Many of them
+     are doing this just fine for years on end, and Nixpkgs can imitate them
+     easily - and even better, given we have Nix language machinery available.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
