@@ -156,7 +156,7 @@ These attributes will need to be moved to the standard manually with some arguab
 ## Git and NixOS release problems
 
 - The migration PR will cause merge conflicts with all existing PRs that modify moved files, however they can trivially be rebased using `git rebase && git push -f`.
-- Commits that change moved files in `pkgs/unit` can be cherry-picked to the previous file location without problems.
+- Commits that change moved files in `pkgs/unit` [can be cherry-picked](https://gist.github.com/infinisil/00b5ccc62b76bc1fe91b32db758adb41) to the previous file location without problems.
 - `git blame` locally and on GitHub is unaffected, since it follows file moves properly.
 
 ## `callPackage` with `nix-build -E`
