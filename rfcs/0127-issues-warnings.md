@@ -35,17 +35,15 @@ For some use cases, like for packages without maintainers, we do not want to bre
 
 A new attribute is added to the `meta` section of a package: `problems`. If present, it is a an attribute set of attrsets which each have at least the following fields:
 
-- `kind`: Required. The resulting warning will be printed as `kind: message`. Defaults to the attrset key if absent.
+- `kind`: The 'kind' of the problem, see [problem kinds](#problem-kinds) for allowed values. Defaults to the attribute set key.
 - `message`: Required. A string message describing the issue with the package. The value should:
   - Start with the "This package", "The application" or equivalent, or simply with the package name.
   - Be capitalized (unless it starts with the package name).
   - Use a period at the end.
-- `name`: Inferred from the attrset key if `kind` is specified. Give the issue a custom name for more easy filtering.
 - `date`: Required. An ISO 8601 `yyyy-mm-dd`-formatted date from when the issue was added.
 - `urls`: Optional, list of strings. Can be used to link issues, pull requests and other related items.
 
-Other attributes are allowed. Some message kinds may specify additional required attributes.
-The keys in the attribute set are used to infer the `name` or `kind` values within, depending on which is present.
+Problem kinds may specify additional attributes. Apart from that, other attributes are not allowed.
 
 Example values:
 
@@ -58,10 +56,10 @@ meta.problems = {
     date = "1970-01-01";
     urls = [ "https://github.com/NixOS/nixpkgs/issues/148779" ];
   };
-  # This one will have no name
+  # This one will have the name "removal"
   removal = {
     # kind = "removal"; # Inferred from attribute key
-    message = "The application has been abandoned upstream, use libfoo instead";
+    message = "The application has been abandoned upstream, use libfoo instead.";
     date = "1970-01-01";
   };
 };
@@ -73,12 +71,12 @@ At the moment, the following values for the `kind` field of a warning are known:
 
 - `removal`: The package is scheduled for removal some time in the future.
 - `deprecated`: The package has been abandoned upstream or has end of life dependencies.
-- `maintainerless`: `meta.maintainers` is empty
-- `insecure`: The package has some security vulnerabilities
-- `broken`: The package is marked as broken
-- `unsupported`: The package is not expected to build on this platform
+- `maintainerless`: `meta.maintainers` is empty. Cannot be manually declared in `meta.problems`.
+- `insecure`: (Reserved for future use.) The package has some security vulnerabilities.
+- `broken`: (Reserved for future use.) The package is broken in some way.
+- `unsupported`: (Reserved for future use.) The package is not expected to build on this platform.
 
-Not all values make sense for declaration in `meta.problems`: Some may be automatically generated from other `meta` attributes (for example `maintainerless`). New kinds may be added in the future. Furthermore, some kinds are expected to be present only up to once per derivation: for example, we have no use for having multiple `maintainerless` problems, and therefore also no need to give them a name in order to distinguish them.
+Not all values make sense for declaration in `meta.problems`: Some may be automatically generated from other `meta` attributes (for example `maintainerless`). New kinds may be added in the future. Furthermore, some kinds are expected to be present only up to once per derivation: for example, we have no use for having multiple `maintainerless` problems.
 
 ### Nixpkgs configuration
 
@@ -86,7 +84,7 @@ The following new config options are added to nixpkgs: `config.problemHandler` a
 
 Handler values can be either `"error"`, `"warn"` or `"ignore"`. `"error"` maps to `throw`, `"warn"` maps to `trace`. Future values may be added in the future.
 
-`config.problemHandlers` is the simple and most user-facing configuration value. It is a simple doubly-nested attribute set, of style `pkgName.problemName`.
+`config.problemHandlers` is the simple and most user-facing configuration value. It is a simple doubly-nested attribute set, of style `pkgName.problemName`. The package name is taken from `lib.getName`, which currently yields its `pname` attribute.
 
 ```nix
 config.problemHandlers = {
@@ -115,13 +113,21 @@ config.problemHandlerDefaultMatchers = [
     kind = "insecure";
     handler = "ignore";
   }
-  { # Disallowed: use problemHandlers instead
-    pkgName = "hello";
+  { # Disallowed: Non-wildcards are better handled by using `problemHandlers` instead
+    # The equivalent would be: `config.problemHandlers.hello.CVE1234 = "error";
+    package = "hello";
     name = "CVE1234";
-    handler = "ignore";
+    handler = "error";
   }
 ]
 ```
+
+To make it more explicit, a matches is an attribute set which may contain the following fields:
+
+- `package`: Match only problems of a specified package.
+- `kind`: Match only problems of a specific kind.
+- `name`: Match only problems with a specific name.
+- `handler`: Required. Sets the level for packages that have been matched by this matcher.
 
 ## Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -134,18 +140,18 @@ When the problem requires actions on dependents however, it does not sufficientl
 
 ### Backwards compatbility, Backporting and stable releases
 
-New problems generally should not be added to stable branches if possible, and also not be backported to them, since it may break evaluation. The same rule applies to other changes to a pacakge's `meta` which may generate a problem and thus lead to evaluation failure too. Scenarios where evaluation failure is a desired goal, for example with unfixable security issues, are obviously exempt from this.
+New problems generally should not be added to stable branches if possible, and also not be backported to them, since it may break evaluation. The same rule applies to other changes to a package or its `meta` which may generate a problem and thus lead to evaluation failure too. Scenarios where evaluation failure is a desired goal, for example with unfixable security issues, are obviously exempt from this.
 
 ### Removal of packages
 
-The plan is to eventually remove packages with long outstanding problems. The details will be part of future work, but at the very least a package must have a problem whose kind defaults to "error" for at least one full release cycle (so that stable users have sufficient time to be warned and intervene).
+The plan is to eventually remove packages with long outstanding problems of some kinds. The details will be part of future work, but users will be warned sufficiently in advance to give them the chance to intervene.
 
 If a package needs to be removed for some other reason, the problem kind `removal` should be used instead:
 
 ```nix
 meta.problems = {
   removal = {
-    message = "We don't want this in nixpkgs anymore";
+    message = "This package will be removed from Nixpkgs.";
     date = "1970-01-01";
   };
 };
