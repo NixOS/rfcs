@@ -92,7 +92,9 @@ Non-automatic updates may also be done to ensure further correctness, such as
 - [GitHub's CODEOWNERS](https://github.com/NixOS/nixpkgs/blob/master/.github/CODEOWNERS)
 - Update scripts like [this](https://github.com/NixOS/nixpkgs/blob/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/applications/version-management/cz-cli/generate-dependencies.sh)
 
-Since this migration should be widely announced with a pinned issue on the Nixpkgs issue tracker and a Discourse post.
+This PR [will cause merge conflicts](https://github.com/nixpkgs-architecture/nixpkgs/pull/2) with all existing PRs that modify moved files, however they can trivially be rebased using `git rebase && git push -f`.
+Because of this, merging of this PR should be widely announced with a pinned issue on the Nixpkgs issue tracker and a Discourse post.
+Additionally this PR can benefit from being merged after a release due to the decreased PR count, leading to less conflicts.
 
 ## Examples
 [examples]: #examples
@@ -153,10 +155,9 @@ These attributes will need to be moved to the standard manually with some arguab
 
 `nix edit` and search.nixos.org will automatically point to the new location without problems, since they rely on `meta.position` to get the file to edit, which still works.
 
-## Git and NixOS release problems
+## Git and NixOS release
 
-- The migration PR will cause merge conflicts with all existing PRs that modify moved files, however they can trivially be rebased using `git rebase && git push -f`.
-- Commits that change moved files in `pkgs/unit` [can be cherry-picked](https://gist.github.com/infinisil/00b5ccc62b76bc1fe91b32db758adb41) to the previous file location without problems.
+- Backporting changes to moved files [won't be problematic](https://github.com/nixpkgs-architecture/nixpkgs/pull/4)
 - `git blame` locally and on GitHub is unaffected, since it follows file moves properly.
 
 ## `callPackage` with `nix-build -E`
