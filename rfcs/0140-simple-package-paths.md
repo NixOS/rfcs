@@ -51,6 +51,7 @@ Create the initially-empty directory `pkgs/unit`, called _unit base directory_, 
 
 Check the following using CI:
 - The unit base directory must only contain subdirectories of the form `pkgs/unit/${shard}/${name}`, called _unit directories_.
+- The `name`'s of unit directories must be unique when lowercased
 - `name` is a string only consisting of the ASCII characters `a-z`, `A-Z`, `0-9`, `-` or `_`.
 - `shard` is the lowercased first two letters of `name`, expressed in Nix: `shard = toLower (substring 0 2 name)`.
 - Each unit directory must contain a `package.nix` file and may contain arbitrary other files.
