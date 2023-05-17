@@ -1,13 +1,11 @@
----
-feature: simple-package-paths
-start-date: 2022-09-02
-author: "Silvan Mosberger (@infinisil)"
-co-authors: "Robert Hensing (@roberth)"
-pre-RFC reviewers: "Thomas Bereknyei (@tomberek), John Ericson (@Ericson2314), Alex Ameen (@aakropotkin)"
-shepherd-team: "@phaer @06kellyjac @aakropotkin @piegamesde"
-shepherd-leader: -
-related-issues: https://github.com/NixOS/nixpkgs/pull/211832
----
+| feature | simple-package-paths |
+| start-date | 2022-09-02 |
+| author | Silvan Mosberger (@infinisil) |
+| co-authors | Robert Hensing (@roberth) |
+| pre-RFC reviewers | Thomas Bereknyei (@tomberek), John Ericson (@Ericson2314), Alex Ameen (@aakropotkin) |
+| shepherd-team | @phaer @06kellyjac @aakropotkin @piegamesde |
+| shepherd-leader | - |
+| related-issues | https://github.com/NixOS/nixpkgs/pull/211832 |
 
 # Summary
 [summary]: #summary
