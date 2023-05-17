@@ -232,11 +232,22 @@ The semantics of how unit directories are checked by CI do allow the definition 
 Context: `pkgs/unit` is the unit base directory
 
 Alternatives:
-- Don't nest the directory under `pkgs`
-  - This is future proof in case we want to make the directory structure more general purpose, but this is out of scope
-- Another name than `unit`, proposed were `auto`, `pkg`, `mod`, `component`, `part`, `comp`, `app`, `simple`, 
+- Use `unit` in the root directory instead
+  - (+) This is future proof in case we want to make the directory structure more general purpose
+    - (-) We don't yet know if we want that, so this is out of scope for now
+- Use `pkgs` instead, so that the `${shard}`'s are siblings to the other current directories in `pkgs` such as `top-level`, with the intention that the other directories would be hopefully removed at some point, then only leaving the shards in `pkgs`
+  - (+) If we remove the other directories at some point, only the `${shard}`'s will be left in `pkgs`
+  - (-) This leads to ambiguities between the directories from the standard and the other directories, requiring special handling in the code and CI, leading to complexities.
+  - (-) This would be harder to document and explain to people, since one always has to disregard all non-unit directories, with no obvious justification
+  - (-) Currently we cannot apply this standard to all definitions in `pkgs`, in particular nested packages like `pythonPackages.*`, non-`callPackage`'d definitions like `copyDesktopItems` and non-derivations like `fetchFromGitHub`.
+    Depending on how we want to handle those, it might make more sense to keep `pkgs/unit` or to use `pkgs` directly once all legacy paths are migrated away to another top-level directory, we don't yet know. `pkgs/unit` will be easier to migrate to `pkgs` than the other way around though.
+- Another name than `unit`, proposed were `auto`, `pkg`, `mod`, `component`, `part`, `comp`, `app`, `simple`
+  - (-) `unit` is considered the most appropriate because a "unit" typically refers to a discrete, indivisible entity that is distict from other entities of the same type.
+  - (-) In addition we envision that in the future we would extend the unit directory standard to not just include a package definition for each unit, but also other parts such as NixOS modules, library components, tests, etc. In this case `unit` would fit even better and could be described as
+    > A collection of standardized files related to the same software component
 
-## Alternate `pkgs/unit` structure
+
+## Alternate shard structure
 
 Context: The structure is `pkgs/unit/${shard}/${name}` with `shard` being the lowercased two-letter prefix of `name`.
 
