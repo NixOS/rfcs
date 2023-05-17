@@ -12,7 +12,7 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/211832
 # Summary
 [summary]: #summary
 
-Auto-generate trivial top-level attribute definitions in `pkgs/top-level/all-packages.nix` from a directory structure that matches the attribute name.
+Auto-generate trivial top-level attribute definitions in Nixpkgs' `pkgs/top-level/all-packages.nix` from a Nixpkgs-internally standardised directory structure that matches the attribute name.
 This makes it much easier to contribute new packages, since there's no more guessing needed as to where the package should go, both in the ad-hoc directory categories and in `all-packages.nix`.
 
 # Motivation
