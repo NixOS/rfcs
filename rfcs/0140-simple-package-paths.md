@@ -73,7 +73,7 @@ with an arbitrary `args`.
 Check the following using CI for each unit directory:
 - `pkgs.${name}` is defined as above, either automatically or with some `args` in `pkgs/top-level/all-packages.nix`.
 - `pkgs.${name}` is a [derivation](https://nixos.org/manual/nix/stable/glossary.html#gloss-derivation).
-- <a id="req-ref"> The `package.nix` file evaluated from `pkgs.${name}` must not access files outside its unit directory.
+- <a id="req-ref"></a> The `package.nix` file evaluated from `pkgs.${name}` must not access files outside its unit directory.
 
 ## PR 2: Automated migration
 
