@@ -1,4 +1,5 @@
 | feature | simple-package-paths |
+| --- | --- |
 | start-date | 2022-09-02 |
 | author | Silvan Mosberger (@infinisil) |
 | co-authors | Robert Hensing (@roberth) |
