@@ -195,6 +195,21 @@ The most immediate drawbacks are:
    easier to create such categories using Nix language when compared to other
    software collections.
 
+3. Superfluous
+
+   It can be argued that there are other ways to discover similar or related
+   package sets, like Repology.
+
+   However, this argument is a bit circular, because e.g. the classification
+   shown by Repology effectively replicates the classification done by the many
+   software collections in its catalog. Therefore, relying in Repology merely
+   transfers the question to external sources.
+
+   Further it becomes more pronounced when we take into account the fact Nixpkgs
+   is top 1 of most Repology statistics. The expected outcome, therefore, should
+   be precisely the opposite: Nixpkgs being _the_ source of structured metainfo
+   for other software collections.
+
 # Alternatives
 [alternatives]: #alternatives
 
