@@ -219,28 +219,30 @@ The most immediate drawbacks are:
 
 2. Ignore/nuke the categorization completely
 
-   This is not an idea as bad as it appear. After all, categorization has a
-   non-negligible propensity to bikeshedding. Removing it removes all problems.
+   This is an alternative worthy of some consideration. After all,
+   categorization is not without its problems, as shown above. Removing or
+   ignoring classification removes all problems.
 
    However, there are good reasons to keep the categorization:
-
-   - The categorization is already present; this RFC proposes to expose it to a
-     higher level, in a more discoverable, structured format.
 
    - The complete removal of categorization is too harsh. A solution that keeps
      and enhances the categorization is way more preferrable than one that nukes
      it completely.
 
+   - As said before, the categorization is already present; this RFC proposes to
+     expose it to a higher level, in a structured, more discoverable format.
+
    - Categorization is very traditional among software collections. Many of them
      are doing this just fine for years on end, and Nixpkgs can imitate them
-     easily - and even better, given we have Nix language machinery available.
+     easily - and even surpass them, given the benefits of Nix language
+     machinery.
 
    - Categorization is useful in many scenarios and use cases - indeed they
      are ubiquitous in software world:
-     - specialized search engines as Repology
+     - specialized search engines (from Repology to MELPA)
      - code forges, from Sourceforge to Gitlab
      - as said above, software collections from pkgsrc to slackbuilds
-     - to organization and preservation
+     - to organization and preservation (as Software Heritage)
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
