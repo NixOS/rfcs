@@ -58,7 +58,13 @@ Why should we *not* do this?
 # Alternatives
 [alternatives]: #alternatives
 
-What other designs have been considered? What is the impact of not doing this?
+- change nothing, obviously
+- also resign old `*.narinfo`.  Maybe it's not too hard.
+  It would help people wanting ot use old builds.
+- double-sign `*.narinfo` for some time. (also not an exclusive alternative)
+  I don't know if consumers support multiple signatures.
+  It doesn't seem to give us significant advantage though;
+  acceptance of multiple keys seems more advantageous.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
