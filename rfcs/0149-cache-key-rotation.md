@@ -70,7 +70,8 @@ Why should we *not* do this?
 [unresolved]: #unresolved-questions
 
 - confirm Nix's (non-)acceptance of FODs without signature
-- determine timing (e.g. the *X* above)
+- determine timing (e.g. the *X* above).
+  Consider aligning the regular schedule with NixOS releases.
 
 # Future work
 [future]: #future-work
