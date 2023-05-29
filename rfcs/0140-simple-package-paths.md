@@ -49,7 +49,7 @@ This PR will be backported to the stable release in order to ensure that backpor
 Create the initially-empty directory `pkgs/unit`, called _unit base directory_, in Nixpkgs.
 
 Check the following using CI:
-- The unit base directory must only contain subdirectories of the form `pkgs/unit/${shard}/${name}`, called _unit directories_.
+- The unit base directory must only contain subdirectories of the form `${shard}/${name}`, called _unit directories_.
 - The `name`'s of unit directories must be unique when lowercased
 - `name` is a string only consisting of the ASCII characters `a-z`, `A-Z`, `0-9`, `-` or `_`.
 - `shard` is the lowercased first two letters of `name`, expressed in Nix: `shard = toLower (substring 0 2 name)`.
@@ -160,14 +160,14 @@ These attributes will need to be moved to the standard manually with some arguab
 - Backporting changes to moved files [won't be problematic](https://github.com/nixpkgs-architecture/nixpkgs/pull/4)
 - `git blame` locally and on GitHub is unaffected, since it follows file moves properly.
 
-## `callPackage` with `nix-build -E`
+## `callPackage` with `nix-build --expr`
 
-A commonly recommended way of building package directories in Nixpkgs is to use `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
-Since the path changes `package.nix` is now used, this becomes like `nix-build -E 'with import <nixpkgs> {}; callPackage pkgs/unit/he/hello/package.nix {}'`, which is harder for users.
+A commonly recommended way of building package directories in Nixpkgs is to use `nix-build --expr 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
+Since the path changes `package.nix` is now used, this becomes like `nix-build --expr 'with import <nixpkgs> {}; callPackage pkgs/unit/he/hello/package.nix {}'`, which is harder for users.
 However, calling a path like this is an anti-pattern anyway, because it doesn't use the correct Nixpkgs version and it doesn't use the correct argument overrides.
 The correct way of doing it was to add the package to `all-packages.nix`, then calling `nix-build -A hello`.
-This `nix-build -E` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
-By teaching users that `pkgs/unit/<shard>/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build -E` workarounds should disappear.
+This `nix-build --expr` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
+By teaching users that `pkgs/unit/<shard>/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build --expr` workarounds should disappear.
 
 ## Manual removal of custom arguments
 
@@ -175,7 +175,7 @@ While this RFC allows passing custom arguments, doing so means that `all-package
 In specific cases where attributes of custom arguments are of the form `name = value` and `name` isn't a package attribute, they can be avoided without breaking the API.
 To do so, ensure that the function in the called file has `value` as an argument and set the default of the `name` argument to `value`.
 
-This notably doesn't work when `name` is already a package attribute, because then the default is never used and instead overridden.
+This notably doesn't work when `name` is already a package attribute or when such a package is added later, because then the default is never used and instead overridden.
 
 ## Package variants
 
@@ -257,10 +257,10 @@ Alternatives:
     - (+) This feature is not used often.
       - (-) [A poll](https://discourse.nixos.org/t/poll-how-often-do-you-navigate-through-directories-on-github-to-get-to-a-nixpkgs-package-file/21641) showed that about 41% of people rely on this feature every week.
   - (-) Bad because it makes `git` and file listings slower.
-- Use three-letter or hour-letter prefixes.
+- Use three-letter or four-letter prefixes.
   - (-) Also leads to directories containing more than 1 000 entries, see above.
 - Use multi-level structure, e.g. a two-level two-letter prefix structure where `hello` is in `pkgs/unit/he/ll/hello`
-  - (+) This would virtually a unlimited number of packages without performance problems
+  - (+) This would allow virtually a unlimited number of packages without performance problems
   - (-) It's hard to understand, type and implement, needs a special case for packages with few characters
     - E.g. `x` could go in `pkgs/unit/x-/--/x`
   - (-) There's not enough packages even in Nixpkgs that a two-level structure would make sense. Most of the structure would only be filled by a couple entries.
@@ -286,7 +286,7 @@ Alternatives:
   - (-) Not using `default.nix` frees up `default.nix` for an expression that is actually buildable, e.g. `(import ../.. {}).hello`, although we don't yet have a use case for this that isn't covered by `nix-build ../.. -A <attrname>`.
   - (-) Using `default.nix` would tempt users to invoke `nix-build .`, which wouldn't work and making package functions auto-callable is a known anti-pattern.
 - `pkg-fun[c].nix`
-  - (+) Makes a potentially transition to a non-function form of packages in the future easier.
+  - (+) Makes a potential transition to a non-function form of packages in the future easier.
     - (-) There's no problem with introducing versioning later with different filenames.
     - (-) We don't even know if we actually want to have a non-function form of packages.
   - (-) Abbreviations are a bit jarring.
@@ -308,19 +308,20 @@ The alternative is to not allow that, requiring that `pkgs.${name}` corresponds 
 - (-) It's harder to explain to beginners whether their package can use the unit directory standard or not
 - (+) The direct correspondance ensures that the unit directory contains all information about the package, which is very intuitive
   - (-) We're not at the point where we can have that though, custom arguments don't have a good replacement yet
-- (-) If a package previously didn't need custom arguments, it would be moved to a unit directory. But then there's a need for a custom argument, which then requires moving it out from the unit directory and into the freeform structure of `pkgs/` again.
+- (-) If a package previously didn't need custom arguments, it would be moved to a unit directory. But when the need for a custom argument arises, it then requires moving it out from the unit directory and into the freeform structure of `pkgs/` again.
 - (+) It's easier to relax restrictions than to impose new ones
 
 ## Reference check
 
 Context: There's a [requirement](#user-content-req-ref) to check that unit directories can't access paths outside themselves.
 
-Alternatives: Don't have this requirement
-- (-) Doesn't discourage the use of file paths as an API.
-- (-) Makes further migrations to different file structures harder.
+Alternatives:
+- Don't have this requirement
+  - (-) Doesn't discourage the use of file paths as an API.
+  - (-) Makes further migrations to different file structures harder.
 - Make the requirement also apply the other way around: Files outside the unit directory cannot access files inside it, with `package.nix` being the only exception, and only for the one attribute in `all-packages.nix`
-- (-) Enforcing this requires a global view of Nixpkgs, which is nasty to implement
-- (-) [Package variants](#package-variants) would not be possible to define
+  - (-) Enforcing this requires a global view of Nixpkgs, which is nasty to implement
+  - (-) [Package variants](#package-variants) would not be possible to define
 
 ## Allow `callPackage` arguments to be specified in `<unit>/args.nix`
 
@@ -358,6 +359,6 @@ All of these questions are in scope to be addressed in future discussions in the
 - Improve the semantics of `callPackage` and/or apply a better solution, such as a module-like solution
 - Potentially establish an updateScript standard to avoid problems like, relates to Flakes too
 - What to do with different versions, e.g. `wlroots = wlroots_0_14`? This goes into version resolution, a different problem to fix
-- What to do about e.g. `libsForQt5.callPackage`? This goes into overrides, a different problem to fix
+- What to do about e.g. `python3Packages.callPackage`? This goes into overrides, a different problem to fix
 - What about aliases like `jami-daemon = jami.jami-daemon`?
 - What about `recurseIntoAttrs`? Not single packages, package sets, another problem
