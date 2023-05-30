@@ -13,7 +13,7 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/177272
 ## Summary
 [summary]: #summary
 
-Inspired by the various derivation checks like for broken and insecure packages, a new system called "problems" is introduced. It is planned to eventually replace the previously mentioned systems where possible, as well as the current – undocumented – "warnings" (which currently only prints a trace message for unmaintained packages). A `config.problemHandler` and `problemHandlerDefaultMatchers` option is added to the nixpkgs configuration, with centralized and granular control over how to handle problems that arise: "error" (fail evaluation), "warn" (print a trace message) or "ignore" (do nothing).
+Inspired by the various derivation checks like for broken and insecure packages, a new system called "problems" is introduced. It is planned to eventually replace the previously mentioned systems where possible, as well as the current – undocumented – "warnings" (which currently only prints a trace message for unmaintained packages). A `config.problems.handlers` and `config.problems.matchers` option is added to the nixpkgs configuration, with centralized and granular control over how to handle problems that arise: "error" (fail evaluation), "warn" (print a trace message) or "ignore" (do nothing).
 
 Additionally, `meta.problems` is added to derivations, which can be used to manually declare that a package has a certain problem. This will then be used to inform users about packages that are in need of maintenance, for example security vulnerabilities or deprecated dependencies.
 
@@ -27,6 +27,8 @@ Nixpkgs has the problem that it is often treated as "append-only", i.e. packages
 Let's take the end of life of Python 2 as an example. (This applies to other ecosystems as well, and will come up again and again in the future.) It has sparked a few bulk package removal actions by dedicated persons, but those are pretty work intensive and prone to burn out maintainers. A goal of this RFC is to provide a way to notify all users of a package about the outstanding issues. This will hopefully draw more attention to abandoned packages, and spread the work load. It can also help soften the removal of packages by providing a period for users to migrate away at their own pace.
 
 For some use cases, like for packages without maintainers, we do not want to break evaluation of a package and simply warn the user instead. We want the users to configure all these according to their needs and through a single standardized interface.
+
+Nixpkgs already has a couple of mechanisms for doing these kind of things, among others for unfree, insecure or broken packages. However these have been added pretty much ad-hoc over time, and while being similar to each other also may have subtle differences. (For example some allow to provide a predicate for more granular control, others don't.) Usually, adding a new such mechanism (recently done with the source provenance in RFC 89) involves copying one of the existing ones and making adaptations. We need to generalize this concept in a way that is extensible towards new use cases, and to provide a more standardized API for configuration.
 
 ## Detailed design
 [design]: #detailed-design
@@ -76,27 +78,27 @@ At the moment, the following values for the `kind` field of a warning are known:
 - `broken`: (Reserved for future use.) The package is broken in some way.
 - `unsupported`: (Reserved for future use.) The package is not expected to build on this platform.
 
-Not all values make sense for declaration in `meta.problems`: Some may be automatically generated from other `meta` attributes (for example `maintainerless`). New kinds may be added in the future. Furthermore, some kinds are expected to be present only up to once per derivation: for example, we have no use for having multiple `maintainerless` problems.
+Not all values make sense for declaration in `meta.problems`: Some may be automatically generated from other `meta` attributes (for example `maintainerless`). New kinds may be added in the future. Furthermore, some kinds are expected to be present only up to once per derivation: for example, we have no use for having multiple `maintainerless` problems. Restrictions like these may be implemented in the metadata check of packages.
 
 ### Nixpkgs configuration
 
-The following new config options are added to nixpkgs: `config.problemHandler` and `config.problemHandlerDefaultMatchers`. The (currently undocumented) option `config.showDerivationWarnings` will be removed.
+The following new config options are added to nixpkgs: `config.problems.handlers` and `config.problems.matchers`. The (currently undocumented) option `config.showDerivationWarnings` will be removed.
 
 Handler values can be either `"error"`, `"warn"` or `"ignore"`. `"error"` maps to `throw`, `"warn"` maps to `trace`. Future values may be added in the future.
 
-`config.problemHandlers` is the simple and most user-facing configuration value. It is a simple doubly-nested attribute set, of style `pkgName.problemName`. The package name is taken from `lib.getName`, which currently yields its `pname` attribute.
+`config.problems.handlers` is the simple and most user-facing configuration value. It is a simple doubly-nested attribute set, of style `pkgName.problemName`. The package name is taken from `lib.getName`, which currently yields its `pname` attribute.
 
 ```nix
-config.problemHandlers = {
+config.problems.handlers = {
   myPackage.maintainerless = "warn";
   otherPackage.CVE1234 = "ignore";
 }
 ```
 
-Some times, there is the need to set the handler for multiple problems on a package, or for one problem kind across all packages. For this,  `config.problemHandlerDefaultMatchers` exists. It is a list of matchers (currently package name, problem name or problem kind), with an associated handler. If multiple matchers match a single package, the one with the highest level (error > warn > ignore) will be used. Since the user configuration is merged with the default configuration, this means that one can not decrease the handler level below the default value. This is to protect users against accidentally disabling entire classes of notifications. Values from `config.problemHandlers` take precedence.
+Some times, there is the need to set the handler for multiple problems on a package, or for one problem kind across all packages. For this,  `config.problems.matchers` exists. It is a list of matchers (currently package name, problem name or problem kind), with an associated handler. If multiple matchers match a single package, the one with the highest level (error > warn > ignore) will be used. Since the user configuration is merged with the default configuration, this means that one can not decrease the handler level below the default value. This is to protect users against accidentally disabling entire classes of notifications. Values from `config.problems.handlers` take precedence.
 
 ```nix
-config.problemHandlerDefaultMatchers = [
+config.problems.matchers = [
   { # Wildcard matcher for everything
     handler = "warn";
   }
@@ -113,8 +115,8 @@ config.problemHandlerDefaultMatchers = [
     kind = "insecure";
     handler = "ignore";
   }
-  { # Disallowed: Non-wildcards are better handled by using `problemHandlers` instead
-    # The equivalent would be: `config.problemHandlers.hello.CVE1234 = "error";
+  { # Disallowed: Non-wildcards are better handled by using `problems.handlers` instead
+    # The equivalent would be: `config.problem.handlers.hello.CVE1234 = "error";
     package = "hello";
     name = "CVE1234";
     handler = "error";
@@ -134,7 +136,7 @@ To make it more explicit, a matches is an attribute set which may contain the fo
 
 ### Propagation across transitive dependencies
 
-When a package has a problem that `throw`s, all packages that depend on it will fail to evaluate until that problem is ignored or resolved. Most of the time, this is sufficient.
+When a package has a problem that `error`s, all packages that depend on it will fail to evaluate until that problem is ignored or resolved. Most of the time, this is sufficient.
 
 When the problem requires actions on dependents however, it does not sufficiently inform about all packages that need action. Multiple packages may be annotated with the same problem, in that case it should be given a name and the name should be the same across all instances. Other values like the message or the URL list do not need to be the same and may be adapted sensibly.
 
@@ -144,9 +146,7 @@ New problems generally should not be added to stable branches if possible, and a
 
 ### Removal of packages
 
-The plan is to eventually remove packages with long outstanding problems of some kinds. The details will be part of future work, but users will be warned sufficiently in advance to give them the chance to intervene.
-
-If a package needs to be removed for some other reason, the problem kind `removal` should be used instead:
+If a package needs to be removed for some reason (most likely due to outstanding unresolved problems), the problem kind `removal` should be added:
 
 ```nix
 meta.problems = {
@@ -154,8 +154,11 @@ meta.problems = {
     message = "This package will be removed from Nixpkgs.";
     date = "1970-01-01";
   };
+  # Probably some more problems here
 };
 ```
+
+The plan is to eventually remove packages with long outstanding problems of some kinds. The details will be part of future work, but users will be warned sufficiently in advance to give them the chance to intervene: Before removing a package, it should have a `removal` annotation for at least one full release cycle.
 
 ## Drawbacks
 [drawbacks]: #drawbacks
@@ -275,7 +278,7 @@ A third approach used a two-level attribute set, similarly to the list above, bu
 - ~~Should issues be a list or an attrset?~~·
   - ~~We are using a list for now, there is always the possibility to also allow attrsets in the future.~~
   - Current design uses an attribute set
-- Currently, many of the relevant nixpkgs configuration options can also be set impurely via environment variables. The `config.problemHandler` option does however not easily map to some environment variable.
+- Currently, many of the relevant nixpkgs configuration options can also be set impurely via environment variables. The `config.problems.handler` option does however not easily map to some environment variable.
   - When merging existing features into the problems system, existing environment variable will keep working in the future.
   - Maybe using less environment variables is all for the better?
   - We may always add specific environment variables for specific use cases where needed without having to expose the full expression power of the configuration options.
@@ -283,7 +286,7 @@ A third approach used a two-level attribute set, similarly to the list above, bu
 ## Future work
 [future]: #future-work
 
-- The actual process of removing packages is only sketched out here to show how the new infrastructure may improve the situation. It is intentionally left as vague as possible, and details should be figured out in a follow-up discussion.
+- The actual process of removing packages is only sketched out here to show how the new infrastructure may improve the situation. It is intentionally left as open as possible, and details should be figured out in a follow-up discussion.
 - The problems system is designed in a way that it supersedes a lot of our "insecure"/"unfree"/"unsupported" packages infrastructure. There is a lot of code duplication between them. In theory, we could migrate some of these to make use of problems. At the very least, we hope that problems are general enough so that no new similar features will have to be added in the future anymore.
   - Migrating the existing systems may end up being tricky due to backwards compatibility issues.
 - Inspired by the automation of aliases, we could build tooling for this as well. This is deemed out of scope of this RFC because only real world usage will tell which actions will be worthwhile automating, but it should definitely be considered in the future.
@@ -291,4 +294,4 @@ A third approach used a two-level attribute set, similarly to the list above, bu
   - Automatically removing packages based on time will likely require providing more information whether it is safe to do so or not.
 - > If the advisories were a list, and we also added them for modules, maybe we could auto-generate most release notes, and move release notes closer to the code they change. [[source]](https://discourse.nixos.org/t/pre-rfc-package-advisories/19509/4)
   - Issues can certainly be automatically integrated into the release notes somehow. However, this alone would not allow us to move most of our release notes into the packages, because for many release entries breaking eval would be overkill.
-- There has been discussion about introducing "tracing aliases", aliases that don't `throw` by default. Such an implementation may make use of the problem infrastructure.
+- There has been discussion about introducing "tracing aliases"; aliases that don't `throw` by default. Such an implementation may make use of the problem infrastructure.
