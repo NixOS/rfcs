@@ -115,45 +115,45 @@ graph TD
 
 
 0. Have a cool idea!
-1. Fill in the RFC. Put care into the details: RFCs that do not present
+0. Fill in the RFC. Put care into the details: RFCs that do not present
    convincing motivation, demonstrate understanding of the impact of the design,
    or are disingenuous about the drawbacks or alternatives tend to be
    poorly-received. Consider using [Semantic Line Breaks](https://sembr.org/)
    in oder to get better diffs on later amendments.
-2. Consider publishing your RFC as pre-RFC [in the forum](https://discourse.nixos.org/c/dev/rfc-steering-committee/33)
+0. Consider publishing your RFC as pre-RFC [in the forum](https://discourse.nixos.org/c/dev/rfc-steering-committee/33)
    to gather initial feedback and iron out the remaining typos.
-3. In case your RFC is a technical proposal, you might want to prepare a
+0. In case your RFC is a technical proposal, you might want to prepare a
    prototype of your idea to firstly make yourself aware of potential pitfalls
    and also help reviewers understand the RFC. Code may be able to explain some
    issues in short.
-4. Submit a pull request. As a pull request the RFC will receive design feedback
+0. Submit a pull request. As a pull request the RFC will receive design feedback
    from the larger community, and the author should be prepared to revise it in
    response.
-5. For the nomination process for potential members of the RFC Shepherd Team,
+0. For the nomination process for potential members of the RFC Shepherd Team,
    that is specific to each RFC, anyone interested can either nominate another
    person or themselves to be a potential member of the RFC Shepherd Team. This
    can already be done when submitting the PR.
-6. The RFC Steering Committee assigns a subset of the nominees to the RFC
+0. The RFC Steering Committee assigns a subset of the nominees to the RFC
    Shepherd Team and designates a leader for it. This has to be done
    unanimously.
-7. Build consensus and integrate feedback. RFCs that have broad support are much
+0. Build consensus and integrate feedback. RFCs that have broad support are much
    more likely to make progress than those that don't receive any comments. Feel
    free to reach out to the RFC Shepherd Team leader in particular to get help
    identifying stakeholders and obstacles.
-8. The RFC Shepherd Team will discuss the RFC pull request, as much as possible
+0. The RFC Shepherd Team will discuss the RFC pull request, as much as possible
    in the comment thread of the pull request itself. Discussion outside of the
    pull request, either offline or in a video conference, that might be
    preferable to get to a solution for complex issues, will be summarized on the
    pull request comment thread.
-9. RFCs rarely go through this process unchanged, especially as alternatives and
+0. RFCs rarely go through this process unchanged, especially as alternatives and
    drawbacks are shown. You can make edits, big and small, to the RFC to clarify
    or change the design, but make changes as new commits to the pull request,
    and leave a comment on the pull request explaining your changes.
    Specifically, do not squash or rebase commits after they are visible on the
    pull request.
-10. At some point, a member of the RFC Shepherd Team will propose to start the
-    "Final Comment Period" (FCP) on behalf of the team, along with a disposition
-    for the RFC (usuall "merge" or "close").
+0. At some point, a member of the RFC Shepherd Team will propose to start the
+   "Final Comment Period" (FCP) on behalf of the team, along with a disposition
+   for the RFC (usuall "merge" or "close").
     * This step is taken when enough of the tradeoffs have been discussed that
       the RFC Shepherd Team is in a position to make a decision. That does not
       require consensus amongst all participants in the RFC thread (which is
@@ -169,22 +169,22 @@ graph TD
     * In order to actually enter FCP, it must be made clear that all members of
       the RFC Shepherd Team sign off the motion, e.g. through comments, reactions,
       approving reviews or a meeting protocol.
-11. The FCP is advertised widely by the shepherds, most importantly in the relevant
-    [Discourse announcements category](https://discourse.nixos.org/c/announcements/rfc-announcements/22).
-    It lasts ten calendar days starting with the Discourse announcement, so that
-    it is open for at least 5 business days. This way all stakeholders have a
-    chance to lodge any final objections before a decision is reached.
-12. In most cases, the FCP is quiet, and the RFC is either merged or
-    closed. However, sometimes substantial new arguments or ideas are raised,
-    the FCP is canceled, and the RFC goes back into development mode.
-    The feedback during FCP may result in minor adjustments to the RFC, this is
-    not necessarily a reason to cancel FCP.
-13. In case of acceptance, the RFC Steering Committee merges the PR.
-    Otherwise the RFC's pull request is closed. If no
-    consensus can be reached on the RFC but the idea in general is accepted, it
-    gets closed, too. A note is added that is should be proposed again, when the
-    circumstances, that are stopping the discussion to come to another decision,
-    change.
+0. The FCP is advertised widely by the shepherds, most importantly in the relevant
+   [Discourse announcements category](https://discourse.nixos.org/c/announcements/rfc-announcements/22).
+   It lasts ten calendar days starting with the Discourse announcement, so that
+   it is open for at least 5 business days. This way all stakeholders have a
+   chance to lodge any final objections before a decision is reached.
+0. In most cases, the FCP is quiet, and the RFC is either merged or
+   closed. However, sometimes substantial new arguments or ideas are raised,
+   the FCP is canceled, and the RFC goes back into development mode.
+   The feedback during FCP may result in minor adjustments to the RFC, this is
+   not necessarily a reason to cancel FCP.
+0. In case of acceptance, the RFC Steering Committee merges the PR.
+   Otherwise the RFC's pull request is closed. If no
+   consensus can be reached on the RFC but the idea in general is accepted, it
+   gets closed, too. A note is added that is should be proposed again, when the
+   circumstances, that are stopping the discussion to come to another decision,
+   change.
 
 ### Unhappy Cases
 
