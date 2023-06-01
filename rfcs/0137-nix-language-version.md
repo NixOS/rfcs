@@ -26,7 +26,7 @@ This sometimes involves backward-incompatible ("breaking") changes that currentl
 
 Therefore we propose a mechanims and policies to introduce changes to the Nix language in a controlled and deliberate manner.
 It aims to avoid breaking existing setups, and to minimise maintenance burden for implementors and users.
-The goal is for new versions of the Nix language evaluator to stay backward compatible with existing Nix expressions, but not necessarily for new Nix expressions to stay forward compatible with existing evaluators.
+The goal is for new versions of the Nix language evaluator to stay backward compatible with existing Nix expressions, and for new Nix expressions to be deliberately incompatible with existing evaluators.
 
 Regardless, changes to the language, especially breaking changes, should remain a rare exception.
 
@@ -63,6 +63,11 @@ Other discussions around language changes:
 - [RFC 110](https://github.com/NixOS/rfcs/pull/110) proposing a alternatives to the `with` expression
 - [Nix 2 – a hypothetical syntax](https://md.darmstadt.ccc.de/s/nix2)
 - [Nix language changes](https://gist.github.com/edolstra/29ce9d8ea399b703a7023073b0dbc00d)
+
+## Drawbacks
+
+Allowing multiple language versions to coexist will over time introduce a proliferation of syntax highlighters and other tooling.
+Once the language version is accessible though, tooling can at least be adapted in a systematic way.
 
 ## Alternatives
 
@@ -145,115 +150,131 @@ Other discussions around language changes:
 
    </details>
 
-1. The language version for Nix files is denoted in the file extension.
+1. The language version for Nix expressions is denoted in special syntax at the beginning of parse unit.
 
    <details><summary>Arguments</summary>
 
-   - (+) Sidesteps misinterpretation keeping metadata out of the actual data
-   - (-) Will introduce a proliferation of syntax highlighters and other tooling
-       - (+) this is correct though, because a syntax highligher has to know the syntax if it changes with the language version
-   - (+) Makes accidental mixing of versions impossible
-       - Have to specify the file extension when importing a file
-       - (-) have to rename all files in a project to change the version
-   - (-) Makes filenames longer, introduces visual noise
-       - This is the cost of being explicit
-   - (-) `default.nix` resolving needs specification:
-       - If for `import ./foo`, all of `./foo/default.nix{6,7,8}` exist, pick the one matching the version used by the evaluator, otherwise fail
-           - Then you'd have to specify a file using a different version explicitly
+   - (+) Will prevent older evaluators from evaluating expressions written in a newer language version following this proposal (no forward compatibility)
+   - (-) The errors on older evaluators will be opaque
+     - (+) Syntax can be made self-describing and human-readable to alleviate that to some extent
+   - (-) The syntax has to be fixed forever if one wanted to provide meaningful errors on language upgrades
+     - This has the same trade-offs as when introducing the new syntax to begin with
+   - (-) Editor support is made harder, since it requires switching the language based on file contents
+     - (+) Making the language version accessible at all will probably outweigh the costs
 
    </details>
 
    <details><summary>Alternatives</summary>
 
    - Use a magic comment at the beginning of the file
-       - (+) Makes explicit what can be expected to work
-       - (+) Enables communicating language changes systematically
-       - (+) Backwards-compatible
-         - (+) Allows for gradual adoption: opt-in until semantics is implemented in Nix *and* the first backwards-incompatible change to the language is introduced
-       - (+) Visually unintrusive
-       - (+) Self-describing and human-readable
+       - (+) Allows for gradual adoption: opt-in until semantics is implemented in Nix *and* the first backwards-incompatible change to the language is introduced
+         - (-) This will produce surprising results if the next language version preserves syntax but changes semantics (forward compatibility)
+         - (-) Requires the first language version following this proposal to be syntactically incompatible with the current language to avoid forward compatibility
+       - (+) Can be made self-describing and human-readable
        - (+) Follows a well-known convention of using [magic numbers in files](https://en.m.wikipedia.org/wiki/Magic_number_(programming)#In_files)
        - (-) May make the appearance that changing the language is harmless
          - (+) The convention itself is harmless and independent of the development culture around the language
-       - (-) The syntax of the magic comment is arbitrary
-       - (-) There is a chance of abusing the magic comment for more metadata in the future. Let's avoid that.
+         - (-) There is a chance of abusing the magic comment for more metadata in the future
        - (-) At least one form of comment is forever bound to begin with `#` to maintain compatibility
-       - (-) Editor support is made harder, since it requires switching the language based on file contents
-       - (-) Requires significant additional effort to implement and maintain an appropriate system to make use of the version information
-       - (-) Raises the question if the new syntax should be a breaking change to the language
-           - Use a magic string that is incompatible with evaluators prior to the feature, e.g. `%? Nix <version>`
-             - (+) Makes clear that the file is not intended to be used without explicit handling of compatibility
-               - (-) Cannot be introduced gradually
-             - (+) Such a breaking change could also be reserved for later iterations of the Nix language
+         - Forward compatibility is undesirable anyway
+       - (-) Requires support by all tooling, lose semantics otherwise
 
-   - Language versioning per "project"
-       - (+) This would easily allow inheriting the language version across imports (solving a lot of issues in this proposal)
-       - (-) There is currently no notion of "project"
+   - Use `assert builtins.languageVersion` in the first line of the file
+       - (+) Produces more telling error messages in existing evaluators
+       - (+) Future evaluators could be augmented to treat this as specially for better errors
+         - (-) Special treatment may confuse users: why does `assert` at the beginning of a file work differently than somewhere else?
+       - (-) Bulky expression that can only be replaced by the magic string solution or kept forever
+
+   - Denote the language version in the file extension
+     - (+) Sidesteps misinterpretation by keeping metadata out of the actual data
+     - (-) In general it does not prevent forward compatibility with current evaluators.
+     - (+) Makes accidental mixing of versions impossible at the syntax level
+         - Have to specify the file extension when importing a file
+         - (-) Have to rename all files in a project to change the version
+           - This is somewhat worse than replacing a magic string which is fixed to the beginning of the file
+     - (-) Makes filenames longer, introduces visual noise
+         - This is the cost of being explicit
+     - (-) Enforces narrow restrictions on what information can be encoded and how
+       - The only reasonable alternative is `-`, e.g. `default.7-nix`
+         - `.`
+             - (-) Nixpkgs has been packaging Linux kernels as `linux-${major}.${minor}.nix`
+               - This may break backwards compatibility of newer evaluators with existing code in surprising ways
+         - No separator
+             – (-) Hard to discern visually
+         - `-`
+             - (+) Visually not intrusive
+         - `_`
+             – (-) Visually more intrusive
+         - `^`
+             – (-) Overlaps with derivation output syntax
+         - All of the following characters will interfere with some tooling:
+             - `!` - shells
+             - `"` - shells
+             - `#` - URLs
+             - `$` - shells
+             - `%` - URLs
+             - `&` - shells, URLs
+             - `+` - URLs
+             - `,` - natural language
+             - `/` - paths, URLs
+             - `:` - URLs
+             - `;` - shells
+             - `=` - URLs, Nix language
+             - `?` - URLs
+             - `@` - URLs, Nix language
+             - `\` - Windows paths
+     - (-) `default.nix` resolving needs specification:
+         - If for `import ./foo`, all of `./foo/default.nix{6,7,8}` exist, pick the one matching the version used by the evaluator, otherwise fail
+             - Then you'd have to specify a file using a different version explicitly
+
+   - Language versioning per "project" in a sidecar file
+       - (+) This would easily allow inheriting the language version across imports (obviating many specifications in this proposal)
+       - (-) There is currently no notion of "project" in the Nix language
          - (-) Attempting to establish one would be a large undertaking and not immediately help solving the problem at hand
+       - (-) Cannot be introduced gradually, particularly relevant for a large codebase like Nixpkgs
        - (-) It would require a separate language to encode project metadata such as the language version
            - The `edition` field was [removed from the flakes schema](https://github.com/NixOS/nix/commit/e5ea01c1a8bbd328dcc576928bf3e4271cb55399) for that reason, as it not not allow distinguishing data from metadata
            - (+) Other languages do the same (Python, Haskell, Rust, JavaScript, ...)
-             - (-) Recursive (albeit smaller) problem of managing the additional langauge for project metadata
+             - (-) Recursive (albeit smaller) problem of managing the additional language for project metadata
 
    </details>
 
-1. The file extension consists of the language version followed by `.nix`.
-   Example:
+1. The following syntax is used for declaring the language version of a Nix expression:
 
    ```
-   default.7.nix
+   version \d*;
    ```
+
+   This implies that if no language version is specified in a Nix file, it is written in version 6 (the version implemented in the stable release of Nix at the time of writing this RFC).
+
+   The syntax is open for bikeshedding.
+   Alternatives should be very short and self-describing.
 
    <details><summary>Arguments</summary>
 
-   - (+) Consistent with the convention of file extensions carrying soft meaning as metadata
-   – (-) A conflicting convention is for denoting nested file types, such as `tar.gz`
-   - (+) Visually least intrusive
+   - (+) Short and fairly self-descriptive
+   - (+) Not an invasive change
 
    </details>
 
    <details><summary>Alternatives</summary>
 
-   - No separator
-       – (-) Hard to discern visually
-   - `^`
-       – (-) Overlaps with derivation output syntax
-   - `-`
-       - (+) Visually not intrusive
-   - `_`
-       – (-) Visually more intrusive
-   - All of the following characters will interfere with some tooling:
-       - `!` - shells
-       - `"` - shells
-       - `#` - URLs
-       - `$` - shells
-       - `%` - URLs
-       - `&` - shells, URLs
-       - `+` - URLs
-       - `,` - natural language
-       - `/` - paths, URLs
-       - `:` - URLs
-       - `;` - shells
-       - `=` - URLs, Nix language
-       - `?` - URLs
-       - `@` - URLs, Nix language
-       - `\` - Windows paths
+   - `use v\d*;`
+     - (+) Shorter
+     - (-) Does not explain much
+   - `Nix language version \d*`
+     - (+) Says it all
+     - (-) Very long
 
    </details>
 
-1. The language version for bare Nix expressions is specified with a parameter to the evaluator.
-
-1. If no language version is specified in the file name, assume version 6.
-   This is the version implemented in the stable release of Nix at the time of writing this RFC.
-
-   <details><summary>Arguments</summary>
-
-   - (+) Backwards compatible with existing evaluators
-   - (+) Does not require changing any existing code
-
-   </details>
+1. The language version declaration is optional for bare Nix expressions, and can be specified with a parameter to the evaluator.
+   If no version is specified in a bare Nix expression, assume the most recent language version supported by the evaluator.
 
    <details><summary>Alternatives</summary>
+
+   - Make it mandatory
+       - (-) This will be very inconvenient to use in the REPL
 
    - Assume the evaluator's current version
        - (-) When the evaluator advances in language version, evaluation may fail on existing code
@@ -263,8 +284,6 @@ Other discussions around language changes:
        - (+) Does not clutter the file names for what is supposed to be the latest version of the code
 
    </details>
-
-1. If no version is specified when invoking the evaluator on a bare Nix expression, assume the most recent language version supported by the evaluator.
 
 1. Language versions prior to 6 are not supported.
 
@@ -276,7 +295,7 @@ Other discussions around language changes:
 
    </details>
 
-1. The Nix language evaluator provides a command to output the latest Nix language version.
+1. The Nix language evaluator provides a command to output the most recent Nix language version.
    This command provides options to list all Nix language versions supported by the evaluator.
 
    <details><summary>Arguments</summary>
@@ -487,51 +506,38 @@ nix --supported-language-versions
 ### Versioned built-ins can be passed across file boundaries
 
 ```nix
-# a.6.nix
+# a.nix
+use 6;
 builtins.langVersion
 ```
 
 ```nix
-# b.7.nix
+# b.nix
+use 7;
 [ (import ./a.6.nix) builtins.langVersion ]
 ```
 
 ```console
-$ nix-instantiate --eval b.7.nix
+$ nix-instantiate --eval b.nix
 [ 6 7 ]
-```
-
-### `default.nix` handling is version-sensitive
-
-```nix
-# default.6.nix
-builtins.langVersion
-```
-
-```nix
-# foo.7.nix
-import ./.
-```
-
-```console
-$ nix-instantiate --eval foo.7.nix
-error: getting status of '/home/$USER/default.7.nix': No such file or directory
 ```
 
 ### Expressions are not forward compatible
 
 ```nix
-# a.7.nix
-builtins.langVersion
+# a.nix
+use 6;
+import ./b.nix
 ```
 
 ```nix
-# b.6.nix
-import ./a.7.nix
+# b.nix
+use 7;
+builtins.langVersion
 ```
 
 ```console
-$ nix-instantiate --eval foo.7.nix
+$ nix-instantiate --eval a.nix
 error: unsupported Nix language version 7
 ```
 
@@ -539,20 +545,22 @@ error: unsupported Nix language version 7
 ### Best-effort interoperability
 
 ```nix
-# a.6.nix
+# a.nix
+use 6;
 { increment }:
 increment 1
 ```
 
 ```nix
-# b.7.nix
-import ./a.6.nix { increment = x: x + 1 }
+# b.nix
+use 7;
+import ./a.nix { increment = x: x + 1 }
 ```
 
 Since `increment` written in version 7 carries its own implementation with it, forcing it within an expression written in version 6 just works:
 
 ```console
-$ nix-instantiate --eval b.7.nix
+$ nix-instantiate --eval b.nix
 2
 ```
 
@@ -562,7 +570,8 @@ Usually existing code will be interacted with by calling functions.
 When passing values from newer versions to functions from older versions of the language, interoperatbility can only be supported on a best-effort basis.
 
 ```nix
-# a.6.nix
+# a.nix
+use 6;
 { value }:
 value + 1
 ```
@@ -570,12 +579,13 @@ value + 1
 Here we pretend that langauge version 7 introduced a new value type and syntax for complex numbers:
 
 ```nix
-# b.7.nix
-import ./a.6.nix { value = %5 + 7i%; }
+# b.nix
+use 7;
+import ./a.nix { value = %5 + 7i%; }
 ```
 
 ```console
-$ nix-instantiate --eval b.7.nix
+$ nix-instantiate --eval bnix
 error: unsupported value type `complex` at built-in operator `+`
 ```
 
