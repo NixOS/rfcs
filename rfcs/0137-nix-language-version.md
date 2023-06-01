@@ -150,7 +150,7 @@ Once the language version is accessible though, tooling can at least be adapted 
 
    </details>
 
-1. The language version for Nix expressions is denoted in special syntax at the beginning of parse unit.
+1. The language version for Nix expressions is denoted in special syntax, at the beginning of a parse unit.
 
    <details><summary>Arguments</summary>
 
