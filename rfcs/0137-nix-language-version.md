@@ -266,6 +266,9 @@ Once the language version is accessible though, tooling can at least be adapted 
    - `Nix language version \d*`
      - (+) Says it all
      - (-) Very long
+   - `with <language> \d*;`
+     - (+) Allows for forward compatibilty hacks such as better error messages
+     - (🔥) Because why not
 
    </details>
 
