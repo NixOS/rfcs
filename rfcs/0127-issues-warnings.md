@@ -3,7 +3,7 @@ feature: issues-warnings
 start-date: 2022-06-11
 author: piegames
 co-authors: —
-shepherd-team: @lheckemann, @mweinelt, @fgaz
+shepherd-team: @RaitoBezarius, @mweinelt, @infinisil
 shepherd-leader: @mweinelt
 related-issues: https://github.com/NixOS/nixpkgs/pull/177272
 ---
