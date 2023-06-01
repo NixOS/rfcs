@@ -155,6 +155,7 @@ Once the language version is accessible though, tooling can at least be adapted 
    <details><summary>Arguments</summary>
 
    - (+) Will prevent older evaluators from evaluating expressions written in a newer language version following this proposal (no forward compatibility)
+   - (+) Precedent: [Perl `use VERSION`]
    - (-) The errors on older evaluators will be opaque
      - (+) Syntax can be made self-describing and human-readable to alleviate that to some extent
    - (-) The syntax has to be fixed forever if one wanted to provide meaningful errors on language upgrades
@@ -612,6 +613,12 @@ warning: The following deprecated features were used:
 ```
 
 # Prior art
+
+- [Perl `use VERSION`]
+
+  [Perl `use VERSION`]: https://perldoc.perl.org/functions/use#use-VERSION
+
+  Many similarities, with versions declared per file and having to deal with interoperability.
 
 - [Rust `edition` field]
 
