@@ -37,12 +37,23 @@ if you feel your detailed design is rudely short, consider making this section l
 # Drawbacks
 [drawbacks]: #drawbacks
 
-Why should we *not* do this?
+What are the disadvantages of doing this?
 
 # Alternatives
 [alternatives]: #alternatives
 
 What other designs have been considered? What is the impact of not doing this?
+For each design decision made, discuss possible alternatives and compare them to the chosen solution.
+The reader should be convinced that this is indeed the best possible solution for the problem at hand.
+
+# Prior art
+[prior-art]: #prior-art
+
+You are unlikely to be the first one to tackle this problem.
+Try to dig up earlier discussions around the topic or prior attempts at improving things.
+Summarize, discuss what was good or bad, and compare to the current proposal.
+If applicable, have a look at what other projects and communities are doing.
+You may also discuss related work here, although some of that might be better located in other sections.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
