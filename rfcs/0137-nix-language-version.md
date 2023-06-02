@@ -642,6 +642,14 @@ warning: The following deprecated features were used:
     - .cjs and .mjs extensions for commonjs/es-modules syntax variants
     - `function() { "use strict"; return 10 }`
 
+- [Go language changes proposal](https://github.com/golang/proposal/blob/master/design/28221-go2-transitions.md#language-changes)
+
+  The document features a discussion of multiple approaches to evolve the language without breaking existing code, and comes to the similar conclusions as our proposal, mainly:
+  - One needs a way to specify the language version
+    - Interestingly, Go developers decided to equate the language version with the compiler release version, despite admitting that this may be confusing
+  - Keep support for code written in older language versions
+  - Breaking down into features that can be enabled separately is not practical
+
 - [Flakes `edition` field]
 
   There had been an attempt to include an `edition` field into the Flakes schema.
