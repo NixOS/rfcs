@@ -119,7 +119,7 @@ graph TD
    convincing motivation, demonstrate understanding of the impact of the design,
    or are disingenuous about the drawbacks or alternatives tend to be
    poorly-received. Consider using [Semantic Line Breaks](https://sembr.org/)
-   in oder to get better diffs on later amendments.
+   in order to get better diffs on later amendments.
 0. Consider publishing your RFC as pre-RFC [in the forum](https://discourse.nixos.org/c/dev/rfc-steering-committee/33)
    to gather initial feedback and iron out the remaining typos.
 0. In case your RFC is a technical proposal, you might want to prepare a
