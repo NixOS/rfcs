@@ -95,7 +95,7 @@ defaultPrefsFile = defaultPrefs
 
 The artificial distinction between the first input and the functions via the list now is gone,
 and so are the parentheses around the functions.
-With the lower syntax overhead, using the operator becomes attractive in more situations,
+With the lower character overhead, using the operator becomes attractive in more situations,
 whereas a `pipe` pays for its overhead only in more complex scenarios (usually three functions or more).
 Having a dedicated operator also increases visibility and discoverability of the feature.
 
@@ -105,18 +105,28 @@ Having a dedicated operator also increases visibility and discoverability of the
 ## `|>` operator
 
 A new operator `|>` is introduced into the Nix language.
-Semantically, it is defined as the reverse of function application: `f a` = `a |> f`.
+It is defined as function application with the order of arguments swapped: `f a` = `a |> f`.
 It is left-associative and has a binding strength one weaker than function application:
 `a |> f |> g b |> h` = `h ((g b) (f a))`.
 
 ## `builtins.pipe`
 
 `lib.pipe`'s functionality is implemented as a built-in function.
+
 The main motivation for this is that it allows to give better error messages
-like line numbers when some part of the pipeline fails.
+like line numbers when some part of the pipeline fails:
+Currently `lib.pipe` internally uses a fold over the list,
+therefore any type mismatches will give a trace which points into `lib.fold`,
+leaving the user without the information at which stage of the pipeline it failed.
+(This is less of a problem when used in packages, but significant enough that currently,
+`lib.pipe` unfortunately should not be used in the implementation of any library functions.)
+This could probably be fixed within Nixpkgs alone,
+however not without incurring a significant performance penalty for using "reflection".
+A built-in operator would be able to provide this more detailed error information basically for free.
+
 Additionally, it allows easy usage outside of Nixpkgs and increases discoverability.
 
-While Nixpkgs is bounds to minimum Nix versions and thus `|>` won't be available until
+While Nixpkgs is bound to minimum Nix versions and thus `|>` won't be available until
 several years after its initial implementation,
 it can directly benefit from `builtins.pipe` and its better error diagnostic by overriding `lib.pipe`.
 Elevating a Nixpkgs library function to a builtin has been done several times before,
@@ -133,6 +143,41 @@ Tooling that evaluates Nix code in some way or does static code analysis should 
 since one may treat the operator as syntactic sugar for function application.
 No fundamentally new semantics are introduced to the language.
 
+## Nixpkgs interaction
+
+`lib.pipe` will default to `builtins.pipe` and use its current implementation only as a fallback.
+
+Documentation will be updated to encourage using `builtins.pipe` more.
+
+As soon as the Nixpkgs minimum version contains `|>`, using it will be allowed and encouraged in the documentation.
+There might be efforts to automatically convert existing `builtins.pipe` usage or even discourage/deprecate using that,
+see future work.
+
+### Existing lib functions
+
+Nixpkgs `lib` contains a couple of functions that are concatenated versions of other lib functions,
+for example `concatMapStringsSep` being a fuse of `map` and `concatStringsSep`.
+This is not unusual in many programming languages,
+nevertheless the existence of easy to use piping functionality would reduce the need for some of them.
+
+Of course removing existing lib functions is not an option, but in the future,
+newly added functions should meet stronger criteria than being purely convenience helpers replacing two function calls with one.
+
+To keep with that example, is the function called `concatMapStringsSep` or `concatMapStringSep`?
+In which order do you provide the mapper or the separator first?
+Using `map (…) |> concatStringsSep` requires to memorize less information.
+Some example with different alternatives:
+
+```nix
+lib.concatMapStringsSep "\n" (test: writeTest "success" test.name "${test}/bin/${test.name}") (lib.attrValues bin)
+
+lib.concatStringsSep "\n" (map (test: writeTest "success" test.name "${test}/bin/${test.name}") (lib.attrValues bin))
+
+lib.attrValues bin |> map (test: writeTest "success" test.name "${test}/bin/${test.name}") |> lib.concatStringsSep "\n"
+
+lib.concatStringsSep "\n" <| map (test: writeTest "success" test.name "${test}/bin/${test.name}") <| lib.attrValues bin
+```
+
 # Prior art
 
 Nickel has `|>` too, with the same name and semantics.
@@ -141,6 +186,9 @@ F# has `|>`, called "pipe-forward" operator, with the same semantics.
 Additionally, it also has "pipe-backward" `<|` and `>>`/`<<` for forwards and backwards function composition.
 `<|` is equivalent to function application, however its lower binding order allows removing parentheses:
 `g (f a)` = `g <| f a`. All these operators have the same precedence and are left-associative.
+F#'s `<|` being left-associative strongly reduces its power of usage,
+this can be considered a mistake/compromise/collateral in the language design.
+All other discussed variants of `<|` in other languages are right-associative.
 
 Elm has the same operators as F#.
 
@@ -151,23 +199,48 @@ and `$`, which is function application again but right-associative and very weak
 
 `|>` is definable as an infix function in several other programming languages,
 and in even more languages as macro or higher-order function (including Nix, that's `lib.pipe`).
+Notable, the Haskell package `flow` provides some common operators like `|>` and `<|`,
+with the usual associativity and same binding strength (unlike Haskell's `$` and `&` discussed above).
+
+Languages that allow for custom operators with custom associativity and precedence like Haskell and Scala
+(but unlike F#) usually forbid mixing same-strengh operators with different associativity without using parentheses
+as a syntax/compile error.
 
 # Alternatives
 [alternatives]: #alternatives
 
 For each change this RFC proposes, there is always the trivial alternative of not doing it. See #drawbacks.
 
-## More operators
-
 We could use the occasion and introduce more operators like those mentioned above.
+
+## Function composition operators
 
 Function composition is mostly interesting for the so-called "point-free" programming style,
 where partially applied compositions of functions are preferred over the introduction of lambda terms.
 However, Nix is not well suited for that programming style for various reasons,
-nor would that point-free style have nearly as many applications in real-world Nixpkgs code.
+nor would that point-free style have nearly as many applications in typical Nixpkgs code.
 
-F#'s reverse-pipe operator has a lot less use due to its left-associativity,
-but a right-associative version of it more similar to Haskell's `$` might be an alternative:
+Take for example this library function, written in a point-free style by using `flip pipe` as function concatenation operator:
+
+```nix
+concatMapAttrs = f: flip pipe [ (mapAttrs f) attrValues (foldl' mergeAttrs { }) ];
+```
+
+When reading this code, one has to manually do the headwork of inferring the types to understand what this function does.
+In Haskell, its powerful type system and type inference would quickly spot any mistakes made.
+But in Nix, this can lead to very confusing runtime errors instead
+(even ignoring the additional stack trace noise of using `flip pipe`).
+Compare this to the fully specifified version of the same function:
+
+```nix
+concatMapAttrs = f: v: pipe v [ (mapAttrs f) attrValues (foldl' mergeAttrs { }) ];
+```
+
+Would you have guessed correctly from the first code example whether it's `f: v:` or `v: f:`?
+
+## Pipe-forward vs pipe-backward
+
+We could use `<|` instead of `|>` instead:
 
 ```nix
 defaultPrefsFile = 
@@ -178,25 +251,52 @@ defaultPrefsFile =
       // ${value.reason}
       pref("${key}", ${builtins.toJSON value.value});
     ''
-  )
+  ) <| # the '<|' here is optional/redundant
   defaultPrefs
   ;
 ```
 
-Adding both pipe directions raises questions about how these two interact when used together.
-F# has the same binding strength for both, but this only works well because both are left-associative.
-Haskell has `&` stronger than `$`, which is very sensible but unlikely to be intuitive to a new user.
-Given that we want to call them `|>` and `<|` instead, then users might equally well to assume both have
-equal strength.
+`<|` also opens up to other scenarios in which `|>` might be less well suited
+(examples inspired by https://github.com/NixOS/nix/issues/1845):
 
-Given these restrictions and the fact that situations where one needs both in Nix are expected to be fairly rare,
-it is recommended to choose either one of `|>` and `<|`, but not have both in the language.
+```nix
+lib.makeOverridable <|
+{ foo, bar }:
+
+builtins.trace "my debug stuff" <|
+# some more code here
+```
+
+While only one of them would probably be sufficient for most use cases, we could also have both `|>` and `<|`.
+Given that we want to call them `|>` and `<|`, users should assume both having equal binding strength.
+Therefore mixing them without parentheses should be forbidden like in other languages,
+having `<|` weaker than `|>` like Haskell's `$` and `&` would be a bad idea.
 
 ## Change the `pipe` function signature
 
 There are many equivalent ways to declare this function, instead of just using the current design.
 For example, one could flip its arguments to allow a partially-applied point-free style (see above).
 One could also make this a single-argument function so that it only takes the list as argument.
+
+The current design of `pipe` has the advantage that its asymmetry points at its operating direction, which is quite valuable.
+
+## `apply` keyword
+
+As suggested in https://github.com/NixOS/rfcs/pull/148#discussion_r1206966546,
+one could introduce a keyword (tentatively called `apply`) for piping,
+which syntactically similar to `with` and `assert` statements:
+
+```nix
+apply f;
+apply g;
+x
+
+# The same as
+f (g x)
+```
+
+The biggest disadvantage with it is backwards compatibility of adding a new keyword into the language,
+which would require solving language versioning first (see RFC #137).
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -212,6 +312,10 @@ One could also make this a single-argument function so that it only takes the li
 - Will this affect evaluation performance in some way?
   - There is reason to expect that replacing `lib.pipe` with a builtin will reduce its overhead,
     and that the builtin should have little to no overhead compared to regular function application.
+
+In order to decide which operators to add to the language (see Alternatives),
+a larger survey across the Nixpkgs code will be conducted.
+This will give us quantitative information to better make any decisions involving tradeoffs.
 
 # Future work
 [future]: #future-work
