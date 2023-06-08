@@ -513,13 +513,13 @@ nix --supported-language-versions
 
 ```nix
 # a.nix
-use 6;
+version 6;
 builtins.langVersion
 ```
 
 ```nix
 # b.nix
-use 7;
+version 7;
 [ (import ./a.6.nix) builtins.langVersion ]
 ```
 
@@ -532,13 +532,13 @@ $ nix-instantiate --eval b.nix
 
 ```nix
 # a.nix
-use 6;
+version 6;
 import ./b.nix
 ```
 
 ```nix
 # b.nix
-use 7;
+version 7;
 builtins.langVersion
 ```
 
@@ -552,14 +552,14 @@ error: unsupported Nix language version 7
 
 ```nix
 # a.nix
-use 6;
+version 6;
 { increment }:
 increment 1
 ```
 
 ```nix
 # b.nix
-use 7;
+version 7;
 import ./a.nix { increment = x: x + 1 }
 ```
 
@@ -577,7 +577,7 @@ When passing values from newer versions to functions from older versions of the 
 
 ```nix
 # a.nix
-use 6;
+version 6;
 { value }:
 value + 1
 ```
@@ -586,7 +586,7 @@ Here we pretend that langauge version 7 introduced a new value type and syntax f
 
 ```nix
 # b.nix
-use 7;
+version 7;
 import ./a.nix { value = %5 + 7i%; }
 ```
 
