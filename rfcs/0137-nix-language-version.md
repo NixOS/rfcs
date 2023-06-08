@@ -25,10 +25,7 @@ Yet, as with any software system, in order to accommodate new insights, we want 
 This sometimes involves backward-incompatible ("breaking") changes that currently cannot be made without significant downstream disruption.
 
 Therefore we propose a mechanims and policies to introduce changes to the Nix language in a controlled and deliberate manner.
-It aims to avoid breaking existing setups, and to minimise maintenance burden for implementors and users.
-The goal is for new versions of the Nix language evaluator to stay backward compatible with existing Nix expressions, and for new Nix expressions to be deliberately incompatible with existing evaluators.
-
-Regardless, changes to the language, especially breaking changes, should remain a rare exception.
+It aims to avoid breaking existing code, to prevent inadvertently breaking reproducibility, and to minimise maintenance burden for implementors and users.
 
 ## Motivating examples
 
@@ -101,6 +98,14 @@ Once the language version is accessible though, tooling can at least be adapted 
 
 # Detailed Design
 
+## Design goals
+
+1. New versions of the Nix language evaluator should to stay backward compatible with existing Nix expressions.
+
+1. New Nix expressions should not work with existing evaluators at all.
+
+1. Changes to the language, especially backward-incompatible changes, should remain a rare exception.
+
 ## Language versioning
 
 1. The language version is a natural number.
@@ -168,7 +173,7 @@ Once the language version is accessible though, tooling can at least be adapted 
    <details><summary>Alternatives</summary>
 
    - Use a magic comment at the beginning of the file
-       - (+) Allows for gradual adoption: opt-in until semantics is implemented in Nix *and* the first backwards-incompatible change to the language is introduced
+       - (+) Allows for gradual adoption: opt-in until semantics is implemented in Nix *and* the first backward-incompatible change to the language is introduced
          - (-) This will produce surprising results if the next language version preserves syntax but changes semantics (forward compatibility)
          - (-) Requires the first language version following this proposal to be syntactically incompatible with the current language to avoid forward compatibility
        - (+) Can be made self-describing and human-readable
