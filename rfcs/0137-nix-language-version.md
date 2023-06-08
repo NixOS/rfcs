@@ -268,7 +268,7 @@ Once the language version is accessible though, tooling can at least be adapted 
      - (-) Very long
    - `with import <language> \d*;`
      - (+) Allows for forward compatibilty hacks such as better error messages
-     - (🔥) Because why not
+     - (-) Will likely mislead beginners to think this is has the same semantics as the original `with import ...;`
 
    </details>
 
