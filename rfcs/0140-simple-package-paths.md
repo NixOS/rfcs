@@ -44,6 +44,16 @@ This standard is internal to Nixpkgs and not exposed as public interface.
 This standard must be documented in the Nixpkgs manual.
 This PR will be backported to the stable release in order to ensure that backports of new packages work.
 
+### The name "unit"
+
+The term "unit" is chosen partly because it's not associated with any pre-existing assumptions about what it means, which should cause people unfamiliar with this standard to read the documentation.
+
+However additionally it makes sense to view unit directories as units, because they are discrete entities distinct from other entities of the same type.
+
+Furthermore, we envision that in the future we could extend the unit directory standard to not just include a package definition for each unit, but also other parts such as NixOS modules, library components, tests, etc. In this case `unit` would fit even better and could be described as
+
+> A collection of standardized files related to the same software component
+
 ### File structure
 
 Create the initially-empty directory `pkgs/unit`, called _unit base directory_, in Nixpkgs.
@@ -237,14 +247,31 @@ Alternatives:
 - Use `pkgs` instead, so that the `${shard}`'s are siblings to the other current directories in `pkgs` such as `top-level`, with the intention that the other directories would be hopefully removed at some point, then only leaving the shards in `pkgs`
   - (+) If we remove the other directories at some point, only the `${shard}`'s will be left in `pkgs`
   - (-) This leads to ambiguities between the directories from the standard and the other directories, requiring special handling in the code and CI, leading to complexities.
+  - (-) This makes it hard to pick out the few non-shard directories in directory listings since they will be interleaved with the ~700 shards.
   - (-) This would be harder to document and explain to people, since one always has to disregard all non-unit directories, with no obvious justification
   - (-) Currently we cannot apply this standard to all definitions in `pkgs`, in particular nested packages like `pythonPackages.*`, non-`callPackage`'d definitions like `copyDesktopItems` and non-derivations like `fetchFromGitHub`.
     Depending on how we want to handle those, it might make more sense to keep `pkgs/unit` or to use `pkgs` directly once all legacy paths are migrated away to another top-level directory, we don't yet know. `pkgs/unit` will be easier to migrate to `pkgs` than the other way around though.
-- Another name than `unit`, proposed were `auto`, `pkg`, `mod`, `component`, `part`, `comp`, `app`, `simple`
-  - (-) `unit` is considered the most appropriate because a "unit" typically refers to a discrete, indivisible entity that is distict from other entities of the same type.
-  - (-) In addition we envision that in the future we would extend the unit directory standard to not just include a package definition for each unit, but also other parts such as NixOS modules, library components, tests, etc. In this case `unit` would fit even better and could be described as
-    > A collection of standardized files related to the same software component
-
+  - (-) Causes poor auto-completion for the existing directories
+- A variation of the above that improves on this is altering the shards to be prefixed with `_` so that they're always ordered together and not interleaved with non-shards. Non-shards would still be at the bottom of file listings though, but at least together. It shares the same other problems however.
+- Various proposals: `pkgs/auto`, `pkgs/pkg`, `pkgs/mod`, `pkgs/component`, `pkgs/part`, `pkgs/comp`, `pkgs/app`, `pkgs/simple`, `pkgs/default`, `pkgs/shards`, `pkgs/top`, `pkgs/main`
+  - (-) Generally all of these names have some pre-existing assumptions about them, causing potential confusion when used for this concept
+  - `pkgs/default`: Could be interpreted to be some Nix-builtin magic that defaults to that folder. Could also be interpreted as "this is where the default packages go", which then raises the question "which packages are part of the default ones?"
+  - `pkgs/shards`: The sharding is a self-evident implementation detail, it shouldn't be repeated
+  - `pkgs/simple`: Implies that there's a complicated way to declare packages, which there currently is, but it's something we should get away from.
+    If we migrate everything, simple wouldn't mean anything anymore.
+  - `pkgs/top`: Easily confusable with `pkgs/top-level`, though `top` would make sense otherwise if we eventually moved all top-level packages to there.
+    - We could consider moving `pkgs/top-level` to another location then, e.g. `pkgs/package-sets`.
+  - `pkgs/main`: "If these are the main packages, where do the others go? What even is a main package?". Also could be confused with an entry-point
+- `packages/${shard}`
+  - (+) Provides a clean starting point without having to be close to the legacy structure
+  - (-) This would be very confusing to newcomers because there's now both a `pkgs` and a `packages` directory in the Nixpkgs root, both spelled the same but very different contents.
+- `pkgs/_`
+  - (+) Very short, fast to type (though that can depend on the keyboard layout)
+  - (+) Avoids naming discussions, because there is no name
+    - (-) Naming things is hard, but we shouldn't avoid the problem by giving it no name, which is arguably the worst name
+  - (-) Looks hacky and internal
+  - (+) Looks temporary, intention to move to `pkgs` itself once everything is sharded
+    - (-) It shouldn't be temporary. While we do hope to migrate all packages to some sharded form at some point, this may never happen, or the direction is completely changed, and this may take years to form.
 
 ## Alternate shard structure
 
@@ -263,8 +290,14 @@ Alternatives:
   - (+) This would allow virtually a unlimited number of packages without performance problems
   - (-) It's hard to understand, type and implement, needs a special case for packages with few characters
     - E.g. `x` could go in `pkgs/unit/x-/--/x`
-  - (-) There's not enough packages even in Nixpkgs that a two-level structure would make sense. Most of the structure would only be filled by a couple entries.
+  - (-) There's not enough packages even in Nixpkgs that a two-level 4-letter structure would make sense. Most of the structure would only be filled by a couple entries.
   - (-) Even Git only uses 2-letter prefixes for its objects hex hashes
+- Use two-letter prefixes split into two directories, like `pkgs/unit/h/e/hello`
+  - (+) Allows easy traversal by clicking on GitHub file listings, shard directories being limited to under 40 children
+  - (-) Requires special-casing single-letter attribute names
+    - (+) There's currently only 6 such cases, which could be handled on a one-off basis
+  - (-) Makes auto-completion worse, having to tab-complete once more
+  - (-) Makes it harder to create shards: if a shard doesn't exist yet, it has to be created with either one or two `mkdir`'s, or a `mkdir -p`
 - Use a dynamic structure where directories are rebalanced when they have too many entries.
   E.g. `pkgs.foobar` could be in `pkgs/unit/f/foobar` initially.
   But when there's more than 1 000 packages starting with `f`, all packages starting with `f` are distributed under 2-letter prefixes, moving `foobar` to `pkgs/unit/fo/foobar`.
