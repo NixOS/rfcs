@@ -35,7 +35,7 @@ Incompatible changes from the past:
 - There have been other, sometimes breaking changes to the language that have not resulted in an increment of the language version (e.g. the recent `fetchGit` changes).
 - The `builtins.toJSON 1.000001` output [changed in Nix 2.12](https://github.com/NixOS/nix/issues/8259).
 
-Possbile future changes that are in discussion:
+Possible future changes that are in discussion:
 
 - Remove URL literals (currently implemented via experimental-features)
 - Remove the old `let { body = ... }` syntax
