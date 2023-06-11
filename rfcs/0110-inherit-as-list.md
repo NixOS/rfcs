@@ -102,12 +102,8 @@ Future RFCs may add additional support for useful idioms such as
 `pkgs.[ python310 python310Packages.pytorch ]` on a case-by-case basis,
 but that is not planned for this RFC.
 
-Other forms of syntax which were considered but are not proposed
-in this RFC include:
-* `[ inherit (attrs) a b c; ]`
-* `[ inherit a b c; ]`
-* `inherit (attrs) [ a b c ]`
-* `pkgs.{ python = python310; openssl = openssl_3; }`
+For a comparison of other forms of syntax considered but not proposed
+in this RFC, refer to the Alternatives section.
 
 # Drawbacks
 [drawbacks]: #drawbacks
@@ -120,9 +116,44 @@ in this RFC include:
 # Alternatives
 [alternatives]: #alternatives
 
-* Skillful use of `with` to avoid its drawbacks
-* Fine-grained attribute selection via existing (more verbose) language
-  features, such as `builtins.attrValues { inherit (attrs) a b c; }`
+A number of alternatives have been considered, which can be roughly divided
+into syntactic (introducing new syntax which requires changes to the Nix language
+to parse) and non-syntactic.
+
+## Comparison of syntactic alternatives:
+
+Priority is given to syntax which would be "backwards compatible" with
+existing Nix code, meaning that any existing code would be evaluated the
+same under an interpreter supporting the new syntax. Conversely,
+evaluating new code under an old interpreter which does not support the
+new syntax would cause a syntax error.
+
+
+| Syntax | Notes | Cons |
+|---|---|---|
+| `inherit (attrs) [ a b c ]` | Initial draft | ["confusing that for attribute sets, the inherit keyword is on the inside but here it is on the outside" -jtojnar](https://github.com/NixOS/rfcs/pull/110#discussion_r730527443) |
+|  `[ inherit (attrs) a b c; ]` | 2nd draft, [proposed by jtojnar](https://github.com/NixOS/rfcs/pull/110#discussion_r730527443) | ["not very happy with reusing inherit here. If I read inherit I read 'right, an attribute-set'." -Ma27](https://github.com/NixOS/rfcs/pull/110#issuecomment-947517675) <br /> ["There currently is no separator in lists, and this would add that." -Synthetica9](https://github.com/NixOS/rfcs/pull/110#issuecomment-959114390) |
+| `attrs.[a b c]` | 3rd (current) draft, [proposed by Synthetica9](https://github.com/NixOS/rfcs/pull/110#issuecomment-959114390) | Has ["ambiguities [...] which would have to be worked out" -Synthetica9](https://github.com/NixOS/rfcs/pull/110#issuecomment-971760508) <br /> ["what `[a b c]` means depends on if it is after `attrs.`" -kevincox](https://github.com/NixOS/rfcs/pull/110#discussion_r933500003) <br /> Needs care to limit scope of this rule, currently limited to single-identifier case (discussions [here](https://github.com/NixOS/rfcs/pull/110#discussion_r1001737515) and [here](https://github.com/NixOS/rfcs/pull/110#discussion_r1013099694)) |
+| `[ with attrs | a b c ]` | [Proposed by nrdxp](https://github.com/NixOS/rfcs/pull/110#discussion_r933570815) | ["Looks more foreign", "may also cause confusion with other languages" -kevincox](https://github.com/NixOS/rfcs/pull/110#discussion_r934516433) <br /> ["introduces a small inconsistency" vs attribute-set `inherit` -rehno-lindeque](https://github.com/NixOS/rfcs/pull/110#discussion_r973033159) |
+| Exclusive `with`, `let with` | [Proposed by infinisil](https://github.com/NixOS/rfcs/pull/110#issuecomment-1319338335) and [later refined](https://github.com/NixOS/rfcs/pull/110#issuecomment-1319338335) | Requires some dynamic behavior to fully replace `with`, including nested usage [-oxalica](https://github.com/NixOS/rfcs/pull/110#issuecomment-1334537982), [-infinisil](https://github.com/NixOS/rfcs/pull/110#issuecomment-1334593541) <br /> May change semantics of existing Nix code |
+
+Some common threads here are the desire to introduce a syntax form which
+is simpler and more ergonomic than existing `with` or alternatives,
+naturally guiding users toward a "safer" form. We also desire consistency,
+reusing keywords or syntax patterns but only where it would be
+harmonious with the existing Nix language.
+
+## Comparison of non-syntactic alternatives:
+
+Other alternatives have been proposed where the motivation for `with`
+deprecation is acknowledged, but would be resolved without introducing
+new syntax to the Nix language.
+
+| Alternative | Notes | Cons |
+|---|---|---|
+| `builtins.attrValues { inherit (attrs) a b c; }` | Considered in initial draft | Verbose, cumbersome to compose, not order-preserving |
+| `select [ "a" "b" "c" ] attrs` | [Proposed by ocharles](https://github.com/NixOS/rfcs/pull/110#issuecomment-952704340) | ["highlights wrong (strings are not data but literal variable names)" -7c6f434c](https://github.com/NixOS/rfcs/pull/110#issuecomment-952817547) <br /> ["`with` is slightly more ergonomic", "the proposed change is arguably same [...] but without semantical gotchas" -7c6f434c](https://github.com/NixOS/rfcs/pull/110#issuecomment-952931398) |
+| Deprecation of list-types in NixOS modules and build inputs | [Proposed by infinisil](https://github.com/NixOS/rfcs/pull/110#issuecomment-959757180) | ["order of `buildInputs` is significant so unordered sets cannot be used" -jtojnar](https://github.com/NixOS/rfcs/pull/110#issuecomment-959799730) |
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
