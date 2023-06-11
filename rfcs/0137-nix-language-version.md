@@ -278,10 +278,10 @@ Once the language version is accessible though, tooling can at least be adapted 
 
    </details>
 
-1. The language version declaration is optional for bare Nix expressions, and can be specified with a parameter to the evaluator.
+1. As an exception, the language version declaration is optional for Nix expressions passed directly as an argument to the evaluator and on the REPL, and can be specified with a separate parameter to the evaluator.
    If no version is specified in a bare Nix expression, assume the most recent language version supported by the evaluator.
 
-   This is to ease use of the REPL and commands taking bare expressions.
+   This is to ease use of the REPL and evaluating ad hoc expressions.
 
    <details><summary>Alternatives</summary>
 
