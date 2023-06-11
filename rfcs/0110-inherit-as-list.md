@@ -41,12 +41,12 @@ and reduced evaluation performance [3].
 * [1] https://github.com/NixOS/nix/issues/490
 * [2] https://github.com/NixOS/nix/issues/1361
 * [3] https://github.com/NixOS/nixpkgs/pull/101139
-* [4] https://nix.dev/anti-patterns/language#with-attrset-expression
+* [4] https://nix.dev/recipes/best-practices#with-scopes
 
 Nonetheless, Nix expression authors are subtly guided toward the `with` form
 because it is (or at least appears) simpler than any existing alternatives.
 Some alternatives are suggested in
-https://nix.dev/anti-patterns/language#with-attrset-expression, but as these
+https://nix.dev/recipes/best-practices#with-scopes, but as these
 are more verbose and complex than `with`, they are rarely used.
 
 The goal of this RFC is to provide a similarly-terse alternative which avoids
