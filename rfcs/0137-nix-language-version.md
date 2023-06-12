@@ -24,7 +24,7 @@ The stability of Nix language has been praised on multiple occasions, e.g. [Nix 
 Yet, as with any software system, in order to accommodate new insights, we want to allow the Nix language to evolve.
 This sometimes involves backward-incompatible ("breaking") changes that currently cannot be made without significant downstream disruption.
 
-Therefore we propose a mechanims and policies to introduce changes to the Nix language in a controlled and deliberate manner.
+Therefore we propose mechanisms and policies for introducing changes to the Nix language in a controlled and deliberate manner.
 It aims to avoid breaking existing code, to prevent inadvertently breaking reproducibility, and to minimise maintenance burden for implementors and users.
 
 ## Motivating examples
