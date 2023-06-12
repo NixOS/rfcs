@@ -42,7 +42,6 @@ Possible future changes that are in discussion:
 - Disallow leading zeroes in integer literals (such as `umask = 0022`)
 - Disallow `a.x or y` if `a` is not an attribute set
 - Simplifying semantics of `builtins.toString` and string interpolation
-- Remove the `let { body }` syntax
 - `__functor` and `__toString`, probably
 - Remove `__overrides`
 - [Make `builtins` more consistent](https://github.com/NixOS/nix/issues/7290), e.g. not exposing `map`, `removeAttrs`, `fetchGit` and and others in the global scope
