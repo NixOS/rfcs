@@ -60,41 +60,6 @@ Other discussions around language changes:
 - [Nix 2 – a hypothetical syntax](https://md.darmstadt.ccc.de/s/nix2)
 - [Nix language changes](https://gist.github.com/edolstra/29ce9d8ea399b703a7023073b0dbc00d)
 
-## Drawbacks
-
-Allowing multiple language versions to coexist will over time introduce a proliferation of syntax highlighters and other tooling.
-Once the language version is accessible though, tooling can at least be adapted in a systematic way.
-
-## Alternatives
-
-- Keep the language as implemented by Nix compatible, but socially restrict the usage of undesirable features.
-    - (+) Roughly matches the current practice, no technical change needed
-    - (+) Maintains usability of old Nixpkgs versions (up to availability of fixed-output artifacts)
-    - (+) Does not break third-party codebases before making a decision, keeping Nix a dependable upstream
-        - (-) This proposal does not allow for breakages unless there is some eventual phase-out of support
-    - (-) Strict enforcement requires extra tooling that this proposal would obviate
-    - (-) The implementation of the features that are no longer desirable still incur complexity and maintenance cost
-        - (-) It's still not really possible to make changes to the language
-
-- Introduce changes to the language with language extensions or feature flags
-  - (-) Combinatorial explosion
-      - See [Haskell language extensions] for real-world experience
-  - (-) Even more maintenance overhead
-  - (+) Allows gradual adoption of features
-      - (-) We already have experimental feature flags as an orthogonal mechanism, with the added benefit that they don't incur support costs and can be dropped without loss
-
-- Never make breaking changes to the language
-    - (+) No additional maintenance effort required
-    - (-) Blocks improvements
-    - (-) Requires additions to be made very carefully
-        - (-) Even incremental changes are really expensive that way
-    - (-) Makes solving some well-known problems impossible
-
-- Continue current practice
-    - (-) There is no process for breaking changes
-    - (-) Breaking changes are not always announced
-    - (-) There are no means of determining compatibility between expressions and evaluator versions
-
 # Detailed Design
 
 ## Design goals
@@ -621,6 +586,40 @@ warning: The following deprecated features were used:
   Use `--lang-no-warn=url-literal` to disable this warning.
   Use `--lang-error=url-literal` to issue errors instead of warnings.
 ```
+
+## Drawbacks
+
+Allowing multiple language versions to coexist complicates implementation of valuators and support tooling, and makes comprehensive test coverage harder.
+
+# Alternatives
+
+- Keep the language as implemented by Nix compatible, but socially restrict the usage of undesirable features.
+    - (+) Roughly matches the current practice, no technical change needed
+    - (+) Maintains usability of old Nixpkgs versions (up to availability of fixed-output artifacts)
+    - (+) Does not break third-party codebases before making a decision, keeping Nix a dependable upstream
+        - (-) This proposal does not allow for breakages unless there is some eventual phase-out of support
+    - (-) Strict enforcement requires extra tooling that this proposal would obviate
+    - (-) The implementation of the features that are no longer desirable still incur complexity and maintenance cost
+        - (-) It's still not really possible to make changes to the language
+
+- Introduce changes to the language with language extensions or feature flags
+  - (-) Combinatorial explosion
+      - See [Haskell language extensions] for real-world experience
+  - (-) Even more maintenance overhead
+  - (+) Allows gradual adoption of features
+      - (-) We already have experimental feature flags as an orthogonal mechanism, with the added benefit that they don't incur support costs and can be dropped without loss
+
+- Never make breaking changes to the language
+    - (+) No additional maintenance effort required
+    - (-) Blocks improvements
+    - (-) Requires additions to be made very carefully
+        - (-) Even incremental changes are really expensive that way
+    - (-) Makes solving some well-known problems impossible
+
+- Continue current practice
+    - (-) There is no process for breaking changes
+    - (-) Breaking changes are not always announced
+    - (-) There are no means of determining compatibility between expressions and evaluator versions
 
 # Prior art
 
