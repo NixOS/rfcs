@@ -303,7 +303,6 @@ Other discussions around language changes:
 
       - (+) No need to have this if the Nix files are versioned
       - (+) `builtins.langVersion` is not documented and not widely used
-      - (-) Requires a Nix language version bump to implement this RFC
 
    </details>
 
