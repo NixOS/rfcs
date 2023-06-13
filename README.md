@@ -153,7 +153,7 @@ graph TD
    pull request.
 0. At some point, a member of the RFC Shepherd Team will propose to start the
    "Final Comment Period" (FCP) on behalf of the team, along with a disposition
-   for the RFC (usuall "merge" or "close").
+   for the RFC (usually "merge" or "close").
     * This step is taken when enough of the tradeoffs have been discussed that
       the RFC Shepherd Team is in a position to make a decision. That does not
       require consensus amongst all participants in the RFC thread (which is
