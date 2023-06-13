@@ -150,7 +150,7 @@ Other discussions around language changes:
          - Forward compatibility is undesirable anyway
        - (-) Requires support by all tooling, lose semantics otherwise
 
-   - Use `assert builtins.languageVersion` in the first line of the file
+   - Use `assert builtins.langVersion` in the first line of the file
        - (+) Produces more telling error messages in existing evaluators
        - (+) Future evaluators could be augmented to treat this as specially for better errors
          - (-) Special treatment may confuse users: why does `assert` at the beginning of a file work differently than somewhere else?
