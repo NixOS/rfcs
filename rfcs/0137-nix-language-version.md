@@ -551,7 +551,7 @@ version 6;
 value + 1
 ```
 
-Here we pretend that langauge version 7 introduced a new value type and syntax for complex numbers:
+Here we pretend that language version 7 introduced a new value type and syntax for complex numbers:
 
 ```nix
 # b.nix
