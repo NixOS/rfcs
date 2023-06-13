@@ -671,5 +671,5 @@ Allowing multiple language versions to coexist complicates implementation of val
     - Deprecate the `let-body` syntax
     - Drop support for leading zeroes on integers
     - Formalise change in float representation
-  - Version 8 is released at least a year after version 7, and only when version annotations according to version 7 are fully supported in Nixpkgs
+  - Version 8 is released only when version annotations according to version 7 are fully supported in Nixpkgs
 
