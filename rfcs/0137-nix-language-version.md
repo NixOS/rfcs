@@ -66,7 +66,7 @@ Other discussions around language changes:
 
 1. New versions of the Nix language evaluator should to stay backward compatible with existing Nix expressions.
 
-1. New Nix expressions should not work with existing evaluators at all.
+1. A Nix expression written in a newer version of the language should never work with older evaluators not supporting that version.
 
 1. Changes to the language, especially backward-incompatible changes, should remain a rare exception.
 
