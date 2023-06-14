@@ -1,11 +1,11 @@
 ---
 feature: local-overlay-store
-start-date: (fill me in with today's date, YYYY-MM-DD)
-author: (name of the main author)
-co-authors: (find a buddy later to help out with the RFC)
+start-date: 2023-06-14
+author: John Ericson (@Ericson2314)
+co-authors: Ben Radford (@benradf)
 shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
-related-issues: (will contain links to implementation PRs)
+related-issues: https://github.com/NixOS/nix/pull/8397
 ---
 
 # Summary
