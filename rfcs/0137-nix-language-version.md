@@ -317,7 +317,7 @@ Other discussions around language changes:
            - (+) This would be beneficial for alternative implementations in terms of churn and effort to keep up
        - Or implementors of alternative evaluators catching up with changes
          - (+) Specifying the language precisely via the version actually offers alternative implementations an alternative to catching up: only support a given language version
-     - (+) This essentially nudges one to organise Nix language (specification or evaluator implementation ) development to be more independent of the rest of Nix
+     - (+) This essentially nudges one to organise Nix language (specification or evaluator implementation) development to be more independent of the rest of Nix
        This is good, since it in turn forces stronger separation of concerns and more architectural clarity
      - (-) Prohibits best-effort attempts at evaluating expressions with possibly incompatible evaluators
        - (+) With the proposed level of strictness, one doesn't have to rely on best effort but can instead be explicit
