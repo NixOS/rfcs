@@ -276,6 +276,9 @@ We can have a "fsck" operation however that manually scans for missing / duplica
 
 ## Read-only `local` Store
 
+*This was [already approved](https://github.com/NixOS/nix/pull/8356#event-9483342493) by the Nix team on an experimental basis, as an experimental feature that is trivial enough to be approved with out requiring an RFC.
+It is still included here just to provide context.*
+
 In order to facilitate using `local-overlay` where the lower store is entirely read only (read only SQLite files too, not just store directory), it is useful to also implement a new "read-only" setting on the `local` store.
 The main thing this does is use SQLite's [immutable mode](https://www.sqlite.org/c3ref/open.html).
 
