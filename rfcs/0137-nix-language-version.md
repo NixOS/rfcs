@@ -215,7 +215,7 @@ Other discussions around language changes:
    ```
    version \d*;
    ```
-
+   The evaluator must ignore a shebang line (starting with `#!) at the start of files, to leave room for additional tooling.
    This implies that if no language version is specified in a Nix file, it is written in version 6 (the version implemented in the stable release of Nix at the time of writing this RFC).
 
    The syntax is open for bikeshedding.
