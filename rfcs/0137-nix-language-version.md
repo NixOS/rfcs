@@ -102,6 +102,7 @@ Other discussions around language changes:
    - [Semantic Versioning](https://semver.org/)
        - (+) Can distinguish additions from other changes
            - (-) This is not needed for our use case, since any addition to an expression will break for older evaluators even if the major version matches
+       - (+) Simplifies evaluator implementation: pure additions can be guarded by the minor version cleanly within a major version's evaluator code
        - (-) Requires more characters to account for the added expressiveness
            - This may be relevant depending on where it has to be encoded
    - Use version numbers of Nix stable releases for specifying the version of the Nix language
