@@ -615,6 +615,10 @@ warning: The following deprecated features were used:
 Allowing multiple language versions to coexist complicates implementation of evaluators and support tooling, and makes comprehensive test coverage harder.
 All else being equal, it may increase maintenance burden and the likelihood of introducing bugs.
 
+Providing a pathway for introducing breaking changes bears the risk of version proliferation.
+We argue though that the implementation overhead incurred by the strict compatibility requirements will by itself balance that out.
+At least such a trade-off now could then be made to begin with, as currently breaking changes cannot be made at all.
+
 # Alternatives
 
 - Keep the language as implemented by Nix compatible, but socially restrict the usage of undesirable features.
