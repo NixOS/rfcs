@@ -588,7 +588,8 @@ warning: The following deprecated features were used:
 
 ## Drawbacks
 
-Allowing multiple language versions to coexist complicates implementation of valuators and support tooling, and makes comprehensive test coverage harder.
+Allowing multiple language versions to coexist complicates implementation of evaluators and support tooling, and makes comprehensive test coverage harder.
+All else being equal, it may increase maintenance burden and the likelihood of introducing bugs.
 
 # Alternatives
 
