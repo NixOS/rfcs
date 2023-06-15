@@ -564,6 +564,30 @@ $ nix-instantiate --eval bnix
 error: unsupported value type `complex` at built-in operator `+`
 ```
 
+In the following example, version 7 *removed* the `null` primitive, such that it can no longer be used.
+
+```nix
+# a.nix
+null
+```
+
+```nix
+# b.nix
+version 7;
+import ./a.nix
+```
+
+```console
+$ nix-instantiate --eval b.nix
+error: unsupported value `null`
+```
+
+This is consistent with best-effort interoperability:
+Old code keeps working on its own, and new code has to be adapted because it was not there before the breaking change.
+
+While this requires additional effort to adopt the new language version, expression authors can always recourse to writing new code in older versions while using newer evaluators.
+This in fact allows for creating compatibility wrappers as needed.
+
 ## Deprecation warnings
 
 ```
