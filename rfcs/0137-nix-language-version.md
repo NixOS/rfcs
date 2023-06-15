@@ -354,6 +354,9 @@ Other discussions around language changes:
 
 1. Semantics are preserved across file boundaries for past language versions.
 
+   This should be fairly straightforward to implement since values passed around in the evaluator carry all the information needed to force them.
+   Newer parts of the evaluator can always wrap their values in interfaces that are accepted by older parts, as far as possible.
+
    Example: [Best-effort interoperability](#best-effort-interoperability)
 
    <details><summary>Arguments</summary>
