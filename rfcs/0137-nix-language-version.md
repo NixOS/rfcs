@@ -237,7 +237,7 @@ Other discussions around language changes:
      - (+) Says it all
      - (-) Very long
    - `with import <language> \d*;`
-     - (+) Allows for forward compatibilty hacks such as better error messages
+     - (+) Allows for forward compatibility hacks such as better error messages
      - (-) Will likely mislead beginners to think this is has the same semantics as the original `with import ...;`
 
    </details>
