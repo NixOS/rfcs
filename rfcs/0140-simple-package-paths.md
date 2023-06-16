@@ -6,12 +6,12 @@
 | pre-RFC reviewers | Thomas Bereknyei (@tomberek), John Ericson (@Ericson2314), Alex Ameen (@aakropotkin) |
 | shepherd-team | @phaer @06kellyjac @aakropotkin @piegamesde |
 | shepherd-leader | - |
-| related-issues | https://github.com/NixOS/nixpkgs/pull/211832 |
+| related-issues | https://github.com/NixOS/nixpkgs/pull/237439, https://github.com/NixOS/nixpkgs/pull/211832 |
 
 # Summary
 [summary]: #summary
 
-Auto-generate trivial top-level attribute definitions in Nixpkgs' `pkgs/top-level/all-packages.nix` from a Nixpkgs-internally standardised directory structure that matches the attribute name.
+Auto-generate trivial top-level attribute definitions in Nixpkgs' `pkgs/top-level/all-packages.nix` from a directory structure that matches the attribute name.
 This makes it much easier to contribute new packages, since there's no more guessing needed as to where the package should go, both in the ad-hoc directory categories and in `all-packages.nix`.
 
 # Motivation
@@ -37,70 +37,61 @@ This makes it much easier to contribute new packages, since there's no more gues
 This RFC consists of two parts, each of which is implemented with a PR to Nixpkgs.
 These PR's should be done after a release to maximize the testing period and minimize merge conflicts.
 
-## PR 1: The unit directory standard
+## PR 1: The directory structure
 
-This part establishes the new _unit directory standard_ in Nixpkgs.
-This standard is internal to Nixpkgs and not exposed as public interface.
-This standard must be documented in the Nixpkgs manual.
+This part establishes the new directory structure in Nixpkgs.
+This directory structure is internal to Nixpkgs and not exposed as public interface.
+This directory structure must be documented in the Nixpkgs manual.
 This PR will be backported to the stable release in order to ensure that backports of new packages work.
-
-### The name "unit"
-
-The term "unit" is chosen partly because it's not associated with any pre-existing assumptions about what it means, which should cause people unfamiliar with this standard to read the documentation.
-
-However additionally it makes sense to view unit directories as units, because they are discrete entities distinct from other entities of the same type.
-
-Furthermore, we envision that in the future we could extend the unit directory standard to not just include a package definition for each unit, but also other parts such as NixOS modules, library components, tests, etc. In this case `unit` would fit even better and could be described as
-
-> A collection of standardized files related to the same software component
 
 ### File structure
 
-Create the initially-empty directory `pkgs/unit`, called _unit base directory_, in Nixpkgs.
+Create the initially-empty _base directory_ `pkgs/by-name` in Nixpkgs.
 
 Check the following using CI:
-- The unit base directory must only contain subdirectories of the form `${shard}/${name}`, called _unit directories_.
-- The `name`'s of unit directories must be unique when lowercased
+- The base directory must only contain subdirectories of the form `${shard}/${name}`, called _package directories_.
+- The `name`'s of package directories must be unique when lowercased
 - `name` is a string only consisting of the ASCII characters `a-z`, `A-Z`, `0-9`, `-` or `_`.
 - `shard` is the lowercased first two letters of `name`, expressed in Nix: `shard = toLower (substring 0 2 name)`.
-- Each unit directory must contain a `package.nix` file and may contain arbitrary other files.
+- Each package directory must contain a `package.nix` file and may contain arbitrary other files.
 
 ### Semantics
 
-Introduce code to automatically define `pkgs.${name}` for each unit directory as a value equivalent to
+Introduce code to automatically define `pkgs.${name}` for each package directory as a value equivalent to
 ```nix
-pkgs.callPackage pkgs/unit/${shard}/${name}/package.nix { }
+pkgs.callPackage pkgs/by-name/${shard}/${name}/package.nix { }
 ```
 
 Optionally there may also be an overriding definition of `pkgs.${name}` in `pkgs/top-level/all-packages.nix` equivalent to
 ```nix
-pkgs.callPackage pkgs/unit/${shard}/${name}/package.nix args
+pkgs.callPackage pkgs/by-name/${shard}/${name}/package.nix args
 ```
 
 with an arbitrary `args`.
 
-Check the following using CI for each unit directory:
+Check the following using CI for each package directory:
 - `pkgs.${name}` is defined as above, either automatically or with some `args` in `pkgs/top-level/all-packages.nix`.
 - `pkgs.${name}` is a [derivation](https://nixos.org/manual/nix/stable/glossary.html#gloss-derivation).
-- <a id="req-ref"></a> The `package.nix` file evaluated from `pkgs.${name}` must not access files outside its unit directory.
+- <a id="req-ref"></a> The `package.nix` file evaluated from `pkgs.${name}` must not access files outside its package directory.
 
 ## PR 2: Automated migration
 
-Automatically migrate to the unit directory standard for all _satisfiying definitions_ `pkgs.${name}`, meaning derivations defined as above using `callPackage`.
+Automatically migrate to new directory structure for all _satisfiying definitions_ `pkgs.${name}`, meaning derivations defined as above using `callPackage`.
 
 However automatic migration is only possible if:
 - Files don't need to be changed, only moved, with the exception of `pkgs/top-level/all-packages.nix`
 - The Nixpkgs package evaluation result does not change
 
 All satisfying definitions that can't be automatically migrated due to the above restrictions will be added to a CI exclusion list.
-CI is added to ensure that all satisfying definitions except the CI exclusion list must be using the unit directory standard.
-This means that the unit directory standard becomes mandatory for new satisfying definitions after this PR.
+CI is added to ensure that all satisfying definitions except the CI exclusion list must be using the new directory structure.
+This means that the new directory structure becomes mandatory for new satisfying definitions after this PR.
 The CI exclusion list should be removed eventually once the non-automatically-migratable satisfying definitions have been manually migrated.
 Only in very limited circumstances is it allowed to add new entries to the CI exclusion list.
 
 Non-automatic updates may also be done to ensure further correctness, such as
 - [GitHub's CODEOWNERS](https://github.com/NixOS/nixpkgs/blob/master/.github/CODEOWNERS)
 - Update scripts like [this](https://github.com/NixOS/nixpkgs/blob/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/applications/version-management/cz-cli/generate-dependencies.sh)
+- The Nixpkgs manual like [here](https://github.com/NixOS/nixpkgs/blob/4c8ca604aef8204145c185c89cc52ee54dd7fc1a/doc/contributing/quick-start.chapter.md#L27)
 
 This PR [will cause merge conflicts](https://github.com/nixpkgs-architecture/nixpkgs/pull/2) with all existing PRs that modify moved files, however they can trivially be rebased using `git rebase && git push -f`.
 Because of this, merging of this PR should be widely announced with a pinned issue on the Nixpkgs issue tracker and a Discourse post.
@@ -109,14 +100,14 @@ Additionally this PR can benefit from being merged after a release due to the de
 ## Examples
 [examples]: #examples
 
-To add a new package `pkgs.foobar` to Nixpkgs, one only needs to create the file `pkgs/unit/fo/foobar/package.nix`.
+To add a new package `pkgs.foobar` to Nixpkgs, one only needs to create the file `pkgs/by-name/fo/foobar/package.nix`.
 No need to find an appropriate category nor to modify `all-packages.nix` anymore.
 
-With some packages, the `pkgs/unit` directory may look like this:
+With some packages, the `pkgs/by-name` directory may look like this:
 
 ```
 pkgs
-└── unit
+└── by-name
    ├── _0
    │  ├── _0verkill
    │  └── _0x
@@ -137,7 +128,7 @@ pkgs
 
 ## Shard distribution
 
-The shard structure nesting unit directories under their lowercased two-letter prefix [leads to a distribution](https://gist.github.com/infinisil/95c7013db62e9f23ab2bc92165a37221) into shards as follows:
+The sharded structure [leads to a distribution](https://gist.github.com/infinisil/95c7013db62e9f23ab2bc92165a37221) as follows:
 - There's 17305 total non-alias top-level attribute names in Nixpkgs revision [6948ef4deff7](https://github.com/nixos/nixpkgs/commit/6948ef4deff7a72ebe5242244bd3730e8542b925)
 - These are split into 726 shards
 - The top three shards are:
@@ -146,10 +137,10 @@ The shard structure nesting unit directories under their lowercased two-letter p
   - "co": 252 values
 - There's only a single directory with over 1 000 entries, which is notably GitHub's display limit, so this means only 92 attributes would be harder to see on GitHub
 
-These stats are also similar for other package sets for if this standard were to be adopted for them in the future.
+These stats are also similar for other package sets for if directory structure were to be adopted for them in the future.
 
 ## Migration size
-Due to the limitations of the standard, only a limited set of top-level attributes can be automatically migrated:
+Due to the limitations of the new directory structure, only a limited set of top-level attributes can be automatically migrated:
 - No attributes that aren't derivations like `pkgs.fetchFromGitHub` or `pkgs.python3Packages`
 - No attributes defined using non-`pkgs.callPackage` functions like `pkgs.python3Packages.callPackage` or `pkgs.haskellPackages.callPackage`.
 In the future we might consider having a separate namespace for such definitions.
@@ -159,7 +150,7 @@ Concretely this [can be computed](https://gist.github.com/infinisil/4f2bd165c260
 And the initial automatic migration will be a bit more limited due to the additional constraints:
 - No attributes that share common files with other attributes like [`pkgs.readline`](https://github.com/NixOS/nixpkgs/tree/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/development/libraries/readline)
 - No attributes that references files from other packages like [`pkgs.gettext`](https://github.com/NixOS/nixpkgs/blob/cb2d5a2fa9f2fa6dd2a619fc3be3e2de21a6a2f4/pkgs/development/libraries/gettext/default.nix#L60)
-These attributes will need to be moved to the standard manually with some arguably-needed refactoring to improve reusability of common files.
+These attributes will need to be moved to the new directory structure manually with some arguably-needed refactoring to improve reusability of common files.
 
 ## Package locations
 
@@ -172,12 +163,12 @@ These attributes will need to be moved to the standard manually with some arguab
 
 ## `callPackage` with `nix-build --expr`
 
-A commonly recommended way of building package directories in Nixpkgs is to use `nix-build --expr 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
-Since the path changes `package.nix` is now used, this becomes like `nix-build --expr 'with import <nixpkgs> {}; callPackage pkgs/unit/he/hello/package.nix {}'`, which is harder for users.
+A commonly recommended way of building current package directories in Nixpkgs is to use `nix-build --expr 'with import <nixpkgs> {}; callPackage pkgs/applications/misc/hello {}'`.
+Since the path changes `package.nix` is now used, this becomes like `nix-build --expr 'with import <nixpkgs> {}; callPackage pkgs/by-name/he/hello/package.nix {}'`, which is harder for users.
 However, calling a path like this is an anti-pattern anyway, because it doesn't use the correct Nixpkgs version and it doesn't use the correct argument overrides.
 The correct way of doing it was to add the package to `all-packages.nix`, then calling `nix-build -A hello`.
 This `nix-build --expr` workaround is partially motivated by the difficulty of knowing the mapping from attributes to package paths, which is what this RFC improves upon.
-By teaching users that `pkgs/unit/<shard>/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build --expr` workarounds should disappear.
+By teaching users that `pkgs/by-name/<shard>/<name>` corresponds to `nix-build -A <name>`, the need for such `nix-build --expr` workarounds should disappear.
 
 ## Manual removal of custom arguments
 
@@ -211,17 +202,17 @@ Because of this, there's the pattern of duplicating the `callPackage` call with 
 }
 ```
 
-The semantics of how unit directories are checked by CI do allow the definition of package variants from unit directories:
+The semantics of how package directories are checked by CI do allow the definition of package variants from package directories:
 ```nix
 {
-  graphviz_nox = callPackage ../unit/gr/graphviz/package.nix { withXorg = false; };
+  graphviz_nox = callPackage ../by-name/gr/graphviz/package.nix { withXorg = false; };
 }
 ```
 
 # Drawbacks
 [drawbacks]: #drawbacks
 
-- This standard can only be used for top-level packages using `callPackage`, so not for e.g. `python3Packages.requests` or a package defined using `haskellPackages.callPackage`
+- This directory structure can only be used for top-level packages using `callPackage`, so not for e.g. `python3Packages.requests` or a package defined using `haskellPackages.callPackage`
 - It's not possible anymore to be a [GitHub code owner](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) of category directories.
 - The existing categorization of packages gets lost. Counter-arguments:
   - It was never that useful to begin with.
@@ -236,24 +227,31 @@ The semantics of how unit directories are checked by CI do allow the definition 
 # Alternatives
 [alternatives]: #alternatives
 
-## A different unit base directory
+## A different base directory
 
-Context: `pkgs/unit` is the unit base directory
+Context: `pkgs/by-name` is the base directory
 
 Alternatives:
-- Use `unit` in the root directory instead
+- Use `by-name` in the root directory instead
   - (+) This is future proof in case we want to make the directory structure more general purpose
     - (-) We don't yet know if we want that, so this is out of scope for now
 - Use `pkgs` instead, so that the `${shard}`'s are siblings to the other current directories in `pkgs` such as `top-level`, with the intention that the other directories would be hopefully removed at some point, then only leaving the shards in `pkgs`
   - (+) If we remove the other directories at some point, only the `${shard}`'s will be left in `pkgs`
-  - (-) This leads to ambiguities between the directories from the standard and the other directories, requiring special handling in the code and CI, leading to complexities.
+  - (-) This leads to ambiguities between the directories from the new directory structure and the other directories, requiring special handling in the code and CI, leading to complexities.
   - (-) This makes it hard to pick out the few non-shard directories in directory listings since they will be interleaved with the ~700 shards.
-  - (-) This would be harder to document and explain to people, since one always has to disregard all non-unit directories, with no obvious justification
-  - (-) Currently we cannot apply this standard to all definitions in `pkgs`, in particular nested packages like `pythonPackages.*`, non-`callPackage`'d definitions like `copyDesktopItems` and non-derivations like `fetchFromGitHub`.
-    Depending on how we want to handle those, it might make more sense to keep `pkgs/unit` or to use `pkgs` directly once all legacy paths are migrated away to another top-level directory, we don't yet know. `pkgs/unit` will be easier to migrate to `pkgs` than the other way around though.
+  - (-) This would be harder to document and explain to people, since one always has to disregard all non-sharded directories, with no obvious justification
+  - (-) Currently we cannot apply this directory structure to all definitions in `pkgs`, in particular nested packages like `pythonPackages.*`, non-`callPackage`'d definitions like `copyDesktopItems` and non-derivations like `fetchFromGitHub`.
+    Depending on how we want to handle those, it might make more sense to keep `pkgs/by-name` or to use `pkgs` directly once all legacy paths are migrated away to another top-level directory, we don't yet know. `pkgs/by-name` will be easier to migrate to `pkgs` than the other way around though.
   - (-) Causes poor auto-completion for the existing directories
 - A variation of the above that improves on this is altering the shards to be prefixed with `_` so that they're always ordered together and not interleaved with non-shards. Non-shards would still be at the bottom of file listings though, but at least together. It shares the same other problems however.
-- Various proposals: `pkgs/auto`, `pkgs/pkg`, `pkgs/mod`, `pkgs/component`, `pkgs/part`, `pkgs/comp`, `pkgs/app`, `pkgs/simple`, `pkgs/default`, `pkgs/shards`, `pkgs/top`, `pkgs/main`
+- `pkgs/unit`: This was the name initially used by the RFC until `by-name` was proposed and favored.
+  - (+) It's not associated with any pre-existing assumptions about what it means, which should cause people unfamiliar with this directory structure to read the documentation.
+    - (-) This is however also a disadvantage, the name doesn't inform people anything about what it does
+    - (-) Systemd also has the term "unit", which could be confused with this
+  - (+) It makes sense to view package directories as units, because they are discrete entities distinct from other entities of the same type
+  - (+) We envision that in the future we could extend the directory structure to not just include a package definition for each directory, but also other parts such as NixOS modules, library components, tests, etc. In this case `unit` would fit even better and could be described as
+    > A collection of standardized files related to the same software component
+- Various other proposals: `pkgs/auto`, `pkgs/pkg`, `pkgs/mod`, `pkgs/component`, `pkgs/part`, `pkgs/comp`, `pkgs/app`, `pkgs/simple`, `pkgs/default`, `pkgs/shards`, `pkgs/top`, `pkgs/main`
   - (-) Generally all of these names have some pre-existing assumptions about them, causing potential confusion when used for this concept
   - `pkgs/default`: Could be interpreted to be some Nix-builtin magic that defaults to that folder. Could also be interpreted as "this is where the default packages go", which then raises the question "which packages are part of the default ones?"
   - `pkgs/shards`: The sharding is a self-evident implementation detail, it shouldn't be repeated
@@ -275,10 +273,10 @@ Alternatives:
 
 ## Alternate shard structure
 
-Context: The structure is `pkgs/unit/${shard}/${name}` with `shard` being the lowercased two-letter prefix of `name`.
+Context: The structure is `pkgs/by-name/${shard}/${name}` with `shard` being the lowercased two-letter prefix of `name`.
 
 Alternatives:
-- A flat directory, where `pkgs.hello` would be in `pkgs/unit/hello`.
+- A flat directory, where `pkgs.hello` would be in `pkgs/by-name/hello`.
   - (+) Simpler for the user and code.
   - (-) The GitHub web interface only renders the first 1 000 entries when browsing directories, which would make most packages inaccessible in this way.
     - (+) This feature is not used often.
@@ -286,27 +284,27 @@ Alternatives:
   - (-) Bad because it makes `git` and file listings slower.
 - Use three-letter or four-letter prefixes.
   - (-) Also leads to directories containing more than 1 000 entries, see above.
-- Use multi-level structure, e.g. a two-level two-letter prefix structure where `hello` is in `pkgs/unit/he/ll/hello`
+- Use multi-level structure, e.g. a two-level two-letter prefix structure where `hello` is in `pkgs/by-name/he/ll/hello`
   - (+) This would allow virtually a unlimited number of packages without performance problems
   - (-) It's hard to understand, type and implement, needs a special case for packages with few characters
-    - E.g. `x` could go in `pkgs/unit/x-/--/x`
+    - E.g. `x` could go in `pkgs/by-name/x-/--/x`
   - (-) There's not enough packages even in Nixpkgs that a two-level 4-letter structure would make sense. Most of the structure would only be filled by a couple entries.
   - (-) Even Git only uses 2-letter prefixes for its objects hex hashes
-- Use two-letter prefixes split into two directories, like `pkgs/unit/h/e/hello`
+- Use two-letter prefixes split into two directories, like `pkgs/by-name/h/e/hello`
   - (+) Allows easy traversal by clicking on GitHub file listings, shard directories being limited to under 40 children
   - (-) Requires special-casing single-letter attribute names
     - (+) There's currently only 6 such cases, which could be handled on a one-off basis
   - (-) Makes auto-completion worse, having to tab-complete once more
   - (-) Makes it harder to create shards: if a shard doesn't exist yet, it has to be created with either one or two `mkdir`'s, or a `mkdir -p`
 - Use a dynamic structure where directories are rebalanced when they have too many entries.
-  E.g. `pkgs.foobar` could be in `pkgs/unit/f/foobar` initially.
-  But when there's more than 1 000 packages starting with `f`, all packages starting with `f` are distributed under 2-letter prefixes, moving `foobar` to `pkgs/unit/fo/foobar`.
+  E.g. `pkgs.foobar` could be in `pkgs/by-name/f/foobar` initially.
+  But when there's more than 1 000 packages starting with `f`, all packages starting with `f` are distributed under 2-letter prefixes, moving `foobar` to `pkgs/by-name/fo/foobar`.
   - (-) The structure depends not only on the name of the package then, making it harder to find packages again and figure out where they should go
   - (-) Complex to implement
 
 ## Alternate `package.nix` filename
 
-Context: The only file that has to exist in unit directories is `package.nix`, it must contain a function suitable for `callPackage`.
+Context: The only file that has to exist in package directories is `package.nix`, it must contain a function suitable for `callPackage`.
 
 Alternatives:
 - `default.nix`
@@ -315,7 +313,7 @@ Alternatives:
     - Removing the need to specify the file name in expressions, but this does not apply because this file will be imported automatically by the code that replaces definitions from `all-packages.nix`.
       - (+) But there's still some support for `all-packages.nix` for custom arguments, which requires people to type out the name
         - (-) This is hopefully only temporary, in the future we should fully get rid of `all-packages.nix`
-    - Removing the need to specify the file name on the command line, but this does not apply because a package function must be imported into an expression before it can be used, making `nix build -f pkgs/unit/hell/hello` equally broken regardless of file name.
+    - Removing the need to specify the file name on the command line, but this does not apply because a package function must be imported into an expression before it can be used, making `nix build -f pkgs/by-name/hell/hello` equally broken regardless of file name.
   - (-) Not using `default.nix` frees up `default.nix` for an expression that is actually buildable, e.g. `(import ../.. {}).hello`, although we don't yet have a use case for this that isn't covered by `nix-build ../.. -A <attrname>`.
   - (-) Using `default.nix` would tempt users to invoke `nix-build .`, which wouldn't work and making package functions auto-callable is a known anti-pattern.
 - `pkg-fun[c].nix`
@@ -337,44 +335,44 @@ Alternative:
 
 Context: It's possible to override the default `{ }` argument to `callPackage` by manually specifying the full definition in `all-packages.nix`
 
-The alternative is to not allow that, requiring that `pkgs.${name}` corresponds directly to `callPackage pkgs/unit/${shard}/${name}/package.nix { }`.
-- (-) It's harder to explain to beginners whether their package can use the unit directory standard or not
-- (+) The direct correspondance ensures that the unit directory contains all information about the package, which is very intuitive
+The alternative is to not allow that, requiring that `pkgs.${name}` corresponds directly to `callPackage pkgs/by-name/${shard}/${name}/package.nix { }`.
+- (-) It's harder to explain to beginners whether their package can use the new directory structure or not
+- (+) The direct correspondance ensures that the package directory contains all information about the package, which is very intuitive
   - (-) We're not at the point where we can have that though, custom arguments don't have a good replacement yet
-- (-) If a package previously didn't need custom arguments, it would be moved to a unit directory. But when the need for a custom argument arises, it then requires moving it out from the unit directory and into the freeform structure of `pkgs/` again.
+- (-) If a package previously didn't need custom arguments, it would be moved to the new directory structure. But when the need for a custom argument arises, it then requires moving it out from new directory structure and into the freeform structure of `pkgs/` again.
 - (+) It's easier to relax restrictions than to impose new ones
 
 ## Reference check
 
-Context: There's a [requirement](#user-content-req-ref) to check that unit directories can't access paths outside themselves.
+Context: There's a [requirement](#user-content-req-ref) to check that package directories can't access paths outside themselves.
 
 Alternatives:
 - Don't have this requirement
   - (-) Doesn't discourage the use of file paths as an API.
   - (-) Makes further migrations to different file structures harder.
-- Make the requirement also apply the other way around: Files outside the unit directory cannot access files inside it, with `package.nix` being the only exception, and only for the one attribute in `all-packages.nix`
+- Make the requirement also apply the other way around: Files outside the package directory cannot access files inside it, with `package.nix` being the only exception, and only for the one attribute in `all-packages.nix`
   - (-) Enforcing this requires a global view of Nixpkgs, which is nasty to implement
   - (-) [Package variants](#package-variants) would not be possible to define
 
-## Allow `callPackage` arguments to be specified in `<unit>/args.nix`
+## Allow `callPackage` arguments to be specified in `args.nix`
 
 Context: Custom `callPackage` arguments have to be added to `all-packages.nix`
 
 Alternative:
 Expand the auto-calling logic according to:
-Unit directories are automatically discovered and transformed to a definition of the form
+Package directories are automatically discovered and transformed to a definition of the form
 ```
 # If args.nix doesn't exist
-pkgs.${name} = pkgs.callPackage ${unitDir}/package.nix {}
+pkgs.${name} = pkgs.callPackage ${packageDir}/package.nix {}
 # If args.nix does exists
-pkgs.${name} = pkgs.callPackage ${unitDir}/package.nix (import ${unitDir}/args.nix pkgs);
+pkgs.${name} = pkgs.callPackage ${packageDir}/package.nix (import ${packageDir}/args.nix pkgs);
 ```
 
 - (+) It makes another class of packages uniform, by picking a solution with restricted expressive power.
 - (-) It does not solve the contributor experience problem of having too many rules.
       `args.nix` is another pattern that contributors need to learn how to use, as we have seen that it is not immediately obvious to everyone how it works.
   - (+) A CI check can mitigate the possible lack of uniformity, and we see a simple implementation strategy for it.
-- (-) Complicates the unit directory structure with an optional file
+- (-) Complicates the directory structure with an optional file
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
