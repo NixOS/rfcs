@@ -46,10 +46,10 @@ This PR will be backported to the stable release in order to ensure that backpor
 
 ### File structure
 
-Create the initially-empty _base directory_ `pkgs/by-name` in Nixpkgs.
+Create the initially-empty `pkgs/by-name` directory in Nixpkgs, and migrate the `hello` package into it.
 
 Check the following using CI:
-- The base directory must only contain subdirectories of the form `${shard}/${name}`, called _package directories_.
+- `pkgs/by-name` must only contain subdirectories of the form `${shard}/${name}`, called _package directories_.
 - The `name`'s of package directories must be unique when lowercased
 - `name` is a string only consisting of the ASCII characters `a-z`, `A-Z`, `0-9`, `-` or `_`.
 - `shard` is the lowercased first two letters of `name`, expressed in Nix: `shard = toLower (substring 0 2 name)`.
@@ -227,9 +227,9 @@ The semantics of how package directories are checked by CI do allow the definiti
 # Alternatives
 [alternatives]: #alternatives
 
-## A different base directory
+## An alternative to the `pkgs/by-name` location
 
-Context: `pkgs/by-name` is the base directory
+Context: this directory contains the shards, which contain the package directories. We could move the shards to a different location.
 
 Alternatives:
 - Use `by-name` in the root directory instead
