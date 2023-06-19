@@ -35,14 +35,13 @@ Nixpkgs already has a couple of mechanisms for doing these kind of things, among
 
 ### Package problems
 
-A new attribute is added to the `meta` section of a package: `problems`. If present, it is a an attribute set of attrsets which each have at least the following fields:
+A new attribute is added to the `meta` section of a package: `problems`. If present, it is a an attribute set of attrsets where the keys are the problem names and the values have at least the following fields each:
 
 - `kind`: The 'kind' of the problem, see [problem kinds](#problem-kinds) for allowed values. Defaults to the attribute set key.
 - `message`: Required. A string message describing the issue with the package. The value should:
   - Start with the "This package", "The application" or equivalent, or simply with the package name.
   - Be capitalized (unless it starts with the package name).
   - Use a period at the end.
-- `date`: Required. An ISO 8601 `yyyy-mm-dd`-formatted date from when the issue was added.
 - `urls`: Optional, list of strings. Can be used to link issues, pull requests and other related items.
 
 Problem kinds may specify additional attributes. Apart from that, other attributes are not allowed.
@@ -55,42 +54,50 @@ meta.problems = {
   python2-eol = {
     kind = "deprecated";
     message = "This package depends on Python 2, which has reached end of life.";
-    date = "1970-01-01";
     urls = [ "https://github.com/NixOS/nixpkgs/issues/148779" ];
   };
   # This one will have the name "removal"
   removal = {
     # kind = "removal"; # Inferred from attribute key
     message = "The application has been abandoned upstream, use libfoo instead.";
-    date = "1970-01-01";
   };
 };
 ```
 
 ### Problem kinds
 
-At the moment, the following values for the `kind` field of a warning are known:
+At the moment, the following values for the `kind` field of a problem are known:
 
-- `removal`: The package is scheduled for removal some time in the future.
+- `removal`: The package is scheduled for removal some time in the future. Only up to one instance per package.
+  - Packages are already being removed for various reasons on a regular basis. Now we can properly warn users about this in advance.
 - `deprecated`: The package has been abandoned upstream or has end of life dependencies.
-- `maintainerless`: `meta.maintainers` is empty. Cannot be manually declared in `meta.problems`.
+  - Currently we do mass-pings for all maintainers of affected packages, although many packages are under-maintained. This allows to warn users who depend on that package as last resort stake holders.
+- `maintainerless`: `meta.maintainers` is empty. Cannot be manually declared in `meta.problems`. Only up to one instance per package.
+  - This is currently provided by `config.showDerivationWarnings`, which is only used by Hydra.
 - `insecure`: (Reserved for future use.) The package has some security vulnerabilities.
+  - This will hopefully replace the existing insecure warnings (`meta.knownVulnerabilities`, `config.permittedInsecurePackages`) in the future (see Future work).
 - `broken`: (Reserved for future use.) The package is broken in some way.
+  - This will hopefully replace or enhance `meta.broken` in the future (see Future work).
 - `unsupported`: (Reserved for future use.) The package is not expected to build on this platform.
+  - This will hopefully replace `meta.platforms` and `meta.badPlatforms` in the future (see Future work).
 
-Not all values make sense for declaration in `meta.problems`: Some may be automatically generated from other `meta` attributes (for example `maintainerless`). New kinds may be added in the future. Furthermore, some kinds are expected to be present only up to once per derivation: for example, we have no use for having multiple `maintainerless` problems. Restrictions like these may be implemented in the metadata check of packages.
+New kinds may be added in the future.
+
+Not all values make sense for declaration in `meta.problems`: Some may be automatically generated from other `meta` attributes (for example `maintainerless`). Furthermore, some kinds are expected to be present only up to once per derivation: for example, we have no use for having multiple `maintainerless` problems. Restrictions like these may be implemented in the metadata check of packages.
 
 ### Nixpkgs configuration
 
-The following new config options are added to nixpkgs: `config.problems.handlers` and `config.problems.matchers`. The (currently undocumented) option `config.showDerivationWarnings` will be removed.
+The following new config options are added to nixpkgs: `config.problems.handlers` and `config.problems.matchers`. The (currently undocumented) option `config.showDerivationWarnings` will eventually be removed.
 
-Handler values can be either `"error"`, `"warn"` or `"ignore"`. `"error"` maps to `throw`, `"warn"` maps to `trace`. Future values may be added in the future.
+Handler values can be either `"error"`, `"warn"` or `"ignore"`. `"error"` maps to `throw`, `"warn"` maps to `trace`. Further values may be added in the future.
 
 `config.problems.handlers` is the simple and most user-facing configuration value. It is a simple doubly-nested attribute set, of style `pkgName.problemName`. The package name is taken from `lib.getName`, which currently yields its `pname` attribute.
 
 ```nix
 config.problems.handlers = {
+  # If "myPackage" is used (evaluated) somewhere and has a problem named "maintainerless", print a warning
   myPackage.maintainerless = "warn";
+  # This was added because "otherPackage" has a problem "CVE1234" which prevents evaluation, which needs to be ignored to use it nevertheless ("warn" would work too of course)
   otherPackage.CVE1234 = "ignore";
 }
 ```
@@ -126,7 +133,7 @@ config.problems.matchers = [
 
 To make it more explicit, a matches is an attribute set which may contain the following fields:
 
-- `package`: Match only problems of a specified package.
+- `package`: Match only problems of a specified package. (Using `lib.getName` for the name, same as in `config.problems.handlers`)
 - `kind`: Match only problems of a specific kind.
 - `name`: Match only problems with a specific name.
 - `handler`: Required. Sets the level for packages that have been matched by this matcher.
@@ -152,13 +159,18 @@ If a package needs to be removed for some reason (most likely due to outstanding
 meta.problems = {
   removal = {
     message = "This package will be removed from Nixpkgs.";
-    date = "1970-01-01";
   };
   # Probably some more problems here
 };
 ```
 
 The plan is to eventually remove packages with long outstanding problems of some kinds. The details will be part of future work, but users will be warned sufficiently in advance to give them the chance to intervene: Before removing a package, it should have a `removal` annotation for at least one full release cycle.
+
+### Package declarations outside of Nixpkgs
+
+Since package checks are done via "check-meta" called by `mkDerviation`, these problems can also be declared and checked in third-party packages outside of Nixpkgs.
+This is not always desirable though, since third-party packages do not necessarily need to abide by the standards in Nixpkgs (e.g. having maintainer fields).
+Because of this, the implementation needs to ensure no warnings or errors get generated without a `meta` declaration to keep the noise for third-parties to a minimum. (The idea being that third-party packages commonly don't specify a `meta` attribute in the first place.)
 
 ## Drawbacks
 [drawbacks]: #drawbacks
@@ -167,6 +179,7 @@ The plan is to eventually remove packages with long outstanding problems of some
   - One idea I had is to be more verbose on the unstable channels, and then tune down the noise after branch-off.
   - New lints to packages should be introduced gradually, by making them "silent" by default on start and only going to "warn" after most problems in nixpkgs itself are resolved.
 - People have voiced strong negative opinions about the prospect of removing packages from nixpkgs at all, especially when they still *technically* work.
+  - We already do remove packages on a regular basis, so now at least we can properly warn people about it in advance.
   - We do not want to encourage the use of unmaintained software likely to contain security vulnerabilities, and we do not have the bandwidth to maintain packages deprecated by upstream. Nothing is lost though, because we have complete binary cache coverage of old nixpkgs versions, providing a comparatively easy way to pin old very package versions.
   - This change is a general improvement in the ecosystem even if we do not end up using it to remove any packages.
 
@@ -234,12 +247,10 @@ Some more design options that were considered:
 meta.problems = {
   "deprecated/python2-eol" = {
     message = "This package depends on Python 2, which has reached end of life.";
-    date = "1970-01-01";
     urls = [ "https://github.com/NixOS/nixpkgs/issues/148779" ];
   };
   removal = {
     message = "The application has been abandoned upstream, use libfoo instead";
-    date = "1970-01-01";
   };
 };
 
@@ -247,12 +258,10 @@ meta.problems = {
   "deprecated" = [{
     name = "python2-eol";
     message = "This package depends on Python 2, which has reached end of life.";
-    date = "1970-01-01";
     urls = [ "https://github.com/NixOS/nixpkgs/issues/148779" ];
   }];
   removal = {
     message = "The application has been abandoned upstream, use libfoo instead";
-    date = "1970-01-01";
   };
 };
 ```
