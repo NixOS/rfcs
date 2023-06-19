@@ -131,7 +131,7 @@ config.problems.matchers = [
 ]
 ```
 
-To make it more explicit, a matches is an attribute set which may contain the following fields:
+To make it more explicit, a matcher is an attribute set which may contain the following fields:
 
 - `package`: Match only problems of a specified package. (Using `lib.getName` for the name, same as in `config.problems.handlers`)
 - `kind`: Match only problems of a specific kind.
@@ -168,14 +168,14 @@ The plan is to eventually remove packages with long outstanding problems of some
 
 ### Package declarations outside of Nixpkgs
 
-Since package checks are done via "check-meta" called by `mkDerviation`, these problems can also be declared and checked in third-party packages outside of Nixpkgs.
-This is not always desirable though, since third-party packages do not necessarily need to abide by the standards in Nixpkgs (e.g. having maintainer fields).
-Because of this, the implementation needs to ensure no warnings or errors get generated without a `meta` declaration to keep the noise for third-parties to a minimum. (The idea being that third-party packages commonly don't specify a `meta` attribute in the first place.)
+Since package checks are done via "check-meta" called by `mkDerivation`, these problems can also be declared and checked in third-party packages outside of Nixpkgs.
+This is not always desirable though, since third-party packages do not necessarily need to abide by the standards of Nixpkgs (e.g. having maintainer fields).
+Because of this, the implementation needs to ensure no warnings or errors get generated without a `meta` declaration to keep the noise for third-party packages to a minimum. (The idea being that third-party packages commonly don't specify a `meta` attribute in the first place.)
 
 ## Drawbacks
 [drawbacks]: #drawbacks
 
-- Too much warnigns may cause Alarm fatigue
+- Too much warnings may cause Alarm fatigue
   - One idea I had is to be more verbose on the unstable channels, and then tune down the noise after branch-off.
   - New lints to packages should be introduced gradually, by making them "silent" by default on start and only going to "warn" after most problems in nixpkgs itself are resolved.
 - People have voiced strong negative opinions about the prospect of removing packages from nixpkgs at all, especially when they still *technically* work.
