@@ -13,9 +13,9 @@ related-issues: https://github.com/NixOS/nix/issues/7255
 # Summary
 [summary]: #summary
 
-Introduce a convention to determine which version of the Nix language grammar to use for parsing and evaluating Nix expressions.
-
-Add parameters to the Nix language evaluator, controlling the behavior of deprecation warnings and errors.
+- Introduce a convention to determine which version of the Nix language grammar to use for parsing and evaluating Nix expressions.
+- Add parameters to the Nix language evaluator, controlling the behavior of deprecation warnings and errors.
+- Codify a versioning policy for the Nix language specification
 
 # Motivation
 [motivation]: #motivation
