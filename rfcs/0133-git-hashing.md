@@ -65,7 +65,7 @@ Like-minded projects emphasizing content-addressing are our *natural* partners, 
 
 Each item can be done separately provided its dependent items are also done.
 These are the items we wish to commit to at this time.
-(See [Future Work](#future-work) for other steps left for later.)
+(See the two Future Work sections for other steps left for later.)
 
 ## Git file hashing
 
@@ -87,28 +87,37 @@ Git hashing would not support references (since references in Nix's sense are no
 The builtin fetchers can also be made to work with git file hashing just as they support the other types.
 In addition, Git repo fetching can leverage this better to than the other formats since the data in git repos is already content-addressed in this way.
 
-## Content address or store path in Store interface
+## Nix-agnostic content-addressing "stores"
 
 - **Purpose**: All distribution
 
-Modify many store interface methods that today take store paths to instead accept *either* a store path or a content address.
+We want to be able to substitute from an arbitrary store (in the general, non-Nix sense) of content-addressed objects.
+For the purpose of this RFC, that means querying objects by git hash, and being able to trust the results because we can verify them against the git hash.
 
-For stores that are purpose-built for Nix, like the ones we support today, all addressing can be done store paths, so the current interface is fine.
-But for Nix-agnostic stores, store paths are rather useless as a key type because Nix-agnostic tools don't know about them.
-They can, however, understand content addresses.
-And from such a content address we can always produce a store path again, so there is no loss of functionality with existing stores.
+In the implementation, we could accomplish this in a variety of ways.
 
-## NAR info or content address normative in `ValidPathInfo`
+- On on extreme, we could have a `ContentAddressedSubstitutor` abstract interface completely separate from Nix's `Store` interface.
 
-- **Purpose**: Source distribution and archival
-- **Depends on**: Content address or store path in Store interface,
+- On the other extreme, we can generalize `Store` itself to allow taking content addresses or store paths as references.
 
-As described in the first step, currently `NarHash` and `NarSize` are the *normative* fields which are used to verify a store object.
-But if the store object is content-addressed, we don't need these, because the content address (`CA` field) will also suffice, all by itself.
-Relax the abstract `ValidPathInfo` type to merely require that *either* the pair of `NarHash` and `NarSize` or just `CA` alone be defined.
+Exactly how this shakes out is to be determined post-RFC, but it would be nice to use Nix-agnostic persistent methods with `--store` and `--substituters`.
 
-Existing Nix stores types are still required to contain a `NarHash` and `NarSize`, which is good for backwards compat and don't come with a cost.
-Only new nix-agnostic store types would take advantage of these new, relaxed rules.
+If we do go the route of modifying the `Store` class, note that these things will need to happen:
+
+ - Many store interface methods that today take store paths will need to also accept names & content addresse pairs.
+
+   For stores that are purpose-built for Nix, like the ones we support today, all addressing can be done store paths, so the current interface is fine.
+   But for Nix-agnostic stores, store paths are rather useless as a key type because Nix-agnostic tools don't know about them.
+   Those store can, however, understand content addresses.
+   And from such a name + content address, we can always produce a store path again, so there is no loss of functionality with existing stores.
+
+- Relax `ValidPathInfo` to merely require that *either* the pair of `NarHash` and `NarSize` or just `CA` alone be defined.
+
+  As described in the first step, currently `NarHash` and `NarSize` are the *normative* fields which are used to verify a store object.
+  But if the store object is content-addressed, we don't need these, because the content address (`CA` field) will also suffice, all by itself.
+  
+  Existing Nix stores types are still required to contain a `NarHash` and `NarSize`, which is good for backwards compat and don't come with a cost.
+  Only new nix-agnostic store types would take advantage of these new, relaxed rules.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -166,8 +175,24 @@ For now they are all written together, but during the RFC meetings we will decid
 
 None at this time.
 
+# Future work --- Software Heritage
+[future]: #future-work-swh
+
+## Motivation
+
+Software Heritage is a great way to get source code that is no longer found at its original location online.
+It would be really great to use it as a substituter to fetch source code that fails to be fetched the default way.
+
+## Detailed Designed
+
+- **Depends on**: Nix-agnostic content-addressing "stores"
+
+[`GET /api/1/raw/(swhid)/`](https://docs.softwareheritage.org/devel/swh-web/uri-scheme-api.html#get--api-1-raw-(swhid)-)
+is a relatively new Software Heritage API endpoint to get a git object for the given SWHID.
+We can used this to write a Software Heritage store, which will accomplish the task layed out in the previous motivation section.
+
 # Future work --- IPFS
-[future]: #future-work
+[future]: #future-work-ipfs
 
 ## Motivation
 
@@ -178,9 +203,13 @@ It out-of-the-box match's Nix's data model extremely well.
 
 ### Source distribution and archival
 
-IPFS also supports git hashing, and so we also provide a good way for people and institutions to "pin" the sources they need, especially if those sources include private ones SWH won't have.
-Finally, per [Obsidian's bridging work](https://github.com/obsidiansystems/go-ipfs-swh-plugin), we have a 3 way integration between IPFS, SWH, and Nix.
-Data can be directly downloaded from SWH via HTTPS, or indirectly via IPFS, which can act as a CDN to not put as much load on SWH's servers.
+IPFS also supports git hashing, and so we also provide a good way for people and institutions to "pin" the sources they need, especially if those sources include private ones Software Heritage won't have.
+Finally, per [this IPFS plugin](https://blog.obsidian.systems/software-heritage-bridge/), we can have a 3 way integration between IPFS, Software Heritage, and Nix.
+Data can be directly downloaded from Software Heritage via HTTPS, or indirectly via IPFS.
+
+This would hopefully supercede the direct Software Heritage store outlined above.
+This is because Software Heritage is primarily an archive, and we should be careful not to waste their limitted resources with copious egress bandwidth.
+IPFS can act as a CDN to not put as much load on Software Heritage's servers.
 
 ### Not just IPFS
 
@@ -265,7 +294,7 @@ Printing out a new CID for the index root allows the store administrator to upda
 ### "stateless" IPFS store
 
 - **Purpose**: Source distribution and archival
-- **Depends on**: NAR info or content address normative in `ValidPathInfo`
+- **Depends on**: Nix-agnostic content-addressing "stores"
 
 Use the above functionality to create a "stateless" IPFS store.
 Opaque store path lookups always fail, but when the key is the new content address type, we can translate the key itself into a CID that we can look up.
