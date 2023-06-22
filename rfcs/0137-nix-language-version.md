@@ -699,12 +699,12 @@ At least such a trade-off now could then be made to begin with, as currently bre
 [future]: #future-work
 
 - Define a roadmap to introduce the next language versions, for example:
-  - Version 7 commits to changes that do not require additional work on Nixpkgs:
-    - Introduce the version declaration, required to distinguish versions 6 and 7
+  - Major version 7 commits to changes that do not require additional work on Nixpkgs:
+    - Introduce the version declaration, required to distinguish major versions 6 and 7
     - Remove `builtins.langVersion`, as it's not needed any more
     - Deprecate URL literals
     - Deprecate the `let-body` syntax
     - Drop support for leading zeroes on integers
     - Formalise change in float representation
-  - Version 8 is released only when version annotations according to version 7 are fully supported in Nixpkgs
+  - Major version 8 is released only when version annotations according to version 7 are fully supported in Nixpkgs
 
