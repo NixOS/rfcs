@@ -43,7 +43,8 @@ As measured in the community polls, Nix has a lot of new users, dwarfing the num
 Flakes is very popular among these new users.
 Ergo, Flakes is very popular among the Nix community as a whole.
 
-Many Groups and individuals interested in the continued growth the Nix community see Flakes are popular, an also wish it to be stabilized to attract still more users, since Flakes are already proven to be popular among users.
+Many groups and individuals interested in the continued growth the Nix community see that Flakes are popular, and wish for them to be stabilized to attract still more users/
+The thinking is that if unstable Flakes are already proven to be popular, stable Flakes will be even moreso.
 
 ### Difficulties in the roll-out
 
@@ -57,9 +58,9 @@ Experimental features are expected to be subject to community feedback, modified
 ### Flakes are criticized for encroaching on other features
 
 There are many criticisms about Flakes.
-But one of them especially relevant to stabilizing is a perception that Flakes have encroached on other new features, in the sense that it ought to be possible to use them without Flakes but isn't in practice.
-For example, there is no reason in theory that pure evaluation if Nix expressions requires Flakes.
-But without the ability to populate some sort of initial list of store paths that are safe to import, pure evaluation in practice does require Flakes.
+But one of them especially relevant to stabilizing is a perception that Flakes have encroached on other new features, in the sense that it ought to be possible to use those other features without Flakes but isn't in practice.
+For example, there is no reason in theory that pure evaluation of Nix expressions requires Flakes.
+But without the ability to populate some sort of initial list of store paths that are safe to import, pure evaluation does in practice require Flakes.
 
 This is especially noticeable for new CLI features that *previously did*, in fact, work without Flakes.
 For example, in earlier versions of Nix, `nix search` worked without Flakes.
@@ -103,10 +104,10 @@ This hopefully is fairly uncontroversial and dovetails with the [experimental fe
 
 The broader of these principles is about Nix's architecture and a renewed commitment to layering.
 It is the opinion of the author and shepherds (?) that lying behind some process woes is architectural uncertainty
---- Flakes being relatively big and addressing many things at once made it a somewhat unavoidable magnet for controversy even if the process we wanted was perfectly followed.
+--- Flakes being relatively big and addressing many things at once made it a somewhat unavoidable magnet for controversy, even had the process we now propose been perfectly followed.
 
 Together this gives us a good "defense in depth":
-we enshrine a process which should keep tensions down, and we seek to avoid features/behavior which would tempt us by its scope to veer from that process the first place.
+we enshrine a process which should keep tensions down, and we seek to avoid features/behaviors which would tempt us by their scope to veer from that process the first place.
 
 ## Conclusion
 
@@ -161,38 +162,50 @@ These basic layering principles will be added to the [Nix architecture documenta
 
 See the [current documentation on experimental features and their lifecyle](https://nixos.org/manual/nix/stable/contributing/experimental-features.html).
 
-**TODO perhaps cut this down to be more of a diff against the above, rather than redundant in many ways.8**
-
 Stabilization of any feature, not just the CLI or Flakes, is not a matter of just flipping a switch on an implementation that has accrued for a period of time.
 Because the moment before stabilization is our last chance to make major changes, it is crucial that we look over what is being stabilized.
 
-To stabilize a piece of functionality we must do these things:
+To stabilize a piece of functionality (experimental -> stable in flowchart in linked documentation) we must do these things:
 
 1. **Audit the functionality**
 
    Making note of the current state.
    Do this publicly so the Nix community writ large has a chance to weigh in.
 
-   The features to be stabilized should "stand alone", meaning that they should make sense and work both with and without further unstable features not yet undergoing the stabilization process.
+   Checklist during audit:
 
-2. **Propose refinements of the functionality**
+   - **Documentation**
+
+     Ideally the feature is already well-documented and the audit brings up nothing new.
+     But if it isn't, it must be by the end of the audit.
+
+   - **Whole feature flag, not part of a feature flag**
+
+     It should be possible to enable just the experimental that is ready for stabilization *in isolation*, without also enabling other unstable functionality that is not ready for stabilization.
+     We are not allowed to propose to stabilize part of an experimenal feature and do so immediately.
+     We have to first break out the candidate functionality to be stabilized so it is just guarded by one feature flag.
+
+   - **Self-Containment**
+
+     With the previous checklist item ensuring that the feature *exists* in isolation, we then have to make sure it *make sense* in isolation.
+     The feature to be stabilized should "stand alone", meaning that it should make sense and work both with and without further unstable features not yet undergoing the stabilization process.
+
+   - **RFC Compliance**
+
+     If we have an RFC, the release candidate experimental feature should match the RFC.
+
+2. **Hold "Final Comment Period" for refinements of the functionality**
 
    It is reasonable to notice things that were not noticed before the audit.
    Features can either be changed, or they can be carefully carved out as ineligible for stabilization at this time, and left to be dealt with in a later round of this process.
 
    Note that for large, complex, and controversial features, an RFC is also required (per usual) to advance to the next step.
-   The acceptance of the RFC concludes the "propose refinements" step.
+   The auditing and FCP for the feature in this case take place under the auspices of the RFC process.
 
-3. **Ensure the candidate feature to be stabilized is just under one flag**
-
-   It should be possible to enable just the experimental that is ready for stabilization *in isolation*, without also enabling other unstable functionality that is not ready for stabilization.
-   This is important to allow users (and tests!) to try it out and make sure it is a meaningful feature in its own right, and not just a partially-complete things that relies on the further unstable features.
-
-   If we have an RFC, the release candidate experimental feature should match the RFC.
-
-4. **Actually stabilize**
+3. **Actually stabilize**
 
    Only this last step is "stabilization proper".
+   This should be nothing more than removing a feature flag that has made it though the previous steps.
 
 ## CLI in waves, then Flakes
 
@@ -215,7 +228,7 @@ The rounds thus look like this:
 
 Step 1 is technical work, with a self-imposed deadline so we can be sure it doesn't delay stabilization too long.
 The remaining steps are stabilization steps.
-For each of them, a separate RFC or other discussion medium will describe the new interfaces to be stabilized, and solicit feedback.
+For each of them, separate RFCs or other discussion media will describe the new interfaces to be stabilized, and solicit feedback.
 
 ### Step 0: Audit, refine, and stabilize the store-only installable-free CLI
 
