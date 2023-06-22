@@ -281,32 +281,6 @@ Other discussions around language changes:
 
    </details>
 
-1. `builtins.langVersion` returns the language version used for evaluating the given expression.
-
-   <details><summary>Arguments</summary>
-
-   - (+) Could make use of it for generating Nix expressions programmatically and annotating them with the correct version
-   - (+) `builtins.langVersion` is already part of the stable interface, this way we can make it pure
-   - (-) Requires maintaining more API surface without a clear use case
-
-   </details>
-
-   <details><summary>Alternatives</summary>
-
-   - Return the latest language version instead
-
-      - (-) Doesn't help to determine what is used for evaluating the current expression
-          - (+) Might provide opportunities for forward-compatible Nix code
-          - (-) Brittle and defeats the purpose of this RFC
-      - (-) Impure, the value depends on the environment
-
-   - Don't expose `builtins.langVersion` at all
-
-      - (+) No need to have this if the Nix files are versioned
-      - (+) `builtins.langVersion` is not documented and not widely used
-
-   </details>
-
 1. Each time the language specification (currently as embodied by the Nix language evaluator) is changed, the language version must be incremented.
 
    <details><summary>Arguments</summary>
