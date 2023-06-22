@@ -702,6 +702,7 @@ At least such a trade-off now could then be made to begin with, as currently bre
 - Define a roadmap to introduce the next language versions, for example:
   - Version 7 commits to changes that do not require additional work on Nixpkgs:
     - Introduce the version declaration, required to distinguish versions 6 and 7
+    - Remove `builtins.langVersion`, as it's not needed any more
     - Deprecate URL literals
     - Deprecate the `let-body` syntax
     - Drop support for leading zeroes on integers
