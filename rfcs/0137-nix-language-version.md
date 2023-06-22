@@ -72,18 +72,25 @@ Other discussions around language changes:
 
 ## Language versioning
 
-1. The language version is a natural number.
+1. The language version consists of two integers, denoting a major and a minor component.
 
    <details><summary>Arguments</summary>
 
-   - (+) Formally decouples the Nix language version from the Nix version
-     - (+) The Nix language is supposed to change much less often than the rest of Nix
-     - (-) There are two version numbers to keep track of
-     - (-) Makes more evident that the Nix language is a distinct architectural component of the Nix ecosystem
-   - (+) It's currently handled that way, no change needed apart from documentation
-        - See [`builtins.langVersion`] (currently undocumented)
-   - (+) Simple and unambiguous
-   - (+) Concise, even in the long term, since the language is supposed to change very rarely
+   - (+) Can distinguish additions from breaking changes
+       - (-) This may not be needed for our use case, since any addition to an expression will break for older evaluators even if the major version matches
+       - (+) Weaker forms of this are already in use:
+
+         - `builtins.foo ? workaround`
+         - `builtins.langVersion < 6`
+         - `builtins.nixVersion`
+
+         An explicit version declaration would would make obvious to readers what to expect and allow for better error messages.
+
+   - (+) Simplifies evaluator implementation: pure additions can be guarded by the minor version cleanly within a major version's evaluator code
+   - (-) Requires more characters to account for the added expressiveness
+       - This may be relevant depending on where it has to be encoded
+   - (+) Follows well-known convention of [Semantic Versioning](https://semver.org/)
+   - (-) May be confused with the version number of the Nix release
 
    [`builtins.langVersion`]: https://github.com/NixOS/nix/blob/26c7602c390f8c511f326785b570918b2f468892/src/libexpr/primops.cc#L3952-L3957
 
@@ -91,6 +98,15 @@ Other discussions around language changes:
 
    <details><summary>Alternatives</summary>
 
+    - The language version is a natural number.
+       - (+) Formally decouples the Nix language version from the Nix version
+         - (+) The Nix language is supposed to change much less often than the rest of Nix
+         - (-) There are two version numbers to keep track of
+         - (-) Makes more evident that the Nix language is a distinct architectural component of the Nix ecosystem
+       - (+) It's currently handled that way, no change needed apart from documentation
+            - See [`builtins.langVersion`] (currently undocumented)
+       - (+) Simple and unambiguous
+       - (+) Concise, even in the long term, since the language is supposed to change very rarely
    - [Calendar Versioning](https://calver.org/)
        - (+) Provides information on when changes happened
            - (-) This is not needed because only compatibility information is needed
@@ -99,12 +115,6 @@ Other discussions around language changes:
        - (+) Restricting to only the year would force language changes to be rare
            - (+) This would allow obvious synchronisation points with Nixpkgs releases
            - (-) It may be too much policy encoded in a mechanism
-   - [Semantic Versioning](https://semver.org/)
-       - (+) Can distinguish additions from other changes
-           - (-) This is not needed for our use case, since any addition to an expression will break for older evaluators even if the major version matches
-       - (+) Simplifies evaluator implementation: pure additions can be guarded by the minor version cleanly within a major version's evaluator code
-       - (-) Requires more characters to account for the added expressiveness
-           - This may be relevant depending on where it has to be encoded
    - Use version numbers of Nix stable releases for specifying the version of the Nix language
       - (+) More obvious to see for users what the current Nix version is rather than `builtins.langVersion`
       - (-) Would tie alternative Nix language evaluators to the rest of Nix
@@ -214,8 +224,9 @@ Other discussions around language changes:
 1. The following syntax is used for declaring the language version of a Nix expression:
 
    ```
-   version \d*;
+   version \d*.\d*;
    ```
+
    The evaluator must ignore a shebang line (starting with `#!) at the start of files, to leave room for additional tooling.
    This implies that if no language version is specified in a Nix file, it is written in version 6 (the version implemented in the stable release of Nix at the time of writing this RFC).
 
@@ -231,13 +242,13 @@ Other discussions around language changes:
 
    <details><summary>Alternatives</summary>
 
-   - `use v\d*;`
+   - `use v\d*\.\d*;`
      - (+) Shorter
      - (-) Does not explain much
-   - `Nix language version \d*`
+   - `Nix language version \d*\.\d*`
      - (+) Says it all
      - (-) Very long
-   - `with import <language> \d*;`
+   - `with import <language> \d*\.\d*;`
      - (+) Allows for forward compatibility hacks such as better error messages
      - (-) Will likely mislead beginners to think this is has the same semantics as the original `with import ...;`
 
@@ -262,68 +273,45 @@ Other discussions around language changes:
 
    </details>
 
-1. Language versions prior to 6 are not supported.
+1. Each time the language specification (currently as embodied by the Nix language evaluator) is changed:
+
+   - When backward compatibility is preserved, the minor version number is incremented.
+
+     A backward compatible change to the language means that all existing expressions written for the prior version will still evaluate to the same result.
+     Examples include additions of `builtins`, operators, or syntactic constructs.
+
+   - When breaking changes are introduced, the major version number is incremented.
+
+     Examples include semantic changes or removal of `builtins`, operators, or syntactic constructs.
 
    <details><summary>Arguments</summary>
 
-   - (+) Does not require additional development effort
-   - (+) Prior langauge versions are not fully supported by current code already, and the rest of this proposal argues to deprecate old versions in the future in order to keep the implementation manageable
-   - (-) Legacy code will not get support for managing compatibility
-
-   </details>
-
-1. The Nix language evaluator provides a command to output the most recent Nix language version.
-   This command provides options to list all Nix language versions supported by the evaluator.
-
-   <details><summary>Arguments</summary>
-
-   - (+) This is for convenience to determine which features are available
-
-   </details>
-
-1. Each time the language specification (currently as embodied by the Nix language evaluator) is changed, the language version must be incremented.
-
-   <details><summary>Arguments</summary>
-
-     - (+) The principled solution: guarantees reproducibility given a fixed language version
-     - (-) Implies additional overhead in development effort:
-       - Either for Nix maintainers to accommodate that practice in the release lifecycle
-         - For example, one would have to batch language changes for a version bump to limit the number of increments
-           - (+) This would be beneficial for alternative implementations in terms of churn and effort to keep up
-       - Or implementors of alternative evaluators catching up with changes
-         - (+) Specifying the language precisely via the version actually offers alternative implementations an alternative to catching up: only support a given language version
-     - (+) This essentially nudges one to organise Nix language (specification or evaluator implementation) development to be more independent of the rest of Nix
-       This is good, since it in turn forces stronger separation of concerns and more architectural clarity
-     - (-) Prohibits best-effort attempts at evaluating expressions with possibly incompatible evaluators
-       - (+) With the proposed level of strictness, one doesn't have to rely on best effort but can instead be explicit
-     - (-) Fixing evaluator bugs (i.e., clearly unintended behavior) after releases would technically require a version bump and therefore (theoretically) cooperation by expression authors
-       - This could be communicated with an increment in the Nix patch-level version, as is already practice
+   - (+) The principled solution: guarantees reproducibility given a fixed language version
+   - (+) Makes explicit current practice of adding features to the language, and allows introducing breaking changes in a controlled fashion, which is currently not possible at all
+   - (-) Implies additional overhead in development effort:
+     - Either for Nix maintainers to accommodate that practice in the release lifecycle
+       - For example, one would have to batch language changes for a major version bump to limit the number of increments
+         - (+) This would be beneficial for alternative implementations in terms of churn and effort to keep up
+     - Or implementors of alternative evaluators catching up with changes
+       - (+) Specifying the language precisely via the version actually offers alternative implementations an alternative to catching up: only support a given language version
+   - (+) This essentially nudges one to organise Nix language (specification or evaluator implementation) development to be more independent of the rest of Nix
+     This is good, since it in turn forces stronger separation of concerns and more architectural clarity
+   - (-) Prohibits best-effort attempts at evaluating expressions with possibly incompatible evaluators
+     - (+) With the proposed level of strictness, one doesn't have to rely on best effort but can instead be explicit
+   - (-) Fixing evaluator bugs (i.e., clearly unintended behavior) after releases would technically require a version bump and therefore (theoretically) cooperation by expression authors
+     - This could be communicated with an increment in the Nix patch-level version, as is already practice
 
    </details>
 
    <details><summary>Alternatives</summary>
 
-   - Bump version only when evaluation result on prior version evaluators would be *substantially* different
+   - Bump major version only when evaluation result on prior version evaluators would be *substantially* different
      - (+) Leaves room for judgement by developers
        - (+) Allows controlling progression of versions to some degree
      - (-) Conversely, leaves room for sneaking in breaking changes unannounced
        - (-) This loses compatibility guarantees we'd get from a stricter paradigm
        - (-) Deprives expression authors of ability to be selective with evaluator versions
      - (-) Due to hashing this is often not much different from taking *any* change into account
-   - Bump version when prior evaluators would fail
-     - (-) Derivation hashes may change between evaluator versions if different evaluation results were allowed within one version
-       - This amounts to giving up on specifying the language exhaustively using a version label
-     - (+) Fewer version increments or precautions required given current development practice
-
-   </details>
-
-1. Whenever Nix drops support for evaluating prior language versions, a major version bump is required.
-
-   Example: Assuming the current language version is 8, the Nix release version is 2.20, and support for language version 6 is dropped, the next Nix release must be version 3.0
-
-   <details><summary>Arguments</summary>
-
-   - (+) This enforces that existing code that works will not break inadvertently when upgrading Nix
 
    </details>
 
@@ -366,6 +354,43 @@ Other discussions around language changes:
 
    - (+) This allows systematic migration of existing code written for prior evaluators to the most recent language version
    - (+) It will notify users about what's going on instead of just breaking
+   </details>
+
+1. Language versions prior to 6 are not supported.
+
+   <details><summary>Arguments</summary>
+
+   - (+) Does not require additional development effort
+   - (+) Prior langauge versions are not fully supported by current code already, and the rest of this proposal argues to deprecate old versions in the future in order to keep the implementation manageable
+   - (-) Legacy code will not get support for managing compatibility
+
+   </details>
+
+1. The Nix language evaluator provides a command to output the most recent Nix language version.
+   This command provides options to list all Nix language versions supported by the evaluator.
+
+   <details><summary>Arguments</summary>
+
+   - (+) This is for convenience to determine which features are available
+
+   </details>
+
+1. Whenever Nix drops support for evaluating prior language versions, a major version bump is required.
+
+   Example: Assuming the current language version is 8.0, the Nix release version is 2.20, and support for language version 6 is dropped, the next Nix release must be version 3.0
+
+   <details><summary>Arguments</summary>
+
+   - (+) This enforces that existing code that works will not break inadvertently when upgrading Nix
+
+   </details>
+
+   <details><summary>Alternatives</summary>
+
+   - Separate Nix development from the Nix language entirely and keep it outside of the scope of this proposal
+     - (-) Currently the upstream Nix language evaluator and compatibility of expressions in Nixpkgs is closely tied to the rest of Nix, and have to take that into account
+       - Further separation of concerns is out of scope for this proposal
+
    </details>
 
 ## Deprecation warnings and errors
@@ -445,13 +470,15 @@ Other discussions around language changes:
 
 ```console
 nix --language-version
-7
+7.0
 ```
 
 ```console
 nix --supported-language-versions
-6
-7
+6.1
+6.2
+6.3
+7.0
 ```
 
 ## Version interoperability
@@ -460,38 +487,38 @@ nix --supported-language-versions
 
 ```nix
 # a.nix
-version 6;
+version 6.1;
 builtins.langVersion
 ```
 
 ```nix
 # b.nix
-version 7;
-[ (import ./a.6.nix) builtins.langVersion ]
+version 7.0;
+[ (import ./a.nix) builtins.null ]
 ```
 
 ```console
 $ nix-instantiate --eval b.nix
-[ 6 7 ]
+[ 6 null ]
 ```
 
 ### Expressions are not forward compatible
 
 ```nix
 # a.nix
-version 6;
+version 6.1;
 import ./b.nix
 ```
 
 ```nix
 # b.nix
-version 7;
-builtins.langVersion
+version 7.0;
+builtins.null
 ```
 
 ```console
 $ nix-instantiate --eval a.nix
-error: unsupported Nix language version 7
+error: unsupported Nix language version 7.0
 ```
 
 
@@ -499,18 +526,18 @@ error: unsupported Nix language version 7
 
 ```nix
 # a.nix
-version 6;
+version 6.1;
 { increment }:
 increment 1
 ```
 
 ```nix
 # b.nix
-version 7;
+version 7.0;
 import ./a.nix { increment = x: x + 1 }
 ```
 
-Since `increment` written in version 7 carries its own implementation with it, forcing it within an expression written in version 6 just works:
+Since `increment` written in version 7.0 carries its own implementation with it, forcing it within an expression written in version 6.1 just works:
 
 ```console
 $ nix-instantiate --eval b.nix
@@ -524,7 +551,7 @@ When passing values from newer versions to functions from older versions of the 
 
 ```nix
 # a.nix
-version 6;
+version 6.1;
 { value }:
 value + 1
 ```
@@ -533,7 +560,7 @@ Here we pretend that language version 7 introduced a new value type and syntax f
 
 ```nix
 # b.nix
-version 7;
+version 7.0;
 import ./a.nix { value = %5 + 7i%; }
 ```
 
@@ -542,22 +569,23 @@ $ nix-instantiate --eval bnix
 error: unsupported value type `complex` at built-in operator `+`
 ```
 
-In the following example, version 7 *removed* the `null` primitive, such that it can no longer be used.
+In the following example, assume version 7.0 *removed* floating point numbers, such that they can no longer be used.
 
 ```nix
 # a.nix
-null
+version 6.1;
+1.1
 ```
 
 ```nix
 # b.nix
-version 7;
-import ./a.nix
+version 7.0;
+(import ./a.nix) * 2
 ```
 
 ```console
 $ nix-instantiate --eval b.nix
-error: unsupported value `null`
+error: unsupported type `float` for multiplication
 ```
 
 This is consistent with best-effort interoperability:
