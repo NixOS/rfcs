@@ -698,7 +698,6 @@ At least such a trade-off now could then be made to begin with, as currently bre
 # Future work
 [future]: #future-work
 
-- Define rules deciding when a change to the language is appropriate, to avoid version proliferation and limit complexity of implementations.
 - Define a roadmap to introduce the next language versions, for example:
   - Version 7 commits to changes that do not require additional work on Nixpkgs:
     - Introduce the version declaration, required to distinguish versions 6 and 7
