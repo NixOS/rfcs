@@ -76,7 +76,8 @@ This support entails two basic things:
  - Content addresses are used to compute store paths.
  - Content addresses are used to verify store object integrity.
 
-Git hashing would not support references (since references in Nix's sense are not a Git concept), but that is not an issue for the intended use-case of exchanging source code.
+Git hashing would not (in this first proposed version) support references, since references in Nix's sense are not part of Git's data model.
+This is OK for now; encoding references is not needed for the intended initial use-case of exchanging source code.
 
 ## Git file hashing for `buitins.fetch*`
 
