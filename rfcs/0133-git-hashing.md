@@ -1,6 +1,6 @@
 ---
 feature: git-hashing
-start-date: (fill me in with today's date, YYYY-MM-DD)
+start-date: 2022-08-27
 author: John Ericsion (@Ericson2314) on behalf of [Obsidian Systems](https://obsidian.systems)
 co-authors: (find a buddy later to help out with the RFC)
 shepherd-team: edolstra, kevincox, gador, @amjoseph-nixpkgs
