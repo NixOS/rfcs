@@ -32,18 +32,17 @@ The first steps proposed below do *not* tackle this problem directly, but it lay
 
 ## Source distribution and archival
 
-A goal of the Nix ecosystem is to package software in a way that never bitrots.
-Getting in the way of that, however, is the fact source code frequently goes off-line.
-The Software Heritage archive is the best in the world, and a natural partner in this effort.
+Source code used by Nix expressions frequently goes off-line. It would be beneficial if there was some resistance to this form of bitrot.
+The Software Heritage archive stores much of the source code that Nix expressions use. They would be a natural partner in this effort.
 
-Unfortunately, as https://www.tweag.io/blog/2020-06-18-software-heritage/ describes at the end, a major challenge is the way nix content-addresses software.
+Unfortunately, as https://www.tweag.io/blog/2020-06-18-software-heritage/ describes at the end, a major challenge is the way Nix content-addresses software.
 First of all, Nix hashes sources in bespoke ways that no other project will adopt.
-Second of all, tarballs instead of the underlying files leaking non-normative details (compression, odd perms, etc.).
+Second of all, hashing tarballs instead of the underlying files leads non-normative details (compression, odd perms, etc.).
 
 We should natively support git file hashing, which Git repos and Software Heritage both support.
 This will completely obliterate these issues.
 
-Overall, are building out a uniform way to work with source code, regardless of its origins or the exact tools involved.
+Overall, we are building out a uniform way to work with source code, regardless of its origins or the exact tools involved.
 
 ## Build adoption through seamless interop
 
@@ -104,9 +103,9 @@ Exactly how this shakes out is to be determined post-RFC, but it would be nice t
 
 If we do go the route of modifying the `Store` class, note that these things will need to happen:
 
- - Many store interface methods that today take store paths will need to also accept names & content addresse pairs.
+ - Many store interface methods that today take store paths will need to also accept names & content address pairs.
 
-   For stores that are purpose-built for Nix, like the ones we support today, all addressing can be done store paths, so the current interface is fine.
+   For stores that are purpose-built for Nix, like the ones we support today, all addressing can be done with store paths, so the current interface is fine.
    But for Nix-agnostic stores, store paths are rather useless as a key type because Nix-agnostic tools don't know about them.
    Those store can, however, understand content addresses.
    And from such a name + content address, we can always produce a store path again, so there is no loss of functionality with existing stores.
@@ -131,19 +130,19 @@ Note at the time of writing this guide uses our original 2020 fork of Nix.
 ## Complexity
 
 The main cost is more complexity to the store layer.
-For a few reason we think this is not so bad.
+For a few reasons we think this is not so bad.
 
 Most importantly is the division of the work into a dependency graph of steps.
-This allows us to slowly try out things like IPFS that leverage git hashing, and not commit to more change than we want to up front.
+This allows us to slowly try out things like IPFS that leverage Git hashing, and not commit to more change than we want to up front.
 
 Even if we do end up adopting everything though, we think for the following two reasons the complexity can still be kept manageable:
 
-2. Per the abstract vs concrete model of the nix store in https://github.com/NixOS/nix/pull/6877 , everything we are doing is simply flushing out alternative interpretations of the abstract model.
+1. Per the abstract vs concrete model of the nix store in https://github.com/NixOS/nix/pull/6877 , everything we are doing is simply flushing out alternative interpretations of the abstract model.
    This is the sense in which we are "removing the weaknesses and restrictions that make additional features appear necessary" per the Scheme mantra cited above:
    Instead of extending the model with new features, we are relaxing concrete model assumptions (e.g. references are always opaque store paths) while keeping the abstract model the same.
 
-3. We also support plans to decouple the layers of Nix further, and update our educational and marketing material to reflect it.
-   With Flakes and other post-2.0 features, the upper layer of Nix have gained an enormous amount of flexibility and sophistication.
+2. We also support plans to decouple the layers of Nix further, and update our educational and marketing material to reflect it.
+   With Flakes and other post-2.0 features, the upper layers of Nix have gained an enormous amount of flexibility and sophistication.
    RFCs like this show that the so-far more sleepy lower layers also have plenty of potential to gain sophistication too.
 
    Embracing layering on technical, educational, communications, and managerial levels can scale our capacity to manage complexity and sophistication without the project growing out of control.
@@ -158,7 +157,7 @@ Nix puts the permission info of a file (executable bit for now) with that file, 
 The practical effect of this discrepancy is that a root file (as opposed to directory) in Nix has permission info, but does not in Git.
 
 If we are trying to convert existing Nix data into Git, this is a problem.
-Assuming we treat "no permission bits" as meaning "non-executable", we will have a partial conversion that will fail on executable bare files.
+Assuming we treat "no permission bits" as meaning "non-executable", we will have a partial conversion that will fail on executable files without a parent directory.
 Tricks like always wrapping everything in a directory get around this, but then we have to be careful the directory is exactly as expected when "unwrapping" in the other direction.
 
 For now, we only focus on ingesting data *from* Git *to* Nix, and this side-steps the issue.
