@@ -44,21 +44,6 @@ This will completely obliterate these issues.
 
 Overall, we are building out a uniform way to work with source code, regardless of its origins or the exact tools involved.
 
-## Build adoption through seamless interop
-
-This last argument is more strategic than technical.
-
-A lot of people in this community would like to see Nix be used more widely, but as much as we all wish otherwise, the fact remains that there is some tension between making nix *better* and making it *more accessible*.
-
-Nix is very foreign from the "bad conventional" way things are done, and making Nix better can sometimes involve making it even more foreign.
-We don't want to steepen the learning curve or make it "seem more weird".
-
-On the other hand, making Nix more accessible by making it more like tools users are already use-to can obscure or chip-away at Nix's benefits.
-We don't want to "pander" in ways that will make Nix faddish but ultimately undermine it's popularity over the long haul (see Docker the company's woes).
-
-One way to get around this tension to me is rather than pushing Nix towards the rest of the world, pushing the rest of the world towards us.
-Like-minded projects emphasizing content-addressing are our *natural* partners, and we should work with them to promote Nix-*agnostic* standards that further our values and mission.
-
 # Detailed design
 [design]: #detailed-design
 
