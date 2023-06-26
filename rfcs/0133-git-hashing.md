@@ -199,7 +199,7 @@ We can used this to write a Software Heritage store, which will accomplish the t
 ### Binary Distribution
 
 IPFS is a potential solution leveraging content addressing for a P2P CDN.
-It out-of-the-box match's Nix's data model extremely well.
+Out-of-the-box it matches Nix's data model extremely well.
 
 ### Source distribution and archival
 
