@@ -37,9 +37,9 @@ The Software Heritage archive stores much of the source code that Nix expression
 
 Unfortunately, as https://www.tweag.io/blog/2020-06-18-software-heritage/ describes at the end, a major challenge is the way Nix content-addresses software.
 First of all, Nix hashes sources in bespoke ways that no other project will adopt.
-Second of all, hashing tarballs instead of the underlying files leads non-normative details (compression, odd perms, etc.).
+Second of all, hashing tarballs instead of the underlying files leads to non-normative details (compression, odd perms, etc.).
 
-We should natively support git file hashing, which Git repos and Software Heritage both support.
+We should natively support Git file hashing, which is supported both by Git repos and Software Heritage.
 This will completely obliterate these issues.
 
 Overall, we are building out a uniform way to work with source code, regardless of its origins or the exact tools involved.
@@ -49,7 +49,7 @@ Overall, we are building out a uniform way to work with source code, regardless 
 
 Each item can be done separately provided its dependent items are also done.
 These are the items we wish to commit to at this time.
-(The goals mentioned future work are, in a separate document, also broken down into a dependency graph of smaller steps.)
+(The goals mentioned under [future work](#future-work) are, in a separate document, also broken down into a dependency graph of smaller steps.)
 
 ## Git file hashing
 
@@ -67,21 +67,21 @@ This is OK for now; encoding references is not needed for the intended initial u
 ## Git file hashing for `buitins.fetch*`
 
 - **Purpose**: Source distribution and archival
-- **Depends on**: Git file hashing,
+- **Depends on**: Git file hashing
 
-The builtin fetchers can also be made to work with git file hashing just as they support the other types.
-In addition, Git repo fetching can leverage this better to than the other formats since the data in git repos is already content-addressed in this way.
+The built-in fetchers can also be made to work with Git file hashing just as they support the other types.
+In addition, Git repo fetching can leverage this better to than the other formats since the data in Git repos is already content-addressed in this way.
 
 ## Nix-agnostic content-addressing "stores"
 
 - **Purpose**: All distribution
 
 We want to be able to substitute from an arbitrary store (in the general, non-Nix sense) of content-addressed objects.
-For the purpose of this RFC, that means querying objects by git hash, and being able to trust the results because we can verify them against the git hash.
+For the purpose of this RFC, that means querying objects by Git hash, and being able to trust the results because we can verify them against the Git hash.
 
 In the implementation, we could accomplish this in a variety of ways.
 
-- On on extreme, we could have a `ContentAddressedSubstitutor` abstract interface completely separate from Nix's `Store` interface.
+- On one extreme, we could have a `ContentAddressedSubstitutor` abstract interface completely separate from Nix's `Store` interface.
 
 - On the other extreme, we can generalize `Store` itself to allow taking content addresses or store paths as references.
 
@@ -101,8 +101,8 @@ If we do go the route of modifying the `Store` class, note that these things wil
   As described in the first step, currently `NarHash` and `NarSize` are the *normative* fields which are used to verify a store object.
   But if the store object is content-addressed, we don't need these, because the content address (`CA` field) will also suffice, all by itself.
   
-  Existing Nix stores types are still required to contain a `NarHash` and `NarSize`, which is good for backwards compat and don't come with a cost.
-  Only new nix-agnostic store types would take advantage of these new, relaxed rules.
+  Existing Nix stores types are still required to contain a `NarHash` and `NarSize`, which is good for backwards compatibility and don't come with a cost.
+  Only new Nix-agnostic store types would take advantage of these new, relaxed rules.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -123,8 +123,8 @@ This allows us to slowly try out things like IPFS that leverage Git hashing, and
 
 Even if we do end up adopting everything though, we think for the following two reasons the complexity can still be kept manageable:
 
-1. Per the abstract vs concrete model of the nix store in https://github.com/NixOS/nix/pull/6877 , everything we are doing is simply flushing out alternative interpretations of the abstract model.
-   This is the sense in which we are "removing the weaknesses and restrictions that make additional features appear necessary" per the Scheme mantra cited above:
+1. Per the abstract vs concrete model of the Nix store in https://github.com/NixOS/nix/pull/6877, everything we are doing is simply flushing out alternative interpretations of the abstract model.
+   This is the sense in which we are, per the Scheme mantra, "removing the weaknesses and restrictions that make additional features appear necessary":
    Instead of extending the model with new features, we are relaxing concrete model assumptions (e.g. references are always opaque store paths) while keeping the abstract model the same.
 
 2. We also support plans to decouple the layers of Nix further, and update our educational and marketing material to reflect it.
@@ -133,9 +133,7 @@ Even if we do end up adopting everything though, we think for the following two 
 
    Embracing layering on technical, educational, communications, and managerial levels can scale our capacity to manage complexity and sophistication without the project growing out of control.
    It will "divide and conquer" the project so the interfaces between each layer are still rigorously enforced preventing a combinatorial explosion in complexity.
-   That frees up "complexity budget" for project like this.
-
-   We plan on more formally proposing this next.
+   That frees up "complexity budget" for projects like this.
 
 ## Git and Nix's file system data models do not entirely coincide
 
@@ -147,7 +145,7 @@ Assuming we treat "no permission bits" as meaning "non-executable", we will have
 Tricks like always wrapping everything in a directory get around this, but then we have to be careful the directory is exactly as expected when "unwrapping" in the other direction.
 
 For now, we only focus on ingesting data *from* Git *to* Nix, and this side-steps the issue.
-That conversation is total (though not surjective), and so there is no problem for now.
+That mapping is total, i.e. all Git data can be mapped, and injective, i.e. each Git data has a unique Nix data representative (though not surjective, i.e. not all Nix data can be represented as a piece of Git data), and so there is no problem for now.
 
 # Alternatives
 [alternatives]: #alternatives
