@@ -128,11 +128,7 @@ Even if we do end up adopting everything though, we think for the following two 
    Instead of extending the model with new features, we are relaxing concrete model assumptions (e.g. references are always opaque store paths) while keeping the abstract model the same.
 
 2. We also support plans to decouple the layers of Nix further, and update our educational and marketing material to reflect it.
-   With Flakes and other post-2.0 features, the upper layers of Nix have gained an enormous amount of flexibility and sophistication.
-   RFCs like this show that the so-far more sleepy lower layers also have plenty of potential to gain sophistication too.
-
-   Embracing layering on technical, educational, communications, and managerial levels can scale our capacity to manage complexity and sophistication without the project growing out of control.
-   It will "divide and conquer" the project so the interfaces between each layer are still rigorously enforced preventing a combinatorial explosion in complexity.
+   Layering will "divide and conquer" the project so the interfaces between each layer are still rigorously enforced preventing a combinatorial explosion in complexity.
    That frees up "complexity budget" for projects like this.
 
 ## Git and Nix's file system data models do not entirely coincide
