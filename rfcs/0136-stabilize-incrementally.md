@@ -225,7 +225,7 @@ The rounds thus look like this:
 
 ## Combined plan
 
-Step 1 is technical work, with a self-imposed deadline so we can be sure it doesn't delay stabilization too long.
+Step 1 is technical work.
 The remaining steps are stabilization steps.
 For each of them, separate RFCs or other discussion media will describe the new interfaces to be stabilized, and solicit feedback.
 
