@@ -54,7 +54,9 @@ A NixOS GitHub organization owner needs to implement this change and should ther
 
 There is a [GitHub Actions workflow to detect directly pushed commits](https://github.com/NixOS/nixpkgs/blob/0b411c1e040870e89a3e598437e708979137b665/.github/workflows/direct-push.yml).
 When detected, it creates a comment in the commit pointing out that this is discouraged and linking to [this issue](https://github.com/NixOS/nixpkgs/issues/118661), where it's easy to see all direct pushes.
-The script occasionally has false positives ([issue](https://github.com/NixOS/nixpkgs/issues/240314), which creates some unnecessary commit comment notifications.
+The script occasionally has false positives[^3], which creates some unnecessary commit comment notifications.
+
+[^3]: https://github.com/NixOS/nixpkgs/issues/240314
 
 With this proposal accepted it won't be possible to directly push commits anymore, making that workflow unnecessary.
 It can be removed and the above two issues can be closed.
@@ -64,9 +66,9 @@ It can be removed and the above two issues can be closed.
 
 ## Direct pushes listing
 
-Out of the 112217 commits to master in the last year[^3], _at most_ 58 (0.0517%) of them were direct pushes.
+Out of the 112217 commits to master in the last year[^4], _at most_ 58 (0.0517%) of them were direct pushes.
 
-[^3]: Unix epoch 1658361600 to 1689897600
+[^4]: Unix epoch 1658361600 to 1689897600
 
 To determine whether a commit was pushed directly, the GitHub API was queried for pull requests associated with that commit (see [`associatedPullRequests`](https://docs.github.com/en/graphql/reference/objects#commit)).
 If this list includes a merged pull request to the Nixpkgs master branch, the commit is known to be merged with a pull request.
