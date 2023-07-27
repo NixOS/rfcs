@@ -17,19 +17,25 @@ Require pull requests for all Nixpkgs commits.
 [motivation]: #motivation
 
 There are currently 197 people with commit access to Nixpkgs, all of whom can push directly to any branch without a pull request.
-Such pushes generally do not notify anybody and do not trigger CI.
+Such pushes generally[^1] do not notify anybody and do not trigger CI.
+
+[^1]: There's no GitHub mechanism that takes care of notifying other people and there's no builtin way to get notified for new commits linked to [the direct push issue](https://github.com/NixOS/nixpkgs/issues/118661), but third-party tooling could be implemented to get notified explicitly for direct pushes
 
 This makes such commits susceptible to:
-- Be anonymous
+- Be anonymous[^2]
 - Include malicious code
 - Be broken
 - Have poor code quality
 
+[^2]: GitHub does not require committers to match the pushing GitHub account, [here's](https://github.com/infinisil/github-test/commit/0553a1afe8ee38d45ef38c7055a7b6c3ee08f3d3) an example.
+
 While requiring pull requests isn't a panacea, it does help by:
-- Notifying [code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
 - Running CI (though there's no requirement for it to succeed, see [future work][future])
+- Requesting reviews from [Nixpkgs maintainers](https://github.com/NixOS/rfcs/pull/39) via CI
+- Requesting reviews from [code owners](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners)
 - Tying commits to a GitHub account
-- Being discoverable in the pull request list
+- Being discoverable in the pull request list using various filterable and sortable metadata such as (manually and [automatically](https://github.com/NixOS/nixpkgs/blob/e0d40b94732d0a077ea8e409d394bcd36750584e/.github/labeler.yml) assigned) [labels](https://github.com/NixOS/nixpkgs/labels), update time, authors, reviews, etc.
+
 
 # Detailed design
 [design]: #detailed-design
@@ -43,6 +49,15 @@ Staging branches are intentionally not included, because they will already requi
 The same applies to similar long-term branches like `haskell-packages`.
 
 A NixOS GitHub organization owner needs to implement this change and should therefore review this proposal.
+
+## Disable the direct push detection workflow
+
+There is a [GitHub Actions workflow to detect directly pushed commits](https://github.com/NixOS/nixpkgs/blob/0b411c1e040870e89a3e598437e708979137b665/.github/workflows/direct-push.yml).
+When detected, it creates a comment in the commit pointing out that this is discouraged and linking to [this issue](https://github.com/NixOS/nixpkgs/issues/118661), where it's easy to see all direct pushes.
+The script occasionally has false positives ([issue](https://github.com/NixOS/nixpkgs/issues/240314), which creates some unnecessary commit comment notifications.
+
+With this proposal accepted it won't be possible to directly push commits anymore, making that workflow unnecessary.
+It can be removed and the above two issues can be closed.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -135,15 +150,6 @@ The time required to fix such breakages however is barely affected: Since there 
 
 The staging workflow is not affected because it [already uses pull requests](https://github.com/NixOS/nixpkgs/pull/241951) for all merges into the affected branches.
 
-## Direct push detection
-
-There is a [GitHub Actions workflow to detect directly pushed commits](https://github.com/NixOS/nixpkgs/blob/0b411c1e040870e89a3e598437e708979137b665/.github/workflows/direct-push.yml).
-When detected, it creates a comment in the commit pointing out that this is discouraged and linking to [this issue](https://github.com/NixOS/nixpkgs/issues/118661), where it's easy to see all direct pushes.
-The script occasionally has false positives ([issue](https://github.com/NixOS/nixpkgs/issues/240314), which creates some unnecessary commit comment notifications.
-
-With this proposal accepted it won't be possible to directly push commits anymore, making that workflow unnecessary.
-It can be removed and the above two issues can be closed.
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -152,6 +158,9 @@ It can be removed and the above two issues can be closed.
 
 # Alternatives
 [alternatives]: #alternatives
+
+- It would be possible to implement a third-party interface to de-anonymize future commits (even if pushed directly to master) using the [push event GitHub webhook](https://docs.github.com/en/webhooks-and-events/webhooks/webhook-events-and-payloads#push), which includes the `sender` field to match the pushing GitHub user.
+  - This would not solve the other problems with direct pushes though: It still wouldn't notify others, trigger CI or be discoverable.
 
 # Prior art
 [prior-art]: #prior-art
