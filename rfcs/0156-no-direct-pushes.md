@@ -64,9 +64,9 @@ It can be removed and the above two issues can be closed.
 
 ## Direct pushes listing
 
-Out of the 112217 commits to master in the last year[^1], _at most_ 58 (0.0517%) of them were direct pushes.
+Out of the 112217 commits to master in the last year[^3], _at most_ 58 (0.0517%) of them were direct pushes.
 
-[^1]: Unix epoch 1658361600 to 1689897600
+[^3]: Unix epoch 1658361600 to 1689897600
 
 To determine whether a commit was pushed directly, the GitHub API was queried for pull requests associated with that commit (see [`associatedPullRequests`](https://docs.github.com/en/graphql/reference/objects#commit)).
 If this list includes a merged pull request to the Nixpkgs master branch, the commit is known to be merged with a pull request.
