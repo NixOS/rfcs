@@ -21,42 +21,39 @@ This RFC includes two concerns that define a doc-comment:
 However, both concerns relate closely to each other; It makes sense and reduces bureaucracy to address both in a single RFC.
 # Definitions
 
-- **doc-comment**: A comment following a specific structure, intended to document the code's API.
-- **internal comment**: A free-form comment whose target audience is someone insterested in the code's implementation.
+For this RFC, we adopt the following definitions:
 
+- **doc-comment**: A structured comment documenting the code's API.
+- **internal comment**: A free-form comment for those interested in the code's implementation.
+
+The doc-comment properties are grouped into these subcategories:
+
+- **Outer format**: Specifies rules linking code (API) and doc-comments. (e.g. placement, syntax rules)
+
+- **Inner format**: Specifies rules affecting the comment's actual content. (e.g. usage of commonMark)
 
 # Motivation
 [motivation]: #motivation
 
 The following are the envisioned goals.
 
-- Be able to generate documentation from code for any nix expression.
-- Make doc comments easy to write and read
-- Standardize a format for doc comments that further RFCs can extend
-  - E.g. extend with code examples that can be converted to tests (aka doctests).
+- Create distinct outer and inner formats for Nix doc-comments to enable accurate automated parsing and extraction. 
+- Ensure clear differentiation from internal comments, making them accessible to tooling solutions such as documentation rendering and building. 
 
-This RFC is a significant change to existing documentation conventions.
-It allows distinguishing between internal and doc comments (see "Definitions" section). Having distinction is essential because internal comments should not end up in generated documentation.
+- Switch existing Nixpkgs code to this format.
 
-> Note: Generating static documentation is a controversial topic in nixpkgs.[^1][^2][^3][^4] We found that it is very hard to generate accurate documentation statically. A correct solution would involve the evaluation of expressions in some way.
-
-[^1]: [Unmerged PR: nix repl doc-comments](https://github.com/NixOS/nix/pull/1652), 2017
-[^2]: [Unmerged PR: doc-strings for functors](https://github.com/NixOS/nix/pull/5527), 2021
-[^3]: [discourse: users asking how to obtain documentation](https://discourse.nixos.org/t/how-to-generate-documentation-from-arbitrary-nix-code/22292), 2022
-[^4]: [discourse: aksing for consensus on documentation](https://discourse.nixos.org/t/any-consensus-on-documentation-generation-tool-for-nixpkgs-manual/15550), 2021
+- In addition, the developer experience and adherence to established conventions should be taken into account. Equally important is ensuring that doc comments remain effortless to compose and comprehend, though it is essential to acknowledge that this aspect may vary subjectively based on personal preferences.
 
 # Non-goals
 
 - Discuss in which tool doc-comments are parsed and rendered. This could be an external tool, or Nix, or something else entirely, but that's out of scope for this RFC.
 - Providing a migration path for existing comments. This is expected to require some amount of manual work. See "Future work" section.
+
+- Extending the scope of *nixdoc* is not a goal. Instead, this RFC finds formal rules for writing *doc-comments*. Tools like *nixdoc* can then implement against this RFC.
+
 ## Current State
 
-Currently, Nix does not have doc comments. Over time some informal conventions have crystallized, but they were never formally specified.
-Within this RFC, we want to clarify which convention we should use, harmonize and improve the format for doc-comments to achieve the envisioned goals.
-
 A third-party tool called [nixdoc](https://github.com/nix-community/nixdoc) has emerged, which codifies its own rules as to the internal and external formats of a Nix doc-comment. This tool has seen some adoption, notably for the `nixpkgs.lib` functions.
-
-The format of a doc-comment was, however, never specified. The nix community does not understand the rules required by `nixdoc`, which we believe is one of the reasons for its lack of adoption.
 
 Here is an example of the format understood by *nixdoc*:
 
@@ -96,15 +93,13 @@ In general, the format for writing documentation strings is **not formally speci
 
 Among the formats encountered in the wild, the one used in `nixpkgs/lib` is the only one intended to be rendered as part of an API documentation, via the nixdoc third-party tool, whose syntax has not been standardized.
 
-Extending the scope of *nixdoc* is not the primary goal. Instead, we should find formal rules for writing *doc-comments*. Tools like *nixdoc* can then implement against this RFC instead of the format relying on nixdoc implementation details.
-
 ### Impossible to differentiate from internal comments
 
 The lack of a formal definition of a doc-comment also means there is no reliable way to distinguish them from internal comments, which would result in automatically-produced API documentation which includes the wrong type of comments.
 
 ### References to the problems above
 
-> Note: That specific collection of links should show the amount of inconsistency within the Nix ecosystem, which is a target of this RFC.
+> This curated link collection highlights the Nix ecosystem's inconsistencies, a primary focus of this RFC.
 
 #### nixpkgs - doc-comment examples
 
@@ -113,46 +108,34 @@ The lack of a formal definition of a doc-comment also means there is no reliable
 - [stdenv/mkDerivation](https://github.com/NixOS/nixpkgs/blob/master/pkgs/stdenv/generic/make-derivation.nix)
 - [nixos/lib/make-disk-image](https://github.com/NixOS/nixpkgs/blob/master/nixos/lib/make-disk-image.nix)
 
-#### Current tools
-
-We collected some Tools that work directly with the nix AST and comments.
-Those would benefit from a standardized doc-comment.
-
-- [noogle](https://noogle.dev) - Nix API search engine. It allows searching functions and other expressions.
-- [nix-doc](https://github.com/lf-/nix-doc) - A Nix developer tool leveraging the rnix Nix parser for intelligent documentation search and tags generation
-- [manix](https://github.com/mlvzk/manix) - A fast CLI documentation searcher for Nix.
-
-# Detailed design
+# Design
 [design]: #detailed-design
+
+In the following we give a comprehensive overview to our decision that we've made. Detailed arguments for and against every decision can be found in the [Decisions](#Decisions) section
+
+## CommonMark
+
+**CommonMark is the content of all doc-comments.**
+
+Adopting CommonMark as the content for all doc-comments brings the benefits of widely accepted and understood documentation format in tech projects, while maintaining profitability and consistency within the Nix ecosystem by aligning with existing [NixOS/RFC-72](https://github.com/NixOS/rfcs/blob/master/rfcs/0072-commonmark-docs.md).
+
+## `/**` starts a doc-comment
+
+The decision to use /** to start a doc-comment ensures a unique distinction from regular comments while still allowing seamless writing without IDE or editor support. This choice not only provides the best developer experience but also minimizes the need for additional tooling overhead.
+
+## Placement
+
+> TODO: Finding a universal approach for describing the appropriate placement that effectively links doc-comments with corresponding code elements.
+
+
+
+
+# Decisions
+
 
 Each subsection here contains a decision along with arguments and counter-arguments for (+) and against (-) that decision.
 
 > Note: This RFC does not promote any tool; It focuses only on the format, not implementation. At the same time, this RFC must be technically feasible.
-
-## Discontinue nixdoc's custom format
-
-**Observing**: Nixdoc currently provides some format that can generate documentation from a small fraction of files in nixpkgs, Namely the files for `.lib` functions. The directory provides a consistent community convention that allows the building of static documentation. Applying nixdoc to files outside that directory is only partially possible due to the lack of a standard doc-comment format.
-
-**Considering**: Should we propose the `nixdoc` format as a community standard?
-
-**Decision**: Discontinue nixdoc's custom format in favor of using something more generic.
-
-<details>
-<summary>Arguments</summary>
-
-- (+) Stays primarily compatible with the currently used comments in lib.
-    - (-) Outside the ./lib directory, nixodc is not a convention.
-- (-) Is not widely understood.
-- (-) The format is specific, should be more generic, and follow established conventions. (e.g., Markdown, Doxygen, JSdoc, Haddock)
-- (-) The format is too complex and needs a whole list of complex rules to describe the exact format and content rules; this can also be observed in many false-formatted comments that do not render correctly.
-    - (-) The sections are implicitly continued.
-    - (-) The predefined section headers/keywords are very close to natural language and may accidentally be used.
-        - (-) Syntax to start new sections does not follow conventions (e.g., `Example:`) In contrast JSdoc defines `@Example`; Markdown `# Example`; Doxygen `@example`; Haskell-Haddock `>>>`
-    - (-) The content is implicitly rendered differently depending on predefined rules. Those rules need to be understood/feel natural.
-- (+) Some usages outside of /lib directory indicate the process of adoption.
-- (-) Some multiline comments become doc-comments, but it is unclear which comments have such a property.
-    
-</details>
 
 ## `/**` to start a doc-comment
 
@@ -229,15 +212,15 @@ Each subsection here contains a decision along with arguments and counter-argume
   
 </details>
 
-## Place doc-comments before the referenced expression
+## TODO: Placement of doc-comments
 
-**Observing**: Doc-comments currently are placed above the expression they document. More precisely, only named attribute bindings `foo = <expr>` can be documented. There is also the need to support documentation for anonymous functions. More generally, there is the need to document anonymous expressions where they are defined.
+> This decision is still under construction by the rfc shepherd team and needs a final proof of concept implementaion.
 
-**Considering**: General reference logic between doc-comments and expressions.
+**Observing**: Doc-comments currently are placed above the expression they document. More precisely, only named attribute bindings `foo = <expr>` can be documented. There is also the need to support documentation for anonymous functions. More generally, it would be desirable to document anonymous expressions.
+
+**Considering**: General linking logic between doc-comments and expressions / values. Taking into account both static and dynamic implementation requirements.
 
 **Decision**: Doc-comment refer to the expression that is **immediately** next to it. Only whitespaces are allowed between doc-comment and following expression.
-
-> Note: We are working on a generic example implementation that covers about 90% of all documentation use cases.
 
 <details>
 <summary>Arguments</summary>
@@ -565,6 +548,13 @@ However the border between those two variants is not strict and we might find fu
 
 ## Related discussions
 
-- [@documentation-team (meet @ 13.Apr 2023)](https://discourse.nixos.org/t/2023-04-13-documentation-team-meeting-notes-41/27264)
+ - https://discourse.nixos.org/t/2023-04-13-documentation-team-meeting-notes-41/27264)
 
-- There is an actual but rather old PR (@roberth) that uses just comments to show documentation in the nix repl for functions. -> https://github.com/NixOS/nix/pull/1652
+- https://github.com/NixOS/nix/issues/3904
+- https://github.com/NixOS/nix/issues/228
+
+
+- https://github.com/NixOS/nix/pull/5527
+- https://github.com/NixOS/nix/pull/1652 
+
+[#1652](https://github.com/NixOS/nix/pull/1652) gets closest what this RFC imagines, implementation is almost done. It certainly has some limitations, but got stuck on politics and diverging opinions about markdown and syntax rules. 
