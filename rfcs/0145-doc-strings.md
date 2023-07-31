@@ -11,14 +11,19 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Propose a standard format specification for Doc-comments.
+Propose a standard format specification for doc-comments.
 
 This RFC includes two concerns that define a doc-comment:
 
 - Outer format rules to allow distinction between regular comments and doc-comments
-- Inner format rules that describe the required format of the content.
+- Inner format rules that describe the required format of a doc-comment.
 
-However, both concerns relate closely to each other; It makes sense and reduces bureaucracy to address that in a single RFC.
+However, both concerns relate closely to each other; It makes sense and reduces bureaucracy to address both in a single RFC.
+# Definitions
+
+- **doc-comment**: A comment following a specific structure, intended to document the code's API.
+- **internal comment**: A free-form comment whose target audience is someone insterested in the code's implementation.
+
 
 # Motivation
 [motivation]: #motivation
@@ -31,7 +36,7 @@ The following are the envisioned goals.
   - E.g. extend with code examples that can be converted to tests (aka doctests).
 
 This RFC is a significant change to existing documentation conventions.
-It allows distinguishing between regular and doc comments. Having distinction is essential because arbitrary code comments should not end up in generated documentation.
+It allows distinguishing between internal and doc comments (see "Definitions" section). Having distinction is essential because internal comments should not end up in generated documentation.
 
 > Note: Generating static documentation is a controversial topic in nixpkgs.[^1][^2][^3][^4] We found that it is very hard to generate accurate documentation statically. A correct solution would involve the evaluation of expressions in some way.
 
@@ -40,56 +45,62 @@ It allows distinguishing between regular and doc comments. Having distinction is
 [^3]: [discourse: users asking how to obtain documentation](https://discourse.nixos.org/t/how-to-generate-documentation-from-arbitrary-nix-code/22292), 2022
 [^4]: [discourse: aksing for consensus on documentation](https://discourse.nixos.org/t/any-consensus-on-documentation-generation-tool-for-nixpkgs-manual/15550), 2021
 
+# Non-goals
+
+- Discuss in which tool doc-comments are parsed and rendered. This could be an external tool, or Nix, or something else entirely, but that's out of scope for this RFC.
+- Providing a migration path for existing comments. This is expected to require some amount of manual work. See "Future work" section.
 ## Current State
 
-Currently, Nix does not have doc comments. Over time there evolved certain conventions, but they were never formally specified.
+Currently, Nix does not have doc comments. Over time some informal conventions have crystallized, but they were never formally specified.
 Within this RFC, we want to clarify which convention we should use, harmonize and improve the format for doc-comments to achieve the envisioned goals.
 
-We use a tool called [nixdoc](https://github.com/nix-community/nixdoc) to use a 'doc-comment'- like functionality, which allows us to build a subset of static documentation of the `nixpkgs.lib` functions.
+A third-party tool called [nixdoc](https://github.com/nix-community/nixdoc) has emerged, which codifies its own rules as to the internal and external formats of a Nix doc-comment. This tool has seen some adoption, notably for the `nixpkgs.lib` functions.
 
 The format of a doc-comment was, however, never specified. The nix community does not understand the rules required by `nixdoc`, which we believe is one of the reasons for its lack of adoption.
 
 Here is an example of the format understood by *nixdoc*:
 
 ```nix
-# nixpkgs/lib/attrsets.nix
+  # nixpkgs/lib/trivial.nix
 
-{
-  /* <Attr Description>
-  
-     Type:
-     <Type signature>
-     
+  /* The constant function
+
+     Ignores the second argument. If called with only one argument,
+     constructs a function that always returns a static value.
+
+     Type: const :: a -> b -> a
      Example:
-     <Comprehensive Code example>
+       let f = const 5; in f 10
+       => 5
   */
-  Attr =
-    # <Describe arg1>
-    arg1:
-    # <Describe arg2>
-    arg2:
-    
-    # ... implementation
-}
+  const =
+    # Value to return
+    x:
+    # Value to ignore
+    y: x;
 ```
 
 ## Current problems
 
-### Lack of having an agreed format
+### Multiplicity of formats
 
-The Nix community interprets the outer format and content of doc-comments differently. Within nixpkgs, several conventions and patterns need to be harmonized. It seems every directory decides upon their own convention; Or doesn't follow any. We immediately observe one clear thing: Most of comments utilize some form of markdown, even if they are not rendered.
+Within nixpkgs alone, several conventions for doc-comments have emerged, see [1], [2] and [3].
+
+Notably, most doc-comments utilize some fraction of the of CommonMark syntax, even if they are not meant to be rendered.
+
+[1]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders/default.nix
+[2]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/stdenv/generic/make-derivation.nix
+[3]: https://github.com/NixOS/nixpkgs/blob/master/nixos/lib/make-disk-image.nix
 
 In general, the format for writing documentation strings is **not formally specified**.
 
-The *nixdoc*-tool requires a somewhat consistent format, but the basic format was never specified and cannot be enforced in parts of nixpkgs where nixdoc is currently not applied.
+Among the formats encountered in the wild, the one used in `nixpkgs/lib` is the only one intended to be rendered as part of an API documentation, via the nixdoc third-party tool, whose syntax has not been standardized.
 
 Extending the scope of *nixdoc* is not the primary goal. Instead, we should find formal rules for writing *doc-comments*. Tools like *nixdoc* can then implement against this RFC instead of the format relying on nixdoc implementation details.
 
-### Impossible to differentiate from regular comments
+### Impossible to differentiate from internal comments
 
-The format does not allow any distinction between doc comments and regular comments.
-
-Having a distinction would allow us to build reliable and correct documentation
+The lack of a formal definition of a doc-comment also means there is no reliable way to distinguish them from internal comments, which would result in automatically-produced API documentation which includes the wrong type of comments.
 
 ### References to the problems above
 
@@ -436,18 +447,15 @@ Some more
 
 ## Changes the existing comments inside the code base
 
-This could be automated. (e.g., via codemod)
+This could be automated.
 
-Also, this affects only the `lib` directory and a few other places currently used to build the documentation.
+Also, the migration could be performed piecemal, starting perhaps with `nixpkgs.lib`, as it is already parsed by a tool (nixdoc), which could be modified for the new standard.
 
-## Changes in the `nixdoc` tooling are required
+## Requires changes in existing tooling to produce documentation
 
-It remains an open question that needs to be tried;
+nixdoc, the tool used to produce Nixpkgs library function documentation, would have to be modified to fit the new format.
 
-Can we still build the current Nixos manuals with the new standard?
-
-- We can wait to change everything.
-- Migration can happen in small steps.
+This would be a small change, and anyway this RFC is agnostic to the tool used -- an entirely new tool could be developed, or the functionality be included as part of Nix.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -504,7 +512,7 @@ This is why we decided to follow this convention.
 
 ## Migrate the existing comments
 
-Reformating existing doc-comments but also filtering out those who are not part of a documentation. e.g., Whether they are just empty or contain irrelevant information.
+Reformatting existing doc-comments in Nixpkgs, but also filtering out false-positives, i.e. those that should not be part of the API documentation.
 
 ## Editor support
 
