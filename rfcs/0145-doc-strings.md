@@ -2,9 +2,9 @@
 feature: doc-comment-standard
 start-date: 2023-03-27
 author: hsjobeki
-co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (@DavHau; @sternenseemann; tbd.)
-shepherd-leader: (name to be appointed by RFC steering committee)
+co-authors: --
+shepherd-team: @DavHau; @sternenseemann; @asymmetric
+shepherd-leader: @lassulus
 related-issues: (will contain links to implementation PRs)
 ---
 
