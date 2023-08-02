@@ -149,6 +149,25 @@ nix store setup > /nix/store/nix-cache-info
 python3 -m http.server -d /nix/store
 ```
 
+An alternative way could be use of a flake to build isolated directory with the filtered store path references only, or even an option to have upstream filtered paths (that are not in https://cache.nixos.org). Something like:
+
+```nix
+{
+  # ...
+  outputs = args: {
+    packages.x86_64-linux.my-binary-cache = some-binary-cache-setup-function {
+      packages = [ custom-package-1 custom-package-2 ];
+      # ...
+    };
+  };
+}
+
+# nix build '.#my-binary-cache'
+# python3 -m http.server -d result
+```
+
+Again, an indirect result of flake enforcement.
+
 ### (optional) stdenv improvements
 
 Build requirement of C/C++ should be opt-in, it isn't generally true that everything requires C/C++ compiler and header/ldflag setup.
