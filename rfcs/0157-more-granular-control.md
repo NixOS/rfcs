@@ -57,7 +57,7 @@ In void (just as a reference), a package that ignores already upstream-dependenc
 
 While the current configuration does work for most people, and many are content with the existing solutions, a more granular control system would offer tremendous possibilities for customization and make the infrastructure flexible for future shifts.
 
-Instead of deprecating pulseaudio's sound.* in favor of services.pipewire.*, we should aim to build a flexible API that persists even when new standards emerge, reducing confusion caused by generic names like "sound" being deprecated.
+Instead of deprecating pulseaudio's `sound.*` in favor of `services.pipewire.*`, we should aim to build a flexible API that persists even when new standards emerge, reducing confusion caused by generic names like "sound" being deprecated.
 
 ### Everything is opt-in!
 
@@ -71,13 +71,13 @@ This approach also facilitates the use of NixOS-modules on non-NixOS nix install
 
 ### Emphasis on flake over shell script wrappers
 
-With the introduction of nix run and nix build, all current implementations should transition to using these first-party nix commands instead of wrappers like nixos-rebuild, nixos-generate, and home-manager.
+With the introduction of `nix run` and `nix build`, all current implementations should transition to using these first-party nix commands instead of wrappers like nixos-rebuild, nixos-generate, and home-manager.
 
 Operating everything under flake also opens up various opportunities, such as building the latest nixos iso image with or without plasma/gnome directly from the nixpkgs repository if its derivation is exposed in flake.nix (for example, `nix build nixpkgs#isoInstallerImageWithGnome`).
 
 ### CLI improvements
 
-As explained earlier in the motivation section, the binary cache has no direct access, and using nix-store --import {exported} does not automatically pull missing dependencies from the binary cache in case the export does not include the whole closure.
+As explained earlier in the motivation section, the binary cache has no direct access, and using `nix-store --import {exported}` does not automatically pull missing dependencies from the binary cache in case the export does not include the whole closure.
 
 Allowing direct binary-cache access, such as querying information and pulling specific paths into the local `/nix/store`, would be a significant enhancement.
 
@@ -85,7 +85,7 @@ Allowing direct binary-cache access, such as querying information and pulling sp
 
 Optionally, we could accompany this with a simpler, low-abstraction alternative to stdenv, or an opt-in C compiler setup.
 
-It is worth noting that stdenv.mkDerivation pulls gcc and autotools, but not all builds require these dependencies. Some simple shell scripts and builds in other languages redundantly pull these dependencies as part of the build, even when builtins.derivation provided by nix language could be sufficient.
+It is worth noting that `stdenv.mkDerivation` pulls gcc and autotools, but not all builds require these dependencies. Some simple shell scripts and builds in other languages redundantly pull these dependencies as part of the build, even when builtins.derivation provided by nix language could be sufficient.
 
 The automatic header include and ldflag magic provided by stdenv often leads to a "just-works" mentality, causing us to become overly dependent on it.
 
@@ -122,7 +122,7 @@ By providing this level of granularity, users can precisely control their system
 
 This is majorly for improving the binary cache user interaction, remote-builders setup, and cache serving.
 
-This is not the exact want, but something like this:
+This is not the exact design required, but something like this will suffice:
 
 ```bash
 nix-store -r /nix/store/{some.drv}        ## OR: nix build /nix/store/{some.drv}
