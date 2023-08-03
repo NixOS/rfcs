@@ -61,10 +61,10 @@ It is quite common for organizations using Nix to first adopt it behind the scen
 That is to say, Nix is used to prepare some artifacts which are then presented to a consumer that need not be aware they were made with Nix.
 Later though, because of Nix's gaining popularity, there may be a desire to reveal its usage so consumers can use Nix themselves.
 Rather than Nix being a controversial tool worth hiding, it can be a popular tool worth exposing.
-Nix-unware usage can still work, but Nix-aware usage can do additional things.
+Nix-unaware usage can still work, but Nix-aware usage can do additional things.
 
 The `local-overlay` store can serve as a crucial tool to bridge these two modes of using Nix.
-The lower store can be as before
+The lower store can be served as before
 --- however the artifacts were disseminated in the "hidden Nix" first phase of adoption
 --- perhaps with only a small tweak to expose the DB / daemon socket if it wasn't before.
 The `local-overlay` store is new, but purely local, separate for each user that wants to use Nix, and completely not impacting any user that doesn't.
