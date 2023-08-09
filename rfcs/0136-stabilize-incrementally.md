@@ -313,7 +313,7 @@ Some examples of ways the principles are upheld:
   - True already
 - It is possible to use pure eval without flakes
   - (**gravity**, because "pure eval" is a feature not a layer)
-  - 95% true, but some "last mile" functionality is needed to make this "ergonomic enough for people to beleive it"
+  - 95% true, but some "last mile" functionality is needed to make this "ergonomic enough for people to believe it"
 
 Also, because public aspects of Nix are subject to a (nebulous) stability promise, exposing layering publically necessarily means stabilizing aspects of that layering too.
 The precise details are not formally worked about, but one example would be:
