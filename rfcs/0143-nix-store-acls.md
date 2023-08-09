@@ -3,8 +3,8 @@ feature: nix-store-acls
 start-date: 2023-01-16
 author: Alexander Bantyev
 co-authors: Silvan Mosberger, Théophane Hufschmitt
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: John Ericson, Théophane Hufschmitt, Eelco Dolstra
+shepherd-leader: Théophane Hufschmitt
 related-issues: (will contain links to implementation PRs)
 ---
 
