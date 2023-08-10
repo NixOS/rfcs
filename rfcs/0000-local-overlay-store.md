@@ -3,8 +3,8 @@ feature: local-overlay-store
 start-date: 2023-06-14
 author: John Ericson (@Ericson2314)
 co-authors: Ben Radford (@benradf)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @RaitoBezarius @tomberek @arianvp 
+shepherd-leader: @tomberek
 related-issues: https://github.com/NixOS/nix/pull/8397
 ---
 
