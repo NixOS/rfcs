@@ -119,20 +119,20 @@ We can break the initial experimental feature down nicely into steps.
 
    We hopefully will soon allow CLI "installable" args in the form
    ```
-   single-installable ::= <path> ! <output-name>
+   single-installable ::= <path> ^ <output-name>
    ```
    where the first path is a derivation, and the second is the output we want to build.
 
    We should generalize the grammar like so:
    ```
-   single-installable ::= <single-installable> ! <output-name>
+   single-installable ::= <single-installable> ^ <output-name>
                        |  <path>
 
    multi-installable  ::= <single-installable>
-                       |  <single-installable> ! *
+                       |  <single-installable> ^ *
    ```
 
-   Plain paths just mean that path itself is the goal, while `!` indexing indicates one more outputs of the derivation to the left of the `!` is the goal.
+   Plain paths just mean that path itself is the goal, while `^` indexing indicates one more outputs of the derivation to the left of the `^` is the goal.
 
    > For example,
    > ```
@@ -140,15 +140,15 @@ We can break the initial experimental feature down nicely into steps.
    > ```
    > would just obtain `/nix/store/…foo.drv` and not build it, while
    > ```
-   > nix build /nix/store/…foo.drv!*
+   > nix build /nix/store/…foo.drv^*
    > ```
    > would obtain (by building or substituting) all its outputs.
    > ```
-   > nix build /nix/store/…foo.drv!out!out
+   > nix build /nix/store/…foo.drv^out^out
    > ```
-   > would obtain the `out` output of whatever derivation `/nix/store/…foo.drv!out` produces.
+   > would obtain the `out` output of whatever derivation `/nix/store/…foo.drv^out` produces.
 
-   Now that we have `path` vs `path!*`, we also don't need `--derivation` as a disambiguator, and so that should be removed along with all the complexity that goes with it.
+   Now that we have `path` vs `path^*`, we also don't need `--derivation` as a disambiguator, and so that should be removed along with all the complexity that goes with it.
    (`toDerivedPathsWithHints` in the the nix commands should always be pure functions and not consult the store.)
 
 3. Extend the scheduler and derivation dependencies similarly:
@@ -164,7 +164,7 @@ We can break the initial experimental feature down nicely into steps.
    The placeholder string is quite analogous to that used for floating content-addressed derivation outputs.
    \[With just floating content-addressed derivations but no computed derivations, derivations are always known statically but their outputs aren't.
    With this RFC, since drv files themselves can be floating CA derivation outputs, we also might not know the derivations statically, so we need "deep" placeholders to account for arbitrary layers of dynamism.
-   This also corresponds to the use of arbitrary many `!` in the CLI.\]
+   This also corresponds to the use of arbitrary many `^` in the CLI.\]
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
