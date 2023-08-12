@@ -167,6 +167,8 @@ The alternatives are
 
   E.g. waf is basically a Python library, whereas premake and xmake are Lua libraries. They can't be decoupled of their implementation languages.
 
+  Another indispensable attribute to be considered is cross-compilation support.
+
 - Use Bazel
 
   For the sake of completeness, there is Bazel, a Google(TM)-backed build system that sells itself as "fast, scalable, multi-language and extensible".
