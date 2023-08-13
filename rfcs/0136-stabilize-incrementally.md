@@ -379,7 +379,7 @@ None at this time.
 # Future work
 [future]: #future-work
 
-Generalizing features (live pure eval and search) to work without Flakes might be desired by the Flake-skeptic faction, but is purposely left as future work in order to not delay stabilization.
+Generalizing features (like pure eval and search) to work without Flakes might be desired by the Flake-skeptic faction, but is purposely left as future work in order to not delay stabilization.
 
 General feature stability lifecycle: https://discourse.nixos.org/t/potential-rfc-idea-stability/27055
 
