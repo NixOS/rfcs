@@ -71,9 +71,9 @@ This is an example of a port allocator using the function, plus a usage example:
 { config, lib }:
 let
     inherit (lib) types;
-    inherit (__future__) mkAllocModule;
+    inherit (__future__) mkAllocatorModule;
 in {
-    options.networking.ports = mkAllocModule {
+    options.networking.ports = mkAllocatorModule {
         valueKey = "port";
         valueType = types.port;
         cfg = config.networking.ports;
