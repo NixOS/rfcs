@@ -180,7 +180,7 @@ To stabilize a piece of functionality (experimental -> stable in flowchart in li
 
    - **Whole feature flag, not part of a feature flag**
 
-     It should be possible to enable just the experimental that is ready for stabilization *in isolation*, without also enabling other unstable functionality that is not ready for stabilization.
+     It should be possible to enable just the experimental feature that is ready for stabilization *in isolation*, without also enabling other unstable functionality that is not ready for stabilization.
      We are not allowed to propose to stabilize part of an experimenal feature and do so immediately.
      We have to first break out the candidate functionality to be stabilized so it is just guarded by one feature flag.
 
@@ -379,7 +379,7 @@ None at this time.
 # Future work
 [future]: #future-work
 
-Generalization features to work without Flakes, like pure eval and search, might be desired by the Flake-skeptic faction, but is purposely left as future work in order to not delay stabilization.
+Generalizing features (live pure eval and search) to work without Flakes might be desired by the Flake-skeptic faction, but is purposely left as future work in order to not delay stabilization.
 
 General feature stability lifecycle: https://discourse.nixos.org/t/potential-rfc-idea-stability/27055
 
