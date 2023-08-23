@@ -11,7 +11,7 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Add a `version` option for a flake to define which flake spec version one flake is using.
+Add a optional `version` option for a flake to define which flake spec version one flake is using.
 
 # Motivation
 [motivation]: #motivation
@@ -41,7 +41,9 @@ That way we can define the already existent versions as the following:
 - Version 2: Flakes revision introduced in Nix 2.7
 
 The lack of `version` in a `flake.nix` will trigger a warning and then Nix will handle as
-if version has the latest one defined so no breakage is expected.
+if `version` has the latest one supported by the version, so `1` for Nix <2.7 and `2` or more
+for Nix past `>=2.7`. The support of the presence of the version option will require backs,
+otherwise only the missing value case will be supported without the warning.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -63,12 +65,12 @@ if version has the latest one defined so no breakage is expected.
 [drawbacks]: #drawbacks
 
 - Logic complexity in the Nix evaluator to support different versions.
-- Inter-flake references may require some kind of driver to support inputs of different flakes.
+- Inter-flake references may require some kind of driver to support inputs from different flakes.
 
 # Alternatives
 [alternatives]: #alternatives
 
-- Using of flakes if the experimental feature is not enabled as a warning instead of a hard error
+- Flake usage without the experimental feature raising a warning instead of a hard error.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
