@@ -2,9 +2,9 @@
 feature: Decouple filesystem from categorization
 start-date: 2023-04-23
 author: Anderson Torres
-co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+co-authors:
+shepherd-team: @7c6f434c @natsukium @fgaz @infinisil
+shepherd-leader: @7c6f434c
 related-issues: (will contain links to implementation PRs)
 ---
 
