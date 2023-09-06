@@ -52,6 +52,7 @@ Possible future changes that are in discussion:
 - Do something about `?` meaning two different things depending on where it occurs (`{ x ? "" }:` vs `x ? ""`)
 - Better support for static analysis
 - [Syntax for hexadecimal numbers](https://github.com/NixOS/nix/pull/7695)
+- [Fix multiline strings](https://github.com/NixOS/nix/issues/3759)
 
 Other discussions around language changes:
 
