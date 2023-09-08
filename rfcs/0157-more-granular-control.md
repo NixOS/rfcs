@@ -40,11 +40,11 @@ Instead of deprecating pulseaudio's `sound.*` in favor of `services.pipewire.*`,
 
 First and foremost, during image building (whether it's nixos-rebuild or vm/iso generation), the filesystem should be empty, with no packages or files.
 
-We can then assemble basic components by defining choices such as the bootloader, kernel, initramfs generator [1], libc, init, and then the choice of sound & de/wm.
+We can then assemble basic components by defining choices such as the bootloader, kernel, initramfs generator, libc, init, privilege escalator and then finally the choice of sound daemon & DE/WM.
 
-This approach also facilitates the use of NixOS-modules on non-NixOS nix installations.
+Just a note, [dracut (initramfs generator) just got merged](https://github.com/NixOS/nixpkgs/issues/77858), but there are no clear instructions on how to use that, if exposed through options can also be made easy to switch to.
 
-<sub>[1]: Recently [dracut merged](https://github.com/NixOS/nixpkgs/issues/77858), but there are no clear instructions on how to use that.</sub>
+This approach will also facilitate the use of NixOS-modules on non-NixOS nix installations.
 
 
 # Examples and Interactions
@@ -59,12 +59,12 @@ Decoupling the system from fixed parts can be done by availing configuration opt
   bootloader.gummiboot.enable = true;
   init.runit.enable = true;
   boot.kernelPackages = pkgs.linuxPackages_latest;
-  boot.baseFiles = pkgs.baseFiles_latest;
+
   # Other system configurations can be added here  ...
 }
 ```
 
-This is an example constituting how one can easily replace grub with gummiboot.
+This is an example constituting how one can easily replace grub with gummiboot or zfsbootmenu.
 
 By providing this level of granularity, users can precisely control their system components, opting for their preferred choices while excluding unnecessary defaults. This empowers users to create tailored configurations and enhances the flexibility of their NixOS setups.
 
@@ -81,7 +81,7 @@ If everything is made opt-in, it may result in a slightly longer initial configu
 
 Not too sure about alternatives, let's discuss potential alternatives (if there are).
 
-If left unimplemented however, abstraction will keep growing and complexity will continue to add up.
+If left unimplemented however, abstraction will keep growing and complexity will continue to add up, and currently chosen low-level components will continue to become an inseparable part of the NixOS.
 
 
 # Prior art
