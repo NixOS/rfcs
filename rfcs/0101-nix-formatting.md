@@ -1,10 +1,10 @@
 ---
 feature: nix_formatting
 start-date: 2021-08-17
-author: Raphael Megzari
-co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: 0x4A6F, Silvan Mosberger (infinisil), piegames, Thomas Bereknyei (tomberek)
-shepherd-leader: Silvan Mosberger (infinisil)
+author: \@piegamesde
+co-authors: \@infinisil
+shepherd-team:
+shepherd-leader:
 related-issues: https://github.com/serokell/nixfmt/pull/118
 ---
 
@@ -76,57 +76,120 @@ Then, special cases with more compact output for the most common patterns are in
 sacrificing those properties in favor of conciseness.
 The idea is that this results in a format that is wide by default but compact where it matters.
 
-Readability is mostly ensured through the general style guidelines.
-Some of the rules in there are followed more strictly, whereas others can be sacrificed in favor of the other goals.
-
-We introduce a set of general *guidelines* that describe the Nix formatting style (**Appendix A**).
-
-From these style guidelines, a set of more specific formatting rules is derived (**Appendix B**).
-
 The interactions between different language features are complex and producing a style that matches the expectations involves a lot of special cases.
 Edge cases abound.
 Any attempt at creating an exhaustive rule set would be futile.
 Therefore, the formatting rules are intentionally under-specified, leaving room for the formatter implementation.
 However, the most important or potentially controversial rules are included.
-The test suite of the formatter implementation specifies the exact formatting, it is up to the formatter team to adjust it as needed.
-
+The test suite of the formatter implementation specifies the exact formatting, it is up to the formatter team to adjust it as needed while staying within the design of this RFC.
 
 ### General notes
 
-- Unless stated otherwise, any expression that fits onto one signle line will be trivially formatted as such.
-- Expressions are either written on one line, or maximally spread out across lines, with no in-between (e.g. grouping).
-  - Grouping should be done by adding blank lines or comments.
-  - Multine expressions that contain multiple items (like lists and attribute sets) must have the first item start on a new line. `[ firstElement` for example is not allowed.
-- Expressions containing multiple expressions inside should be liberally expanded, even if they would fit onto one line.
-  - The motivation is to keep the information per line managable. Usually "number of elements" is a better metric for that than "line length".
-  - The cutoff is usually determined empirically based on common usage patterns.
 - When deciding between two *equally good* options, currently prevalent formatting style in Nixpkgs should be followed.
-- ~~Any two expressions that are fully on a single line must have a common (transitive) parent expression which is also fully on that line.~~
-  - ~~Equivalently: If a maximally parenthesized form of a line fully contains a parenthesis pair, there must be a single outermost pair on that line, meaning it contains all of the others.~~
-  - TODO: Consider moving this
-  - TODO revisit this
-- Functions with multiple arguments should be treated as a single entity, despite technically being just a bunch of nested single-argument functions.
-  - Even the Nix evaluator does this, for performance reasons
-  - The same principle can be extended to other language features like associative operators and if chains
-- Instead of reducing indentation by starting expressions  on the end of the previous line, it is reduced by not indenting the body of some expressions where possible.
-  - This applies for example to `with`, `let … in` (only the in part), function declarations.
-  - This reduces complexity in the implementation and special casing.
-  - Most of the time, this yields the same indentation level for the body as the alternative, with the only difference being in the first line of the expression.
-- This style treats the "double indentation" guideline as a hard rule. Under no circumstances\* may a line have two (or more) additional indentation levels relative to its previous line.
-  - \* This is sometimes difficult to implement for strings with interpolation, but even then it should be abided on a best-effort basis.
-- Avoid compact position of brackets and braces, i.e. avoid lines like `} {` or `] ++ [`
+- Any two expressions that are fully on a single line must have a common (transitive) parent expression which is also fully on that line.
+  - Equivalently: If a maximally parenthesized form of a line fully contains a parenthesis pair, there must be a single outermost pair on that line, meaning it contains all of the others.
+  - Example:
+    ```nix
+    # Bad, because cond and foo are two expressions but they don't have a common parent on the same line
+    if cond then foo
+    else bar
+    ```
+- Expressions of the same kind that can be treated as a sequence of expressions on the same level should be treated as such, even though they are technically parsed as a nested tree.
+  - This applies to else-if chains, functions with multiple arguments, some operators, etc.
+  - Example:
+    ```nix
+    # This is treated as a sequence of if-then-elsa's chains
+    if cond1 then
+      foo
+    else if cond2 then
+      bar
+    else
+      baz
+    ```
+- Bad code does not deserve good formatting.
 
 ### Indentation
 
 - Two spaces are used for each indentation level.
+  - This may be revisited should Nix get proper support for [using tabs for indentation](https://github.com/NixOS/nix/issues/7834) in the future.
 - There is no vertical alignment, neither at the start of the line nor within lines.
-- Indentation levels must not be "skipped", i.e. a line must not have more than one additional indentation compared to the line above it.
-  - This only applies for increasing indentation levels
+  - Example:
+    ```nix
+    {
+      # No good!
+      foo    = "foo";
+      foo123 = arg:
+               # This is also no good!
+               [ 
+                 1
+                 2
+               ];
+    }
+    ```
+- Indentation levels *must* not be "skipped", i.e. on subsequent lines, indentation can only increase by at most one level, but may decrease arbitrarily many levels.
   - In other words: a line on indentation level 6 could be followed by a line on indentation level 1, but not the other way around.
-- Most syntax features have an "outer" part and one or more "inner" parts. The segmentation between these should be clear.
+  - Example:
+    ```nix
+    buildInputs = [
+        # No good!
+        foo
+      ] // lib.optionals cond [
+        bar
+      ];
+
+    # No good, indentation increases by two levels in following lines
+    (callFunction {
+        foo = "bar";
+      }
+      arg
+    );
+      
+    
+    # This is okay, indentation increases only one level per line
+    let
+      x = {
+        a = foo
+          bar
+          baz;
+      }
+      # The above decrease by two levels is okay though
+    in
+    null
+    ```
+- The indentation level reflects the nested structure of the expression.
+  - It should be visibly clear where multi line expressions start and end.
+  - Avoid compact position of brackets and braces, i.e. avoid lines like `} {`, `] ++ [` or `] else [`
+  - Example:
+    ```nix
+    let
+      # Indentation reflects that we're inside the let in bindings
+      myAttr = foo // {
+        # …
+        # This does not reflect the structure, but a necessary evil to not have too much indentation
+      } // someFunction {
+        # …
+      };
+    in
+    if foo then
+      # The indentation shows that this is the result of the if expression
+      {
+        # Indentation shows that this is inside an attribute set.
+        foo = 10;
+      }
+    else
+      concatMapStringsSep "\n"
+        # Indentation shows that these are function arguments
+        (str: ''
+          ${str}
+        '')
+        input
+    ```
+
+// TODO
+<!-- remove-according-to-infinisil>
+- Some expressions have an "outer" part and one or more "inner" parts.
   - Tokens of the outer part should not be indented, and preferably on the same vertical height (i.e. start of line)
-  - The inner part may be one of:
-    1. Indented by (at least) one level on all lines
+    - For example starting a line with `] else` is invalid
       ```nix
       if foo then
         {
@@ -135,15 +198,36 @@ The test suite of the formatter implementation specifies the exact formatting, i
       else
         null
       ```
+- Some expressions have a "head" and a "body" part.
+  - Both are on the same indentation relative to each other.
+  ```nix
+  with pkgs;
+  concatMapStringsSep "\n"
+    (str: ''
+      ${str}
+    '')
+    input
+  ```
+
+  Expression reference:
+  - Atom: Int, Float, String, Path
+  - Atom: Variable
+  - Outer/Inner: Attrs, List
+  - Outer/Inner: Function, Apply
+  - Outer/Inner: If/Then/Else
+  - Outer/Inner/Body: Let
+  - Head/Body: With, Assert
+  - Atom: SelectAttr (`.`, `or`), HasAttr (`?`)
+  - Atom: `!`
+  - Atom: `==`, `!=`, `&&`, `||`, `->`
+  - Atom: `//`, `++`, `+`
+
+
+- Most syntax features have an "outer" part and one or more "inner" parts. The segmentation between these should be clear.
+  - Tokens of the outer part should not be indented, and preferably on the same vertical height (i.e. start of line)
+  - The inner part may be one of:
+    1. Indented by (at least) one level on all lines
     2. Unindented on the first lines then indented on all the remaining ones
-      ```nix
-      with pkgs;
-      concatMapStringsSep "\n"
-        (str: ''
-          ${str}
-        '')
-        input
-      ```
     3. Indented by (at least) one level on all lines except the first and last one
       ```nix
       stdenv.mkDerivation {
@@ -152,32 +236,109 @@ The test suite of the formatter implementation specifies the exact formatting, i
       ```
     - Notably, having lines on the same indentation level as the outer part in the middle of the inner part should be avoided, to not obfuscate the boundaries of the outer part.
       ```nix
-      # valid according to rules below, but a necessary evil in this case
+      # invalid according to rules below, but a necessary evil in this case
       myAttr = foo // {
         # …
       } // someFunction {
         # …
       };
       ```
+- Generally the "body" of an expression should not be indented.
+- Instead of reducing indentation by starting expressions on the end of the previous line, it is reduced by not indenting the body of some expressions where possible.
+  - Example:
+    ```nix
+    # 1
+    let
+      foo = 1;
+    in
+      {
+        inherit foo;
+      }
+
+    # 2
+    let
+      foo = 1;
+    in {
+      inherit foo;
+    }
+
+    # 3
+    let
+      foo = 1;
+    in
+    {
+      inherit foo;
+    }
+    ```
+    In this 
+  - This applies for example to `with`, `let … in` (only the in part), function declarations.
+  - This reduces complexity in the implementation and special casing.
+  - Most of the time, this yields the same indentation level for the body as the alternative, with the only difference being in the first line of the expression.
+</remove-according-to-infinisil -->
+
+
+### Expansion of expressions (TODO)
+
+Unless stated otherwise, any expression that fits onto one single line will be trivially formatted as such.
+
+For expressions which contain a list of sub-expressions, like lists, attribute sets or function calls and declarations, the following applies:
+
+- Expressions containing many sub-expressions inside should be liberally expanded, even if they would fit onto one line.
+  - The motivation is to keep the information per line manageable. Usually "number of elements" is a better metric for that than "line length".
+  - The cutoff is usually determined empirically based on common usage patterns.
+- If formatted with multiple lines, each item should be on its own line.
+  - Grouping similar items together can be done by adding blank lines or comments between the groups instead.
+  - This also applies to the first item, so e.g. `[ firstElement` in a multi line list is not allowed.
+
+**Examples:**
+
+```nix
+{
+  # This is on multiple lines, even if it would fit into one
+  buildInputs = [
+    foo
+    bar
+    baz
+  ];
+  
+  nativeBuildInputs = [
+    # No good! These need to be on their own line!
+    foo bar baz
+    
+    foobarbaz
+  ]
+}
+```
 
 ### Attribute sets and lists
 
 - Brackets and braces are generally written with a space on the inside, like `[ `, ` ]`, `{ ` and ` }`.
-- Empty lists and attribute sets are written as`[ ]` and`{ }`, respectively.
+  - Empty lists and attribute sets are written as`[ ]` and`{ }`, respectively.
+- Lists/attrsets can only be on a single line if:
+  - They contain at most one element
+  - Fit on the line
+- Lists with a single element which is a list or attribute set may be written compactly
+  - Example:
+    ```nix
+    mySingletons = [ [ ({
+      # stuff in there
+    }) ] ];
 
-TODO
+    mySingletons = [ [
+      (function call)
+    ] ];
+    ```
 
 ### Function application
 
 **Description:**
 
-In a function application chain, the first element is treated as the "function" and the remaining ones as "arguments".
-The last argument receives special treatment, to better represent common coding patterns.
-As much arguments as possible are fit onto the first line.
-If all but the last argument do fit, then the last argument may start on the first line.
-If an earlier argument does not fit onto the first line, then itself and all the following ones start on a new line. This is called the expanded form.
-
-All arguments are indented relative to the function.
+- In a function application chain, the first element is treated as the "function" and the remaining ones as "arguments".
+- The last argument receives special treatment, to better represent common coding patterns.
+- As much arguments as possible are fit onto the first line.
+  - If all but the last argument do fit, then the last argument may start on the same line.
+  - If an earlier argument does not fit onto the first line, then itself and all the following ones start on a new line. This is called the expanded form.
+  - All arguments that are not on the same line as the function are indented by one level.
 
 **Examples:**
 
@@ -224,39 +385,37 @@ function arg1 (
 
 **Drawbacks**
 
-- This style sometimes forces lists or attribute sets to start on a new line, with additional indentation.
+- This style sometimes forces lists or attribute sets to start on a new line, with additional indentation of their items.
 
 **Rationale and alternatives**
 
-- Not indenting the arguments, to save some indentation depth. This would be consistent with other constructs like function declarations let bindings.
+- Not indenting the arguments, to save some indentation depth. This would be consistent with other constructs like function declarations and let bindings.
 - Compacting multiline arguments like this:
   ```nix
-  #4
+  #4b
   function arg1 {
-    #stuff
+    # stuff
   } arg3
 
-  #5
+  #5b
   function {
     # …
   } {
     # …
   }
   ```
-  - This violates the guideline of not having unindented inner lines, and thus reduces readability.
+  - This violates the guideline of the indentation representing the expression structure, and thus reduces readability.
   - This does not work well with line length limits on short arguments like in example #3.
 
 ### Function declaration
 
 **Description**
 
-The body of the function is not indented relative to its arguments.
-Multiple "simple" arguments are written onto the same line if possible.
-
-Attribute set arguments always start on a new line; they are not mixed with "simple" arguments.
-If they have up to one parameter the argument may be written on a single line, otherwise the expanded form is used.
-
-Attribute set arguments have their parameters on a new line each with indentation, followed by a trailing semicolon.
+- The body of the function is not indented relative to its arguments.
+- Multiple ("simple") identifier arguments are written onto the same line if possible.
+- Attribute set arguments always start on a new line; they are not mixed with identifier arguments.
+  - If they have few attributes, the argument may be written on a single line, otherwise the expanded form is used.
+- Attribute set arguments have their attributes on a new line each with indentation, followed by a trailing comma.
 
 **Examples**
 
@@ -283,16 +442,24 @@ args@{
 {
   # body
 }
+
+#5
+{ pkgs }:
+name: value: 
+{
+  # body
+}
 ```
 
 **Rationale and alternatives**
 
-- The body of the function declaration could be indented. However, this would require starting some body values on the same line to reduce the indentation level again.
-- Have leading comments for parameters in attribute set arguments, like currently done in Nixpkgs
+- Have leading commas for parameters in attribute set arguments, like currently done in Nixpkgs
   ```nix
+  #6
   { some
   , arg
   }:
+  #7
   args@{
     some
   , argument
@@ -306,7 +473,7 @@ args@{
   # …
   ```
   - This leads to problems with the first argument, as leading commas are not allowed. `{ some` is discouraged by the the style guidelines; `some` should start on a new line instead. Also, this does not work well with `@` bindings.
-  - The currently suggested style for commenting items in the Nixpkgs manual (depicted here) is atrocious. However, there are no other good solutions with leading comma style that don\'t run into other problems.
+  - The currently suggested style for commenting items in the Nixpkgs manual (depicted here in `#7`) is not great. However, there are no other good solutions with leading comma style that don't run into other problems.
   - The leading comma style was a lesser-evil workaround for the lack of trailing commas in the Nix language. Now that the language has this feature, there is no reason to keep it that way anymore.
 
 ### Operations
@@ -409,6 +576,21 @@ For `with` expressions there may be exceptions for common idioms, in which the b
 Let bindings and attribute sets share the same syntax elements, which are discussed here together.
 
 #### Binders
+
+TODO sort in
+
+- Attribute sets should be force-expanded even if they contain only one element in binders. 
+  - Example:
+    ```nix
+    {
+      # Bad
+      foo = { bar.baz = "qux"; };
+      # Good
+      foo = {
+        bar.baz = "qux";
+      };
+    }
+    ```
 
 **Description**
 
