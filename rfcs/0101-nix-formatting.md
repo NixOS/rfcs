@@ -41,24 +41,7 @@ Non-goals of this RFC:
 - Formatting non-Nix files in Nixpkgs
 - Applying the format to other repositories within the NixOS organization containing Nix code. It is up to their respective maintainers to make the transition.
 
-## Detailed design
-[design]: #detailed-design
-
-TODO rewrite that header:
-
-There are four main parts to this RFC:
-- Establish basic formatting guidelines
-- Pick a formatter implementation
-- Migrate Nixpkgs to the format and enforce it in CI
-- Create a process for future maintenance of the implementation
-
-### Terms and definitions
-
-- Brackets: `[]`
-- Braces: `{}`
-- Parentheses: `()`
-
-### Formatting style goals and approach taken
+## Goals and approach
 
 There are several goals that the formatting style should match.
 These are inherently at conflict with each other, requiring priorisation and making trade-offs.
@@ -85,6 +68,20 @@ The test suite of the formatter implementation specifies the exact formatting, i
 
 TODO move part of this out into a section which describes the future of the format (see also the team), and where it is documented.
 
+- When deciding between two *equally good* options, currently prevalent formatting style in Nixpkgs should be followed.
+  - The emphasis here is on "equally good". We should not fear of making radical changes to the current style if there are sufficient arguments in favor of it.
+- *Bad code does not deserve good formatting.*
+
+## Detailed design
+[design]: #detailed-design
+
+TODO rewrite that header:
+
+There are four main parts to this RFC:
+- Establish basic formatting guidelines
+- Pick a formatter implementation
+- Migrate Nixpkgs to the format and enforce it in CI
+- Create a process for future maintenance of the implementation
 
 ### Formatter tooling
 
@@ -272,9 +269,7 @@ TODO
 
 ## The detailed format
 
-- When deciding between two *equally good* options, currently prevalent formatting style in Nixpkgs should be followed.
-  - The emphasis here is on "equally good". We should not fear of making radical changes to the current style if there are sufficient arguments in favor of it.
-- *Bad code does not deserve good formatting.*
+
 - Newlines are not guaranteed to be preserved, but empty lines are.
   - This allows the formatter to compact down multi-line expressions if necessary, while still allowing to structure the code appropriately.
 - Expressions of the same kind that can be treated as a sequence of expressions on the same level should be treated as such, even though they are technically parsed as a nested tree.
@@ -297,6 +292,12 @@ TODO
     if cond then foo
     else bar
     ```
+
+### Terms and definitions
+
+- Brackets: `[]`
+- Braces: `{}`
+- Parentheses: `()`
 
 ### Indentation
 
