@@ -860,7 +860,7 @@ The team initially consists of:
 - @tomberek
 - @piegames
 - @0x4A6F
-- @kamadorueda (if available, TODO: @tomberek sent a message)
+- @Sereja313
 
 The team has the authority to remove and add members as needed.
 
