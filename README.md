@@ -115,44 +115,45 @@ graph TD
 
 
 0. Have a cool idea!
-1. Fill in the RFC. Put care into the details: RFCs that do not present
+0. Fill in the RFC. Put care into the details: RFCs that do not present
    convincing motivation, demonstrate understanding of the impact of the design,
    or are disingenuous about the drawbacks or alternatives tend to be
-   poorly-received. You might want to create a PR in your fork of the RFCs
-   repository to help you flesh it out with a few supporters or chat/video
-   conference with a few people involved in the topic of the RFC.
-2. In case your RFC is a technical proposal, you might want to prepare a
+   poorly-received. Consider using [Semantic Line Breaks](https://sembr.org/)
+   in order to get better diffs on later amendments.
+0. Consider publishing your RFC as pre-RFC [in the forum](https://discourse.nixos.org/c/dev/rfc-steering-committee/33)
+   to gather initial feedback and iron out the remaining typos.
+0. In case your RFC is a technical proposal, you might want to prepare a
    prototype of your idea to firstly make yourself aware of potential pitfalls
    and also help reviewers understand the RFC. Code may be able to explain some
    issues in short.
-3. Submit a pull request. As a pull request the RFC will receive design feedback
+0. Submit a pull request. As a pull request the RFC will receive design feedback
    from the larger community, and the author should be prepared to revise it in
    response.
-4. For the nomination process for potential members of the RFC Shepherd Team,
+0. For the nomination process for potential members of the RFC Shepherd Team,
    that is specific to each RFC, anyone interested can either nominate another
    person or themselves to be a potential member of the RFC Shepherd Team. This
    can already be done when submitting the PR.
-5. The RFC Steering Committee assigns a subset of the nominees to the RFC
+0. The RFC Steering Committee assigns a subset of the nominees to the RFC
    Shepherd Team and designates a leader for it. This has to be done
    unanimously.
-6. Build consensus and integrate feedback. RFCs that have broad support are much
+0. Build consensus and integrate feedback. RFCs that have broad support are much
    more likely to make progress than those that don't receive any comments. Feel
    free to reach out to the RFC Shepherd Team leader in particular to get help
    identifying stakeholders and obstacles.
-7. The RFC Shepherd Team will discuss the RFC pull request, as much as possible
+0. The RFC Shepherd Team will discuss the RFC pull request, as much as possible
    in the comment thread of the pull request itself. Discussion outside of the
    pull request, either offline or in a video conference, that might be
    preferable to get to a solution for complex issues, will be summarized on the
    pull request comment thread.
-8. RFCs rarely go through this process unchanged, especially as alternatives and
+0. RFCs rarely go through this process unchanged, especially as alternatives and
    drawbacks are shown. You can make edits, big and small, to the RFC to clarify
    or change the design, but make changes as new commits to the pull request,
    and leave a comment on the pull request explaining your changes.
    Specifically, do not squash or rebase commits after they are visible on the
    pull request.
-9. At some point, a member of the RFC Shepherd Team will propose a "motion for
-   final comment period" (FCP), along with a disposition for the RFC (merge or
-   close).
+0. At some point, a member of the RFC Shepherd Team will propose to start the
+   "Final Comment Period" (FCP) on behalf of the team, along with a disposition
+   for the RFC (usually "merge" or "close").
     * This step is taken when enough of the tradeoffs have been discussed that
       the RFC Shepherd Team is in a position to make a decision. That does not
       require consensus amongst all participants in the RFC thread (which is
@@ -165,21 +166,25 @@ graph TD
     * For RFCs with lengthy discussion, the motion to FCP is usually preceded by
       a summary comment trying to lay out the current state of the discussion
       and major tradeoffs/points of disagreement.
-    * Before actually entering FCP, all members of the RFC Shepherd Team must
-      sign off the motion.
-10. The FCP lasts ten calendar days, so that it is open for at least 5 business
-    days. It is also advertised widely, e.g. in NixOS Weekly and through
-    Discourse announcements. This way all stakeholders have a chance to lodge
-    any final objections before a decision is reached.
-11. In most cases, the FCP period is quiet, and the RFC is either merged or
-    closed. However, sometimes substantial new arguments or ideas are raised,
-    the FCP is canceled, and the RFC goes back into development mode.
-12. In case of acceptance, the RFC Steering Committee merges the PR.
-    Otherwise the RFC's pull request is closed. If no
-    consensus can be reached on the RFC but the idea in general is accepted, it
-    gets closed, too. A note is added that is should be proposed again, when the
-    circumstances, that are stopping the discussion to come to another decision,
-    change.
+    * In order to actually enter FCP, it must be made clear that all members of
+      the RFC Shepherd Team sign off the motion, e.g. through comments, reactions,
+      approving reviews or a meeting protocol.
+0. The FCP is advertised widely by the shepherds, most importantly in the relevant
+   [Discourse announcements category](https://discourse.nixos.org/c/announcements/rfc-announcements/22).
+   It lasts ten calendar days starting with the Discourse announcement, so that
+   it is open for at least 5 business days. This way all stakeholders have a
+   chance to lodge any final objections before a decision is reached.
+0. In most cases, the FCP is quiet, and the RFC is either merged or
+   closed. However, sometimes substantial new arguments or ideas are raised,
+   the FCP is canceled, and the RFC goes back into development mode.
+   The feedback during FCP may result in minor adjustments to the RFC, this is
+   not necessarily a reason to cancel FCP.
+0. In case of acceptance, the RFC Steering Committee merges the PR.
+   Otherwise the RFC's pull request is closed. If no
+   consensus can be reached on the RFC but the idea in general is accepted, it
+   gets closed, too. A note is added that is should be proposed again, when the
+   circumstances, that are stopping the discussion to come to another decision,
+   change.
 
 ### Unhappy Cases
 
@@ -215,8 +220,11 @@ This RFC is being closed due to lack interest. If enough shepherds are found thi
 
 ## The RFC life-cycle
 
-Once an RFC is accepted the authors may implement it and submit the feature as a
-pull request to the Nix or Nixpkgs repo. Being accepted is not a rubber stamp,
+Most RFCs describe changes that eventually need to be implemented, usually in
+form of pull requests against one of the Nix\* repositories. Ideally,
+implementations are ready to be merged alongside the RFC when it gets accepted.
+Other times, implementation happens only after the RFC gets accepted.
+Being accepted is not a rubber stamp,
 and in particular still does not mean the feature will ultimately be merged; it
 does mean that in principle all the major stakeholders have agreed to the
 feature and are amenable to merging it. In general though this means that the
@@ -231,17 +239,16 @@ implementation, it is by far the most effective way to see an RFC through to
 completion: authors should not expect that other project developers will take on
 responsibility for implementing their accepted feature.
 
-Minor modifications to accepted RFCs can be done in follow-up pull requests. We
-strive to write each RFC in a manner that it will reflect the final design of
-the feature; but the nature of the process means that we cannot expect every
-merged RFC to actually reflect what the end result will be after implementation.
-
-In general, once accepted, RFCs should not be substantially changed. Only very
-minor changes should be submitted as amendments. More substantial changes should
-be new RFCs, with a note added to the original RFC. Exactly what counts as a
-"very minor change" is up to the RFC Shepherd Team of the RFC to be amended, to
-be decided in cooperation with the RFC Steering Committee.
-
+RFC documents are intended to be seen as the documentation of a decision and a
+snapshot of a moment in time, rather than a specification-like normative document.
+Think more of a Matrix Spec Proposal and less like an IETF RFC. Therefore,
+once accepted, RFCs should generally not be substantially changed. Only very
+minor changes should be submitted as amendments (via a follow-up pull request).
+It is the general expectation that any information intended to be normative and
+"outlive" the initial RFC process should live outside of the RFC document, mostly
+in documentation and code. These may be subject to change as usual, and of course
+any "substantial" changes will again require a new RFC. Usually there is no need
+to update the original RFC to keep it up with updates on the implementation.
 
 ## Members of the RFC Steering Committee
 
