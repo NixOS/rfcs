@@ -127,20 +127,14 @@ The decision to use /** to start a doc-comment ensures a unique distinction from
 
 **The placment describes the relationship between doc-comments and the expression they are documenting.**
 
-- Doc-comments are placed before the documentable node. Only `WHITESPACES` are allowed in between.
+- Doc-comments are placed before the documentable node. Only `WHITESPACES` are allowed in between. ([Examples](#basic-examples)) 
     - `WHITESPACES` are: `[\n \r ' ' \t]`.
-    - Example: [Basic examples](#basic-examples)  
 
-- The documentation present before the `attribute path` describes the body of the attribute.
-- Example: [Attributes](#Attributes)
-    - In case placement is ambiguous, the one closer to the body has higher precedence.
-    - Example: [Ambiguous placement](#ambiguous-placement)
-
-      
-- All partial functions of a curried lambda can share the same placement with the outermost lambda.
-    - Example: [partial lambda functions](#partial-lambda-functions)
+- The documentation present before the `attribute path` describes the body of the attribute. ([Examples](#Attributes))
+    - In case placement is ambiguous, the one closer to the body has higher precedence. ([Examples](#ambiguous-placement))
+         
+- All partial functions of a curried lambda can share the same placement with the outermost lambda. ([Examples](#partial-lambda-functions))
   
-
 > Note: Research of the RFC Sheperds Team showed that this allows for intuitive placements like are already done in nixpkgs.
 
 ### Examples
@@ -341,19 +335,19 @@ See future work.
 
 ## All considered outer formats
 
-| Property / Approach | `##` | `/** */` | `Javadoc` | `/*\|` or `/*^`  |
-|---|---|---|---|---|
-| Inspired by | Rust | Current nixpkgs.lib | C++/Java/Javascript | Haskell Haddock |
-| Changes the existing code by | Much | Less | Even More | Less |
-| Needs Termination | No | Yes | Yes | Yes |
-| Indentation | Clear | like Nix's multiline strings, thus **Intuitive** | Clear | ? |
-| Needs vertical space  | No | Yes | Yes | Yes |
-| Visual distinction from comments | High | Low | Medium | Medium |
-| Needs Autocompletion (Language Server) to continue the next line. | Yes | No | Yes | No |
-| Punctuation Variations / Amount of different special characters | 1 (Less) | 2 (Medium) | 2 (Medium) | 3 (More) |
-| Markdown compatibility (also depends on indentation clarity) | Good, but visual conflicts with headings `# Title` | Good | Medium | Good |
-| breaks when interrupted with newlines | Yes | No | ? | No |
-| Simplicity (Brainload) | Medium | Simple | Complex | More Complex |
+| Property / Approach | `##` | `/** */` | `Javadoc` | `/*\|` or `/*^`  | All comments are doc-comments |
+|---|---|---|---|---|---|
+| Inspired by | Rust | Current nixpkgs.lib | C++/Java/Javascript | Haskell Haddock | Current nixpkgs.lib |
+| Changes the existing code by | Much | Less | Even More | Less | No change |
+| Needs Termination | No | Yes | Yes | Yes | ? |
+| Indentation | Clear | like Nix's multiline strings, thus **Intuitive** | Clear | ? | ? |
+| Needs vertical space  | No | Yes | Yes | Yes | ? |
+| Visual distinction from comments | High | Low | Medium | Medium | No distinction at all |
+| Needs Autocompletion (Language Server) to continue the next line. | Yes | No | Yes | No | ? |
+| Punctuation Variations / Amount of different special characters | 1 (Less) | 2 (Medium) | 2 (Medium) | 3 (More) | None |
+| Markdown compatibility (also depends on indentation clarity) | **Visual conflicts with headings `# Title`** | Good | Medium | Good | Only with multiline comments |
+| breaks when interrupted with newlines | Yes | No | ? | No | |
+| Simplicity (Brainload) | Medium | Simple | Complex | More Complex | |
 
 ### Refactoring note
 
@@ -375,48 +369,29 @@ While this allows the most freedom, it is usually considered the best option, no
 - [RFC72](https://github.com/NixOS/rfcs/blob/master/rfcs/0072-commonmark-docs.md) defines commonMark as the official documentation format.
 This is why we decided to follow this convention. Writing plain text is still possible.
 
-## Consequences of not implementing this
-
-- By not implementing this feature, Nix gains no ability for tool-generated documentation.
-- Many existing comments written for documentation will remain imperceptible for automated tooling.
-
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-- Will `nix` itself implement native support like in rust -> `cargo doc`?
+- Migration path for nixpkgs comments.
+- How to document the `arguments`. Should there be some markdown equivalent to `@param` i.e. `# Params`?
+    - Possible answer: Future RFC might need to clarify that.
 
 # Future work
 [Future]: #future-work
 
-## Migrate the existing comments
+## Migrate existing nixpkgs comments
 
-Reformatting existing doc-comments in Nixpkgs, but also filtering out false-positives, i.e. those that should not be part of the API documentation.
+Reformatting existing doc-comments in nixpkgs.
 
-## nixpkgs Manual tooling
+## nixpkgs Manual
 
-The current tooling needs to be adopted to this change. With supporting the new format the currently existing scope can be retained to build the nixpkgs manual.
-
-## Enhanced Documentation generators
-
-We think that a future documentation tool could be out of one of the two following categories.
-
-- (1) Tools that utilize static code analysis and configuration files.
-
-- (2) Tools that use dynamic evaluation to attach name and value relationships and provides more accurate documentation with less configuration overhead.
-
-For the beginning it seems promising to start with the static approach (1). In the long term a dynamic approach (2) seems more promising and accurate but requires a much deeper understanding of compilers and evaluators.
-
-However the border between those two variants is not strict and we might find future tools that fit our needs just perfectly.
+The current nixpkgs manual needs to be adopted to this change.
 
 ## Native support in Nix
 
-- `NixOS/nix` should implement native support for doc-comments so that our users do not have to rely on nixpkgs or external tools. Those tools can still exist and provide more custom functionality, but documenting nix expressions should be natively possible.
+- `NixOS/nix` should implement native support for doc-comments.
 
-We propose to add:
-
-- Adding two builtins: `getAttrDoc` and `getLambdaDoc`
-- both introduced with `unsafe` prefix
-- until properly stabilized according to the official process for feature stabilization.
+> Note: We considered implementation details, but specifying those is out of scope for this rfc.
 
 ## References
 
