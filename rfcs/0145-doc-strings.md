@@ -129,15 +129,16 @@ The decision to use /** to start a doc-comment ensures a unique distinction from
 
 - Doc-comments are placed before the documentable node. Only `WHITESPACES` are allowed in between.
     - `WHITESPACES` are: `[\n \r ' ' \t]`.
-    - [Basic examples](#basic-examples)  
+    - Example: [Basic examples](#basic-examples)  
 
 - The documentation present before the `attribute path` describes the body of the attribute.
-    - [Ambiguous placement](#ambiguous-placement)
+- Example: [Attributes](#Attributes)
     - In case placement is ambiguous, the one closer to the body has higher precedence.
+    - Example: [Ambiguous placement](#ambiguous-placement)
 
       
 - All partial functions of a curried lambda can share the same placement with the outermost lambda.
-    - [partial lambda functions](#partial-lambda-functions)
+    - Example: [partial lambda functions](#partial-lambda-functions)
   
 
 > Note: Research of the RFC Sheperds Team showed that this allows for intuitive placements like are already done in nixpkgs.
