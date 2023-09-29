@@ -129,28 +129,40 @@ The decision to use /** to start a doc-comment ensures a unique distinction from
 
 - Doc-comments are placed before the documentable node. Only `WHITESPACES` are allowed in between.
     - `WHITESPACES` are: `[\n \r ' ' \t]`.
+    - [Basic examples](#basic-examples)  
 
 - The documentation present before the `attribute path` describes the body of the attribute.
-  
-  [Examples](#Examples)
+    - [Ambiguous placement](#ambiguous-placement)
     - In case placement is ambiguous, the one closer to the body has higher precedence.
 
-      [Ambiguous placement](#Ambiguous-placement)
       
 - All partial functions of a curried lambda can share the same placement with the outermost lambda.
-
-  [partial lambda functions](#partial-lambda-functions)
+    - [partial lambda functions](#partial-lambda-functions)
   
 
 > Note: Research of the RFC Sheperds Team showed that this allows for intuitive placements like are already done in nixpkgs.
 
 ### Examples
 
+#### Basic examples
+
+Only whitespaces between the `documentable node` and the `doc-comment`
+
 ```nix
 /**Doc for anonymous lambda function*/
 ↓
 x: x;
 ```
+
+```nix
+listToAttrs [
+  { name = "foo"; value = /**Documentation for '1'*/1; }
+]
+```
+
+#### Attributes 
+
+It is allowed to write the documentation before the attribute instead of placing it right before the body.
 
 ```nix
 /**Doc for lambda function bound to a variable*/
@@ -164,14 +176,6 @@ assigned = x: x;
           ↓
     foo = map (x: x);          
 }
-```
-
-```nix
-builtins.listToAttrs [
-  { name = "foo"; value = /**Documentation for '1'*/1; }
-]
-# =>
-# { foo = 1; }
 ```
 
 #### Ambiguous placement
