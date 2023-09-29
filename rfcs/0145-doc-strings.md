@@ -117,8 +117,6 @@ In the following we give a comprehensive overview to our decision that we've mad
 
 Adopting CommonMark as the content for all doc-comments brings the benefits of widely accepted and understood documentation format in tech projects, while maintaining profitability and consistency within the Nix ecosystem by aligning with existing [NixOS/RFC-72](https://github.com/NixOS/rfcs/blob/master/rfcs/0072-commonmark-docs.md).
 
-The content indentation inherits the indentation logic from nixs' multiline strings `'' ''` allowing any arbitrary indentation the user might prefer.
-
 ## `/** */` is the doc-comment format
 
 The decision to use /** to start a doc-comment ensures a unique distinction from regular comments while still allowing seamless writing without IDE or editor support. This choice not only provides the best developer experience but also minimizes the need for additional tooling overhead.
@@ -392,6 +390,13 @@ The current nixpkgs manual needs to be adopted to this change.
 - `NixOS/nix` should implement native support for doc-comments.
 
 > Note: We considered implementation details, but specifying those is out of scope for this rfc.
+
+Related POCs:
+
+- https://github.com/NixOS/nix/pull/9054
+- https://github.com/NixOS/nix/pull/1652
+- https://github.com/NixOS/nix/pull/5527
+- https://github.com/NixOS/nix/commit/8e252320f52426c734883709eb398d2161c3fe82
 
 ## References
 
