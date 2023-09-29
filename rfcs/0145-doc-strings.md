@@ -336,7 +336,7 @@ See future work.
 | Property / Approach | `##` | `/** */` | `Javadoc` | `/*\|` or `/*^`  | All comments are doc-comments |
 |---|---|---|---|---|---|
 | Inspired by | Rust | Current nixpkgs.lib | C++/Java/Javascript | Haskell Haddock | Current nixpkgs.lib |
-| Changes the existing code by | Much | Less | Even More | Less | No change |
+| Changes the existing code by | Much | Less | Even More | Less | ? |
 | Needs Termination | No | Yes | Yes | Yes | ? |
 | Indentation | Clear | like Nix's multiline strings, thus **Intuitive** | Clear | ? | ? |
 | Needs vertical space  | No | Yes | Yes | Yes | ? |
