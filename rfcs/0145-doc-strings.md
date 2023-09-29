@@ -125,146 +125,86 @@ The decision to use /** to start a doc-comment ensures a unique distinction from
 
 ## Placement
 
-- Documentable nodes are `lambda value` and `attribute name` only. (This might be extended in the future)
+**The placment describes the relationship between doc-comments and the expression they are documenting.**
 
 - Doc-comments are placed before the documentable node. Only `WHITESPACES` are allowed in between.
-    - `WHITESPACES` are: `[\n \r ' ' \t]`, singleline- and multiline-comments (that are not doc-comments). 
+    - `WHITESPACES` are: `[\n \r ' ' \t]`.
 
-Accurate and usable Lambda documentation reqires some more details to be specified:
+- The documentation present before the `attribute path` describes the body of the attribute.
+  
+  [Examples](#Examples)
+    - In case placement is ambiguous, the one closer to the body has higher precedence.
 
-- **If a lambda is assigned to an `attribute name`, then the `attribute name`-documentation is also the `lambda value` documentation**.
-    - In case both places have doc-comments, the one closer to the lambda has higher precedence.
+      [Ambiguous placement](#Ambiguous-placement)
       
-- In case of curried functions all partial functions can share the same placement with the outermost lambda.
+- All partial functions of a curried lambda can share the same placement with the outermost lambda.
 
-> Note: Research of the RFC Sheperds Team showed That this allows for intuitive placements like are already done in nixpkgs. 
+  [partial lambda functions](#partial-lambda-functions)
+  
 
-### Lambda Examples
+> Note: Research of the RFC Sheperds Team showed that this allows for intuitive placements like are already done in nixpkgs.
+
+### Examples
 
 ```nix
 /**Doc for anonymous lambda function*/
 ↓
 x: x;
-
-# doc -> Lambda Value '(x: x)'
 ```
 
 ```nix
-/**Doc for assigned lambda function*/
-↓
+/**Doc for lambda function bound to a variable*/
+           ↓
 assigned = x: x;
 ```
 
 ```nix
+{
+    /**This documents the specialisation `map (x: x)` */
+          ↓
+    foo = map (x: x);          
+}
+```
+
+```nix
+builtins.listToAttrs [
+  { name = "foo"; value = /**Documentation for '1'*/1; }
+]
+# =>
+# { foo = 1; }
+```
+
+#### Ambiguous placement
+
+```nix
 /**Doc B*/
-assigned = /**Doc A*/x: x;
+int = /**Doc A*/1;
 
-# Lambda Documentation is 'Doc A' because it is directly next to the documentable lambda.
+# Documentation is 'Doc A' because it is directly next to the documentable body.
 ```
 
-### Attribute Examples
+#### Dynamic attribute
 
 ```nix
 {
-    /** Documentation for 'foo' */
-    ↓ 
-    foo = 1;
-}
-# doc -> Attribute Name foo
-```
-
-```nix
-{
-    /** Documentation for 'bar' */
-    ↓
+    /** Documentation for '2' */
+                                   ↓
     ${let name = "bar"; in name} = 2;
 }
-# Interpolated attribute names
+# Dynamic attribute
 ```
 
-```nix
-{
-    /** Documentation for 'bar' */
-    ↓
-    ${let name = "bar"; in name} = 2;
-}
-# Interpolated attribute names
-```
+#### Partial lambda functions
 
 ```nix
-setWithMappedNamed =
-    lib.mapAttrs' (name: value: {
-      /**Undocumentable attribute name*/
-              ↓
-      name = "${n + "foo"}";
-      inherit value;
-    })
-    {
-      a = 1;
-      b = 2;
-    };
-# Dynamically constructed attribute names cannot be documented. (constructed in a function call like above)
-``` 
-
-### Examples when the lambda is not directly assigned
-
-```nix
-{
-    /**This documents (1), NOT (2) */
-    ↓1    ↓2
-    foo = map (x: x);
-          ^~~~~~~~~~~ Evaluates to a specialisation of map, which is a partially applied lambda and defined elsewhere.
-          
-# IMPORTANT: Documentation of the specialized map function can still be done as shown. But is related to attrName 'foo' (1)
-}
-```
-
-```nix
-{
-    /**This documents (1), NOT (2) */
-    ↓1                           ↓2
-    foo = mapAttrs (name: value: (x: x) ) {a=1; b=2;};
-    # => 
-    # foo = {
-    #   a = x: x;
-    #   b = x: x; 
-    # }
-# Doesn't document the inner anonymous lambda function.
-}
-```
-
-### Partially applied lambda
-
-All partial functions can share the same placement with the outermost lambda.
-
-```nix
-/**Generic doc for all partial lambda functions too*/
+/**Generic doc for all partial lambda functions*/
 ↓1 ↓2          ↓3
 x: ({y, ...}:  z: x + y) * z;
 
-# 1 -> Lambda Value `x: ({y, ...}: z: x + y) * z` countApplied: 0
-# 2 -> Lambda Value `({y, ...}: z: x + y) * z`    countApplied: 1
-# 3 -> Lambda Value `z: x + y) * z`               countApplied: 2
-```
-
-```nix
-{
-    /** incrMap. Adds one to every item. */
-    ↓    
-    incrMap = map (x: x + 1);
-              ^~~~~~~~~~~ Evaluates to a specialisation of map, which is a partially applied lambda and defined elsewhere.
-              
-# The lambda documementation is taken from the place where the `map` lambda is defined
-# Retrieve the documentation from the attribute 'incrMap'.
-}
-```
-
-Still all other 'Fundamentals' apply.
-
-```nix
-                                 Always doc for anonymous lambda function 'y: x + y'
-                                 ↓    
-x: /** Partial Doc for y: x+y */ y: x + y;
+# All partial functions can share the same placement with the outermost lambda.
+# 1 -> Lambda Value `x: ({y, ...}: z: x + y) * z` 
+# 2 -> Lambda Value `({y, ...}: z: x + y) * z`    
+# 3 -> Lambda Value `z: x + y) * z`               
 ```
 
 # Decisions
