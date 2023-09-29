@@ -49,6 +49,8 @@ The following are the envisioned goals.
 
 - Discuss in which tool doc-comments are parsed and rendered. This could be an external tool, or Nix, or something else entirely, but that's out of scope for this RFC.
 
+- Implementation details are not specified. The RFC shepherd group has some (feature incomplete) POC's sufficient for a generic specification. (See [Native support in Nix](#Native-support-in-Nix) )
+
 ## Current State
 
 A third-party tool called [nixdoc](https://github.com/nix-community/nixdoc) has emerged, which codifies its own rules as to the internal and external formats of a Nix doc-comment. This tool has seen some adoption, notably for the `nixpkgs.lib` functions.
