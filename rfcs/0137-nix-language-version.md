@@ -3,8 +3,8 @@ feature: nix-language-version
 start-date: 2022-12-12
 author: @fricklerhandwerk @yorickvp
 co-authors: @thufschmitt @Ericson2314 @infinisil
-shepherd-team:
-shepherd-leader:
+shepherd-team: @piegamesde @sternenseemann @gabriel-doriath-dohler
+shepherd-leader: @sternenseemann
 related-issues: https://github.com/NixOS/nix/issues/7255
 ---
 
