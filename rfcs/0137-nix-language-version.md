@@ -133,6 +133,10 @@ Other discussions around language changes:
 
 1. The language version for Nix expressions is denoted in special syntax, at the beginning of a parse unit.
    A parse unit is any text stream, e.g. a file or string.
+   The evaluator must ignore a shebang line (starting with `#!) at the start of files, to leave room for additional tooling.
+
+   The language version declaration is optional if it is instead made in an external per-project file.
+   The details of the per-project file syntax are out of scope for this proposal.
 
    <details><summary>Arguments</summary>
 
@@ -144,6 +148,7 @@ Other discussions around language changes:
      - This has the same trade-offs as when introducing the new syntax to begin with
    - (-) Editor support is made harder, since it requires switching the language based on file contents
      - (+) Making the language version accessible at all will probably outweigh the costs
+   - (+) Using a per-project file avoids littering every file with version declarations.
 
    </details>
 
@@ -228,7 +233,6 @@ Other discussions around language changes:
    version \d*.\d*;
    ```
 
-   The evaluator must ignore a shebang line (starting with `#!) at the start of files, to leave room for additional tooling.
    This implies that if no language version is specified in a Nix file, it is written in version 6 (the version implemented in the stable release of Nix at the time of writing this RFC).
 
    The syntax is open for bikeshedding.
@@ -285,6 +289,10 @@ Other discussions around language changes:
 
      Examples include semantic changes or removal of `builtins`, operators, or syntactic constructs.
 
+   Values are decidedly not covered by versioning, but must instead stay the same indefinitely.
+   In particular, there must not be, e.g., string values internally tagged with different language versions.
+   This constraint can be loosened with a follow-up RFC.
+
    <details><summary>Arguments</summary>
 
    - (+) The principled solution: guarantees reproducibility given a fixed language version
@@ -317,11 +325,20 @@ Other discussions around language changes:
    </details>
 
 1. Semantics are preserved across file boundaries for past language versions.
+   In other words, code written in an old language version evaluates to the same result when used from the new versions for all input values which are legal on the old version.
 
-   This should be fairly straightforward to implement since values passed around in the evaluator carry all the information needed to force them.
+   This should be fairly straightforward to implement since values passed around in the evaluator can carry all the information needed to force them.
    Newer parts of the evaluator can always wrap their values in interfaces that are accepted by older parts, as far as possible.
 
-   Example: [Best-effort interoperability](#best-effort-interoperability)
+   Examples:
+   - [Best-effort interoperability](#best-effort-interoperability)
+   - [Preserving semantics across version boundaries](#preserving-semantics-across-version-boundaries)
+
+  When new value types are added to the language:
+
+  - Passing new values to functions is allowed, as it cannot be prevented anyways due to laziness and composite types (like lists).
+  - Any values of unknown type to code from an older Nix version are treated as the opaque "external" type (which already exists for things like plugins).
+    Attempts at using them other than passing them around will thus cause type errors.
 
    <details><summary>Arguments</summary>
 
@@ -341,6 +358,14 @@ Other discussions around language changes:
      - (-) Prohibits incremental changes, as any language update will require updating all files involved
    - Do not support passing values to functions from older language versions
      - (-) Calling functions is the most common use case, and you can hardly do anything without it
+
+   </details>
+
+1. The backward compatibility mechanism must be "zero cost" when not used, meaning that no performance overhead must be paid when no legacy Nix files are imported.
+
+   <details><summary>Arguments</summary>
+
+   - (+) This additional implementation constraint encourages being conservative with substantial changes.
 
    </details>
 
@@ -543,6 +568,29 @@ Since `increment` written in version 7.0 carries its own implementation with it,
 ```console
 $ nix-instantiate --eval b.nix
 2
+```
+
+### Preserving semantics across version boundaries
+
+```nix
+# a.nix
+version 6.1;
+{ float };
+toString float
+```
+
+```nix
+# b.nix
+version 7.0;
+{
+  old = import ./a.nix 1.1;
+  new = toString 1.1;
+}
+```
+
+```console
+$ nix-instantiate --eval b.nix --strict
+{ old = "1.100000"; new = "1.1"; }
 ```
 
 ### Pathological example
