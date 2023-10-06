@@ -872,9 +872,19 @@ solution:
 * [system-manager](https://github.com/numtide/system-manager) addresses the
   limitation of NixOS to use systemd units independently and can deploy many
   services in the NixOS repository on any Ubuntu-based distribution.
+* [devenv](https://devenv.sh) also makes it possible to run multiple processes
+  (of different services) in a Nix-based development environment. It works a
+  with a variety container-friendly/non-PID-1 based process managers, such as
+  process-compose, overmind, and honcho.
+* [Dysnomia](https://github.com/svanderburg/dysnomia) is a system to manage the
+  life-cycle of services deployed by
+  [Disnix](https://github.com/svanderburg/disnix) in a generic way. It has its
+  own `process` module that deploys services as daemons running the background.
+  It can also use the Nix process management framework to deploy services that
+  are managed by any kind process manager supported by the framework.
 
-Aside from the first option, the biggest drawback is that these solutions are
-not generic and there is only little reuse possible between service
+Aside from the first and last option, the biggest drawback is that these
+solutions are not generic and there is only little reuse possible between service
 configurations.
 
 # Unresolved questions
