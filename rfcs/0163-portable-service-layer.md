@@ -851,12 +851,6 @@ to be operating system agnostic.
 This RFC is not the first approach that combines Nix with a process management
 solution:
 
-* The service deployment chapter (chapter 9) of
-  [Eelco Dolstra's PhD thesis](https://github.com/edolstra/edolstra.github.io/blob/master/pubs/phd-thesis.pdf)
-  describes a very early service deployment approach that uses generated
-  start/stop scripts implemented in `bash`. Because shell scripts are so common,
-  they can be used on a variety of operating systems -- in addition to Linux, it
-  can also be used on Darwin and FreeBSD.
 * [NixOS](https://nixos.org) uses `systemd` as its process management solution.
   Services can be deployed by generating systemd unit configuration files in a
   Nix expression. NixOS deploys `systemd` units globally and requires super
@@ -872,20 +866,48 @@ solution:
 * [system-manager](https://github.com/numtide/system-manager) addresses the
   limitation of NixOS to use systemd units independently and can deploy many
   services in the NixOS repository on any Ubuntu-based distribution.
-* [devenv](https://devenv.sh) also makes it possible to run multiple processes
-  (of different services) in a Nix-based development environment. It works a
-  with a variety container-friendly/non-PID-1 based process managers, such as
-  process-compose, overmind, and honcho.
+* [nixos-init-freedom](https://git.sr.ht/~guido/nixos-init-freedom) puts some
+  efforts on replacing systemd-as-pid-1 with s6. Instead of implementing a
+  generic service layer, it translates parts of systemd module configuration
+  into s6 configuration.
+
+The biggest drawback is that these solutions are not generic and there is only
+little reuse possible between service configurations.
+
+There are also solutions that introduce a portable approach for managing
+processes in combination Nix:
+
+* The service deployment chapter (chapter 9) of
+  [Eelco Dolstra's PhD thesis](https://github.com/edolstra/edolstra.github.io/blob/master/pubs/phd-thesis.pdf)
+  describes a very early service deployment approach that uses generated
+  start/stop scripts implemented in `bash`. Because shell scripts are so common,
+  they can be used on a variety of operating systems -- in addition to Linux, it
+  can also be used on Darwin and FreeBSD.
 * [Dysnomia](https://github.com/svanderburg/dysnomia) is a system to manage the
   life-cycle of services deployed by
   [Disnix](https://github.com/svanderburg/disnix) in a generic way. It has its
   own `process` module that deploys services as daemons running the background.
   It can also use the Nix process management framework to deploy services that
   are managed by any kind process manager supported by the framework.
+* [devenv](https://devenv.sh) also makes it possible to run multiple processes
+  (of different services) in a Nix-based development environment. It works a
+  with a variety container-friendly/non-PID-1 based process managers, such as
+  `process-compose`, `overmind`, and `honcho`.
+* [NixNG](https://github.com/nix-community/NixNG) is considered a late sibling
+  to NixOS and shares many designs of it. It also implements the function of
+  generating services for several kinds of container-friendly init systems from
+  the same Nix expressions. NixNG is primarily used to run in containers.
+* [dream2nix](https://github.com/nix-community/dream2nix) has a work-in-progress
+  implementation for a high-level specification that can be translated to
+  configurations for multiple process managers.
 
-Aside from the first and last option, the biggest drawback is that these
-solutions are not generic and there is only little reuse possible between service
-configurations.
+The drawback of some of these solutions is that they rely on services that
+daemonize on their own. Although they are portable, not all services have
+such functionality. Moreover, foreground processes can be more reliably managed
+because they do not rely on PID files -- PID files may get inconsistent.
+
+The other solutions only work with container-friendly supervisors and not with
+commonly used process managers, such as `systemd`.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
