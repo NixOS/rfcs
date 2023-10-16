@@ -42,19 +42,20 @@ For derivations themselves (.drv files), we add the user to the list when they s
 
 For derivation outputs, we add user to the list when the user requests to realise the derivation and has access to the transitive dependencies, including the sources.
 
-Protected paths should not be readable by anyone during the build.
+Protected paths and derivation outputs should not be readable by anyone during the build.
 Necessary permissions are granted after the build.
 
 There also should be a way to enable the protection for selective ACLs (perhaps `nix store access protect`), and explicitly grant (`nix store access grant`) or revoke (`nix store access revoke`) access of certain user or group to each individual path.
-Naturally, this should only be available to `trusted-user`s and users who have access to this path already (either because they are on the ACL, or they belong to a group on the ACL).
+Naturally, this should only be available to `trusted-user`s and users who have access to this path already.
+Additionally, only trusted users should be able to protect a path or revoke permissions, since that could potentially break things for other users.
 
 ### Changes to the system
 
-We should implement a way to restrict access to all the store paths for users.
+It should be possible to restrict access to all the store paths for users.
 A first "line of defense" could be something like [RFC 97], which makes the store non-world-listable.
 However, it is separate from this RFC, and is not required.
 On top of that, we must enforce a stricter access control, using [POSIX ACLs](https://man7.org/linux/man-pages/man5/acl.5.html) to only allow users access to store paths if they are part of the ACL (or belong to a group on the ACL) for that path.
-Nix daemon (or other local store implementations) should execute the appropriate `setfacl` calls whenever a path is added to store or gets different permissions.
+Nix daemon (or other local store implementations) should ensure that the proper ACLs are set whenever a path is added to store or gets different permissions.
 
 [RFC 97]: https://github.com/NixOS/rfcs/pull/97
 
@@ -74,10 +75,7 @@ The Nix daemon (or the local store implementation) should, if necessary, update,
 After the build is performed, the user should be granted access to all the derivation outputs.
 Also, paths dumped to store by users should automatically be accessible by the user, and the access list should be updated should any other user dump the same path in the future.
 
-This should work as follows: when `acl` are enabled, we recursively set permissions on all the existing store paths to `500`, so that only the store owner can access it by default.
-When `selective-acl` are enabled, we only set this permission on the `protected` store paths.
-
-Whenever the user adds a path to the store (`wopAdd*ToStore`, `wopImportPaths`), we add them to the ACL in `db.sqlite` for that path, and also set the ACL in the filesystem accordingly, like this (but in C++, of course):
+Whenever the user adds a path to the store (`Add*ToStore`, `ImportPaths`), set the ACL in the filesystem accordingly, like this (but in C++, of course):
 
 ```shell
 setfacl -R -m user:$UID:rx /nix/store/...
@@ -85,9 +83,8 @@ setfacl -R -m user:$UID:rx /nix/store/...
 
 Whenever a user tries to build a store path (`BuildPaths*`, `BuildDerivation`), we check if they have access to all dependencies or they are granted permission explicilty, then we build the path if necessary, and then recursively add an entry for them to the ACL of the store path.
 
-All these operations should support a flag to mark the path as protected, so that it is not exposed during building or adding.
-
-There should also be a couple of new operations in the worker protocol (perhaps `SetAccessStatus`/ `GetAccessStatus`) which allows to get and set the list of users/groups with access to the path, potentially in the future if the path does not exist.
+There should be a couple of new operations in the worker protocol which allow getting and setting the list of users/groups with access to the path.
+If the specified path does not exist yet, those commands should operate on the "future" access status of the path, meaning the access status that will be applied as soon as the path gets added to the store.
 
 This should be emitted by Nix clients before the path is added to the store or a build is completed, and by `nix store access grant`/`nix store access revoke`.
 
@@ -110,13 +107,8 @@ There should be a protocol to establish proof-of-source, as in proof that the cl
 Simply providing the hash of the inputs as the proof would be one possible (but problematic) implementation.
 It is succeptible to replay attacks, furthermore typically obtaining the hash of the inputs is easier then obtaining the inputs themselves.
 
-Another example of such a protocol would be a challenge-response protocol, where the substituter sends a challenge salt to the client, the client then hashes all the NARs of inputs of the derivation, adding this salt, and finally sends the hash back to the substituter, which, if the hash is correct, provides the path.
-
-Yet another example would be a time-based protocol, where the salt is the current POSIX timestamp.
-The substituter then checks that the timestamp is recent enough (say, 5 seconds to allow for discrepancies between clocks and the network delays) and then validates the hash.
-If all is good, the path is returned.
-This has the advantage that it does not need two-way interaction, so it can easily work with e.g. HTTPS.
-But it's somewhat problematic since a replay attack is possible if executed quickly.
+An improvement on simply providing the hash would be providing the hash of the concatenation of substituter URI and the NAR contents of the input closure.
+This still has some potential for MITM attacks, but prevents replays. Using an HTTPS cache should prevent most types of MITM attacks.
 
 Another solution (which can be implemented together with the previous one) is to keep an access list as metadata in the cache, and keep a mapping between local users with access to that list and simple credentials (e.g. simple HTTP auth).
 This has the benefit of being the easiest one to implement, but is a hassle to use (requires granting the permissions and setting up credentials externally), and also is succeptible to credential leaks.
