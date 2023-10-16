@@ -27,11 +27,17 @@ Finally, it means that substituter access is all-or-nothing: either a user can a
 # Detailed design
 [design]: #detailed-design
 
-Change the implementation of the Nix daemon (and, potentially, nix-serve, depending on the chosen "Remote Store" implementation) to store access control lists as metadata, automatically update them when users provide proof that they have the necessary source, and allow `trusted-user`s to manipulate those ACLs manually.
+Change the implementation of the Nix daemon (and, potentially, nix-serve, depending on the chosen "Remote Store" implementation) to:
+
+- Apply necessary [POSIX ACLs](https://man7.org/linux/man-pages/man5/acl.5.html) to store paths, automatically update them when users provide proof that they have the necessary source, and allow `trusted-user`s and users with access to the paths in question to manipulate those ACLs manually.
+- Add a setting (perhaps `protect-by-default`) to protect all new store paths by default.
 
 This should ensure that this change is as seamless as possible for the users: they will still always be able to execute `nix build` or similar for derivations where they have access to all the sources, substituting as much as possible, as though nothing had changed.
-The only major difference would be that `/nix/store` itself is now not readable.
-If a user needs to be able to access some store paths without having access to their sources (e.g. for proprietary software where sharing the artifacts is ok but sharing the sources isn't), such access can be granted explicitly by the administrators (`trusted-user`'s).
+If a user needs to be able to access some store paths without having access to their sources (e.g. for proprietary software where sharing the artifacts is ok but sharing the sources isn't), such access can be granted explicitly by the administrators (`trusted-user`'s) or users with access to said path.
+
+Additionally, [RFC 97] can be implemented for some extra security.
+
+[RFC 97]: https://github.com/NixOS/rfcs/pull/97
 
 ## Local store
 
@@ -45,19 +51,9 @@ For derivation outputs, we add user to the list when the user requests to realis
 Protected paths and derivation outputs should not be readable by anyone during the build.
 Necessary permissions are granted after the build.
 
-There also should be a way to enable the protection for selective ACLs (perhaps `nix store access protect`), and explicitly grant (`nix store access grant`) or revoke (`nix store access revoke`) access of certain user or group to each individual path.
-Naturally, this should only be available to `trusted-user`s and users who have access to this path already.
+There also should be a way to enable the protection (perhaps `nix store access protect`), explicitly grant (`nix store access grant`), and revoke (`nix store access revoke`) access of certain user or group to each individual path.
+Naturally, this should only be available to `trusted-user`s and users who already have access to this path.
 Additionally, only trusted users should be able to protect a path or revoke permissions, since that could potentially break things for other users.
-
-### Changes to the system
-
-It should be possible to restrict access to all the store paths for users.
-A first "line of defense" could be something like [RFC 97], which makes the store non-world-listable.
-However, it is separate from this RFC, and is not required.
-On top of that, we must enforce a stricter access control, using [POSIX ACLs](https://man7.org/linux/man-pages/man5/acl.5.html) to only allow users access to store paths if they are part of the ACL (or belong to a group on the ACL) for that path.
-Nix daemon (or other local store implementations) should ensure that the proper ACLs are set whenever a path is added to store or gets different permissions.
-
-[RFC 97]: https://github.com/NixOS/rfcs/pull/97
 
 ### Nix language
 
@@ -86,11 +82,11 @@ Whenever a user tries to build a store path (`BuildPaths*`, `BuildDerivation`), 
 There should be a couple of new operations in the worker protocol which allow getting and setting the list of users/groups with access to the path.
 If the specified path does not exist yet, those commands should operate on the "future" access status of the path, meaning the access status that will be applied as soon as the path gets added to the store.
 
-This should be emitted by Nix clients before the path is added to the store or a build is completed, and by `nix store access grant`/`nix store access revoke`.
+Those operations should be emitted by Nix clients before the path is added to the store or a build is completed, and by `nix store access grant`/`nix store access revoke`.
 
 For all other operations working on paths, we check if the user has access before doing anything.
 
-When the access is revoked explicilty, we remove the user from the ACL:
+When the access is revoked explicitly, we remove the user from the ACL:
 
 ```shell
 setfacl -R -x user:$UID:rx /nix/store/...
@@ -122,7 +118,6 @@ It should be rather easy to implement, since all the same checks would have to b
 ## Local example
 
 Alice, Bob, Carol and Eve share a build-machine with a single nix store.
-The daemon on this machine has `acl` enabled.
 
 Alice builds some proprietary software from source.
 She can do this as usual, by just running `nix build`.
@@ -138,10 +133,6 @@ Alternatively, either of them can issue a `nix store access grant --recursive --
 Carol can inspect and run the binary version of the software, and even (theoretically) build other software on top of it.
 
 Finally, an evil Eve wants to steal the software.
-She has multiple obstacles:
-
-1. The nix store is not readable, hence she can't easily figure out the store path of the software
-2. If she somehow figures out the store path of the software or the sources, those paths are not readable to her.
 
 The only two ways for her to get access to the software would be either to obtain the sources via some other means, at which point she doesn't really need anything in the store anyways since it would be trivial to produce the binary artifacts on her personal machine, or trick the machine's administrators into explicitly granting her access.
 
