@@ -35,10 +35,6 @@ If a user needs to be able to access some store paths without having access to t
 
 ## Local store
 
-For a local store, we keep a list of local (POSIX) users who have access to each store path as path metadata.
-When the relevant config option (perhaps `acl`) is enabled, this ACL (access control list) is enforced, meaning that only users on that list, or belonging to groups on that list, can read the store path, execute files from it, or use it as a dependency in their derivations.
-We also add a less strict mode (`selective-acl`) in which derivations are only protected if they are marked as such.
-
 For paths external to the Nix sandbox (added via `nix store add-{file,path}`, paths in the Nix language, `builtins.fetch*`, or flake sources), we add the user to the list when they send the path to the daemon.
 We might need to add a flag (like `--protect`) for the selective ACL mode.
 
@@ -46,16 +42,11 @@ For derivations themselves (.drv files), we add the user to the list when they s
 
 For derivation outputs, we add user to the list when the user requests to realise the derivation and has access to the transitive dependencies, including the sources.
 
-When `selective-acl` is enabled, protected paths should not be readable by anyone during the build.
+Protected paths should not be readable by anyone during the build.
 Necessary permissions are granted after the build.
 
 There also should be a way to enable the protection for selective ACLs (perhaps `nix store access protect`), and explicitly grant (`nix store access grant`) or revoke (`nix store access revoke`) access of certain user or group to each individual path.
 Naturally, this should only be available to `trusted-user`s and users who have access to this path already (either because they are on the ACL, or they belong to a group on the ACL).
-
-### `db.sqlite`
-
-The `ValidPaths` table should get a new field, something like `allowed-users`, which should list the users and groups who have either provided proof of source for this derivation or had been explicitly granted access.
-When `selective-acl` is enabled, there should be a field like `protected` to mark a derivation as protected.
 
 ### Changes to the system
 
@@ -63,15 +54,19 @@ We should implement a way to restrict access to all the store paths for users.
 A first "line of defense" could be something like [RFC 97], which makes the store non-world-listable.
 However, it is separate from this RFC, and is not required.
 On top of that, we must enforce a stricter access control, using [POSIX ACLs](https://man7.org/linux/man-pages/man5/acl.5.html) to only allow users access to store paths if they are part of the ACL (or belong to a group on the ACL) for that path.
-Nix daemon (or other local store implementations) should execute the appropriate `setfacl` calls whenever a path is added to store or gets different permissions in the db.
+Nix daemon (or other local store implementations) should execute the appropriate `setfacl` calls whenever a path is added to store or gets different permissions.
 
 [RFC 97]: https://github.com/NixOS/rfcs/pull/97
 
 ### Nix language
 
-We change the `derivation` and `path` builtins, such that a `__permissions` attribute, when set, is expected to be a list of strings, representing the users and groups who should be granted access to the store path (or the derivation outputs, in the case of `derivation`).
+We define an "access control status" as an attrset `{ protected : bool; users : [string]; groups : [string]; }`.
 
-If this list is set, the Nix daemon (or other store implementation) should be notified that the path/derivation is supposed to be protected (perhaps using a new worker protocol command), and after the build is completed, the ACLs should be set appropriately (only the users specified in the `__permissions` list should have access to the path).
+We change the `derivation` builtin, adding a `__permissions` argument. This argument is supposed to be of form `{ drv : access control status; outputs.<name> : access control status; log : access control status; }`, each attribute being optional. The attributes correspond to the desired permissions of the derivation itself (`.drv` file), outputs of the derivation, and the build log.
+
+We change the `path` builtin, adding a `permissions` argument, which is an access control status representing the desired permissions of the resulting store path.
+
+If either of those arguments are passed, the Nix daemon (or other store implementation) should be notified that the corresponding store object is supposed to be protected (perhaps using a new worker protocol command), and after the build is completed, the ACLs should be set appropriately (only the users specified in the argument, and the building user, should have access to the path).
 
 ### Nix Daemon/local store implementation
 
@@ -88,12 +83,13 @@ Whenever the user adds a path to the store (`wopAdd*ToStore`, `wopImportPaths`),
 setfacl -R -m user:$UID:rx /nix/store/...
 ```
 
-Whenever a user tries to build a store path (`wopBuildPaths*`, `wopBuildDerivation`), we check if they have access to all dependencies or they are granted permission explicilty, then we build the path if necessary, and then recursively add an entry for them to the ACL of the store path both in the DB and in the FS.
+Whenever a user tries to build a store path (`BuildPaths*`, `BuildDerivation`), we check if they have access to all dependencies or they are granted permission explicilty, then we build the path if necessary, and then recursively add an entry for them to the ACL of the store path.
 
 All these operations should support a flag to mark the path as protected, so that it is not exposed during building or adding.
 
-There should also be a couple of new operations (perhaps `wopSetACL`/ `wopGetACL`) which allows to get and set the list of users/groups with access to the path, both in the DB and FS simultaneously.
-This should be emitted by Nix clients after the path is added to the store or a build is completed, and by `nix store access grant`/`nix store access revoke`.
+There should also be a couple of new operations in the worker protocol (perhaps `SetAccessStatus`/ `GetAccessStatus`) which allows to get and set the list of users/groups with access to the path, potentially in the future if the path does not exist.
+
+This should be emitted by Nix clients before the path is added to the store or a build is completed, and by `nix store access grant`/`nix store access revoke`.
 
 For all other operations working on paths, we check if the user has access before doing anything.
 
@@ -145,7 +141,7 @@ She shares the source with Bob, he executes `nix build` as well, which is really
 No actual building occurs.
 
 Now, Alice and Bob want to share the resulting binaries (but not the sources) with Carol.
-They can add a `__permissions = [ "alice" "bob" "carol" ];` and re-build the derivation (nothing will get re-built, only the permissions will be updated).
+They can add a `__permissions.outputs.out.users = [ "alice" "bob" "carol" ];` and re-build the derivation (nothing will get re-built, only the permissions will be updated).
 Alternatively, either of them can issue a `nix store access grant --recursive --user carol /nix/store/...-software` command, granting Carol access to software and all its runtime dependencies, but none of the sources.
 Carol can inspect and run the binary version of the software, and even (theoretically) build other software on top of it.
 
@@ -159,7 +155,7 @@ The only two ways for her to get access to the software would be either to obtai
 
 ## Remote example
 
-Alice sets up a binary cache with `acl` enabled.
+Alice sets up a binary cache.
 
 She uploads some proprietary software (both the source and the realised derivation output) to the store.
 
