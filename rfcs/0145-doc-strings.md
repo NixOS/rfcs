@@ -119,7 +119,7 @@ Adopting CommonMark as the content for all doc-comments brings the benefits of w
 
 ## `/** */` is the doc-comment format
 
-The decision to use /** to start a doc-comment ensures a unique distinction from regular comments while still allowing seamless writing without IDE or editor support. This choice not only provides the best developer experience but also minimizes the need for additional tooling overhead.
+The decision to use /** to start a doc-comment ensures a unique distinction from regular comments while still allowing seamless writing without IDE or editor support. A single choice provides the best developer experience and simplifies tooling.
 
 ## Placement
 
