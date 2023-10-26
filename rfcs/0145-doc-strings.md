@@ -18,8 +18,6 @@ This RFC includes two concerns that define a doc-comment:
 - Outer format rules to allow distinction between regular comments and doc-comments
 - Inner format rules that describe the required format of a doc-comment.
 
-However, both concerns relate closely to each other; It makes sense and reduces bureaucracy to address both in a single RFC.
-
 # Definitions
 
 For this RFC, we adopt the following definitions:
