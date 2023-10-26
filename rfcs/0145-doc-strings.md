@@ -22,7 +22,7 @@ This RFC includes two concerns that define a doc-comment:
 
 For this RFC, we adopt the following definitions:
 
-- **doc-comment**: A structured comment documenting the code's API.
+- **doc-comment**: A structured comment documenting the code's interface.
 - **internal comment**: A free-form comment for those interested in the code's implementation.
 
 The doc-comment properties are grouped into these subcategories:
