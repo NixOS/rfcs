@@ -123,7 +123,7 @@ The decision to use /** to start a doc-comment ensures a unique distinction from
 
 ## Placement
 
-**The placment describes the relationship between doc-comments and the expression they are documenting.**
+**The placement describes the relationship between doc-comments and the expression they are documenting.**
 
 - Doc-comments are placed before the documentable node. Only `WHITESPACES` are allowed in between. ([Examples](#basic-examples)) 
     - `WHITESPACES` are: `[\n \r ' ' \t]`.
