@@ -27,7 +27,7 @@ For this RFC, we adopt the following definitions:
 
 The doc-comment properties are grouped into these subcategories:
 
-- **Outer format**: Specifies rules linking code (API) and doc-comments. (e.g. placement, syntax rules)
+- **Outer format**: Specifies rules linking code and doc-comments, regarding placement within expressions and the chosen lexical syntax of the comment within the existing Nix language.
 
 - **Inner format**: Specifies rules affecting the comment's actual content. (e.g. usage of commonMark)
 
