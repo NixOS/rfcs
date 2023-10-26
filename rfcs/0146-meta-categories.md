@@ -244,6 +244,16 @@ The most immediate drawbacks are:
      - as said above, software collections from pkgsrc to slackbuilds
      - to organization and preservation (as Software Heritage)
 
+# Prior art
+[prior-art]: #prior-art
+
+As said above, categorization is very traditional among software collections. It
+is not hard to cite examples in this arena; the most interesting ones I have
+found are listed above (linked at [references section](#references))
+
+- FreeBSD Ports;
+- Debtags;
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
@@ -272,6 +282,10 @@ Still unsolved is what data structure is better suited to represent a category.
     categories](https://specifications.freedesktop.org/menu-spec/latest/apas02.html)
   - [Reserved
     categories](https://specifications.freedesktop.org/menu-spec/latest/apas03.html)
+
+- [Appstream](https://www.freedesktop.org/wiki/Distributions/AppStream/)
+
+- [Debtags](https://wiki.debian.org/Debtags)
 
 - [NetBSD pkgsrc guide](https://www.netbsd.org/docs/pkgsrc/)
   - Especially, [Chapter 12, Section
