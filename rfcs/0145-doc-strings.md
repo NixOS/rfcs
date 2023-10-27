@@ -97,7 +97,7 @@ The lack of a formal definition of a doc-comment also means there is no reliable
 
 ### References to the problems above
 
-> This curated link collection highlights the Nix ecosystem's inconsistencies, a primary focus of this RFC.
+This curated link collection highlights the Nix ecosystem's inconsistencies, a primary focus of this RFC.
 
 #### nixpkgs - comment examples
 
