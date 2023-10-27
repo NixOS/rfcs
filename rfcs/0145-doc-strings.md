@@ -415,7 +415,7 @@ Related POCs:
 
 ## Related discussions
 
- - https://discourse.nixos.org/t/2023-04-13-documentation-team-meeting-notes-41/27264)
+- https://discourse.nixos.org/t/2023-04-13-documentation-team-meeting-notes-41/27264
 
 - https://github.com/NixOS/nix/issues/3904
 - https://github.com/NixOS/nix/issues/228
