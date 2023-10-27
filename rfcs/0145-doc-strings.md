@@ -125,8 +125,7 @@ The decision to use /** to start a doc-comment ensures a unique distinction from
 
 **The placement describes the relationship between doc-comments and the expression they are documenting.**
 
-- Doc-comments are placed before the documentable node. Only `WHITESPACES` are allowed in between. ([Examples](#basic-examples)) 
-    - `WHITESPACES` are: `[\n \r ' ' \t]`.
+- Doc-comments are placed before the documentable node. Only whitespace is allowed in between. ([Examples](#basic-examples)) 
 
 - The documentation present before the `attribute path` describes the body of the attribute. ([Examples](#Attributes))
     - In case placement is ambiguous, the one closer to the body has higher precedence. ([Examples](#ambiguous-placement))
