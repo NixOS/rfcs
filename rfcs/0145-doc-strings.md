@@ -424,4 +424,4 @@ Related POCs:
 - https://github.com/NixOS/nix/pull/5527
 - https://github.com/NixOS/nix/pull/1652 
 
-[#1652](https://github.com/NixOS/nix/pull/1652) gets closest what this RFC imagines, implementation is almost done. It certainly has some limitations, but got stuck on politics and diverging opinions about markdown and syntax rules. 
+[#1652](https://github.com/NixOS/nix/pull/1652) gets closest what this RFC imagines, implementation is almost done. It certainly has some limitations, but was not merged due to uncertainty and complexity. 
