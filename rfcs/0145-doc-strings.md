@@ -113,7 +113,7 @@ In the following we give a comprehensive overview to our decision that we've mad
 
 ## CommonMark
 
-**CommonMark is the content of all doc-comments.**
+**CommonMark according to [RFC 72](https://github.com/NixOS/rfcs/blob/master/rfcs/0072-commonmark-docs.md) is the content of all doc-comments.**
 
 Adopting CommonMark as the content for all doc-comments brings the benefits of widely accepted and understood documentation format in tech projects, while maintaining profitability and consistency within the Nix ecosystem by aligning with existing [NixOS/RFC-72](https://github.com/NixOS/rfcs/blob/master/rfcs/0072-commonmark-docs.md).
 
