@@ -170,6 +170,18 @@ assigned = x: x;
 }
 ```
 
+### Attribute path
+
+```nix
+{
+  /** Doc 1 bound to 'c' */
+      ↓   ↓
+  a.b.c = 1;
+}
+
+# Documents only the expression bound to 'c'. NOT the attribute set bound to 'a' or 'b'.
+```
+
 #### Ambiguous placement
 
 ```nix
