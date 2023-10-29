@@ -23,7 +23,7 @@ This RFC includes two concerns that define a doc-comment:
 For this RFC, we adopt the following definitions:
 
 - **doc-comment**: A structured comment documenting the code's interface.
-- **internal comment**: A free-form comment for those interested in the code's implementation.
+- **comment**: A free-form comment for to help with understanding the implementation and design concerns that aren't obvious.
 
 The doc-comment properties are grouped into these subcategories:
 
@@ -39,7 +39,7 @@ The following are the envisioned goals.
 - Create distinct outer and inner formats for Nix doc-comments to enable accurate automated parsing and extraction. 
 - Ensure clear differentiation from internal comments, making them accessible to tooling solutions such as documentation rendering and building. 
 
-- Migrate `nixpkgs'` comments to this format.
+- Convert `nixpkgs` comments intended for documentation into this format.
 
 - In addition, the developer experience and adherence to established conventions should be taken into account. Equally important is ensuring that doc comments remain effortless to compose and comprehend, though it is essential to acknowledge that this aspect may vary subjectively based on personal preferences.
 
@@ -125,14 +125,14 @@ The decision to use /** to start a doc-comment ensures a unique distinction from
 
 **The placement describes the relationship between doc-comments and the expression they are documenting.**
 
+The following rules apply in descending order of precedence:
+
 - Doc-comments are placed before the documentable node. Only whitespace is allowed in between. ([Examples](#basic-examples)) 
 
 - The documentation present before the `attribute path` describes the body of the attribute. ([Examples](#Attributes))
     - In case placement is ambiguous, the one closer to the body has higher precedence. ([Examples](#ambiguous-placement))
          
-- All partial functions of a curried lambda can share the same placement with the outermost lambda. ([Examples](#partial-lambda-functions))
-  
-> Note: Research of the RFC Sheperds Team showed that this allows for intuitive placements like are already done in nixpkgs.
+- All partial functions of a curried lambda can share the same placement with the outermost lambda. ([Examples](#partial-lambda-functions)) 
 
 ### Examples
 
