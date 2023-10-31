@@ -132,16 +132,22 @@ The decision to use /** to start a doc-comment ensures a unique distinction from
 
 ## Placement
 
-**The placement describes the relationship between doc-comments and the expression they are documenting.**
+**The placement describes the relationship between doc-comments and the documentable node.**
+
+A **documentable node** can be:
+
+- Expression 
+- Binding 
+- Lambda Formal
 
 The following rules apply in descending order of precedence:
 
-- Doc-comments are placed before the documentable node. Only whitespace is allowed in between. ([Examples](#basic-examples)) 
+- Doc-comments are placed before the **documentable node**. Only whitespace is allowed in between. ([Examples](#basic-examples)) 
 
 - The documentation present before the `attribute path` describes the body of the attribute. ([Examples](#Attributes))
     - In case placement is ambiguous, the one closer to the body has higher precedence. ([Examples](#ambiguous-placement))
          
-- All partial functions of a curried lambda can share the same placement with the outermost lambda. ([Examples](#partial-lambda-functions)) 
+- All partial functions of a curried lambda can share the same placement with the outermost lambda. ([Examples](#partial-lambda-functions))
 
 ### Examples
 
@@ -211,17 +217,58 @@ int = /**Doc A*/1;
 # Dynamic attribute
 ```
 
+#### `Let .. in ..` binding
+
+```nix
+let
+ /** Documentation for the id function*/
+     ↓
+ a = x: x;
+in
+ a
+
+# Documentation can still be retrieved.
+```
+
 #### Partial lambda functions
 
 ```nix
 /**Generic doc for all partial lambda functions*/
 ↓1 ↓2          ↓3
-x: ({y, ...}:  z: x + y) * z;
+x: ({y, ...}:  z: x + y * z)
 
 # All partial functions can share the same placement with the outermost lambda.
-# 1 -> Lambda Value `x: ({y, ...}: z: x + y) * z` 
-# 2 -> Lambda Value `({y, ...}: z: x + y) * z`    
-# 3 -> Lambda Value `z: x + y) * z`               
+# 1 -> Lambda Value `x: ({y, ...}: z: x + y * z)` 
+# 2 -> Lambda Value `({y, ...}: z: x + y * z)`    
+# 3 -> Lambda Value `z: x + y * z)`               
+```
+
+> Allows for fallback documentation in case documentation on the partially applied function cannot be written or retrieved.
+
+#### Lambda formals
+
+```nix
+/**Doc for the whole lambda function*/
+{
+ /**Doc for attribute 'a'*/
+ a
+}:
+ a              
+```
+
+```nix
+/**Doc for the whole lambda function*/
+{
+ /**Doc for attribute 'a'*/
+ a,
+ ...
+}@args:
+ a + args.b;
+
+# `...` and `@args` cannot (yet) be documented.
+# We recommend:
+# - Include all known arguments in the pattern `{ }:`
+# - Document how more arguments can be passed to the function in `Doc for the whole lambda function`
 ```
 
 # Decisions
