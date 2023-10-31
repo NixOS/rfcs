@@ -459,7 +459,7 @@ The current nixpkgs manual needs to be adopted to this change.
 
 - `NixOS/nix` should implement native support for doc-comments.
 
-Primarily because the *Nix* language requires access to the actual evaluator for building correct relations between doc-comment and and the expressions they document.
+Primarily because the *Nix* language requires access to the actual evaluator for building correct relations between doc-comment and and the node they document.
 
 > Note: We considered implementation details, but specifying those is out of scope for this rfc.
 
