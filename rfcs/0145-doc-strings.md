@@ -147,7 +147,7 @@ The following rules apply in descending order of precedence:
 - The documentation present before the `attribute path` describes the body of the attribute. ([Examples](#Attributes))
     - In case placement is ambiguous, the one closer to the body has higher precedence. ([Examples](#ambiguous-placement))
          
-- All partial functions of a curried lambda can share the same placement with the outermost lambda. ([Examples](#partial-lambda-functions))
+- All partial applications of a curried lambda can share the same placement with the outermost lambda. ([Examples](#partial-lambda-functions))
 
 ### Examples
 
