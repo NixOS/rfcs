@@ -142,7 +142,7 @@ A **documentable node** can be:
 
 The following rules apply in descending order of precedence:
 
-- Doc-comments are placed before the **documentable node**. Only whitespace is allowed in between. ([Examples](#basic-examples)) 
+- Doc-comments are placed before the **documentable node**. Only whitespace or non-doc comments are allowed in between. ([Examples](#basic-examples)) 
 
 - The documentation present before the `attribute path` describes the body of the attribute. ([Examples](#Attributes))
     - In case placement is ambiguous, the one closer to the body has higher precedence. ([Examples](#ambiguous-placement))
@@ -250,25 +250,10 @@ x: ({y, ...}:  z: x + y * z)
 ```nix
 /**Doc for the whole lambda function*/
 {
- /**Doc for attribute 'a'*/
+ /**Doc for formal 'a'*/
  a
 }:
  a              
-```
-
-```nix
-/**Doc for the whole lambda function*/
-{
- /**Doc for attribute 'a'*/
- a,
- ...
-}@args:
- a + args.b;
-
-# `...` and `@args` cannot (yet) be documented.
-# We recommend:
-# - Include all known arguments in the pattern `{ }:`
-# - Document how more arguments can be passed to the function in `Doc for the whole lambda function`
 ```
 
 # Decisions
@@ -352,29 +337,29 @@ Each subsection here contains a decision along with arguments and counter-argume
   
 </details>
 
-## Single-line doc-comments (do not exist)
+## Single-line doc-comments (not specified by this rfc)
 
 **Observing**: Nix offers two variants of comments; single- (`#`) and multi-line comments (`/* */`). There may be use cases where it is desirable to have a form of single-line comments subtyped for doc-comment purposes.
 
-**Considering**: Single-line comment for documentation. (Starting a doc-comment with `##`)
+**Considering**: Single-line comment for documentation. (Starting a doc-comment with `##` or similar)
 
-**Decision**: Single-line comments (starting with `##`) **cannot be used** in any form for documentation puposes.
+**Decision**: Single-line comments (starting with `##`) **remain unspecified** by this rfc.
 
 <details>
 <summary>Arguments</summary>
 
-- (+) It Would be consistent with providing variants for both nix comments.
-- (-) Doc-comments should have only one variant to reduce complexity.  
-- (-) documentation will likely everytime take up more than one line.
-- (-) If documentation grows bigger than one line, refactoring into a multiline-doc-comment must occur.
-- (+) Offer the choice.
+- (-) It Would be consistent with providing variants for both nix comments.
+- (+) Doc-comments have only one variant to reduce complexity.  
+- (+) documentation will likely everytime take up more than one line.
+- (+) If documentation grows bigger than one line, refactoring into a multiline-doc-comment must occur.
+- (-) Offer the choice.
 - (o) Single lines could also be concatenated to form multi-line documentation.
-  - (+) Convinience
-  - (-) Technical more complex
-- (+) Takes up less vertical space
-- (-) Visually confusing when every line starts with a `#` character.
-    - (-) Potential visual conflicts with the content that is markdown (e.g. with headings).
-- (+) Indentation of the content is clear.
+  - (-) Convinience
+  - (+) Technical more complex
+- (-) Takes up less vertical space
+- (+) Visually confusing when every line starts with a `#` character.
+    - (+) Potential visual conflicts with the content that is markdown (e.g. with headings).
+- (-) Indentation of the content is clear.
 
 </details>
 
@@ -383,15 +368,31 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 ## Changes the existing comments inside the code base
 
-This could be automated.
+This could be (partially) automated. (see our [codemod](https://github.com/nix-community/docnix/tree/3c0531cb5b4c9f3e9069b73d19e6c4be8508d905/codemod) )
 
 Also, the migration could be performed piecemal, starting perhaps with `nixpkgs.lib`.
 
 See future work.
 
-## Tooling to produce the nixpkgs manual
+### Migration Example
 
-Change or write a new tool used to produce Nixpkgs library function documentation. Because this is a breaking change.
+TODO:
+
+`old format`
+```nix
+
+```
+
+->
+
+`new format`
+```nix
+
+```
+
+## Breaking the nixpkgs manual
+
+This is a breaking change, to the current nixpkgs manual tooling Nixpkgs library function documentation.
 
 See future work.
 
@@ -447,13 +448,25 @@ This is why we decided to follow this convention. Writing plain text is still po
 
 Reformatting existing doc-comments in nixpkgs.
 
+Action points:
+
+- [ ] Change comments to markdown.
+- [ ] Migrate nixdoc 'argument documentation' format.
+
 ## Tooling
 
 All current rendering tooling solutions should support displaying the specified doc-comment format.
 
+Currently at least:
+
 ### nixpkgs Manual renderer
 
 The current nixpkgs manual needs to be adopted to this change.
+
+We expect changes in the following to be neccessary:
+
+- [nixos_render_docs](https://github.com/NixOS/nixpkgs/tree/e4082efedb483eb0478c3f014fa851449bca43f9/pkgs/tools/nix/nixos-render-docs/src) 
+- [nixdoc](https://github.com/nix-community/nixdoc)
 
 ## Native support in Nix
 
