@@ -24,6 +24,10 @@ Also, it makes storing secrets in the Nix store even more dangerous then it coul
 
 Finally, it means that substituter access is all-or-nothing: either a user can access the cache and download everything there is in there just by knowing store paths (even without having the source code or Nix expressions available), or they can't download anything.
 
+This can be rectified by adding access control list (ACL) functionality to Nix, making it possible to set ACLs on store paths.
+
+This RFC targets the use-case of protecting proprietary software on a shared nix store or substituter. It could potentially be used to store secrets (such as passwords) in the Nix store, but this is potentially succeptible to some attacks; for example, some store paths are content-addressed (including files simply imported into the store), thus it may be possible to brute-force their contents based on the world-readable hash part of the store path. It is definitely **not** intended for storing small (<64 bits of entropy) secrets.
+
 # Detailed design
 [design]: #detailed-design
 
@@ -31,6 +35,8 @@ Change the implementation of the Nix daemon (and, potentially, nix-serve, depend
 
 - Apply necessary [POSIX ACLs](https://man7.org/linux/man-pages/man5/acl.5.html) to store paths, automatically update them when users provide proof that they have the necessary source, and allow `trusted-user`s and users with access to the paths in question to manipulate those ACLs manually.
 - Add a setting (perhaps `protect-by-default`) to protect all new store paths by default.
+
+An additional invariant that must be ensured at all times is that the complete runtime closure of the store path is available to a user if the store path itself is available.
 
 This should ensure that this change is as seamless as possible for the users: they will still always be able to execute `nix build` or similar for derivations where they have access to all the sources, substituting as much as possible, as though nothing had changed.
 If a user needs to be able to access some store paths without having access to their sources (e.g. for proprietary software where sharing the artifacts is ok but sharing the sources isn't), such access can be granted explicitly by the administrators (`trusted-user`'s) or users with access to said path.
