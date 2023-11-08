@@ -374,22 +374,6 @@ Also, the migration could be performed piecemal, starting perhaps with `nixpkgs.
 
 See future work.
 
-### Migration Example
-
-TODO:
-
-`old format`
-```nix
-
-```
-
-->
-
-`new format`
-```nix
-
-```
-
 ## Breaking the nixpkgs manual
 
 This is a breaking change, to the current nixpkgs manual tooling Nixpkgs library function documentation.
@@ -452,6 +436,64 @@ Action points:
 
 - [ ] Change comments to markdown.
 - [ ] Migrate nixdoc 'argument documentation' format.
+
+### Migration Example
+
+The following shows one of the many possible ways to migrate the current `nixpkgs.lib` comments.
+
+> Refactoring Note: the current `nixdoc` feature 'Function arguments' should be changed or removed. Doc-comments that relate to a lambda use this placement already. 
+
+`lib/attrsets.nix (old format)`
+````nix
+/* Filter an attribute set by removing all attributes for which the
+   given predicate return false.
+
+   Example:
+     filterAttrs (n: v: n == "foo") { foo = 1; bar = 2; }
+     => { foo = 1; }
+
+   Type:
+     filterAttrs :: (String -> Any -> Bool) -> AttrSet -> AttrSet
+*/
+filterAttrs =
+  # Predicate taking an attribute name and an attribute value, which returns `true` to include the attribute, or `false` to exclude the attribute.
+  pred:
+  # The attribute set to filter
+  set:
+  listToAttrs (concatMap (name: let v = set.${name}; in if pred name v then [(nameValuePair name v)] else []) (attrNames set));
+````
+
+->
+
+`lib/attrsets.nix (new format)`
+````nix
+/**
+  Filter an attribute set by removing all attributes for which the
+  given predicate return false.
+
+  # Example
+
+  ```nix
+  filterAttrs (n: v: n == "foo") { foo = 1; bar = 2; }
+  => { foo = 1; }
+  ```
+
+  # Type
+
+  ```
+  filterAttrs :: (String -> Any -> Bool) -> AttrSet -> AttrSet
+  ```
+
+  # Arguments
+
+  - [pred] Predicate taking an attribute name and an attribute value, which returns `true` to include the attribute, or `false` to exclude the attribute.
+  - [set] The attribute set to filter
+*/
+filterAttrs =
+  pred:
+  set:
+  listToAttrs (concatMap (name: let v = set.${name}; in if pred name v then [(nameValuePair name v)] else []) (attrNames set));
+````
 
 ## Tooling
 
