@@ -56,6 +56,8 @@ The following are the envisioned goals.
 
 - Discuss in which tool doc-comments are parsed and rendered. This could be an external tool, native nix, or something else entirely, but that's out of scope for this RFC.
 
+- How to style or format the commonmark inside of a doc-comment.
+
 - Implementation details are not specified. The RFC shepherd group has some (feature incomplete) POC's sufficient for a generic specification. (See [Native support in Nix](#Native-support-in-Nix) )
 
 ## Current State
