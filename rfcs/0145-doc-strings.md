@@ -148,8 +148,6 @@ The following rules apply in descending order of precedence:
 
 - The documentation present before the `attribute path` describes the body of the attribute. ([Examples](#Attributes))
     - In case placement is ambiguous, the one closer to the body has higher precedence. ([Examples](#ambiguous-placement))
-         
-- All partial applications of a curried lambda can share the same placement with the outermost lambda. ([Examples](#partial-lambda-functions))
 
 ### Examples
 
@@ -231,21 +229,6 @@ in
 
 # Documentation can still be retrieved.
 ```
-
-#### Partial lambda functions
-
-```nix
-/**Generic doc for all partial lambda functions*/
-↓1 ↓2          ↓3
-x: ({y, ...}:  z: x + y * z)
-
-# All partial functions can share the same placement with the outermost lambda.
-# 1 -> Lambda Value `x: ({y, ...}: z: x + y * z)` 
-# 2 -> Lambda Value `({y, ...}: z: x + y * z)`    
-# 3 -> Lambda Value `z: x + y * z)`               
-```
-
-> Allows for fallback documentation in case documentation on the partially applied function cannot be written or retrieved.
 
 #### Lambda formals
 
