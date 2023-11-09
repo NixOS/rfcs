@@ -445,7 +445,7 @@ The following shows one of the many possible ways to migrate the current `nixpkg
 
 > We managed to partially automate this effort with a [codemod](https://github.com/nix-community/docnix/tree/3c0531cb5b4c9f3e9069b73d19e6c4be8508d905/codemod)
 
-> Refactoring Note: the current `nixdoc` feature 'Function arguments' should be changed or removed. Doc-comments that relate to a lambda use this placement already. 
+> Note: The current `nixdoc` feature 'Function arguments' uses a different mental model than this RFC. Arguments must now be explicitly documented inside of the lambda documentation.
 
 `lib/attrsets.nix (old format)`
 ````nix
