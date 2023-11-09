@@ -339,32 +339,6 @@ Each subsection here contains a decision along with arguments and counter-argume
   
 </details>
 
-## Single-line doc-comments (not specified by this rfc)
-
-**Observing**: Nix offers two variants of comments; single- (`#`) and multi-line comments (`/* */`). There may be use cases where it is desirable to have a form of single-line comments subtyped for doc-comment purposes.
-
-**Considering**: Single-line comment for documentation. (Starting a doc-comment with `##` or similar)
-
-**Decision**: Single-line comments (starting with `##`) **remain unspecified** by this rfc.
-
-<details>
-<summary>Arguments</summary>
-
-- (-) It Would be consistent with providing variants for both nix comments.
-- (+) Doc-comments have only one variant to reduce complexity.  
-- (+) documentation will likely everytime take up more than one line.
-- (+) If documentation grows bigger than one line, refactoring into a multiline-doc-comment must occur.
-- (-) Offer the choice.
-- (o) Single lines could also be concatenated to form multi-line documentation.
-  - (-) Convinience
-  - (+) Technical more complex
-- (-) Takes up less vertical space
-- (+) Visually confusing when every line starts with a `#` character.
-    - (+) Potential visual conflicts with the content that is markdown (e.g. with headings).
-- (-) Indentation of the content is clear.
-
-</details>
-
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -429,6 +403,10 @@ This is why we decided to follow this convention. Writing plain text is still po
 
 # Future work
 [Future]: #future-work
+
+## Single-line doc-comments 
+
+Single line doc-comment remained unspecified by this rfc. It might be an option to specify how they behave in the future.
 
 ## Migrate existing nixpkgs comments
 
