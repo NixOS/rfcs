@@ -551,7 +551,7 @@ name: value:
   }:
   # …
   ```
-  - This leads to problems with the first argument, as leading commas are not allowed. `{ some` is discouraged by the the style guidelines; `some` should start on a new line instead. Also, this does not work well with `@` bindings.
+  - This leads to problems with the first argument, as leading commas are not allowed. `{ some` is discouraged by the style guidelines; `some` should start on a new line instead. Also, this does not work well with `@` bindings.
   - The currently suggested style for commenting items in the Nixpkgs manual (depicted here in `#7`) is not great. However, there are no other good solutions with leading comma style that don't run into other problems.
   - The leading comma style was a lesser-evil workaround for the lack of trailing commas in the Nix language. Now that the language has this feature, there is no reason to keep it that way anymore.
 
@@ -597,7 +597,7 @@ foo
   items
 ]
 ++
-  runCommand name # <- But only functions whose last argument can start on the same line
+  runCommand name # <- ... but only for functions whose last argument starts on the same line
     ''
       echo hi
     ''
@@ -946,7 +946,7 @@ inherit
 
 **Description**
 
-- If the inherit target is single-line, it is placed on the same line as the `inherit`, even if the following items do not fit onto one line.
+- If the inherit source is single-line, it is placed on the same line as the `inherit`, even if the following items do not fit onto one line.
 - Otherwise, it starts on a new line with indentation, like the others.
   - In that case, the remaining items are force-expanded too, even if they would have fit onto one line in the first place.
 
