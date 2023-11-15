@@ -1027,12 +1027,14 @@ There are four considered semicolon styles:
   attr3 =
     function call
       many
-      arguments;
+      arguments
+  ;
   attr3 =
     let
       foo = "bar";
     in
-    some statemens;
+    some statemens
+  ;
   ```
 2. On a new line with one indentation level.
   - Just as wasteful on space as (1), but a bit less clear about signaling the end of the binding.
@@ -1041,12 +1043,14 @@ There are four considered semicolon styles:
     app1
     app2
     # …
-    app42;
+    app42
+    ;
 
   attr3 =
     function call
       many
-      arguments;
+      arguments
+    ;
   ```
 3. A mix of (1) and (2), where usually the semicolon is placed directly at the end of the binder.
    But with exceptions in which the semicolon is placed onto the following line instead in cases where the value is a multiline `if` expression or nested operator.
@@ -1057,21 +1061,20 @@ There are four considered semicolon styles:
      if foo then
        "bar"
      else
-       "baz";
+       "baz"
+   ;
 
    attr5 =
      let
        foo = false;
      in
-     if foo then
-       "bar"
-     else
-       "baz";
+     foo || bar;
        
    attr7 =
      cond1
      || cond2
      ||
        some function call
-       && cond3;
+       && cond3
+   ;
    ```
