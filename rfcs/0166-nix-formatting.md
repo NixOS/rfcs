@@ -566,7 +566,7 @@ If an operator chain does not fit onto one line, it is expanded such that every 
 - If the operand can also fit on the same line as the operator, it's put there
 - Otherwise, the operand usually starts indented on a new line, with special handling for parenthesis, brackets, braces, function applications
 
-Operator chains may be compacted as long as all lines between the first and last one are indented.
+Operator chains in binders may be compacted as long as all lines between the first and last one are indented.
 
 **Examples**
 
@@ -603,19 +603,37 @@ foo
     ''
     test
 
-# We can use a more compact form as long as all inbetween lines are indented
-bar // {
-  x = 10;
-  y = 20;
-} // baz
+# In binders we can use a more compact form as long as all inbetween lines are indented.
+{
+  foo = bar // {
+    x = 10;
+    y = 20;
+  } // baz;
+}
 
 # Bad, we can't use the more compact form because an intermediate line is not indented.
 {
-  x = 10;
-  y = 20;
-} // foo // {
-  z = 30;
-  w = 40;
+  foo = {
+    x = 10;
+    y = 20;
+  } // bar // {
+    z = 30;
+    w = 40;
+  };
+}
+
+# Good, this is the non-compact operator form
+{
+  foo =
+    {
+      x = 10;
+      y = 20;
+    }
+    // bar
+    // {
+      z = 30;
+      w = 40;
+    };
 }
 ```
 
