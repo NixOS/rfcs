@@ -13,7 +13,7 @@ related-issues: https://github.com/serokell/nixfmt/pull/118, https://github.com/
 
 ## Summary
 
-The RFC consist of these main parts, see the [detailed design section](#detailed-design) for more information:
+The RFC consists of these main parts, see the [detailed design section](#detailed-design) for more information:
 
 - Define the initial _standard Nix format_
 - Establish the _Nix format team_
@@ -47,7 +47,7 @@ Non-goals of this RFC:
 ## Goals and approach
 
 There are several goals that the formatting style should match.
-These are inherently at conflict with each other, requiring priorisation and making trade-offs.
+These are inherently in conflict with each other, requiring prioritisation and making trade-offs.
 The resulting choice is always a compromise.
 
 In general, we want the code to be (in no particular order):
@@ -72,7 +72,7 @@ However, the most important or potentially controversial rules are included, as 
 
 When deciding between two *equally good* options, currently prevalent formatting style in Nixpkgs should be followed.
 The emphasis here is on "equally good".
-We should not fear of making radical changes to the current style if there are sufficient arguments in favor of it.
+We should not fear making radical changes to the current style if there are sufficient arguments in favor of it.
 
 *Bad code does not deserve good formatting.*
 
@@ -80,7 +80,7 @@ We should not fear of making radical changes to the current style if there are s
 
 ### Standard Nix format
 
-The _standard nix format_ defines the officially recommended way how Nix code should be formatted.
+The _standard Nix format_ defines the officially recommended way that Nix code should be formatted.
 
 The initial version of the standard Nix format is defined in a section towards the end:
 
@@ -412,7 +412,7 @@ For sequences of items in expressions, like elements in a list, key-value pairs 
 
 - In a function application chain, the first element is treated as the "function" and the remaining ones as "arguments".
 - The last argument receives special treatment, to better represent common coding patterns.
-- As much arguments as possible are fit onto the first line.
+- As many arguments as possible are fit onto the first line.
   - If all but the last argument do fit, then the last argument may start on the same line.
   - If an earlier argument does not fit onto the first line, then itself and all the following ones start on a new line. This is called the expanded form.
   - All arguments that are not on the same line as the function are indented by one level.
@@ -592,7 +592,7 @@ foo
 ++ ( # <- The operator is on a new line, but parenthesis/brackets/braces can start on the same line
   foo
 )
-++ optionals condition [ # <- As are multiline functions applications
+++ optionals condition [ # <- As are multiline function applications
   more
   items
 ]
@@ -603,7 +603,7 @@ foo
     ''
     test
 
-# In binders we can use a more compact form as long as all inbetween lines are indented.
+# In binders we can use a more compact form as long as all in-between lines are indented.
 {
   foo = bar // {
     x = 10;
@@ -639,7 +639,7 @@ foo
 
 ### if
 
-**Desciption**
+**Description**
 
 - `if` and `else` keywords always start a line, the if and else bodies are indented.
 - If the condition does not fit onto one line, then it will start on the next line with indentation, and `then` will be on the start of the line following the condition.
@@ -1033,7 +1033,7 @@ There are four considered semicolon styles:
     let
       foo = "bar";
     in
-    some statemens
+    some statements
   ;
   ```
 2. On a new line with one indentation level.
@@ -1054,7 +1054,7 @@ There are four considered semicolon styles:
   ```
 3. A mix of (1) and (2), where usually the semicolon is placed directly at the end of the binder.
    But with exceptions in which the semicolon is placed onto the following line instead in cases where the value is a multiline `if` expression or nested operator.
-   These are the only syntax elements which may result in the semicolon being placed on a line with arbitrarily deep indentation.
+   These are the only syntax elements that may result in the semicolon being placed on a line with arbitrarily deep indentation.
    
    ```nix
    attr4 =
