@@ -23,7 +23,7 @@ This RFC includes two concerns that define a doc-comment:
 For this RFC, we adopt the following definitions:
 
 - **doc-comment**: A structured comment documenting the code's interface.
-- **implementation comment**: A free-form comment for to help with understanding the implementation and design concerns that aren't obvious.
+- **implementation comment**: A free-form comment to help with understanding the implementation and design concerns that aren't obvious.
 
 The doc-comment properties are grouped into these subcategories:
 
@@ -48,9 +48,9 @@ The following are the envisioned goals.
 - Create distinct outer and inner formats for Nix doc-comments to enable accurate automated parsing and extraction. 
 - Ensure clear differentiation from internal comments, making them accessible to tooling solutions such as documentation rendering and building. 
 
-- Convert `nixpkgs` comments intended for documentation into this format.
+- Convert `Nixpkgs` comments intended for documentation into this format.
 
-- In addition, the developer experience and adherence to established conventions should be taken into account. Equally important is ensuring that doc comments remain effortless to compose and comprehend, though it is essential to acknowledge that this aspect may vary subjectively based on personal preferences.
+- In addition, the developer's experience and adherence to established conventions should be taken into account. Equally important is ensuring that doc comments remain effortless to compose and comprehend, though it is essential to acknowledge that this aspect may vary subjectively based on personal preferences.
 
 ## Non-goals
 
@@ -58,16 +58,16 @@ The following are the envisioned goals.
 
 - How to style or format the commonmark inside of a doc-comment.
 
-- Implementation details are not specified. The RFC shepherd group has some (feature incomplete) POC's sufficient for a generic specification. (See [Native support in Nix](#Native-support-in-Nix) )
+- Implementation details are not specified. The RFC shepherd group has some (feature incomplete) POCs sufficient for a generic specification. (See [Native support in Nix](#Native-support-in-Nix) )
 
 ## Current State
 
-A third-party tool called [nixdoc](https://github.com/nix-community/nixdoc) has emerged, which codifies its own rules as to the internal and external formats of a Nix doc-comment. This tool has seen some adoption, notably for the `nixpkgs.lib` functions.
+A third-party tool called [nixdoc](https://github.com/nix-community/nixdoc) has emerged, which codifies its own rules as to the internal and external formats of a Nix doc-comment. This tool has seen some adoption, notably for the Nixpkgs `lib` functions.
 
 Here is an example of the format understood by *nixdoc*:
 
 ```nix
-  # nixpkgs/lib/trivial.nix
+  # Nixpkgs/lib/trivial.nix
 
   /* The constant function
 
@@ -90,43 +90,43 @@ Here is an example of the format understood by *nixdoc*:
 
 ### Multiplicity of formats
 
-Within nixpkgs alone, several conventions for doc-comments have emerged, see [1], [2] and [3].
+Within Nixpkgs alone, several conventions for doc-comments have emerged; see [1], [2] and [3].
 
-Notably, most doc-comments utilize some fraction of the of CommonMark syntax, even if they are not meant to be rendered.
+Notably, most doc-comments utilize some fraction of the CommonMark syntax, even if they are not meant to be rendered.
 
-[1]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/build-support/trivial-builders/default.nix
-[2]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/stdenv/generic/make-derivation.nix
-[3]: https://github.com/NixOS/nixpkgs/blob/master/nixos/lib/make-disk-image.nix
+[1]: https://github.com/NixOS/Nixpkgs/blob/master/pkgs/build-support/trivial-builders/default.nix
+[2]: https://github.com/NixOS/Nixpkgs/blob/master/pkgs/stdenv/generic/make-derivation.nix
+[3]: https://github.com/NixOS/Nixpkgs/blob/master/nixos/lib/make-disk-image.nix
 
-In general, the format for writing documentation strings is **not formally specified**.
+Generally, the format for writing documentation strings is **not formally specified**.
 
-Among the formats encountered in the wild, the one used in `nixpkgs/lib` is the only one intended to be rendered as part of an API documentation, via the nixdoc third-party tool, whose syntax has not been standardized.
+Among the formats encountered in the wild, the one used in `Nixpkgs/lib` is the only one intended to be rendered as part of an API documentation via the nixdoc third-party tool, whose syntax has not been standardized.
 
 ### Impossible to differentiate from internal comments
 
-The lack of a formal definition of a doc-comment also means there is no reliable way to distinguish them from internal comments, which makes it impossible to access from doc-comments from tooling. Futhermore it makes it very hard to generate accurate and complete reference documentation.
+The lack of a formal definition of a doc-comment also means there is no reliable way to distinguish them from internal comments, which makes it impossible to access doc-comments from tooling. Furthermore, it makes it very hard to generate accurate and complete reference documentation.
 
 ### References to the problems above
 
 This curated link collection highlights the Nix ecosystem's inconsistencies, a primary focus of this RFC.
 
-#### nixpkgs - comment examples
+#### Nixpkgs - comment examples
 
-- [lib/attrsets](https://github.com/NixOS/nixpkgs/blob/5323fbf70331f8a7c47f1b4f49841cf74507f77f/lib/attrsets.nix)
-- [trivial-builders](https://github.com/NixOS/nixpkgs/blob/5323fbf70331f8a7c47f1b4f49841cf74507f77f/pkgs/build-support/trivial-builders/default.nix)
-- [stdenv/mkDerivation](https://github.com/NixOS/nixpkgs/blob/5323fbf70331f8a7c47f1b4f49841cf74507f77f/pkgs/stdenv/generic/make-derivation.nix)
-- [nixos/lib/make-disk-image](https://github.com/NixOS/nixpkgs/blob/5323fbf70331f8a7c47f1b4f49841cf74507f77f/nixos/lib/make-disk-image.nix)
+- [lib/attrsets](https://github.com/NixOS/Nixpkgs/blob/5323fbf70331f8a7c47f1b4f49841cf74507f77f/lib/attrsets.nix)
+- [trivial-builders](https://github.com/NixOS/Nixpkgs/blob/5323fbf70331f8a7c47f1b4f49841cf74507f77f/pkgs/build-support/trivial-builders/default.nix)
+- [stdenv/mkDerivation](https://github.com/NixOS/Nixpkgs/blob/5323fbf70331f8a7c47f1b4f49841cf74507f77f/pkgs/stdenv/generic/make-derivation.nix)
+- [nixos/lib/make-disk-image](https://github.com/NixOS/Nixpkgs/blob/5323fbf70331f8a7c47f1b4f49841cf74507f77f/nixos/lib/make-disk-image.nix)
 
 # Design
 [design]: #detailed-design
 
-In the following we give a comprehensive overview to our decision that we've made. Detailed arguments for and against every decision can be found in the [Decisions](#Decisions) section
+In the following, we give a comprehensive overview of the decisions that we've made. Detailed arguments for and against every decision can be found in the [Decisions](#Decisions) section
 
 ## CommonMark
 
 **CommonMark according to [RFC 72](https://github.com/NixOS/rfcs/blob/master/rfcs/0072-commonmark-docs.md) is the content of all doc-comments.**
 
-Adopting CommonMark as the content for all doc-comments brings the benefits of widely accepted and understood documentation format in tech projects, while maintaining profitability and consistency within the Nix ecosystem by aligning with existing [NixOS/RFC-72](https://github.com/NixOS/rfcs/blob/master/rfcs/0072-commonmark-docs.md).
+Adopting CommonMark as the content for all doc-comments brings the benefits of widely accepted and understood documentation format in tech projects while maintaining profitability and consistency within the Nix ecosystem by aligning with existing [NixOS/RFC-72](https://github.com/NixOS/rfcs/blob/master/rfcs/0072-commonmark-docs.md).
 
 ## `/** */` is the doc-comment format
 
@@ -317,8 +317,8 @@ Each subsection here contains a decision along with arguments and counter-argume
 - (+) Allows copy-paste from and to markdown files. We allow easy refactoring if documentation arises and needs to be split into separate files.
 - (-) Strictly binding doc comments content to commonMark might restrict users.
     - (+) Users/Tools can still use regular comments or develop alternative solutions.
-- (-) CommonMark does not specify the current rich features from nixdoc, such as predefined sections and structures that could be used as a source for automated toolings. Such as types for type-checking or examples to run automated-tests
-    - (+) Future tools can still build their conventions on top of this RFC. They might not directly specify them in an RFC but be a tool developers choose for a specific codebase. However, we have yet to get that tools. So it is good when rich features remain unspecified.
+- (-) CommonMark does not specify the current rich features from nixdoc, such as predefined sections and structures that could be used as a source for automated toolings. Such as types for type-checking or examples to run automated tests
+    - (+) Future tools can still build their conventions on top of this RFC. They might not directly specify them in an RFC but be a tool developers choose for a specific codebase. However, we have yet to get those tools. So, it is good when rich features remain unspecified.
   
 </details>
 
@@ -329,15 +329,15 @@ Each subsection here contains a decision along with arguments and counter-argume
 
 This could be (partially) automated. (see our [codemod](https://github.com/nix-community/docnix/tree/3c0531cb5b4c9f3e9069b73d19e6c4be8508d905/codemod) )
 
-Also, the migration could be performed piecemal, starting perhaps with `nixpkgs.lib`.
+Also, the migration could be performed piecemeal, starting perhaps with Nixpkgs `lib`.
 
 See future work.
 
-## Breaking the nixpkgs manual
+## Breaking the Nixpkgs manual
 
-This is a breaking change, to the current nixpkgs manual tooling Nixpkgs library function documentation.
+This is a breaking change to the current Nixpkgs manual tooling Nixpkgs library function documentation.
 
-See future work.
+Please take a look at future work.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -346,7 +346,7 @@ See future work.
 
 | Property / Approach | `##` | `/** */` | `Javadoc` | `/*\|` or `/*^`  | All comments are doc-comments |
 |---|---|---|---|---|---|
-| Inspired by | Rust | Current nixpkgs.lib | C++/Java/Javascript | Haskell Haddock | Current nixpkgs.lib |
+| Inspired by | Rust | Current Nixpkgs `lib` | C++/Java/JavaScript | Haskell Haddock | Current Nixpkgs.lib |
 | Changes the existing code by | Much | Less | Even More | Less | ? |
 | Needs Termination | No | Yes | Yes | Yes | ? |
 | Indentation | Clear | like Nix's multiline strings, thus **Intuitive** | Clear | ? | ? |
@@ -362,14 +362,14 @@ See future work.
 
 **Observing**: From a refactoring perspective, it might also be interesting to see how many conflicts the different formats would cause.
 
-nixpkgs comments:
+Nixpkgs comments:
 
 - `##` ~4k usages
 - `#` ~20k usages
 - `/*` ~6k usages
 - `/**` 160 usages 
 
-Choosing `/**` or subsets would cause minor conflicts within current nixpkgs. While this is NOT the main reason for the final decision, it MUST be considered.
+Choosing `/**` or subsets would cause minor conflicts within current Nixpkgs. While this is NOT the main reason for the final decision, it MUST be considered.
 
 ## Just free text as a content format
 
@@ -381,19 +381,19 @@ This is why we decided to follow this convention. Writing plain text is still po
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-- Migration path for nixpkgs comments. 
-- How to document the `arguments`. Should there be some markdown equivalent to `@param` i.e. `# Params`?  This RFC intentionally leaves this question unanswered, allowing for further discussion and decision-making in the future.
+- Migration path for Nixpkgs comments. 
+- How to document the `arguments`. Should there be some markdown equivalent to `@param`, i.e. `# Params`?  This RFC intentionally leaves this question unanswered, allowing for further discussion and decision-making in the future.
 
 # Future work
 [Future]: #future-work
 
 ## Single-line doc-comments 
 
-Single line doc-comment remained unspecified by this rfc. It might be an option to specify how they behave in the future.
+Single-line doc-comment remained unspecified by this RFC. It might be an option to specify how they behave in the future.
 
-## Migrate existing nixpkgs comments
+## Migrate existing Nixpkgs comments
 
-Reformatting existing doc-comments in nixpkgs.
+Reformatting existing doc-comments in Nixpkgs.
 
 Action points:
 
@@ -402,7 +402,7 @@ Action points:
 
 ### Migration Example
 
-The following shows one of the many possible ways to migrate the current `nixpkgs.lib` comments.
+The following shows one of the many possible ways to migrate the current Nixpkgs `lib` comments.
 
 > We managed to partially automate this effort with a [codemod](https://github.com/nix-community/docnix/tree/3c0531cb5b4c9f3e9069b73d19e6c4be8508d905/codemod)
 
@@ -421,7 +421,7 @@ The following shows one of the many possible ways to migrate the current `nixpkg
      filterAttrs :: (String -> Any -> Bool) -> AttrSet -> AttrSet
 */
 filterAttrs =
-  # Predicate taking an attribute name and an attribute value, which returns `true` to include the attribute, or `false` to exclude the attribute.
+  # Predicate taking an attribute name and an attribute value, which returns `true` to include the attribute or `false` to exclude the attribute.
   pred:
   # The attribute set to filter
   set:
@@ -464,24 +464,24 @@ filterAttrs =
 
 All current rendering tooling solutions should support displaying the specified doc-comment format.
 
-Currently at least:
+Currently, at least:
 
-### nixpkgs Manual renderer
+### Nixpkgs Manual renderer
 
-The current nixpkgs manual needs to be adopted to this change.
+The current Nixpkgs manual needs to be adapted to this change.
 
-We expect changes in the following to be neccessary:
+We expect changes in the following to be necessary:
 
-- [nixos_render_docs](https://github.com/NixOS/nixpkgs/tree/e4082efedb483eb0478c3f014fa851449bca43f9/pkgs/tools/nix/nixos-render-docs/src) 
+- [nixos_render_docs](https://github.com/NixOS/Nixpkgs/tree/e4082efedb483eb0478c3f014fa851449bca43f9/pkgs/tools/nix/nixos-render-docs/src) 
 - [nixdoc](https://github.com/nix-community/nixdoc)
 
 ## Native support in Nix
 
 - `NixOS/nix` should implement native support for doc-comments.
 
-Primarily because the *Nix* language requires access to the actual evaluator for building correct relations between doc-comment and and the node they document.
+Primarily because the *Nix* language requires access to the actual evaluator for building correct relations between doc-comment and the node they document.
 
-> Note: We considered implementation details, but specifying those is out of scope for this rfc.
+> Note: We considered implementation details, but specifying those is out of the scope of this RFC.
 
 Related POCs:
 
@@ -516,4 +516,4 @@ Related POCs:
 - https://github.com/NixOS/nix/pull/5527
 - https://github.com/NixOS/nix/pull/1652 
 
-[#1652](https://github.com/NixOS/nix/pull/1652) gets closest what this RFC imagines, implementation is almost done. It certainly has some limitations, but was not merged due to uncertainty and complexity. 
+[#1652](https://github.com/NixOS/nix/pull/1652) gets closest to what this RFC imagines, implementation is almost done. It has some limitations but was not merged due to uncertainty and complexity. 
