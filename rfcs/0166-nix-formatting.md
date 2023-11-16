@@ -157,7 +157,7 @@ the official Nix formatter must be used.
 
 ### Git blames
 
-Reformatting commits that get added to `.git-ignore-revs` [won't get shown](https://docs.github.com/en/repositories/working-with-files/using-files/viewing-a-file#ignore-commits-in-the-blame-view) in blames on GitHub,
+Reformatting commits that get added to `.git-blame-ignore-revs` [won't get shown](https://docs.github.com/en/repositories/working-with-files/using-files/viewing-a-file#ignore-commits-in-the-blame-view) in blames on GitHub,
 and can be ignored in the `git blame` command using [`--ignore-revs-file`](https://www.git-scm.com/docs/git-blame#Documentation/git-blame.txt---ignore-revs-fileltfilegt).
 
 ### Formatting gotchas requiring manual intervention
