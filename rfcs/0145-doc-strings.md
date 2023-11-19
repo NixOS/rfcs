@@ -475,21 +475,6 @@ We expect changes in the following to be necessary:
 - [nixos_render_docs](https://github.com/NixOS/Nixpkgs/tree/e4082efedb483eb0478c3f014fa851449bca43f9/pkgs/tools/nix/nixos-render-docs/src) 
 - [nixdoc](https://github.com/nix-community/nixdoc)
 
-## Native support in Nix
-
-- `NixOS/nix` should implement native support for doc-comments.
-
-Primarily because the *Nix* language requires access to the actual evaluator for building correct relations between doc-comment and the node they document.
-
-> Note: We considered implementation details, but specifying those is out of the scope of this RFC.
-
-Related POCs:
-
-- https://github.com/NixOS/nix/pull/9054
-- https://github.com/NixOS/nix/pull/1652
-- https://github.com/NixOS/nix/pull/5527
-- https://github.com/NixOS/nix/commit/8e252320f52426c734883709eb398d2161c3fe82
-
 ## References
 
 ### Other Conventions
