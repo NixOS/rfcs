@@ -367,9 +367,11 @@ Nixpkgs comments:
 - `##` ~4k usages
 - `#` ~20k usages
 - `/*` ~6k usages
-- `/**` 160 usages 
+- `/**` 160 usages
+   - `/**{content}*/` 10 usages. Need to be migrated, if using different convention.
+   - `/**/` 35 usages. They still are non-doc-comments
 
-Choosing `/**` or subsets would cause minor conflicts within current Nixpkgs. While this is NOT the main reason for the final decision, it MUST be considered.
+Choosing `/**` or subsets would cause minor conflicts within current Nixpkgs. While this is NOT the main reason for the final decision, it must be considered.
 
 ## Just free text as a content format
 
