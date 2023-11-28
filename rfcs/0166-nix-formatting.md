@@ -402,7 +402,7 @@ For sequences of items in expressions, like elements in a list, key-value pairs 
     foo
     bar
     baz
-  ;
+    ;
 }
 ```
 
@@ -902,11 +902,9 @@ else
   [ x y ]
   ```
 
-### Bindings and inherit
+### Bindings
 
 Let bindings and attribute sets share the same syntax for their items, which is discussed here together.
-
-#### Bindings
 
 **Description**
 
@@ -931,8 +929,7 @@ foo =
   function
     arg1
     arg2
-    arg3
-;
+    arg3;
 
 #5 simple function arguments (<=2) start on the same line
 add = x: y: {
@@ -994,51 +991,7 @@ some.very.long.attr = callFunction
   arg3;
 ```
 
-#### inherit
-
-**Description**
-
-The items are either all on the same line, or all on a new line each (with indentation).
-
-**Examples**
-
-```nix
-inherit foo bar baz;
-inherit
-  foo'
-  bar'
-  baz'
-;
-```
-
-#### inherit from
-
-**Description**
-
-- If the inherit source is single-line, it is placed on the same line as the `inherit`, even if the following items do not fit onto one line.
-- Otherwise, it starts on a new line with indentation, like the others.
-  - In that case, the remaining items are force-expanded too, even if they would have fit onto one line in the first place.
-
-**Examples**
-
-```nix
-inherit (pkgs) ap1 ap2 ap3;
-inherit (pkgs)
-  app1
-  app2
-  # …
-  app42
-;
-inherit
-  (pkgs.callPackage ./foo.nix {
-    arg = "val";
-  })
-  attr1
-  attr2
-;
-```
-
-#### Semicolon placement
+#### Bindings semicolon placement
 
 **Description**
 
@@ -1108,13 +1061,6 @@ There are four considered semicolon styles:
 2. On a new line with one indentation level.
   - Just as wasteful on space as (1), but a bit less clear about signaling the end of the binding.
   ```nix
-  inherit (pkgs)
-    app1
-    app2
-    # …
-    app42
-    ;
-
   attr3 =
     function call
       many
@@ -1147,3 +1093,48 @@ There are four considered semicolon styles:
        && cond3
    ;
    ```
+
+### inherit
+
+**Description**
+
+- The items are either all on the same line, or all on a new line each (with indentation).
+- The semicolon is on its own line with indentation.
+
+**Examples**
+
+```nix
+inherit foo bar baz;
+inherit
+  foo'
+  bar'
+  baz'
+  ;
+```
+
+#### inherit from
+
+**Description**
+
+- If the inherit source is single-line, it is placed on the same line as the `inherit`, even if the following items do not fit onto one line.
+- Otherwise, it starts on a new line with indentation, like the others.
+  - In that case, the remaining items are force-expanded too, even if they would have fit onto one line in the first place.
+
+**Examples**
+
+```nix
+inherit (pkgs) ap1 ap2 ap3;
+inherit (pkgs)
+  app1
+  app2
+  # …
+  app42
+  ;
+inherit
+  (pkgs.callPackage ./foo.nix {
+    arg = "val";
+  })
+  attr1
+  attr2
+  ;
+```
