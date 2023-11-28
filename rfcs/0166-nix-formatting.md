@@ -713,16 +713,87 @@ else
 
 **Description**
 
-- The body after the statement starts on a new line, without indentation.
-- There may be exceptions for common idioms, in which the body already starts on the same line.
+- If the body is `{ ... }`, `[ ... ]`, `( ... )` or `'' ... ''`, and the `with attrs;`/`assert cond;` does _not_ start on a new line (e.g. `foo = with; …`), then the body will start on that same line too.
+- Otherwise, the body of `with attrs;`/`assert cond;` starts on a new line (and without any additional indentation).
+
+```
+{
+  # Good
+  foo =
+    assert foo == bar;
+    with bar;
+    [
+      # multiline
+      baz
+    ]
+
+  # Good
+  foo = with bar; [
+    # multiline
+    baz
+  ];
+  
+  # Good
+  foo =
+    with bar;
+    baz foo {
+      # multiline
+      qux = 10;
+    }
+    
+  # Good
+  foo = with bar; (
+    baz
+  );
+
+  # Good
+  foo =
+    with bar;
+    if cond then
+      foo
+    else
+      bar;
+  
+  # Bad
+  foo = assert qux; with bar; [
+    # multiline
+    baz
+  ];
+  
+  # Bad
+  foo = with bar;
+    [
+      # multiline
+      baz
+    ];
+
+  # Bad
+  foo =
+    with bar; [
+      # multiline
+      baz
+    ];
+}
+```
 
 **Examples**
 
 ```nix
 with pkgs;
-assert foo == bar; {
+assert foo == bar;
+{
+  meta.maintainers = with lib.maintainers; [
+    some
+    people
+  ];
+}
+
+with pkgs;
+assert foo == bar;
+{
   meta.maintainers =
-    with lib.maintainers; [
+    with lib.maintainers;
+    [
       some
       people
     ];
