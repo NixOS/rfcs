@@ -829,9 +829,7 @@ else
 - Brackets and braces are generally written with a space on the inside, like `[ `, ` ]`, `{ ` and ` }`.
   - Empty lists and attribute sets are written as`[ ]` and`{ }`, respectively.
 - Lists and attribute sets with multiple items are liberally expanded.
-  - They can only be on a single line if:
-    - They contain at most one element
-    - Fit on the line
+  - They can only be on a single line if they fit on the line and contain few enough elements.
   - As described under [Binders](#binders) below, nested attribute sets are always expanded.
 
 **Examples**
