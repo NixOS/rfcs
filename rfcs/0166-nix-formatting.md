@@ -566,7 +566,7 @@ If an operator chain does not fit onto one line, it is expanded such that every 
 - If the operand can also fit on the same line as the operator, it's put there
 - Otherwise, the operand usually starts indented on a new line, with special handling for parenthesis, brackets, braces, function applications
 
-Operator chains in binders may be compacted as long as all lines between the first and last one are indented.
+Operator chains in bindings may be compacted as long as all lines between the first and last one are indented.
 
 **Examples**
 
@@ -603,7 +603,7 @@ foo
     ''
     test
 
-# In binders we can use a more compact form as long as all in-between lines are indented.
+# In bindings we can use a more compact form as long as all in-between lines are indented.
 {
   foo = bar // {
     x = 10;
@@ -807,7 +807,7 @@ assert foo == bar;
 - Let bindings are *always* multiline.
 - The "let" part is indented one level, but not the "in" part.
 - Each item in the "let" part is indented and starts on its own line.
-  For more details, see the [binders section](#binders).
+  For more details, see the [bindings section](#bindings).
 - The "in" part starts on a new line.
 
 **Examples**
@@ -830,7 +830,7 @@ else
   - Empty lists and attribute sets are written as`[ ]` and`{ }`, respectively.
 - Lists and attribute sets with multiple items are liberally expanded.
   - They can only be on a single line if they fit on the line and contain few enough elements.
-  - As described under [Binders](#binders) below, nested attribute sets are always expanded.
+  - As described under [bindings](#bindings) below, nested attribute sets are always expanded.
 
 **Examples**
 
@@ -902,15 +902,15 @@ else
   [ x y ]
   ```
 
-### Binders and inherit
+### Bindings and inherit
 
 Let bindings and attribute sets share the same syntax for their items, which is discussed here together.
 
-#### Binders
+#### Bindings
 
 **Description**
 
-Binders have the most special cases to accommodate for many common Nixpkgs idioms.
+Bindings have the most special cases to accommodate for many common Nixpkgs idioms.
 Generally, the following styles exist, which are used depending on the kind and size of the value:
 
 ```nix
@@ -985,7 +985,7 @@ Notable special cases are:
 
 **Alternatives**
 
-One could eliminate style #2 by having #4 always start on the first line. This would even reduce indentation in some cases. However, this may look really weird in other cases, especially when the binder is very long:
+One could eliminate style #2 by having #4 always start on the first line. This would even reduce indentation in some cases. However, this may look really weird in other cases, especially when the binding is very long:
 
 ```nix
 some.very.long.attr = callFunction
@@ -1121,7 +1121,7 @@ There are four considered semicolon styles:
       arguments
     ;
   ```
-3. A mix of (1) and (2), where usually the semicolon is placed directly at the end of the binder.
+3. A mix of (1) and (2), where usually the semicolon is placed directly at the end of the binding.
    But with exceptions in which the semicolon is placed onto the following line instead in cases where the value is a multiline `if` expression or nested operator.
    These are the only syntax elements that may result in the semicolon being placed on a line with arbitrarily deep indentation.
    
