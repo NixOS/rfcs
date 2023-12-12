@@ -30,6 +30,7 @@ There are several auto-formatters for Nix code, each with their own style, and n
 
 The goals of this RFC are:
 
+- People should not be bothered with formatting.
 - We want to prevent future debate around how things should be formatted.
 - We want to make it as easy as possible for contributors (especially new ones) to make changes without having to worry about formatting.
 - Conversely, reviewers should not be bothered with poorly formatted contributions.
@@ -260,8 +261,35 @@ Terms and definitions:
 - Braces: `{}`
 - Parentheses: `()`
 
-- Newlines are not guaranteed to be preserved, but empty lines are.
+- Line breaks may not be preserved, but empty lines must always be preserved.
   - This allows the formatter to compact down multi-line expressions if necessary, while still allowing to structure the code appropriately.
+  - Multiple subsequent empty lines must get collapsed into a single one.
+
+    For example, formatting this code:
+    ```nix
+    [
+      0
+      10
+      
+      20
+      
+      
+      30
+    ]
+    ```
+
+    turns into this:
+    ```nix
+    [
+      0
+      10
+      
+      20
+      
+      30
+    ]
+    ```
+
 - Expressions of the same kind that can be treated as a sequence of expressions on the same level should be treated as such, even though they are technically parsed as a nested tree.
   - This applies to else-if chains, functions with multiple arguments, some operators, etc.
   - Example:
