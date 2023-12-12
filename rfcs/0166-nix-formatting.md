@@ -410,7 +410,7 @@ Unless stated otherwise, any expression that fits onto one single line will be t
 
 For sequences of items in expressions, like elements in a list, key-value pairs in attribute sets, or function arguments, the following applies:
 
-- If expanded into with multiple lines, each item should be on its own line.
+- If expanded into multiple lines, each item should be on its own line.
   - Grouping similar items together can be done by adding blank lines or comments between the groups instead.
   - This also applies to the first item, so e.g. `[ firstElement` in a multi line list is not allowed.
 - Long sequences of items may be liberally expanded, even if they would fit onto one line character-wise.
@@ -572,7 +572,10 @@ name: value:
 
 **Rationale and alternatives**
 
-- Have leading commas for parameters in attribute set arguments, like currently done in Nixpkgs
+- Have leading commas for parameters in attribute set arguments, like currently done in Nixpkgs.
+
+  - This makes attribute set arguments less likely to be confused with lists.
+  - It's easier to see where arguments start and end.
   ```nix
   #6
   { some
@@ -591,10 +594,13 @@ name: value:
   }:
   # …
   ```
-  - This leads to problems with the first argument, as leading commas are not allowed. `{ some` is discouraged by the style guidelines; `some` should start on a new line instead. Also, this does not work well with `@` bindings.
+
+  Problems with this alternative:
+  - Moving items around with this style may require editing lines.
+  - Inconsistent with the [expression expansion guidelines](#expansion-of-expressions), which disallows forms like `{ some`; `some` should start on a new line instead.
+  - This does not work well with leading `@` bindings.
   - The currently suggested style for commenting items in the Nixpkgs manual (depicted here in `#7`) is not great. However, there are no other good solutions with leading comma style that don't run into other problems.
   - The leading comma style was a lesser-evil workaround for the lack of trailing commas in the Nix language. Now that the language has this feature, there is no reason to keep it that way anymore.
-
 
 ### Operators
 
