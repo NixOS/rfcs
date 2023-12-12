@@ -804,11 +804,20 @@ assert foo == bar;
 
 **Description**
 
+Let bindings always have this form:
+```
+let
+  <name1> = <value1>;
+  <name2> = <value2>;
+  ...
+in
+<body>
+```
+
 - Let bindings are *always* multiline.
-- The "let" part is indented one level, but not the "in" part.
-- Each item in the "let" part is indented and starts on its own line.
+- Each binding is indented and starts on its own line.
   For more details, see the [bindings section](#bindings).
-- The "in" part starts on a new line.
+- The `<body>` always starts on a new line and is not indented.
 
 **Examples**
 
@@ -821,6 +830,39 @@ if foo == "bar" then
 else
   "world"
 ```
+
+**Alternatives**
+
+- To allow having the `<body>` be on the same line as the `in`:
+  ```
+  let
+    <name1> = <value1>;
+    <name2> = <value2>;
+    ...
+  in <body>
+  ```
+
+  In particular when `<body>` is an identifier, list, attribute set and/or others.
+
+  Problems with this alternative:
+  - It leads to larger diffs when inserting something after the `in`
+  - The formatting can change when `<body>` is updated
+  - It's less consistent, since the formatting depends on the `<body>`
+
+- The body could be indented by a level
+  ```
+  let
+    <name1> = <value1>;
+    <name2> = <value2>;
+    ...
+  in
+    <body>
+  ```
+  
+  Problems with this alternative:
+  - Leads to indentation creeps
+  - Inconsistent with other expressions that have a `<body>` that is "returned"
+  - Favors a style where the body starts on the same line as the in for some values (e.g. attribute sets) to reduce an indentation level, see above.
 
 ### Attribute sets and lists
 
