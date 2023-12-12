@@ -303,6 +303,18 @@ Terms and definitions:
       baz
     ```
 
+### Editor Config
+
+This [editor config](https://editorconfig.org/) specifies the basic details about Nix files:
+
+```toml
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+charset = utf-8
+indent_style = space
+```
+
 ### Single-line common ancestor expression rule
 
 For any two (sub-)expressions that are fully on a common single line, their smallest common ancestor expression must also be on the same line.
