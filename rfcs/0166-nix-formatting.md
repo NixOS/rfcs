@@ -4,8 +4,8 @@ start-date: 2021-08-17
 author: piegamesde
 co-authors: infinisil
 pre-RFC reviewers: tomberek, 0x4A6F
-shepherd-team:
-shepherd-leader:
+shepherd-team: das_j, tomberek, 0x4A6F, infinisil
+shepherd-leader: infinisil
 related-issues: https://github.com/serokell/nixfmt/pull/118, https://github.com/piegamesde/nixpkgs/pull/4
 ---
 
