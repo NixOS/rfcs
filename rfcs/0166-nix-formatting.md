@@ -262,34 +262,34 @@ Terms and definitions:
 - Braces: `{}`
 - Parentheses: `()`
 
-- Line breaks may not be preserved, but empty lines must always be preserved.
-  - This allows the formatter to compact down multi-line expressions if necessary, while still allowing to structure the code appropriately.
-  - Multiple subsequent empty lines must get collapsed into a single one.
+- Line breaks may be added or removed, but empty lines must not be created. Single empty lines must be preserved, and consecutive empty lines must be turned into a single empty line.
+  This allows the formatter to expand or compact multi-line expressions, while still allowing grouping of code.
 
-    For example, formatting this code:
-    ```nix
-    [
-      0
-      10
-      
-      20
-      
-      
-      30
-    ]
-    ```
+  For example, formatting this code:
+  ```nix
+  [
+    0 10
 
-    turns into this:
-    ```nix
-    [
-      0
-      10
-      
-      20
-      
-      30
-    ]
-    ```
+    (
+      20 + 1
+    )
+
+
+    30
+  ]
+  ```
+
+  turns into this:
+  ```nix
+  [
+    0  # Line break added
+    10
+
+    (20 + 1) # Line breaks removed
+             # Consecutive empty lines turned into a single empty line
+    30
+  ]
+  ```
 
 - Expressions of the same kind that can be treated as a sequence of expressions on the same level should be treated as such, even though they are technically parsed as a nested tree.
   - This applies to else-if chains, functions with multiple arguments, some operators, etc.
@@ -303,6 +303,30 @@ Terms and definitions:
     else
       baz
     ```
+
+- Indentation should reflect the expression structure.
+  Example:
+  ```nix
+  # Bad, the indentation misleads the user
+  {
+    foo = {
+    bar = if
+    baz == null then 10
+      else 20
+    ;
+  }; }
+
+  # Good
+  {
+    foo = {
+      bar =
+        if baz == null then
+          10
+        else
+          20;
+    };
+  }
+  ```
 
 ### Editor Config
 
@@ -344,16 +368,16 @@ This rule has turned out to be very practical at catching code that could be pot
 
 ### Line length
 
-Lines have a soft length limit that doesn't count indentation.
-There may also be a hard length limit that includes indentation.
-String-like values such as strings, paths, comments, urls, etc. may go over the hard length limit.
-These limits should be configurable, and the soft length limit should default to 100 characters.
+- There should be a configurable _soft_ line length limit, limiting the number of characters on one line without counting the leading indentation.
+  The default should be 100 characters.
+- There may also be a configurable _hard_ line length limit, which includes the leading indentation.
+- String-like values such as strings, paths, comments, urls, etc. may go over the hard line length limit.
 
 ### Indentation
 
-- Two spaces are used for each indentation level.
+- Two spaces must be used for each indentation level.
   - This may be revisited should Nix get proper support for [using tabs for indentation](https://github.com/NixOS/nix/issues/7834) in the future.
-- Vertical alignment may not be persisted, neither at the start of the line nor within lines.
+- Vertical alignment must be ignored, both at the start of the line and within lines.
   - Examples:
     ```nix
     {
@@ -371,23 +395,22 @@ These limits should be configurable, and the soft length limit should default to
                            kernel.execFormat.name;
     }
     ```
-- Indentation levels *must not* be "skipped", i.e. on subsequent lines, indentation can only increase by at most one level, but may decrease arbitrarily many levels.
-  - In other words: a line on indentation level 6 could be followed by a line on indentation level 1, but not the other way around.
+- Increasing indentation levels must not be "skipped": On subsequent lines, indentation can only increase by at most one level, but may decrease arbitrarily many levels.
   - Examples:
     ```nix
     buildInputs = [
-        foo # <--
+        foo # <-- Bad, indentation increases by 2 levels
       ] // lib.optionals cond [
         bar
       ];
 
     attribute = { args }: let
-        foo = "bar" # <--
+        foo = "bar" # <-- Bad, indentation increases by 2 levels
       in
         foo;
 
     (callFunction {
-        foo = "bar"; # <--
+        foo = "bar"; # <-- Bad, indentation increases by 2 levels
       }
       arg
     )
@@ -398,23 +421,21 @@ These limits should be configurable, and the soft length limit should default to
         a = foo
           bar
           baz;
-      }; # <-- The decrease by two levels here is okay though
+      }; # <-- The decrease by two levels here is okay
     in
     null
     ```
 
 ### Expansion of expressions
 
-**Description**
+Unless stated otherwise, any expression that fits onto one single line must be trivially formatted as such.
 
-Unless stated otherwise, any expression that fits onto one single line will be trivially formatted as such.
+For list elements, attributes, and function arguments, the following applies:
 
-For sequences of items in expressions, like elements in a list, key-value pairs in attribute sets, or function arguments, the following applies:
-
-- If expanded into multiple lines, each item should be on its own line.
+- If expanded into multiple lines, each item must be on its own line.
   - Grouping similar items together can be done by adding blank lines or comments between the groups instead.
   - This also applies to the first item, so e.g. `[ firstElement` in a multi line list is not allowed.
-- Long sequences of items may be liberally expanded, even if they would fit onto one line character-wise.
+- Long sequences of items should be liberally expanded, even if they would fit onto one line character-wise.
   - The motivation is to keep the information per line manageable. Usually "number of elements" is a better metric for that than "line length".
   - The cutoff is usually determined empirically based on common usage patterns.
 
@@ -422,7 +443,6 @@ For sequences of items in expressions, like elements in a list, key-value pairs 
 
 ```nix
 {
-  #1
   buildInputs = [
     foo
     bar
@@ -431,13 +451,11 @@ For sequences of items in expressions, like elements in a list, key-value pairs 
     somethingElse
   ];
 
-  #2
   systemd.services = {
     foo = { };
     bar = { };
   };
 
-  #3
   inherit
     lib
     foo
@@ -449,44 +467,38 @@ For sequences of items in expressions, like elements in a list, key-value pairs 
 
 ### Function application
 
-**Description:**
-
 - In a function application chain, the first element is treated as the "function" and the remaining ones as "arguments".
-- The last argument receives special treatment, to better represent common coding patterns.
-- As many arguments as possible are fit onto the first line.
-  - If all but the last argument do fit, then the last argument may start on the same line.
-  - If an earlier argument does not fit onto the first line, then itself and all the following ones start on a new line. This is called the expanded form.
-  - All arguments that are not on the same line as the function are indented by one level.
+- As many arguments as possible must be fit onto the first line.
+  - If all but the last argument do fit, then the last argument may also start on the first line.
+  - If an earlier argument does not fit onto the first line, then that argument and all the following ones must start on their own line.
+  - All arguments that are not on the same line as the function must be indented by one level.
 
 **Examples:**
 
 ```nix
-#1
+# All arguments fit onto the first line
 function arg1 arg2
 
-#2
+# The line length limit is reached, so the remaining arguments need to be on their own lines
+function arg1 arg2 arg3
+  arg4
+  arg5
+
+# The last argument is a multiline expression, so it doesn't fit on the first line,
+# but it can still start on the first line
 function arg1 arg2 {
   more = "things";
 }
 
-#3
-function arg1 arg2 arg3 # reached line limit here
-  arg4
-  arg5
-  [
-    1
-    2
-  ]
-  arg7
-
-#4 All arguments that don't fit on the same line, start indented on a new line
-function arg1
+# The second argument doesn't fit on the first line, but it's not the last argument,
+# so it needs to start on a new line
+function arg1 arg2
   {
-    # items that don't fit on same line
+    more = "things";
   }
   arg3
 
-#5
+# Same with more multiline arguments
 function
   {
     a = 1;
@@ -496,28 +508,21 @@ function
     c = 1;
     d = 2;
   }
-
-#6 (with "--width=20")
-function arg1 (
-  function2 args
-)
 ```
 
 **Drawbacks**
 
 - This style sometimes forces lists or attribute sets to start on a new line, with additional indentation of their items.
 
-**Rationale and alternatives**
+**Alternatives**
 
 - Not indenting the arguments, to save some indentation depth. This would be consistent with other constructs like function declarations and let bindings.
 - Compacting multiline arguments like this:
   ```nix
-  #4b
   function arg1 {
     # stuff
   } arg3
 
-  #5b
   function {
     # …
   } {
@@ -525,17 +530,15 @@ function arg1 (
   }
   ```
   - This violates the guideline of the indentation representing the expression structure, and thus reduces readability.
-  - This does not work well with line length limits on short arguments like in example #3.
+  - This does not work well with line length limits on short arguments (TODO: What does this mean?)
 
 ### Function declaration
 
-**Description**
-
-- The body of the function is not indented relative to its arguments.
-- Multiple ("simple") identifier arguments are written onto the same line if possible.
-- Attribute set arguments always start on a new line; they are not mixed with identifier arguments.
-  - If they have few attributes, the argument may be written on a single line, otherwise the expanded form is used.
-- Attribute set arguments have their attributes on a new line each with indentation, followed by a trailing comma.
+- The body of the function must not be indented relative to its first arguments.
+- Multiple ("simple") identifier arguments are written onto the same line if possible. TODO: What if it's not possible?
+- Attribute set arguments must always start on a new line and they must not be mixed with identifier arguments.
+  - If they have few attributes, the argument may be written on a single line
+  - Otherwise each attribute must be on its own line with indentation, followed by a trailing comma.
 
 **Examples**
 
@@ -571,22 +574,21 @@ name: value:
 }
 ```
 
-**Rationale and alternatives**
+**Alternatives**
 
 - Have leading commas for parameters in attribute set arguments, like currently done in Nixpkgs.
 
   - This makes attribute set arguments less likely to be confused with lists.
   - It's easier to see where arguments start and end.
   ```nix
-  #6
   { some
   , arg
   }:
-  #7
+  
   args@{
     some
   , argument
-  # Single line comment
+    # Single line comment
   , commentedArgument
   , # Comment on the value
     # multiline comment
@@ -600,18 +602,16 @@ name: value:
   - Moving items around with this style may require editing lines.
   - Inconsistent with the [expression expansion guidelines](#expansion-of-expressions), which disallows forms like `{ some`; `some` should start on a new line instead.
   - This does not work well with leading `@` bindings.
-  - The currently suggested style for commenting items in the Nixpkgs manual (depicted here in `#7`) is not great. However, there are no other good solutions with leading comma style that don't run into other problems.
+  - It's unclear whether comments belong to the next or the previous argument.
   - The leading comma style was a lesser-evil workaround for the lack of trailing commas in the Nix language. Now that the language has this feature, there is no reason to keep it that way anymore.
 
 ### Operators
 
-**Description**
+Chained binary associative [operators](https://nixos.org/manual/nix/stable/language/operators.html#operators) (except [function application](#function-application)) with the same or monotonically decreasing precedence must be treated together as a single operator chain.
 
-Chained binary associative [operators](https://nixos.org/manual/nix/stable/language/operators.html#operators) (except [function application](#function-application)) with the same or monotonically decreasing precedence are treated as one.
-
-If an operator chain does not fit onto one line, it is expanded such that every operator starts a new line:
-- If the operand can also fit on the same line as the operator, it's put there
-- Otherwise, the operand usually starts indented on a new line, with special handling for parenthesis, brackets, braces, function applications
+If an operator chain does not fit onto one line, it must be expanded such that every operator starts a new line:
+- If the operand can also fit on the same line as the operator, it must be put there
+- Otherwise, the operand must start indented on a new line, with exceptions for parenthesis, brackets, braces and function applications
 
 Operator chains in bindings may be compacted as long as all lines between the first and last one are indented.
 
@@ -684,19 +684,18 @@ foo
 }
 ```
 
-### if
+### if-then-else
 
-**Description**
-
-- `if` and `else` keywords always start a line, the if and else bodies are indented.
+- `if` and `else` keywords must always start a line.
+- The `if` and `else` bodies must always be indented.
 - If the condition does not fit onto one line, then it will start on the next line with indentation, and `then` will be on the start of the line following the condition.
 - `else if` chains are treated as one long sequence, with no indentation creep on each step.
-- Only simple `if` statement can be single-line, no `else if` chains.
+- `else if` chains must not be on a single line.
 
 **Examples**
 
 ```nix
-#1
+# Condition fits on one line
 if builtins.length matches != 0 then
   { inherit path matches; }
 else if path == /. then
@@ -707,7 +706,7 @@ else if path == /. then
 else
   go (dirOf path);
 
-#2
+# Condition doesn't fit onto one line
 if
   matches != null
   && builtins.length matches != 0
@@ -719,9 +718,9 @@ else
   go (dirOf path);
 ```
 
-**Rationale and alternatives**
+**Alternatives**
 
-- Attribute sets and lists could start on the same line as the if keywords, saving an indentation level on their body:
+- Attribute sets and lists could start on the same line as the `if` keywords, saving an indentation level on their body:
   ```nix  
   #1a
   if builtins.length matches != 0 then {
@@ -758,12 +757,11 @@ else
 
 ### with, assert
 
-**Description**
+- If the body is `{ ... }`, `[ ... ]`, `( ... )` or `'' ... ''`, and the `with attrs;`/`assert cond;` does _not_ start on a new line (e.g. `foo = with; …`), then the body must start on that same line too.
+  TODO: What does it mean for it to "not start on a new line"? This really depends on what the surrounding expression is. Notably bindings yes, anything else?
+- Otherwise, the body of `with attrs;`/`assert cond;` must start on a new line without any additional indentation.
 
-- If the body is `{ ... }`, `[ ... ]`, `( ... )` or `'' ... ''`, and the `with attrs;`/`assert cond;` does _not_ start on a new line (e.g. `foo = with; …`), then the body will start on that same line too.
-- Otherwise, the body of `with attrs;`/`assert cond;` starts on a new line (and without any additional indentation).
-
-```
+```nix
 {
   # Good
   foo =
@@ -787,11 +785,6 @@ else
       # multiline
       qux = 10;
     }
-    
-  # Good
-  foo = with bar; (
-    baz
-  );
 
   # Good
   foo =
@@ -847,11 +840,9 @@ assert foo == bar;
 }
 ```
 
-### let
+### let-in
 
-**Description**
-
-Let bindings always have this form:
+Let bindings must always have this form:
 ```
 let
   <name1> = <value1>;
@@ -913,18 +904,15 @@ else
 
 ### Attribute sets and lists
 
-**Description**
-
-- Brackets and braces are generally written with a space on the inside, like `[ `, ` ]`, `{ ` and ` }`.
-  - Empty lists and attribute sets are written as`[ ]` and`{ }`, respectively.
-- Lists and attribute sets with multiple items are liberally expanded.
+- Brackets and braces must always have a space (or line break) on the inside, like `[ `, ` ]`, `{ ` and ` }`.
+  - Empty lists and attribute sets are written as `[ ]` and `{ }`, respectively.
+- Lists and attribute sets with multiple items should be liberally expanded.
   - They can only be on a single line if they fit on the line and contain few enough elements.
   - As described under [bindings](#bindings) below, nested attribute sets are always expanded.
 
 **Examples**
 
 ```nix
-#1
 [
   { }
   { foo = "bar"; }
@@ -936,7 +924,6 @@ else
   { foo.bar = "baz"; }
 ]
 
-#2
 [
   [ 1 ]
   [
@@ -945,7 +932,6 @@ else
   ]
 ]
 
-#3
 [
   [
     1
@@ -954,7 +940,6 @@ else
   ]
 ]
 
-#4
 [
   {
     mySingletons = [
@@ -978,7 +963,7 @@ else
 
 - Singleton lists may use a lot of indentation
 
-**Rationale and alternatives**
+**Alternatives**
 
 - Have a special compact form for singleton lists, to reduce the indentation level and remove two additional lines
   ```nix
@@ -986,19 +971,15 @@ else
     # content
   } ];
   ```
-- Be a bit less eager about expanding lists and attribute sets (for example by allowing up to n elements on a single line).
-  ```nix
-  [ x y ]
-  ```
 
 ### Bindings
 
 Let bindings and attribute sets share the same syntax for their items, which is discussed here together.
 
-**Description**
-
 Bindings have the most special cases to accommodate for many common Nixpkgs idioms.
 Generally, the following styles exist, which are used depending on the kind and size of the value:
+
+TODO: This entire section doesn't have any real specification and is rather unclear on details
 
 ```nix
 #1 single line
@@ -1051,7 +1032,7 @@ outputs =
 Notable special cases are:
 
 - Single line values that would not benefit from style #2 keep using #1, even if this makes it go above the line limit. This mostly applies to simple strings and paths.
-- Attribute set values are *always* expanded. This has the consequence of always forcing nested attribute sets to be multiline (even if they would be single line otherwise because they only contain a single item), which usually is desired.
+- Attribute set values must always be expanded. This has the consequence of always forcing nested attribute sets to be multiline (even if they would be single line otherwise because they only contain a single item), which usually is desired.
   ```nix
   {
     foo.bar.baz = "qux";
@@ -1082,9 +1063,7 @@ some.very.long.attr = callFunction
 
 #### Bindings semicolon placement
 
-**Description**
-
-The semicolon is always placed on the same line as the expression it concludes.
+The semicolon in bindings must always be placed on the same line as the expression it concludes.
 
 **Examples**
 
@@ -1128,10 +1107,9 @@ The semicolon is always placed on the same line as the expression it concludes.
 }
 ```
 
-**Rationale and alternatives**
+**Alternatives**
 
 
-There are four considered semicolon styles:
 1. On a new line without indentation.
   - This clearly marks a separation between attributes, however it is wasteful of space.
   ```nix
@@ -1185,10 +1163,8 @@ There are four considered semicolon styles:
 
 ### inherit
 
-**Description**
-
-- The items are either all on the same line, or all on a new line each (with indentation).
-- The semicolon is on its own line with indentation.
+The items must either be all on the same line, or all on a new line each (with indentation),
+in which case the semicolon must be on its own line with indentation.
 
 **Examples**
 
@@ -1203,11 +1179,16 @@ inherit
 
 #### inherit from
 
-**Description**
 
-- If the inherit source is single-line, it is placed on the same line as the `inherit`, even if the following items do not fit onto one line.
-- Otherwise, it starts on a new line with indentation, like the others.
-  - In that case, the remaining items are force-expanded too, even if they would have fit onto one line in the first place.
+For a fragment like this:
+```
+inherit (<source>) <attr1> ... <attrn>;
+```
+
+- If the entire fragment fits in the first line, it must be formatted as such.
+- Otherwise if only `inherit (<source>)` fits into the first line, it must be formatted as such,
+  with the same style as the normal `inherit` for the attributes.
+- Otherwise the `(<source>)` must also be on its own line.
 
 **Examples**
 
