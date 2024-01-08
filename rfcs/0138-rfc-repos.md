@@ -17,8 +17,13 @@ Develop and discuss RFCs in repositories instead of a pull request.
 [motivation]: #motivation
 
 RFC discussions are currently held in single pull requests on the [rfcs](https://github.com/NixOS/rfcs/pulls) repository.
-Due to GitHub's limitations on pull requests, this quickly becomes unmanageable.
-The most prominent example of this is [the Flakes RFC](https://github.com/NixOS/rfcs/pull/49) with over 500 comments.
+- Due to GitHub's limitations on pull requests, this quickly becomes unmanageable.
+  The most prominent example of this is [the Flakes RFC](https://github.com/NixOS/rfcs/pull/49) with over 500 comments.
+- These PR threads easily get polluted with minor points like typos and wording improvements,
+  which are not meaningful to the RFCs contents, but distract from other more important discussions.
+- It's easiest to comment at the top-level, without threads,
+  especially when there's no relevant line of the diff to comment on for a thread.
+  This frequently causes multiple discussions to be interleaved at the top-level.
 
 # Detailed design
 [design]: #detailed-design
