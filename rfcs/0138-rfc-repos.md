@@ -65,6 +65,13 @@ Once the RFC is merged, the repository has to be transferred to the NixOS organi
 - There's no line-comment view anymore (the "Files changed" tab for PR's), where you can see the entire proposal and all (up-to-date) line comments.
 - Commenting on an RFC won't automatically subscribe you to updates anymore.
 - Less separation between RFC authors and reviewers with edit suggestions, making it harder to decide who may be a shepherd, since authors can't be shepherds.
+- Force pushes won't be visible anymore in the history.
+  - Force pushing shouldn't be necessary for RFCs, since they always get squash merged anyways
+    - With the previous approach, perhaps the main use case of force pushing was to reduce the PR items to be loaded,
+      since commits also count towards the number of items loaded by GitHub.
+      This is obviously not necessary anymore.
+  - It would be good to protect the main branch for active RFCs,
+    which could be done by requiring the RFC repo be moved to the NixOS organisation.
 
 # Alternatives
 [alternatives]: #alternatives
