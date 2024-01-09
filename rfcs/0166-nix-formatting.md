@@ -530,12 +530,12 @@ function
   }
   ```
   - This violates the guideline of the indentation representing the expression structure, and thus reduces readability.
-  - This does not work well with line length limits on short arguments (TODO: What does this mean?)
 
 ### Function declaration
 
 - The body of the function must not be indented relative to its first arguments.
-- Multiple ("simple") identifier arguments are written onto the same line if possible. TODO: What if it's not possible?
+- Multiple ("simple") identifier arguments must be written onto the same line if admitted from on the line length limit.
+  - Otherwise they're each on their own line.
 - Attribute set arguments must always start on a new line and they must not be mixed with identifier arguments.
   - If they have few attributes, the argument may be written on a single line
   - Otherwise each attribute must be on its own line with indentation, followed by a trailing comma.
@@ -572,6 +572,14 @@ name: value:
 {
   # body
 }
+
+#6: These would be over the line length limit on a single line
+aaaa:
+bbbb:
+cccc: 
+dddd:
+eeee:
+null
 ```
 
 **Alternatives**
@@ -755,23 +763,65 @@ else
   else go (dirOf path);
   ```
 
-### with, assert
+### assert
 
-- If the body is `{ ... }`, `[ ... ]`, `( ... )` or `'' ... ''`, and the `with attrs;`/`assert cond;` does _not_ start on a new line (e.g. `foo = with; …`), then the body must start on that same line too.
-  TODO: What does it mean for it to "not start on a new line"? This really depends on what the surrounding expression is. Notably bindings yes, anything else?
-- Otherwise, the body of `with attrs;`/`assert cond;` must start on a new line without any additional indentation.
+- `assert`s must always start on their own line and the body also starts on its own line without any additional indentation.
+
+```nix
+# Good
+assert foo;
+[
+  bar
+  baz
+]
+
+# Bad
+assert foo; [
+  bar
+  baz
+]
+
+# Good
+{
+  vendor ?
+    assert false;
+    null,
+    
+  vendor ? null,
+}:
+null
+
+let
+  # Good
+  x =
+    assert foo;
+    bar;
+   
+  # Bad
+  y = assert foo;
+    bar;
+in
+x
+```
+
+**Alternatives**
+- Treat it the [same as `with`](#with). The reasons not to do that:
+  - `assert`'s stand on their own and could be removed without breaking anything. Comparatively, `with`'s can't be removed without breaking the code
+  - `assert`'s are a bit like `if-then-else` statements, which are also spread out over multiple lines
+
+### with
+
+- If the body is `{ ... }`, `[ ... ]`, `( ... )` or `'' ... ''`, then the body must start on that same line too.
+  - Otherwise, the body of `with attrs;` must start on a new line without any additional indentation.
+- If the body is `{ ... }`, `[ ... ]`, `( ... )` or `'' ... ''`
+  and `with attrs; …` is parenthesised or to the right side of a binding (e.g. `(with; [ …` or `foo = with; [ …`),
+  then `with` must start on the same line.
+  - Otherwise it must start on a new line.
+
+**Examples**
 
 ```nix
 {
-  # Good
-  foo =
-    assert foo == bar;
-    with bar;
-    [
-      # multiline
-      baz
-    ]
-
   # Good
   foo = with bar; [
     # multiline
@@ -780,11 +830,19 @@ else
   
   # Good
   foo =
+    with foo;
+    with bar; [
+      # multiline
+      baz
+    ];
+  
+  # Good
+  foo =
     with bar;
     baz foo {
       # multiline
       qux = 10;
-    }
+    };
 
   # Good
   foo =
@@ -813,30 +871,16 @@ else
       # multiline
       baz
     ];
-}
-```
-
-**Examples**
-
-```nix
-with pkgs;
-assert foo == bar;
-{
-  meta.maintainers = with lib.maintainers; [
-    some
-    people
-  ];
-}
-
-with pkgs;
-assert foo == bar;
-{
-  meta.maintainers =
-    with lib.maintainers;
-    [
-      some
-      people
-    ];
+    
+  # Good
+  [
+    qux
+    quux
+  ]
+  ++ (with pkgs; [
+    baz
+    blorp
+  ]);
 }
 ```
 
