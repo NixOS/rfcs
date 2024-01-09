@@ -136,7 +136,8 @@ The Nix formatter team is responsible for this task.
 
 In order to minimize conflicts especially when back-porting,
 the pinned formatter should preferably only be updated shortly before the release branch-off.
-This should be done in coordination with the NixOS release managers.
+This should be done in coordination with the NixOS release managers,
+so this information must be added to the [NixOS release wiki](https://nixos.github.io/release-wiki/).
 
 #### Automatically generated files
 
@@ -245,8 +246,6 @@ In this case one level of indentation can be saved using [`lib.singleton`](https
 
 ## Unresolved questions
 
-- Should the line length limit be specified?
-
 ## Future work
 
 - General style guidelines beyond AST reformatting
@@ -295,7 +294,7 @@ Terms and definitions:
   - This applies to else-if chains, functions with multiple arguments, some operators, etc.
   - Example:
     ```nix
-    # This is treated as a sequence of if-then-elsa's chains
+    # This is treated as a sequence of if-then-else's chains
     if cond1 then
       foo
     else if cond2 then
@@ -332,7 +331,7 @@ Terms and definitions:
 
 This [editor config](https://editorconfig.org/) specifies the basic details about Nix files:
 
-```toml
+```editorconfig
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
@@ -347,7 +346,7 @@ For any two (sub-)expressions that are fully on a common single line, their smal
 **Example**
 
 ```nix
-# Bad, expressions cond and bar are fully on the same line,
+# Bad, expressions cond and foo are fully on the same line,
 # but their smallest common ancestor expression is the entire if-then-else, which spans multiple lines
 if cond then foo
 else bar
@@ -516,7 +515,6 @@ function
 
 **Alternatives**
 
-- Not indenting the arguments, to save some indentation depth. This would be consistent with other constructs like function declarations and let bindings.
 - Compacting multiline arguments like this:
   ```nix
   function arg1 {
@@ -580,6 +578,9 @@ cccc:
 dddd:
 eeee:
 null
+
+#7: @ patterns can also come afterwards
+{ pkgs }@args: pkgs.hello
 ```
 
 **Alternatives**
@@ -904,6 +905,19 @@ in
 **Examples**
 
 ```nix
+let
+  foo = "bar";
+in
+func foo;
+
+let
+  foo = "bar";
+in
+{
+  inherit foo;
+  baz = "smth";
+}
+
 let
   foo = "bar";
 in
