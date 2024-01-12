@@ -45,29 +45,33 @@ has neither, and this RFC strives to rectify it.
    corresponding feature parameter MUST have name matching `^enable[^a-z]` and
    SHOULD correspond to the upstream naming.
 
-4. If upstream build features and build dependencies do not map one-to-one,
+4. As special provision, if optional vendored dependency is exposed by feature
+   parameter, that paramter name MUST have match `^with[^a-z]' regular
+   expression.
+
+5. If upstream build features and build dependencies do not map one-to-one,
    then one `with` feature parameter SHOULD be added for every build dependecy
    and one `enable` feature SHOULD be added for every upstream build feature
    intended to be optional. Assertions to preclude incoherent feature
    configurations MAY be added.
 
-5. These rules are to be enforced by static code analyse linter. Since no
+6. These rules are to be enforced by static code analyse linter. Since no
    static code analyzis is perfect, it shall have support for inhibiting
    warnings in individual cases that do not fit into general scheme.
 
-5. Parameter names matching `^(enable|with)` regular expression MUST not be
+7. Parameter names matching `^(enable|with)` regular expression MUST not be
    used for any other purpose. In particular, they always must be boolean.
 
-6. Derivation function MAY expose compile-time string or numeric options of the
+8. Derivation function MAY expose compile-time string or numeric options of the
    upstream build system using feature parameters that MUST match `^conf[^a-z]`
    regular expression, e.g `confDefaultMaildir`.
 
-7. Due overwhelming amount of possible combinations of feature flags for some
+9. Due overwhelming amount of possible combinations of feature flags for some
    packages, nixpkgs maintainer is not expected to test or maintain them all,
    but SHOULD accept provided technically sound contributions related to
    configurations with non-default feature flags.
 
-8. Due overwhelming amount of possible combinations of feature flags for some
+10. Due overwhelming amount of possible combinations of feature flags for some
    packages, only configurations that has name in package set (e.g `emacs-nox`)
    shall be built on CI.
 
@@ -199,6 +203,16 @@ stdenv.mkDerivation { ... }
    underlying library. For example, optional dependecy on `pyqt5` Python
    bindings to `Qt5` library should have `withQt5` feature parameter.
 
+7. Camel case is preferred to other styles. E.g:
+
+```
+pam                   => withPam
+http                  => enableHttp
+gemini                => enableGemini
+ssl                   => enableSsl
+openssl               => withOpenssl
+pythonPackages.pillow => withPythonPillow
+```
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -312,29 +326,33 @@ There are other configuration scenarios not covered by this RFC:
 # Changelog
 
 1. Changed wording to not imply that every upstream build system knob SHOULD be
-   exported via feature parameters. (Thx: @7c6f434c)
+   exported via feature parameters. (Thx: 7c6f434c)
 
 2. Relaxed wording on the name of feature parameters to avoid painting ourselves
-   into ugly and non-intuitive names. (Thx: @7c6f434c)
+   into ugly and non-intuitive names. (Thx: 7c6f434c)
 
 3. Fix typo in regex to be consistent that feature flag name can't have small
-   letter after `with|conf|enable` prefix. (Ths: @don.dfh)
+   letter after `with|conf|enable` prefix. (Ths: don.dfh)
 
 4. Explicitly mention that static code analysis has support for overrides based
-   on human judgement call. (Thx: @7c6f434c)
+   on human judgement call. (Thx: 7c6f434c)
 
 5. Clarify solution scenarios when build inputs and feature flags don't match
-   one-to-one. (Thx: @Atemu, @7c6f434c)
+   one-to-one. (Thx: Atemu, 7c6f434c)
 
 6. Refine the deprecation plan to make sure the warning includes the sunset
-   timestamp. (Thx: @pbsds)
+   timestamp. (Thx: pbsds)
 
-7. Add rules about non-boolean feature parameters. (Thx: @Atemu, @pbsds)
+7. Add rules about non-boolean feature parameters. (Thx: Atemu, pbsds)
 
-8. Set expectations for building and maintaining multiple configurations. (Thx: @pbsds)
+8. Set expectations for building and maintaining multiple configurations. (Thx: pbsds)
 
 9. Removed non-boolean parameters from "Future Work" section.
 
-10. Relaxed requirements for assertions about conflicting flags (Thx: @Atemu)
+10. Relaxed requirements for assertions about conflicting flags (Thx: Atemu)
 
-11. Add guideline so `pythonPackages.pillow` does not get `withPython` feature name. (Thx: @7c6f434c)
+11. Add guideline so `pythonPackages.pillow` does not get `withPython` feature name. (Thx: 7c6f434c)
+
+12. Mention that vendored dependenices are still `with`. (Thx: 7c6f434c)
+
+13. Elaborate on camel case convention. (Thx: 7c6f434c)
