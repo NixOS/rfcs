@@ -301,7 +301,6 @@ existing feature parameters.
 There are other configuration scenarios not covered by this RFC:
 
 - Optional dependencies in shell wrappers (e.g [passage](https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/security/passage/default.nix#L12)).
-- Feature parameter not a boolean, but string or number (e.g [path to default mailbox](https://github.com/muttmua/mutt/blob/master/configure.ac#L499))
 - Finding way to get list of all existing feature parameters. That can be possibly done by building and distributing the index separately,
   like [nix-index](https://github.com/nix-community/nix-index) does it.
 
@@ -328,3 +327,5 @@ There are other configuration scenarios not covered by this RFC:
 7. Add rules about non-boolean feature parameters. (Thx: @Atemu, @pbsds)
 
 8. Set expectations for building and maintaining multiple configurations. (Thx: @pbsds)
+
+9. Removed non-boolean parameters from "Future Work" section.
