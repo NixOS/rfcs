@@ -48,7 +48,8 @@ has neither, and this RFC strives to rectify it.
 4. If upstream build features and build dependencies do not map one-to-one,
    then one `with` feature parameter SHOULD be added for every build dependecy
    and one `enable` feature SHOULD be added for every upstream build feature
-   intended to be exposed, and necessary assertions MUST be added.
+   intended to be optional. Assertions to preclude incoherent feature
+   configurations MAY be added.
 
 5. These rules are to be enforced by static code analyse linter. Since no
    static code analyzis is perfect, it shall have support for inhibiting
@@ -148,7 +149,7 @@ stdenv.mkDerivation { ... }
    ```
    { lib, stdenv, curl, withCurl ? true, enableFTP ? true, enableHTTP ? true }:
 
-   assert withCurl -> enableFTP || enableHTTP;
+   # Assertions are fully optional.
    assert enableFTP -> withCurl;
    assert enableHTTP -> withCurl;
 
@@ -168,11 +169,10 @@ stdenv.mkDerivation { ... }
 
    ```
    { lib, stdenv, enableSSL ? false, openssl, withOpenSSL ? false, libressl, withLibreSSL ? false }:
-   assert withLibreSSL -> enableSSL;
-   assert withOpenSSL -> enableSSL;
+
+   # Assertions are fully optional.
    assert enableSSL -> withOpenSSL || withLibreSSL;
-   assert withOpenSSL -> !withLibreSSL;
-   assert withLibreSSL -> !withOpenSSL;
+   assert !(withLibreSSL && withOpenSSL);
 
    stdenv.mkDerivation {
       ...
@@ -186,13 +186,18 @@ stdenv.mkDerivation { ... }
    }
    ```
 
-4. When build dependency comes from particular package set, it makes set to
+4. When build dependency comes from particular package set, it MAY make sense to
    name feature parameter after it. E.g build dependency on `qt6.qtbase` should
    have `withQt6` feature parameter.
 
-5. Build dependency on bindings to C library SHOULD be named after underlying C library.
-   For example, optional dependecy on `pyqt5` Python bindings to `Qt5` library should have
-   `withQt5` feature parameter.
+5. If feature parameter name suggested by previous point is too generic,
+   package name from the set MAY be included into the feature parameter name.
+   Optional dependency on `pythonPackages.pillow` MAY have feature parameter
+   `withPythonPillow`.
+
+6. Build dependency on bindings to low-level libraries SHOULD be named after
+   underlying library. For example, optional dependecy on `pyqt5` Python
+   bindings to `Qt5` library should have `withQt5` feature parameter.
 
 
 # Examples and Interactions
@@ -329,3 +334,7 @@ There are other configuration scenarios not covered by this RFC:
 8. Set expectations for building and maintaining multiple configurations. (Thx: @pbsds)
 
 9. Removed non-boolean parameters from "Future Work" section.
+
+10. Relaxed requirements for assertions about conflicting flags (Thx: @Atemu)
+
+11. Add guideline so `pythonPackages.pillow` does not get `withPython` feature name. (Thx: @7c6f434c)
