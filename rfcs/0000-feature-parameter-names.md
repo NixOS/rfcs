@@ -30,26 +30,45 @@ has neither, and this RFC strives to rectify it.
 # Detailed design
 [design]: #detailed-design
 
-1. Derivation function SHOULD expose compile-time options of the upstream build system
-   to enable or disable a feature using parameters named either as `enableX` or `withX`,
-   consistent with Autoconf naming convention.
+1. Derivation function MAY expose compile-time boolean options of the upstream
+   build system to enable or disable a feature using parameters named either as
+   `enableX` or `withX`, consistent with Autoconf naming convention.
 
    [Autoconf ENABLE](https://www.gnu.org/software/autoconf/manual/autoconf-2.66/html_node/Package-Options.html)
    [Autoconf WITH](https://www.gnu.org/software/autoconf/manual/autoconf-2.66/html_node/Package-Options.html)
 
 2. If compile-time feature requires build and runtime dependency on package
-   `libfoo`, corresponding feature parameter MUST be named `withFoo`. Prefix `lib`
-   of the build dependency is discarded and first letter of the remaining name is
-   capitalized.
+   `libfoo`, corresponding feature parameter MUST match regular expression
+   `^with[^a-z]`. See guidelines below for choosing name of feature parameter.
 
 3. If compile-time feature does not require any extra build dependencies,
    corresponding feature parameter MUST have name matching `^enable[^a-z]` and
    SHOULD correspond to the upstream naming.
 
-4. These rules are to be enforced by static code analyse linter.
+4. If upstream build features and build dependencies do not map one-to-one,
+   then one `with` feature parameter SHOULD be added for every build dependecy
+   and one `enable` feature SHOULD be added for every upstream build feature
+   intended to be exposed, and necessary assertions MUST be added.
+
+5. These rules are to be enforced by static code analyse linter. Since no
+   static code analyzis is perfect, it shall have support for inhibiting
+   warnings in individual cases that do not fit into general scheme.
 
 5. Parameter names matching `^(enable|with)` regular expression MUST not be
    used for any other purpose. In particular, they always must be boolean.
+
+6. Derivation function MAY expose compile-time string or numeric options of the
+   upstream build system using feature parameters that MUST match `^conf[^a-z]`
+   regular expression, e.g `confDefaultMaildir`.
+
+7. Due overwhelming amount of possible combinations of feature flags for some
+   packages, nixpkgs maintainer is not expected to test or maintain them all,
+   but SHOULD accept provided technically sound contributions related to
+   configurations with non-default feature flags.
+
+8. Due overwhelming amount of possible combinations of feature flags for some
+   packages, only configurations that has name in package set (e.g `emacs-nox`)
+   shall be built on CI.
 
 ## The migration process.
 
@@ -59,7 +78,17 @@ breaking change. As such, renaming of the parameters is done in following way:
 1. Following function is added into `lib` set:
 
 ```
-let coalesce = old: new: if (old != null) then old else new;
+let renamed = { oldName, newName, sunset, oldValue }: newValue:
+   let warning = builtins.concatStringsSep " "
+      [ "Feature flag"
+      , oldName
+      , "is renamed to"
+      , newName
+      , "; old name will no longer be available in nixpkgs="
+      , sunset
+      , "."
+      ]
+   in lib.warnIf (value != null) warning (if (value != null) then value else newValue);
 ```
 
 Starting with following function:
@@ -78,9 +107,12 @@ First step of migration is to replace it with the following:
 { lib
 , stdenv
 , nonCompliantFoo ? null
-, enableFoo ? lib.warnIf (nonCompliantFoo != null)
-                         "Feature flag nonCompliantFoo is renamed to enableFoo."
-                         (lib.coalesce nonCompliantFoo true)
+, enableFoo ? lib.renamed {
+    oldName = "nonCompliantFoo";
+    newName = "enableFoo";
+    sunset = "25.11";
+    value = nonCompliantFoo;
+  } true
 }:
 
 # uses enableFoo
@@ -99,6 +131,68 @@ removed, and function becomes:
 stdenv.mkDerivation { ... }
 ```
 
+## Feature parameter naming guidelines
+
+1. Feature flags that require single external dependency SHOULD be named after
+   that dependency. Prefix `lib` SHOULD be removed. For example,
+   ```
+   systemd => withSystemd
+   libgif  => withGif
+   curl    => withCurl
+   ```
+
+2. When multiple feature flags require the same build dependency, for example
+   derivation has optional support for FTP and HTTP protocols, any of which
+   incur dependency on `curl`, and derivation would look like following:
+
+   ```
+   { lib, stdenv, curl, withCurl ? true, enableFTP ? true, enableHTTP ? true }:
+
+   assert withCurl -> enableFTP || enableHTTP;
+   assert enableFTP -> withCurl;
+   assert enableHTTP -> withCurl;
+
+   stdenv.mkDerivation {
+      ...
+
+      buildInputs = lib.optionals withCurl [ curl ];
+
+      ...
+   }
+   ```
+
+3. Mutually-exclusive build dependencies that provide the same feature are also
+   handled with assertions. For example, if derivation has optional SSL support
+   that may be provided by multiple libraries, but only one may be used and it
+   must be chosen at compilation time, derivation will look like following:
+
+   ```
+   { lib, stdenv, enableSSL ? false, openssl, withOpenSSL ? false, libressl, withLibreSSL ? false }:
+   assert withLibreSSL -> enableSSL;
+   assert withOpenSSL -> enableSSL;
+   assert enableSSL -> withOpenSSL || withLibreSSL;
+   assert withOpenSSL -> !withLibreSSL;
+   assert withLibreSSL -> !withOpenSSL;
+
+   stdenv.mkDerivation {
+      ...
+
+      # Asserts above make sure that at most one SSL implementation will be in
+      # the list.
+      buildInputs = lib.optionals withLibreSSL [ libressl ]
+                  ++ lib.optionals withOpenSSL [ openssl ];
+
+      ...
+   }
+   ```
+
+4. When build dependency comes from particular package set, it makes set to
+   name feature parameter after it. E.g build dependency on `qt6.qtbase` should
+   have `withQt6` feature parameter.
+
+5. Build dependency on bindings to C library SHOULD be named after underlying C library.
+   For example, optional dependecy on `pyqt5` Python bindings to `Qt5` library should have
+   `withQt5` feature parameter.
 
 
 # Examples and Interactions
@@ -116,6 +210,7 @@ $ nix eval --json --impure --expr 'with import ./. {}; builtins.attrNames gnuplo
 ```
 
 I picked the `gnuplot` as example since it is the closest to be compliant with proposed rules.
+
 
 # Drawbacks
 
@@ -209,3 +304,27 @@ There are other configuration scenarios not covered by this RFC:
 - Feature parameter not a boolean, but string or number (e.g [path to default mailbox](https://github.com/muttmua/mutt/blob/master/configure.ac#L499))
 - Finding way to get list of all existing feature parameters. That can be possibly done by building and distributing the index separately,
   like [nix-index](https://github.com/nix-community/nix-index) does it.
+
+# Changelog
+
+1. Changed wording to not imply that every upstream build system knob SHOULD be
+   exported via feature parameters. (Thx: @7c6f434c)
+
+2. Relaxed wording on the name of feature parameters to avoid painting ourselves
+   into ugly and non-intuitive names. (Thx: @7c6f434c)
+
+3. Fix typo in regex to be consistent that feature flag name can't have small
+   letter after `with|conf|enable` prefix. (Ths: @don.dfh)
+
+4. Explicitly mention that static code analysis has support for overrides based
+   on human judgement call. (Thx: @7c6f434c)
+
+5. Clarify solution scenarios when build inputs and feature flags don't match
+   one-to-one. (Thx: @Atemu, @7c6f434c)
+
+6. Refine the deprecation plan to make sure the warning includes the sunset
+   timestamp. (Thx: @pbsds)
+
+7. Add rules about non-boolean feature parameters. (Thx: @Atemu, @pbsds)
+
+8. Set expectations for building and maintaining multiple configurations. (Thx: @pbsds)
