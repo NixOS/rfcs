@@ -140,7 +140,7 @@ A **documentable node** can be:
 
 - Expression 
 - Binding 
-- Lambda Formal
+- Function Argument
 
 The following rules apply in descending order of precedence:
 
@@ -156,7 +156,7 @@ The following rules apply in descending order of precedence:
 Only whitespaces between the `documentable node` and the `doc-comment`
 
 ```nix
-/**Doc for anonymous lambda function*/
+/**Doc for anonymous function*/
 ↓
 x: x;
 ```
@@ -172,7 +172,7 @@ listToAttrs [
 It is allowed to write the documentation before the attribute instead of placing it right before the body.
 
 ```nix
-/**Doc for lambda function bound to a variable*/
+/**Doc for a function bound to a variable*/
            ↓
 assigned = x: x;
 ```
@@ -230,12 +230,12 @@ in
 # Documentation can still be retrieved.
 ```
 
-#### Lambda formals
+#### Function arguments
 
 ```nix
-/**Doc for the whole lambda function*/
+/**Doc for the whole function*/
 {
- /**Doc for formal 'a'*/
+ /**Doc for argument 'a'*/
  a
 }:
  a              
@@ -408,7 +408,7 @@ The following shows one of the many possible ways to migrate the current Nixpkgs
 
 > We managed to partially automate this effort with a [codemod](https://github.com/nix-community/docnix/tree/3c0531cb5b4c9f3e9069b73d19e6c4be8508d905/codemod)
 
-> Note: The current `nixdoc` feature 'Function arguments' uses a different mental model than this RFC. Arguments must now be explicitly documented inside of the lambda documentation.
+> Note: The current `nixdoc` feature 'Function arguments' uses a different mental model than this RFC. Arguments must now be explicitly documented inside of the function documentation.
 
 `lib/attrsets.nix (old format)`
 ````nix
