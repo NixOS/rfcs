@@ -30,52 +30,167 @@ has neither, and this RFC strives to rectify it.
 # Detailed design
 [design]: #detailed-design
 
-1. Derivation function MAY expose compile-time boolean options of the upstream
-   build system to enable or disable a feature using parameters named either as
-   `enableX` or `withX`, consistent with Autoconf naming convention.
+When upstream build system has options to enable or disable a optional features
+or configure some compile-time parameter, like path to default mailbox or
+initial size of hash map, derivation function (for short, package) MAY expose
+compile-time options via feature parameters that match
+`^(with|conf|enable)_[a-z_0-9]$` regular expression. For short, we will refer
+to them as `with`-parameter, `conf`-parameter and `enable`-parameter correspondingly,
+collectively as `feature parameters`.
 
-   [Autoconf ENABLE](https://www.gnu.org/software/autoconf/manual/autoconf-2.66/html_node/Package-Options.html)
-   [Autoconf WITH](https://www.gnu.org/software/autoconf/manual/autoconf-2.66/html_node/Package-Options.html)
+Note that this RFC does not establish any requires whether package should or
+should not have any feature parameters, this decision is left at descretion of
+the package maintainer(s). This RFC only concerns itself with the naming of the
+feature flags. Further text will use wording "corresponding feature parameter"
+with implicit caveat "provided that package maintainer decided to export
+underlying build system configuration option".
 
-2. If compile-time feature requires build and runtime dependency on package
-   `libfoo`, corresponding feature parameter MUST match regular expression
-   `^with[^a-z]`. See guidelines below for choosing name of feature parameter.
+Feature parameters MUST only be used according to the rules outlined in this
+RFC. They MUST NOT be used for any other purpose.
 
-3. If compile-time feature does not require any extra build dependencies,
-   corresponding feature parameter MUST have name matching `^enable[^a-z]` and
-   SHOULD correspond to the upstream naming.
+Boolean feature parameter MUST be either `with`-parameter or `enable`-parameter.
+Non-boolean (e.g. string or integer) feature parameter MUST be an `conf`-parameter.
 
-4. As special provision, if optional vendored dependency is exposed by feature
-   parameter, that paramter name MUST have match `^with[^a-z]' regular
-   expression.
+Feature paramter that incurs additional runtime dependency MUST be and `with`-parameter.
 
-5. If upstream build features and build dependencies do not map one-to-one,
-   then one `with` feature parameter SHOULD be added for every build dependecy
-   and one `enable` feature SHOULD be added for every upstream build feature
-   intended to be optional. Assertions to preclude incoherent feature
-   configurations MAY be added.
+<details><summary>Example</summary>
+```
+{ lib, stdenv, mpfr, with_mpfr ? true }:
 
-6. These rules are to be enforced by static code analyse linter. Since no
-   static code analyzis is perfect, it shall have support for inhibiting
-   warnings in individual cases that do not fit into general scheme.
+stdenv.mkDerivation {
+  # ... snip ...
+  configureFlags = lib.optionals with_mpfr ["--with-mpfr"];
+  buildInputs = lib.optionals with_mpfr [ mpfr ];
+  # ... snip ...
+}
+```
+</details>
 
-7. Parameter names matching `^(enable|with)` regular expression MUST not be
-   used for any other purpose. In particular, they always must be boolean.
+As special provision, if optional vendored dependency is exposed by feature
+parameter, it MUST be `with`-parameter.
 
-8. Derivation function MAY expose compile-time string or numeric options of the
-   upstream build system using feature parameters that MUST match `^conf[^a-z]`
-   regular expression, e.g `confDefaultMaildir`.
+If feature parameter does not incur extra runtime dependencies, corresponding
+feature parameter MUST be `enable`-parameter and its name SHOULD correspond to
+the upstream naming, unless is causes major inconsistency with other packages.
+Consistency of feature parameters across nixpkgs is more important than
+matching to the names used by particular upstream. What constitutes a major
+inconsistency is left at discretion of the package maintainer(s).
 
-9. Due overwhelming amount of possible combinations of feature flags for some
-   packages, nixpkgs maintainer is not expected to test or maintain them all,
-   but SHOULD accept provided technically sound contributions related to
-   configurations with non-default feature flags.
+<details><summary>Example</summary>
 
-10. Due overwhelming amount of possible combinations of feature flags for some
-   packages, only configurations that has name in package set (e.g `emacs-nox`)
-   shall be built on CI.
+If upstream uses `--enable-translations` to denote support for NLS,
+corresponding feature parameter SHOULD be `enable_nls`, since it is much more
+common term for enabling programs to produce output in non-English languages.
+
+</details>
+
+<details><summary>Rationale</summary>
+
+This distinction between `with` and `enable` feature parameters is based on Autoconf naming conventions.
+
+[Autoconf ENABLE](https://www.gnu.org/software/autoconf/manual/autoconf-2.66/html_node/Package-Options.html)
+[Autoconf WITH](https://www.gnu.org/software/autoconf/manual/autoconf-2.66/html_node/Package-Options.html)
+
+</details>
+
+If upstream build features and build dependencies do not map one-to-one, then
+one `with`-parameter SHOULD be added for every build dependecy and one
+`enable`-parameter SHOULD be added for every upstream build feature intended to
+be optional. Assertions to preclude incoherent feature configurations MAY be
+added.
+
+<details><summary>Example</summary>
+```
+{ lib
+, stdenv
+, openssl
+# At maintainer(s) discretion some coherent configuration is chosen.
+, with_openssl ? true
+, wolfssl
+, with_wolfssl ? false
+, enable_ssl ? with_openssl || with_wolfssl
+}:
+
+# Assertions are optional and might be infeasible when package has huge amount
+# of feature flags, but in general improves user experience.
+assert enable_ssl -> with_openssl || with_wolfssl;
+
+stdenv.mkDerivation {
+  # ... snip ...
+  configureFlags = lib.optionals enable_ssl ["--enable-ssl"];
+  buildInputs = lib.optionals with_wolfssl [ wolfssl ]
+             ++ lib.optionals with_openssl [ openssl ];
+  # ,,, snip ...
+}
+
+```
+
+</details>
+
+Maintainer(s) MAY choose to add both `with` and `enable` feature flags even if
+they map one-to-one for consistency with other packages.
+
+<details><summary>Example</summary>
+```
+{ lib
+, stdenv
+, openssl
+, with_openssl ? true
+, enable_ssl ? with_openssl
+}:
+
+assert enable_ssl -> with_openssl;
+
+stdenv.mkDerivation {
+  # ... snip ...
+  configureFlags = lib.optionals enable_ssl ["--enable-ssl"];
+  buildInputs = lib.optionals with_openssl [ openssl ];
+  # ,,, snip ...
+
+  passthru.features = {
+    inherit with_openssl enable_ssl;
+  };
+}
+```
+
+</details>
+
+The rules are to be enforced by static code analyse linter to be written. Since
+no static code analyzis is perfect, it shall have support for inhibiting
+warnings in unsual cases.
+
+All feature parameters SHOULD be exported in `features` passthrough set. See example above.
+
+Due overwhelming amount of possible combinations of feature flags for some
+packages, nixpkgs maintainer is not expected to test or maintain them all, but
+SHOULD accept provided technically sound contributions related to
+configurations with non-default feature flags. Only configurations that has
+name in package set (e.g `emacs-nox`) SHOULD be built on CI.
 
 ## The migration process.
+
+### Orgranization rules
+
+By the very nature of this RFC, once it passes, numerous packages in Nixpkgs
+will become non-compliant. This is unavoidable, otherwise this RFC would not be
+necessary. The following organizational process shall be followed to ensure
+that nixpkgs will eventually become compliant with this RFC:
+
+* In existing packages, maintainers MAY start to expose feature parameters and MAY cease exposing them.
+* Further contributions MAY change their package to be compliant with the RFC
+* Further contributions MUST NOT rename non-compliant feature parameters to another non-compliant name.
+* Further contributions MUST NOT rename compliant feature parameters to non-compliant parameter.
+* Further contributions MAY rename compliant feature parameters to another compliant name
+  for the purposes of consistency with other packages.
+* Further contributions that improve compliance with this RFC MAY involve
+  maintainers but SHOULD NOT be required to do so because the rules MUST be
+  clear.
+* New packages MUST be compliant with the RFC (either no feature parameters or compliant with this RFC.)
+
+This ensures that count of non-compliant feature parameters in nixpkgs is
+non-increasing over the time.
+
+### Technical process
 
 Named parameters are part of the programming interface, and renaming them is a
 breaking change. As such, renaming of the parameters is done in following way:
@@ -96,7 +211,7 @@ let renamed = { oldName, newName, sunset, oldValue }: newValue:
    in lib.warnIf (value != null) warning (if (value != null) then value else newValue);
 ```
 
-Starting with following function:
+Starting with following package:
 ```
 { lib
 , stdenv
@@ -107,112 +222,103 @@ Starting with following function:
 stdenv.mkDerivation { ... }
 ```
 
-First step of migration is to replace it with the following:
+the first step of migration is to replace it with the following:
 ```
 { lib
 , stdenv
 , nonCompliantFoo ? null
-, enableFoo ? lib.renamed {
+, enable_foo ? lib.renamed {
     oldName = "nonCompliantFoo";
-    newName = "enableFoo";
+    newName = "enable_foo";
     sunset = "25.11";
     value = nonCompliantFoo;
   } true
 }:
 
-# uses enableFoo
+# uses enable_foo
 stdenv.mkDerivation { ... }
 ```
 
-and after grace period of two releases, any mentions of `nonCompliantFoo` are
-removed, and function becomes:
+where `sunset` parameter is set two full releases after time of this change.
+So, if this change is made in Jan 2024, `sunset` MUST be set to `25.11`. After
+the release `25.05` all mentions of `nonCompliantFoo` SHOULD be removed, and
+package will look like following:
+
 ```
 { lib
 , stdenv
-, enableFoo ? true
+, enable_foo ? true
 }:
 
-# uses enableFoo
+# uses enable_foo
 stdenv.mkDerivation { ... }
 ```
 
 ## Feature parameter naming guidelines
 
-1. Feature flags that require single external dependency SHOULD be named after
-   that dependency. Prefix `lib` SHOULD be removed. For example,
-   ```
-   systemd => withSystemd
-   libgif  => withGif
-   curl    => withCurl
-   ```
+Rules in the first section of this RFC describe different scenarios when
+`with`, `enable` and `conf` feature parameters must be used, but coming with
+exact name that is clear, concise, describes it effect correctly and is
+consistent across the nixpkgs is hard to codify with absolute rule. Instead,
+this RFC provides set of guidelines and examples based on scenarios brought up
+during the discussion.
 
-2. When multiple feature flags require the same build dependency, for example
-   derivation has optional support for FTP and HTTP protocols, any of which
-   incur dependency on `curl`, and derivation would look like following:
+Feature flags that require single external dependency SHOULD be named after
+that dependency. Prefix `lib` SHOULD be removed. For example,
 
-   ```
-   { lib, stdenv, curl, withCurl ? true, enableFTP ? true, enableHTTP ? true }:
+<details><summary>Example</summary>
+```
+systemd => with_systemd
+libgif  => with_gif
+curl    => with_curl
+alsa    => with_alsa
+# This is completely arbitrary choice recommended by this RFC.
+xorg    => with_x11
+Qt5     => with_qt5
+```
+</details>
 
-   # Assertions are fully optional.
-   assert enableFTP -> withCurl;
-   assert enableHTTP -> withCurl;
+When multiple feature flags require the same build dependency, for example
+derivation has optional support for FTP and HTTP protocols, any of which
+incur dependency on `curl`, the package would look like following:
 
-   stdenv.mkDerivation {
-      ...
-
-      buildInputs = lib.optionals withCurl [ curl ];
-
-      ...
-   }
-   ```
-
-3. Mutually-exclusive build dependencies that provide the same feature are also
-   handled with assertions. For example, if derivation has optional SSL support
-   that may be provided by multiple libraries, but only one may be used and it
-   must be chosen at compilation time, derivation will look like following:
-
-   ```
-   { lib, stdenv, enableSSL ? false, openssl, withOpenSSL ? false, libressl, withLibreSSL ? false }:
-
-   # Assertions are fully optional.
-   assert enableSSL -> withOpenSSL || withLibreSSL;
-   assert !(withLibreSSL && withOpenSSL);
-
-   stdenv.mkDerivation {
-      ...
-
-      # Asserts above make sure that at most one SSL implementation will be in
-      # the list.
-      buildInputs = lib.optionals withLibreSSL [ libressl ]
-                  ++ lib.optionals withOpenSSL [ openssl ];
-
-      ...
-   }
-   ```
-
-4. When build dependency comes from particular package set, it MAY make sense to
-   name feature parameter after it. E.g build dependency on `qt6.qtbase` should
-   have `withQt6` feature parameter.
-
-5. If feature parameter name suggested by previous point is too generic,
-   package name from the set MAY be included into the feature parameter name.
-   Optional dependency on `pythonPackages.pillow` MAY have feature parameter
-   `withPythonPillow`.
-
-6. Build dependency on bindings to low-level libraries SHOULD be named after
-   underlying library. For example, optional dependecy on `pyqt5` Python
-   bindings to `Qt5` library should have `withQt5` feature parameter.
-
-7. Camel case is preferred to other styles. E.g:
+<details><summary>Example</summary>
 
 ```
-pam                   => withPam
-http                  => enableHttp
-gemini                => enableGemini
-ssl                   => enableSsl
-openssl               => withOpenssl
-pythonPackages.pillow => withPythonPillow
+{ lib
+, stdenv
+, curl
+, with_curl ? true
+, enable_ftp ? true
+, enable_http ? true
+}:
+
+# Assertions are fully optional.
+assert enableFTP -> withCurl;
+assert enableHTTP -> withCurl;
+
+stdenv.mkDerivation {
+   # ... snip ...
+
+   configureFlags = lib.optionals enable_http ["--enable-http"]
+                 ++ lib.optionals enable_ftp ["--enable-ftp"];
+   buildInputs = lib.optionals withCurl [ curl ];
+
+   # ... snip ...
+}
 ```
+</details>
+
+When build dependency comes from particular package set, it MAY make sense to
+name feature parameter after it. E.g build dependency on `qt6.qtbase` SHOULD
+have `with_qt6` feature parameter. If that results in feature parameter name
+that is too generic, package name from the set MAY be included into the feature
+parameter name. Optional dependency on `pythonPackages.pillow` MAY have feature
+parameter `with_python_pillow`.
+
+Build dependency on bindings to low-level libraries SHOULD be named after
+underlying library. For example, optional dependecy on `pyqt5` Python bindings
+to `Qt5` library should have `with_qt5` feature parameter.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -245,17 +351,17 @@ I picked the `gnuplot` as example since it is the closest to be compliant with p
 Instead of writing
 
 ```
-{ lib, stdenv, enableFoo ? true }:
+{ lib, stdenv, enable_foo ? true }:
 
-# uses enableFoo
+# uses enable_foo
 stdenv.mkDerivation { ... }
 ```
 
 derivation can be written as
 ```
-{ lib, stdenv, features ? { enableFoo = true; }}:
+{ lib, stdenv, features ? { enable_foo = true; }}:
 
-# uses features.enableFoo
+# uses features.enable_foo
 stdenv.mkDerivation { ... }
 ```
 
@@ -268,13 +374,13 @@ the Nix language.
 2. Overrides become much more verbose. Simple and ubiquitous
 
    ```
-   bar.override { withFoo = true; }
+   bar.override { with_foo = true; }
    ```
 
    becomes unwieldy
 
    ```
-   bar.override (old: old // { features = old.features // { withFoo = true }; })
+   bar.override (old: old // { features = old.features // { with_foo = true }; })
    ```
 
    That can be simplified by introducing `overrideFeatures` function, but we
@@ -311,8 +417,9 @@ previous attempts to solve it on package-by-package basis:
 [unresolved]: #unresolved-questions
 
 This RFC makes it possible to introspect feature parameters of particular
-derivation, but still does not provide simple and efficient way to list all
-existing feature parameters.
+derivation, and makes recomendations to keep feature parameter names consistent
+across whole nixpkgs, but still does not provide simple and efficient way to
+list all existing feature parameters.
 
 # Future work
 [future]: #future-work
@@ -320,8 +427,14 @@ existing feature parameters.
 There are other configuration scenarios not covered by this RFC:
 
 - Optional dependencies in shell wrappers (e.g [passage](https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/security/passage/default.nix#L12)).
+
 - Finding way to get list of all existing feature parameters. That can be possibly done by building and distributing the index separately,
   like [nix-index](https://github.com/nix-community/nix-index) does it.
+
+- Meta-feature-flags, that would allow user to set, e.g `enable_gui = false` on
+  the top level of the overlay, and that would disable support for X11, Qt4,
+  Qt6, GTK2, GTK3, Motif and all other graphical libraries and toolkits for all
+  packages that support doing so.
 
 # Changelog
 
@@ -356,3 +469,9 @@ There are other configuration scenarios not covered by this RFC:
 12. Mention that vendored dependenices are still `with`. (Thx: 7c6f434c)
 
 13. Elaborate on camel case convention. (Thx: 7c6f434c)
+
+14. Explicitly mention that what feature parameters to introduce is left at discretion of the maintainer (Ths: Atemu)
+
+15. Add clause about passthrough `features` set.
+
+16. Switch to `camel_case` since it looks more consistent and less ugly than alternatives.
