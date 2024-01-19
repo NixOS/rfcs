@@ -54,6 +54,7 @@ Non-boolean (e.g. string or integer) feature parameter MUST be an `conf`-paramet
 Feature paramter that incurs additional runtime dependency MUST be and `with`-parameter.
 
 <details><summary>Example</summary>
+
 ```
 { lib, stdenv, mpfr, with_mpfr ? true }:
 
@@ -64,6 +65,7 @@ stdenv.mkDerivation {
   # ... snip ...
 }
 ```
+
 </details>
 
 As special provision, if optional vendored dependency is exposed by feature
@@ -100,6 +102,7 @@ be optional. Assertions to preclude incoherent feature configurations MAY be
 added.
 
 <details><summary>Example</summary>
+
 ```
 { lib
 , stdenv
@@ -131,6 +134,7 @@ Maintainer(s) MAY choose to add both `with` and `enable` feature flags even if
 they map one-to-one for consistency with other packages.
 
 <details><summary>Example</summary>
+
 ```
 { lib
 , stdenv
@@ -267,15 +271,25 @@ Feature flags that require single external dependency SHOULD be named after
 that dependency. Prefix `lib` SHOULD be removed. For example,
 
 <details><summary>Example</summary>
+
 ```
 systemd => with_systemd
 libgif  => with_gif
 curl    => with_curl
 alsa    => with_alsa
-# This is completely arbitrary choice recommended by this RFC.
+
+# When people say "Xorg" support, they usually mean linking "X11"
+# library which is one of the ways to talk X protocol to X server. "xcb"
+# being another one.
+#
+# I am not aware of anybody implementing X protocol themself, and not
+# using one of these libraries.
+
 xorg    => with_x11
+xcb     => with_xcb
 Qt5     => with_qt5
 ```
+
 </details>
 
 When multiple feature flags require the same build dependency, for example
@@ -294,8 +308,8 @@ incur dependency on `curl`, the package would look like following:
 }:
 
 # Assertions are fully optional.
-assert enableFTP -> withCurl;
-assert enableHTTP -> withCurl;
+assert enable_ftp -> with_curl;
+assert enable_http -> with_curl;
 
 stdenv.mkDerivation {
    # ... snip ...
@@ -303,6 +317,12 @@ stdenv.mkDerivation {
    configureFlags = lib.optionals enable_http ["--enable-http"]
                  ++ lib.optionals enable_ftp ["--enable-ftp"];
    buildInputs = lib.optionals withCurl [ curl ];
+
+   # ... snip ...
+
+   passthru.features = {
+      inherit with_curl enable_ftp enable_http;
+   };
 
    # ... snip ...
 }
@@ -346,7 +366,16 @@ I picked the `gnuplot` as example since it is the closest to be compliant with p
 # Alternatives
 [alternatives]: #alternatives
 
-## Group all feature parameters into separate attrset parameter
+## Do nothing
+
+Avoids all the work and drawbacks, but there is no evidence that consistency
+problem will [solve itself evolutionary](https://github.com/NixOS/nixpkgs/pull/234463#issuecomment-1574892207).
+For some build dependencies, we have multiple equally popular feature parameter
+names, and people keep picking random one when adding new packages.
+
+## Other ways to pass feature parameters
+
+### Group all feature parameters into separate attrset parameter
 
 Instead of writing
 
@@ -392,12 +421,27 @@ Any approach that tries to pass attribute set to function will have these
 issues. Using existing [config.nix](https://github.com/NixOS/nixpkgs/blob/master/pkgs/top-level/config.nix)
 is no different.
 
-## Do nothing
+This could be viable and actually more elegant solution if Nix to be extended
+to be able to introspect default parameter values, but that would make nixpkgs
+incompatible with older installations of the Nix.
 
-Avoids all the work and drawbacks, but there is no evidence that consistency
-problem will [solve itself evolutionary](https://github.com/NixOS/nixpkgs/pull/234463#issuecomment-1574892207).
-For some build dependencies, we have multiple equally popular feature parameter
-names, and people keep picking random one when adding new packages.
+### Other ways to name parameters
+
+Other naming conventions were considered and found less appealing.
+
+1. Lisp-style `with-foo` variable names are inconvenient when they need to be
+   passed to the builder environment as opposed being used exclusively at
+   evaluation phase, since Bash does not support referring to environment
+   variables that are not C identifier.
+
+2. Camel case is the most popular naming convention in Nixpkgs at the time of
+   writing, but adding prefix results in quite unnatural-looking identifiers
+   like `enableSsh` or `withLlvm`. In addition, proposed convention visually
+   distinguish feature parameters from other kinds of parameters.
+
+3. Camel case, but allowing to follow upstream spelling, produces naturally
+   looking identifies like `enableSSH`, `withLibreSSL`, `enableAudio` that are
+   completely inconsistent among each other.
 
 # Prior art
 [prior-art]: #prior-art
@@ -428,8 +472,9 @@ There are other configuration scenarios not covered by this RFC:
 
 - Optional dependencies in shell wrappers (e.g [passage](https://github.com/NixOS/nixpkgs/blob/master/pkgs/tools/security/passage/default.nix#L12)).
 
-- Finding way to get list of all existing feature parameters. That can be possibly done by building and distributing the index separately,
-  like [nix-index](https://github.com/nix-community/nix-index) does it.
+- Finding way to get list of all existing feature parameters, like [Gentoo does](https://gitweb.gentoo.org/repo/gentoo.git/tree/profiles/use.desc).
+  That can be possibly done by building and distributing the index separately, like [nix-index](https://github.com/nix-community/nix-index) does it,
+  or requiring every feature parameter used in any package to be listed in some index file kept under version control in nixpkgs.
 
 - Meta-feature-flags, that would allow user to set, e.g `enable_gui = false` on
   the top level of the overlay, and that would disable support for X11, Qt4,
