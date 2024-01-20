@@ -441,7 +441,7 @@ Other naming conventions were considered and found less appealing.
 
 3. Camel case, but allowing to follow upstream spelling, produces naturally
    looking identifies like `enableSSH`, `withLibreSSL`, `enableAudio` that are
-   completely inconsistent among each other.
+   wildly inconsistent between each other.
 
 # Prior art
 [prior-art]: #prior-art
@@ -483,6 +483,8 @@ There are other configuration scenarios not covered by this RFC:
 
 # Changelog
 
+<details><summary>Folded changelog</summary>
+
 1. Changed wording to not imply that every upstream build system knob SHOULD be
    exported via feature parameters. (Thx: 7c6f434c)
 
@@ -519,4 +521,10 @@ There are other configuration scenarios not covered by this RFC:
 
 15. Add clause about passthrough `features` set.
 
-16. Switch to `camel_case` since it looks more consistent and less ugly than alternatives.
+16. Switch to `snake_case` since it looks more consistent and less ugly than alternatives.
+
+17. Mention meta-parameters in the "Future Work" section.
+
+18. Elaborate on benefits if Nix were to allow introducing of default values.
+
+</details>
