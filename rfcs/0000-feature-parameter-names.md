@@ -363,6 +363,9 @@ I picked the `gnuplot` as example since it is the closest to be compliant with p
    will likely conflict with other outstanding changes to the derivation, and potentially
    even with automatic version bumps.
 
+2. While migration is in the process (which is 1 year minimum due the grace
+   period), nixpkgs source will be even less consistent than it is today.
+
 # Alternatives
 [alternatives]: #alternatives
 
