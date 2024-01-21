@@ -187,7 +187,7 @@ that nixpkgs will eventually become compliant with this RFC:
 * Further contributions MAY rename compliant feature parameters to another compliant name
   for the purposes of consistency with other packages.
 * Further contributions that improve compliance with this RFC MAY involve
-  maintainers but SHOULD NOT be required to do so because the rules MUST be
+  maintainers but SHOULD NOT be required to do so because the rules SHOULD be
   clear.
 * New packages MUST be compliant with the RFC (either no feature parameters or compliant with this RFC.)
 
@@ -376,6 +376,26 @@ problem will [solve itself evolutionary](https://github.com/NixOS/nixpkgs/pull/2
 For some build dependencies, we have multiple equally popular feature parameter
 names, and people keep picking random one when adding new packages.
 
+## Do not address consistency issues across different features
+
+For most features, nixpkgs currently uses multiple names. Instead of process
+described in this RFC, we might rename parameters towards the most common one.
+That would mean
+
+```
+dbus => dbusSupport
+qt   => enableQt
+sdl  => withSDL  (winner by one usage)
+```
+
+## Other ways to do migration
+
+1. Just don't and call some release a flag day.
+
+2. Put renaming logic into `callPackage`. That will simplify making changes for
+   individual packages, make their code cleaner, but will incur evaluation
+   penalty for all packages, including compliant ones.
+
 ## Other ways to pass feature parameters
 
 ### Group all feature parameters into separate attrset parameter
@@ -401,7 +421,8 @@ It is definitely looks cleaner, but unfortunately hits several limitations of
 the Nix language.
 
 1. Nix language provides way to [introspect function argument names](https://nixos.org/manual/nix/stable/language/builtins.html#builtins-functionArgs),
-   but no way to learn their default values. So this approach gives consistency, but no way to query list of derivation feature parameters.
+   but no way to learn their default values. Learning default values is fundamentally impossible, since default values of one parameter might depend
+   on the value of another parameter, so default values can't be evaluated until function is called.
 
 2. Overrides become much more verbose. Simple and ubiquitous
 
@@ -428,7 +449,7 @@ This could be viable and actually more elegant solution if Nix to be extended
 to be able to introspect default parameter values, but that would make nixpkgs
 incompatible with older installations of the Nix.
 
-### Other ways to name parameters
+## Other ways to name parameters
 
 Other naming conventions were considered and found less appealing.
 
@@ -529,5 +550,10 @@ There are other configuration scenarios not covered by this RFC:
 17. Mention meta-parameters in the "Future Work" section.
 
 18. Elaborate on benefits if Nix were to allow introducing of default values.
+
+19. Downgrade "MUST be clear" to "SHOULD be clear". This way we won't need another RFC
+    for some corner case.
+
+20. Mention other ways to do (or not to do) the migration.
 
 </details>
