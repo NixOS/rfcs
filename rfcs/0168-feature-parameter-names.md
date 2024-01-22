@@ -91,7 +91,7 @@ common term for enabling programs to produce output in non-English languages.
 This distinction between `with` and `enable` feature parameters is based on Autoconf naming conventions.
 
 [Autoconf ENABLE](https://www.gnu.org/software/autoconf/manual/autoconf-2.66/html_node/Package-Options.html)
-[Autoconf WITH](https://www.gnu.org/software/autoconf/manual/autoconf-2.66/html_node/Package-Options.html)
+[Autoconf WITH](https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.72/html_node/External-Software.html)
 
 </details>
 
@@ -555,5 +555,7 @@ There are other configuration scenarios not covered by this RFC:
     for some corner case.
 
 20. Mention other ways to do (or not to do) the migration.
+
+21. Fix incorrect link to the autoconf manual.
 
 </details>
