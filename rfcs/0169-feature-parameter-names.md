@@ -285,6 +285,18 @@ alsa    => with_alsa
 xorg    => with_x11
 xcb     => with_xcb
 Qt5     => with_qt5
+
+# If upstream feature name contains multiple words (e.g --enable-frame-pointers)
+# then feature parameters SHOULD be snake_cased after upstream.
+--enable-frame-pointers => enable_frame_pointers
+
+# If optional dependency package name has multiple words in it, feature
+# name SHOULD follow the package attribute, but with dashes replaced
+# with underscores.
+pulseaudio => with_pulseaudio
+dump-init => with_dump_init
+
+
 ```
 
 </details>
