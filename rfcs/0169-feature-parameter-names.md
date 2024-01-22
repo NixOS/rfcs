@@ -282,10 +282,6 @@ alsa    => with_alsa
 # When people say "Xorg" support, they usually mean linking "X11"
 # library which is one of the ways to talk X protocol to X server. "xcb"
 # being another one.
-#
-# I am not aware of anybody implementing X protocol themself, and not
-# using one of these libraries.
-
 xorg    => with_x11
 xcb     => with_xcb
 Qt5     => with_qt5
@@ -560,5 +556,7 @@ There are other configuration scenarios not covered by this RFC:
 21. Fix incorrect link to the autoconf manual.
 
 22. Avoid word "usually" in the summary. Many (most?) packages has no upstream feature flags.
+
+23. Remove side note about other independent implementations of X protocol.
 
 </details>
