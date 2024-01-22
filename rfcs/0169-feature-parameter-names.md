@@ -39,7 +39,7 @@ compile-time options via feature parameters that match
 to them as `with`-parameter, `conf`-parameter and `enable`-parameter correspondingly,
 collectively as `feature parameters`.
 
-Note that this RFC does not establish any requires whether package should or
+Note that this RFC does not establish any requirements whether package should or
 should not have any feature parameters, this decision is left at descretion of
 the package maintainer(s). This RFC only concerns itself with the naming of the
 feature flags. Further text will use wording "corresponding feature parameter"
