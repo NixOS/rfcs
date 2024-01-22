@@ -11,9 +11,10 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Nixpkgs usually exports compile-time options of the upstream build system
-through the named parameters of derivation function, but does it inconsistent
-way.
+Nixpkgs has mechanisms to exports compile-time options of the upstream build
+system through the named parameters of derivation function, but the names of
+these parameters are inconsistent from package to package and from feature to
+feature.
 
 # Motivation
 [motivation]: #motivation
@@ -557,5 +558,7 @@ There are other configuration scenarios not covered by this RFC:
 20. Mention other ways to do (or not to do) the migration.
 
 21. Fix incorrect link to the autoconf manual.
+
+22. Avoid word "usually" in the summary. Many (most?) packages has no upstream feature flags.
 
 </details>
