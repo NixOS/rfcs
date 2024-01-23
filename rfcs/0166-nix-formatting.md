@@ -125,8 +125,8 @@ The Nix formatter team should be consulted before the Nix language syntax is cha
 ### Reformat Nixpkgs
 
 For formatting Nixpkgs itself, a pinned release version of the official Nix formatter must be used.
-CI must generally enforce all files in Nixpkgs to be formatted with this version at all times.
-Automatically generated files may be handled differently, see [the next section](#automatically-generated-files).
+CI must generally enforce all Nix files in Nixpkgs to be formatted with this version at all times.
+Automatically generated files may be handled differently, see [this sub-section](#automatically-generated-files).
 
 For every bump of the pinned formatter,
 the files of Nixpkgs must thus be re-formatted accordingly.
@@ -138,6 +138,10 @@ In order to minimize conflicts especially when back-porting,
 the pinned formatter should preferably only be updated shortly before the release branch-off.
 This should be done in coordination with the NixOS release managers,
 so this information must be added to the [NixOS release wiki](https://nixos.github.io/release-wiki/).
+
+#### Nix code in documentation
+
+Nix code in Nixpkgs documentation, such as the Nixpkgs manual, the NixOS manual, NixOS options, `CONTRIBUTING.md` and co. should also be formatted with the pinned release version of the official Nix formatter.
 
 #### Automatically generated files
 
