@@ -197,67 +197,16 @@ non-increasing over the time.
 
 ### Technical process
 
-Named parameters are part of the programming interface, and renaming them is a
-breaking change. As such, renaming of the parameters is done in following way:
+Renaming the parameters is handled automatically by the `makeOverrideable`
+function, as implemented in [https://github.com/NixOS/nixpkgs/pull/284107](#284107).
 
-1. Following function is added into `lib` set:
+Renaming `nonCompliantFoo` into `enable_foo` involves two steps:
 
-```
-let renamed = { oldName, newName, sunset, oldValue }: newValue:
-   let warning = builtins.concatStringsSep " "
-      [ "Feature flag"
-      , oldName
-      , "is renamed to"
-      , newName
-      , "; old name will no longer be available in nixpkgs="
-      , sunset
-      , "."
-      ]
-   in lib.warnIf (value != null) warning (if (value != null) then value else newValue);
-```
-
-Starting with following package:
-```
-{ lib
-, stdenv
-, nonCompliantFoo ? true
-}:
-
-# uses nonCompliantFoo
-stdenv.mkDerivation { ... }
-```
-
-the first step of migration is to replace it with the following:
-```
-{ lib
-, stdenv
-, nonCompliantFoo ? null
-, enable_foo ? lib.renamed {
-    oldName = "nonCompliantFoo";
-    newName = "enable_foo";
-    sunset = "25.11";
-    value = nonCompliantFoo;
-  } true
-}:
-
-# uses enable_foo
-stdenv.mkDerivation { ... }
-```
-
-where `sunset` parameter is set two full releases after time of this change.
-So, if this change is made in Jan 2024, `sunset` MUST be set to `25.11`. After
-the release `25.05` all mentions of `nonCompliantFoo` SHOULD be removed, and
-package will look like following:
-
-```
-{ lib
-, stdenv
-, enable_foo ? true
-}:
-
-# uses enable_foo
-stdenv.mkDerivation { ... }
-```
+ 1. Mechanical renaming all mentions of `nonCompliantFoo` in package
+    definition.
+ 2. Adding renaming rule into
+    [https://github.com/KAction/nixpkgs/blob/contrib/0/rfc169-proof/out/lib/rfc0169.json](makeOverrideable)
+    configuration, if it is not there already.
 
 ## Feature parameter naming guidelines
 
@@ -375,6 +324,9 @@ I picked the `gnuplot` as example since it is the closest to be compliant with p
 2. While migration is in the process (which is 1 year minimum due the grace
    period), nixpkgs source will be even less consistent than it is today.
 
+3. Proposal migration plan slows down evaluation of all packages, including
+   ones without any feature parameters by approximately 1.3%
+
 # Alternatives
 [alternatives]: #alternatives
 
@@ -401,9 +353,10 @@ sdl  => withSDL  (winner by one usage)
 
 1. Just don't and call some release a flag day.
 
-2. Put renaming logic into `callPackage`. That will simplify making changes for
-   individual packages, make their code cleaner, but will incur evaluation
-   penalty for all packages, including compliant ones.
+2. Put deprecation logic into individual packages. That would avoid evaluation
+   penalty for already compliant packages and packages that has no feature
+   parameters, but would be quite verbose and require sophisticated automations
+   to introduce and drop.
 
 ## Other ways to pass feature parameters
 
@@ -570,5 +523,7 @@ There are other configuration scenarios not covered by this RFC:
 22. Avoid word "usually" in the summary. Many (most?) packages has no upstream feature flags.
 
 23. Remove side note about other independent implementations of X protocol.
+
+24. Change the migration plan to do renaming on the `makeOverrideable` level.
 
 </details>
