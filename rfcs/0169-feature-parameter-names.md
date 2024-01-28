@@ -195,6 +195,12 @@ that nixpkgs will eventually become compliant with this RFC:
 This ensures that count of non-compliant feature parameters in nixpkgs is
 non-increasing over the time.
 
+### Documentation changes
+
+* Documentation of [code style](https://github.com/NixOS/nixpkgs/blob/master/CONTRIBUTING.md#syntax) need to
+  be updated to mention that feature parameters use snake case convention unlike other variables that use
+  `lowerCamelCase'.
+
 ### Technical process
 
 Renaming the parameters is handled automatically by the `makeOverrideable`
@@ -525,5 +531,7 @@ There are other configuration scenarios not covered by this RFC:
 23. Remove side note about other independent implementations of X protocol.
 
 24. Change the migration plan to do renaming on the `makeOverrideable` level.
+
+25. Add link to the nix variable name code style. (Thx: @h7x4)
 
 </details>
