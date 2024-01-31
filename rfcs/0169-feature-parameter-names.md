@@ -20,13 +20,42 @@ feature.
 [motivation]: #motivation
 
 Developer interface for building environment with specific features enabled and
-disabled is more complicated and requires more knowledge of implementation
-details compared to already existing systems.
+disabled is more complicated and and involves more "you just have to know it"
+compared to already existing systems.
 
-For example, Gentoo Linux has exhaustive list of [all known configuration
-flags](https://www.gentoo.org/support/use-flags) and has means to
-programmatically query what flags are available for particular package. Nixpkgs
-has neither, and this RFC strives to rectify it.
+1. Knowing that package has a feature parameter (out of knowning the upstream)
+   does not mechanically translates to the name of feature parameter, it can be
+   named in multiple ways.
+
+2. Writing generic code is complicated. Even if list of packages all have
+   optional dependency on package `foo`, duck-typing like
+
+```
+map (p: p.override { with_foo = false; }) packages
+```
+
+won't work because of lack of uniformity, leading ugly code downstream.
+
+3. If user wants to globally disable support for optional feature or build
+   dependency as much as possible, he needs to set multiple feature parameters,
+   and he still can miss couple. E.g, it is not obvious whether the following
+   list is enough to cover everything X11-related:
+
+```
+withX
+withX11
+x11Support
+enableX
+```
+
+4. There is no clear separation between feature parameters and other arguments
+   to the package. With naming mandated by this RFC, distinction is clear to
+   cater to automatic queries.
+
+5. As side effect of the proposad migration plan is compiling exahustive list
+   of known feature parameters. It is not huge stretch to have CI check to
+   enforce that this list is current, bringing nixpkgs on par with Gentoo
+   [use-flags](https://www.gentoo.org/support/use-flags).
 
 # Detailed design
 [design]: #detailed-design
