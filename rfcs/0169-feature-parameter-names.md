@@ -52,10 +52,9 @@ enableX
    to the package. With naming mandated by this RFC, distinction is clear to
    cater to automatic queries.
 
-5. As side effect of the proposad migration plan is compiling exahustive list
-   of known feature parameters. It is not huge stretch to have CI check to
-   enforce that this list is current, bringing nixpkgs on par with Gentoo
-   [use-flags](https://www.gentoo.org/support/use-flags).
+5. Side effect of the proposdd migration plan is compiling of almost
+   exahustive list of known feature parameters.
+
 
 # Detailed design
 [design]: #detailed-design
@@ -501,6 +500,13 @@ There are other configuration scenarios not covered by this RFC:
   the top level of the overlay, and that would disable support for X11, Qt4,
   Qt6, GTK2, GTK3, Motif and all other graphical libraries and toolkits for all
   packages that support doing so.
+
+- Exhaustive list of all existing feature parameters, enabling user to
+  review and configure all feature parameters available in one session
+  instead of researching feature parameters on per-package basis. That
+  would be equivalent of Gentoo's ability to set use flags in
+  [/etc/portage/make.conf](https://wiki.gentoo.org/wiki//etc/portage/make.conf#USE).
+
 
 # Changelog
 
