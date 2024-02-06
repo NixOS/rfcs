@@ -265,7 +265,7 @@ In this case one level of indentation can be saved using [`lib.singleton`](https
 - **Parentheses**: `()`
 - **Expressions:**
   All syntax nodes that would be a syntactically correct Nix program on their own.
-- **Terms:** The follwoing expressions are called terms
+- **Terms:** The follwoing expressions are called terms 
   - Variables, int, float, string, path, list, set, selection, all parenthesised expressions
   - As a rule of thumb: Expressions which can be used as list items (without parentheses)
 - **Absorption:**
@@ -581,10 +581,11 @@ throw ''Some very long error messages containing ${
 
 ### Function application
 
-- In a function application chain, the first element is treated as the "function" and the remaining ones as "arguments".
+In a function application chain, the first element is treated as the "function" and the remaining ones as "arguments".
+
 - As many arguments as possible must be fit onto the first line.
-  - If all but the last argument do fit, then the last argument may get absorbed, i.e. also start on the first line.
-  - If an earlier argument does not fit onto the first line, then that argument and all the following ones must start on their own line.
+- If there is at most one multi-line argument that can be absorbed and all other arguments before/after fit onto a single line respectively, then that multi-line argument is absorbed.
+- Otherwise, the first argument not fitting onto the first line will start a new line with indentation, and all subsequent arguments will start on their own line as well.
   - All arguments that are not on the same line as the function must be indented by one level.
 
 **Examples:**
@@ -606,13 +607,21 @@ function arg1 arg2 {
 
 # The second argument doesn't fit on the first line, but it's not the last argument,
 # so it needs to start on a new line
-function arg1 arg2
+function arg1 {
+  more = "things";
+} arg3
+
+# In this case, the remaining arguments after the second one woulnd't fit onto the line anymore, therefore start all of them on a new line
+function arg1
   {
     more = "things";
   }
   arg3
+  many
+  long
+  args
 
-# Same with more multiline arguments
+# Same with multiple multiline arguments
 function
   {
     a = 1;
@@ -622,6 +631,17 @@ function
     c = 1;
     d = 2;
   }
+
+# Assume that the line lenght limit is here   ↓
+# Good
+concatMapString (s: "short string: ${s}") (
+  attrsToList foo
+)
+
+# Bad: The first argument would have fit onto the first line
+concatMapString (
+  s: "short string: ${s}"
+) (attrsToList foo)
 ```
 
 **Drawbacks**
