@@ -38,7 +38,7 @@ The goals of this RFC are:
 
 Non-goals of this RFC:
 
-- Code style aspects that are not purely syntactic (e.g. optional/redundant parentheses, adding `inherit` statements, swapping argument order with `flip`, …)
+- Code style aspects that are not purely syntactic (e.g. optional/redundant parentheses, adding `inherit` statements, swapping argument order with `flip`, ...)
 - Nixpkgs-specific tweaks to the format (e.g. using attribute names and other context for heuristics about how to best format the contents)
 - Extended Nixpkgs-specific linting like nixpkgs-hammering
 - Formatting non-Nix files in Nixpkgs (that's for [treefmt](https://github.com/numtide/treefmt))
@@ -258,14 +258,65 @@ In this case one level of indentation can be saved using [`lib.singleton`](https
 
 -----
 
+## Terms and definitions:
+
+- **Brackets:** `[]`
+- **Braces:** `{}`
+- **Parentheses**: `()`
+- **Expressions:**
+  All syntax nodes that would be a syntactically correct Nix program on their own.
+- **Terms:** The follwoing expressions are called terms
+  - Variables, int, float, string, path, list, set, selection, all parenthesised expressions
+  - As a rule of thumb: Expressions which can be used as list items (without parentheses)
+- **Absorption:**
+  A multiline expression can have an alternative layout depending on the context.
+  In that case, it will start on the end of the current line instead of a new line,
+  potentially saving a level of indentation of its content.
+  ```nix
+  {
+    # The right-hand side of bindings is an example of a situation where absorption improves the style.
+    absorbed = with bar; [
+      1
+      2
+      3
+    ];
+    notAbsorbed =
+      with bar; # Placing a comment here will force the non-absorbed, multiline layout.
+      [
+        1
+        2
+        3
+      ];
+
+    # In this case, absorption does not reduce the indentation level of the set.
+    absorbed' =
+      let
+        qux = 1;
+      in
+      # { is absorbed
+      bar: baz: {
+        # <-- same level
+      };
+
+    notAbsorbed' =
+      let
+        qux = 1;
+      in
+      way:
+      too:
+      many:
+      arguments:
+      {
+        # <-- same level
+      };
+  }
+  ```
+- **Absorbable Terms:**
+  Attribute sets, lists, and multiline `''` strings are called absorbable terms. Parenthesized absorbable terms are absorbable terms again too.
+
 ## Initial standard Nix format
 
-Terms and definitions:
-- Brackets: `[]`
-- Braces: `{}`
-- Parentheses: `()`
-
-- Line breaks may be added or removed, but empty lines must not be created. Single empty lines must be preserved, and consecutive empty lines must be turned into a single empty line.
+- Line breaks may be added or removed, but empty lines must not be created. Single empty lines must be preserved, and consecutive empty lines must be collapsed into a single empty line.
   This allows the formatter to expand or compact multi-line expressions, while still allowing grouping of code.
 
   For example, formatting this code:
@@ -298,7 +349,7 @@ Terms and definitions:
   - This applies to else-if chains, functions with multiple arguments, some operators, etc.
   - Example:
     ```nix
-    # This is treated as a sequence of if-then-else's chains
+    # This is treated as a sequence of if-then-else chains, instead of indenting the second if as part of the else body
     if cond1 then
       foo
     else if cond2 then
@@ -472,7 +523,7 @@ For list elements, attributes, and function arguments, the following applies:
 
 - In a function application chain, the first element is treated as the "function" and the remaining ones as "arguments".
 - As many arguments as possible must be fit onto the first line.
-  - If all but the last argument do fit, then the last argument may also start on the first line.
+  - If all but the last argument do fit, then the last argument may get absorbed, i.e. also start on the first line.
   - If an earlier argument does not fit onto the first line, then that argument and all the following ones must start on their own line.
   - All arguments that are not on the same line as the function must be indented by one level.
 
@@ -526,9 +577,9 @@ function
   } arg3
 
   function {
-    # …
+    # ...
   } {
-    # …
+    # ...
   }
   ```
   - This violates the guideline of the indentation representing the expression structure, and thus reduces readability.
@@ -536,11 +587,13 @@ function
 ### Function declaration
 
 - The body of the function must not be indented relative to its first arguments.
-- Multiple ("simple") identifier arguments must be written onto the same line if admitted from on the line length limit.
+- A small number of ("simple") identifier arguments can be written onto the same line.
   - Otherwise they're each on their own line.
+  - The body may get absorbed here
 - Attribute set arguments must always start on a new line and they must not be mixed with identifier arguments.
   - If they have few attributes, the argument may be written on a single line
   - Otherwise each attribute must be on its own line with indentation, followed by a trailing comma.
+- Due to structural similarity and for consistency reasons, attribute set arguments with a default value follow the same rules as [bindings](#bindings).
 
 **Examples**
 
@@ -548,16 +601,21 @@ function
 #1
 name: value: name ++ value
 
-#2
-name: value:
-{
-  "${name}-foo" = value;
-}
+#2 absorption
+name: value: ''
+  ${name} = ${value};
+''
 
 #3
-{ pkgs }: pkgs.hello
+name: value:
+name
+++ value
+++ more stuff making the line too long
 
 #4
+{ pkgs }: pkgs.hello
+
+#5
 args@{
   some,
   argument,
@@ -568,14 +626,14 @@ args@{
   # body
 }
 
-#5
+#6
 { pkgs }:
 name: value: 
 {
   # body
 }
 
-#6: These would be over the line length limit on a single line
+#7: These would be over the line length limit on a single line
 aaaa:
 bbbb:
 cccc: 
@@ -583,7 +641,7 @@ dddd:
 eeee:
 null
 
-#7: @ patterns can also come afterwards
+#8: @ patterns can also come afterwards
 { pkgs }@args: pkgs.hello
 ```
 
@@ -608,7 +666,7 @@ null
     default ? value
   , ...
   }:
-  # …
+  # ...
   ```
 
   Problems with this alternative:
@@ -620,11 +678,42 @@ null
 
 ### Operators
 
-Chained binary associative [operators](https://nixos.org/manual/nix/stable/language/operators.html#operators) (except [function application](#function-application)) with the same or monotonically decreasing precedence must be treated together as a single operator chain.
+From the [list of operators](https://nixos.org/manual/nix/stable/language/operators.html#operators), this section focuses on binary operators.
+Function application and attribute selection are not treated as an "operator" in the sense of this section, see [function application](#function-application) instead.
+
+#### Non-chainable operators
+
+Operators with no associativity are non-chainable.
+Each invokation will always have exactly one left-hand side and one right-hand side.
+
+The right-hand side must always be attached to the operator on the same line.
+The operator must either be attached to the left-hand side as well, or start on a new line.
+
+```nix
+shortVariable == 42
+
+stringLength (drvName (toString oldDependency))
+== stringLength (drvName (toString newDependency))
+
+some complicated calculation {
+  # arguments
+} == other stuff {
+  # which may be multiline
+}
+
+some complicated calculation {
+  # arguments
+}
+== "some very long string"
+```
+
+#### Chainable operators
+
+Chained binary associative [operators](https://nixos.org/manual/nix/stable/language/operators.html#operators) with the same or monotonically decreasing precedence must be treated together as a single operator chain.
 
 If an operator chain does not fit onto one line, it must be expanded such that every operator starts a new line:
 - If the operand can also fit on the same line as the operator, it must be put there
-- Otherwise, the operand must start indented on a new line, with exceptions for parenthesis, brackets, braces and function applications
+- Otherwise, the operand must either be absorbed or start a new line with indentation
 
 Operator chains in bindings may be compacted as long as all lines between the first and last one are indented.
 
@@ -649,15 +738,15 @@ foo
   some
   flags
 ]
-++ ( # <- The operator is on a new line, but parenthesis/brackets/braces can start on the same line
+++ ( # <- Parenthesized expressions get absorbed
   foo
 )
-++ optionals condition [ # <- As are multiline function applications
+++ optionals condition [ # <- As are some multiline function applications
   more
   items
 ]
 ++
-  runCommand name # <- ... but only for functions whose last argument starts on the same line
+  runCommand name # <- Function application which cannot be absorbed start on a new line with indentation
     ''
       echo hi
     ''
@@ -699,7 +788,7 @@ foo
 
 ### if-then-else
 
-- `if` and `else` keywords must always start a line.
+- `if` and `else` keywords must always start on a new line.
 - The `if` and `else` bodies must always be indented.
 - If the condition does not fit onto one line, then it will start on the next line with indentation, and `then` will be on the start of the line following the condition.
 - `else if` chains are treated as one long sequence, with no indentation creep on each step.
@@ -733,7 +822,7 @@ else
 
 **Alternatives**
 
-- Attribute sets and lists could start on the same line as the `if` keywords, saving an indentation level on their body:
+- The bodies could be absorbed in some cases, saving an indentation level:
   ```nix  
   #1a
   if builtins.length matches != 0 then {
@@ -816,12 +905,8 @@ x
 
 ### with
 
-- If the body is `{ ... }`, `[ ... ]`, `( ... )` or `'' ... ''`, then the body must start on that same line too.
-  - Otherwise, the body of `with attrs;` must start on a new line without any additional indentation.
-- If the body is `{ ... }`, `[ ... ]`, `( ... )` or `'' ... ''`
-  and `with attrs; …` is parenthesised or to the right side of a binding (e.g. `(with; [ …` or `foo = with; [ …`),
-  then `with` must start on the same line.
-  - Otherwise it must start on a new line.
+- In any situation where a term would get absorbed, the term with a `with` prepended to it may get absorbed as well.
+- Otherwise, the body of `with attrs;` must start on a new line without any additional indentation.
 
 **Examples**
 
@@ -836,7 +921,8 @@ x
   # Good
   foo =
     with foo;
-    with bar; [
+    with bar;
+    [
       # multiline
       baz
     ];
@@ -933,7 +1019,7 @@ else
 
 **Alternatives**
 
-- To allow having the `<body>` be on the same line as the `in`:
+- To allow having the `<body>` be absorbed after the `in`:
   ```
   let
     <name1> = <value1>;
@@ -1036,59 +1122,37 @@ else
 
 ### Bindings
 
-Let bindings and attribute sets share the same syntax for their items, which is discussed here together.
+Let bindings, attribute sets and default function arguments share the same syntax for their items, which is discussed here together.
+
+Within bindings, if the first and last line are not indented, the absorbed style is used, otherwise newline and indent
 
 Bindings have the most special cases to accommodate for many common Nixpkgs idioms.
 Generally, the following styles exist, which are used depending on the kind and size of the value:
 
-TODO: This entire section doesn't have any real specification and is rather unclear on details
-
 ```nix
-#1 single line
+#1 The entire binding fits onto a single line
 foo = "bar";
 
-#2 single line, on a new line
+#2 The body fits onto a single line, but the binding is too long
+length limit
 very.long.foo =
   function arg1 arg2 arg3;
 
-#3 multi line, starting on the same line
+#3 Where possible, the body should be absorbed
 foo = function {
   # args
 };
+add = x: y: {
+  result = x + y;
+};
 
-#4 multi line, starting on a new line
+#4 If neither single-line nor absorbable, start on a new line with indentation
 foo =
   function
     arg1
     arg2
     arg3;
 
-#5 simple function arguments (<=2) start on the same line
-add = x: y: {
-  result = x + y;
-};
-
-#6 attribute bindings always start on a new line
-# If we add more attributes, the indentation stays the same, see #7
-split =
-  { x, ... }:
-  {
-    inc = x + 1;
-    dec = x - 1;
-  };
-
-#7 with enough attribute bindings, they will start on a new line and become multline 
-# it is common to expand input arguments in a way that does not change the number of function applications necessary
-outputs =
-  {
-    x,
-    y,
-    z,
-    ...
-  }:
-  {
-    result = x + y;
-  };
 ```
 
 Notable special cases are:
@@ -1103,24 +1167,42 @@ Notable special cases are:
     };
   }
   ```
-- "statement-like" expressions like "let", "if" and "assert" always use #4 (or #1).
-- If the value is a `with` followed by a function application or list or attribute set, try to use #3.
+- As described in the [`with` section](#with), `with` expressions of absorbable terms should be treated the same way as absorbable terms.
+  - This means that the attribute set force-expansion also applies to them here.
+  - This also means that (multi-line) `with` expressions will use style #3 or #4, depending on their body.
   ```nix
-  buildInputs = with pkgs; [
-    some
-    dependencies
-  ];
+  # Force-expand short attrset
+  meta = with lib; {
+    maintainers = [];
+  };
+  # Don't absorb since the body of `with pkgs;` is `with pyPkgs; ...`, which is not absorbable.
+  buildInputs =
+    with pkgs;
+    with pyPkgs;
+    [
+      some
+      dependencies
+    ];
   ```
 
 **Alternatives**
 
-One could eliminate style #2 by having #4 always start on the first line. This would even reduce indentation in some cases. However, this may look really weird in other cases, especially when the binding is very long:
+Function calls could always be absorbed. This would reduce indentation of their arguments in some cases. However, this may look really weird in other cases, especially when the binding is very long:
 
 ```nix
 some.very.long.attr = callFunction
   arg1
   arg2
   arg3;
+```
+
+Consistent with this would be to also absorb `let` bindings and other expressions, however this might result in double indentation.
+
+```nix
+suff = let
+   foo = "bar"; # <-- double-indentation
+  in
+  foo;
 ```
 
 #### Bindings semicolon placement
@@ -1259,7 +1341,7 @@ inherit (pkgs) ap1 ap2 ap3;
 inherit (pkgs)
   app1
   app2
-  # …
+  # ...
   app42
   ;
 inherit
