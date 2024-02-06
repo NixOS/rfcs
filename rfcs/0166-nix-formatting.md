@@ -519,6 +519,66 @@ For list elements, attributes, and function arguments, the following applies:
 }
 ```
 
+### Strings
+
+- The kind of quotes used in strings (`"` vs `''`) must be preserved from the input.
+- The non-interpolated string parts must be preserved from the input
+  - E.g. changing `\t` to a tab character must not be done automatically
+
+**Examples:**
+```nix
+# Kept as is
+"foo \n\t ${bar} baz"
+# This one too
+''
+  foo \n\t ${bar} baz
+''
+```
+
+#### Interpolations
+
+- "Simple" interpolations must be rendered using the single-line format, regardless of the line's length.
+  - Otherwise, the multiline formatting must be used
+  - "simple" is implementation-defined and generally includes short expressions of low complexity.
+    Multiline expressions are never "simple".
+- If the interpolation is the first thing on the string line, then its contents may be absorbed.
+  - Otherwise, the interpolation code must start on a new line
+
+**Examples**:
+```nix
+# Short and simple
+"foo \n\t ${bar} baz"
+
+# Interpolation of simple or short code
+# Good
+throw ''Some very long error messages containing ${variables} and stuff''
+# Bad
+throw ''Some very long error messages containing ${
+  variables
+} and stuff''
+
+''
+  # Don't absorb interpolations if they don't start the line
+  # Good
+  some longer line ${
+    some function [
+      1
+      2
+    ]
+  } baz
+  # Bad
+  some longer line ${some function [
+    1
+    2
+  ]} baz
+
+  # However, absorption is allowed here, since the interpolation starts a line
+  ${other function (
+    # with stuff
+  )}
+''
+```
+
 ### Function application
 
 - In a function application chain, the first element is treated as the "function" and the remaining ones as "arguments".
