@@ -919,7 +919,8 @@ else
 
 ### assert
 
-- `assert`s must always start on their own line and the body also starts on its own line without any additional indentation.
+- `assert <cond>;` mirrors the formatting for [bindings](#bindings).
+- `assert`s `<body>` must always start on their own line and the body also starts on its own line without any additional indentation.
 
 ```nix
 # Good
@@ -956,6 +957,20 @@ let
     bar;
 in
 x
+
+# Multiline condition
+assert
+  let
+    x = true;
+  in x;
+  true
+
+# Function call condition with absorbed last argument, same formatting as bindings
+assert assertMsg (isPath path) ''
+  lib.path.append:
+    The first argument is of type ${builtins.typeOf path}, but a path was expected
+'';
+true
 ```
 
 **Alternatives**
