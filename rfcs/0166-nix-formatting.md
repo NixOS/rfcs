@@ -87,7 +87,8 @@ The initial version of the standard Nix format is defined in a section towards t
 
 [Initial standard Nix format](#initial-standard-nix-format).
 
-Significant changes to the standard Nix format must go through another RFC.
+Controversial changes to the standard Nix format must go through another RFC.
+It is up to the Nix formatter team to decide when an RFC is necessary.
 
 The latest version of the standard Nix format must be in a file on the main branch of the [official Nix formatter](#official-nix-formatter).
 
