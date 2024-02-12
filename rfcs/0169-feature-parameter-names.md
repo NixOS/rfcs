@@ -117,7 +117,7 @@ common term for enabling programs to produce output in non-English languages.
 
 <details><summary>Rationale</summary>
 
-This distinction between `with` and `enable` feature parameters is based on Autoconf naming conventions.
+This distinction between `with` and `enable` feature parameters is based on Autotools naming conventions.
 
 [Autoconf ENABLE](https://www.gnu.org/software/autoconf/manual/autoconf-2.66/html_node/Package-Options.html)
 [Autoconf WITH](https://www.gnu.org/savannah-checkouts/gnu/autoconf/manual/autoconf-2.72/html_node/External-Software.html)
