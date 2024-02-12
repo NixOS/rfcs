@@ -192,7 +192,7 @@ The rules are to be enforced by static code analyse linter to be written. Since
 no static code analyzis is perfect, it shall have support for inhibiting
 warnings in unsual cases.
 
-All feature parameters SHOULD be exported in `features` passthrough set. See example above.
+All feature parameters SHOULD be exported in `passthru.features` set. See example above.
 
 Due overwhelming amount of possible combinations of feature flags for some
 packages, nixpkgs maintainer is not expected to test or maintain them all, but
