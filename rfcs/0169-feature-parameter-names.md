@@ -23,7 +23,7 @@ Developer interface for building environment with specific features enabled and
 disabled is more complicated and and involves more "you just have to know it"
 compared to already existing systems.
 
-1. Knowing that package has a feature parameter (out of knowning the upstream)
+1. Knowing that package has a feature parameter (out of knowing the upstream)
    does not mechanically translates to the name of feature parameter, it can be
    named in multiple ways.
 
