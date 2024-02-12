@@ -472,7 +472,7 @@ configuration system is Gentoo Linux:
 - [https://www.gentoo.org/support/use-flags]
 
 There is not much work I can find about this problem in Nixpkgs other than my
-previous attempts to solve it on package-by-package basis:
+previous attempts to solve it on a  per package basis:
 
 - https://github.com/NixOS/nixpkgs/issues/148730
 - https://github.com/NixOS/nixpkgs/pull/234463
