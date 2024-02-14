@@ -80,7 +80,7 @@ RFC. They MUST NOT be used for any other purpose.
 Boolean feature parameter MUST be either `with`-parameter or `enable`-parameter.
 Non-boolean (e.g. string or integer) feature parameter MUST be an `conf`-parameter.
 
-Feature paramter that incurs additional runtime dependency MUST be a `with`-parameter.
+Feature parameter that incurs additional runtime dependency MUST be a `with`-parameter.
 
 <details><summary>Example</summary>
 
