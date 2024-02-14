@@ -266,7 +266,7 @@ In this case one level of indentation can be saved using [`lib.singleton`](https
 - **Parentheses**: `()`
 - **Expressions:**
   All syntax nodes that would be a syntactically correct Nix program on their own.
-- **Terms:** The follwoing expressions are called terms 
+- **Terms:** The following expressions are called terms 
   - Variables, int, float, string, path, list, set, selection, all parenthesised expressions
   - As a rule of thumb: Expressions which can be used as list items (without parentheses)
 - **Absorption:**
@@ -633,7 +633,7 @@ function
     d = 2;
   }
 
-# Assume that the line lenght limit is here   ↓
+# Assume that the line length limit is here   ↓
 # Good
 concatMapString (s: "short string: ${s}") (
   attrsToList foo
@@ -765,7 +765,7 @@ Function application and attribute selection are not treated as an "operator" in
 #### Non-chainable operators
 
 Operators with no associativity are non-chainable.
-Each invokation will always have exactly one left-hand side and one right-hand side.
+Each invocation will always have exactly one left-hand side and one right-hand side.
 
 The right-hand side must always be attached to the operator on the same line.
 The operator must either be attached to the left-hand side as well, or start on a new line.
