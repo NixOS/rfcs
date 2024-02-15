@@ -252,7 +252,7 @@ to update the original RFC to keep it up with updates on the implementation.
 
 ## Members of the RFC Steering Committee
 
-The current members of the RFC Steering Committee can be seen at the [NixOS/rfc-steering-committee](https://github.com/NixOS/rfc-steering-committee#workflow-for-rfc-steering-committee) repository.
+The current members of the RFC Steering Committee can be seen on the [NixOS website](https://nixos.org/community/teams/rfc-steering-committee).
 
 
 ## License
