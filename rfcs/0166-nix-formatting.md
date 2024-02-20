@@ -317,6 +317,8 @@ In this case one level of indentation can be saved using [`lib.singleton`](https
 
 ## Initial standard Nix format
 
+- The formatter should be as "pure" as possible, i.e. different input formats of the "same" code (same AST with comments) should result in the same output format.
+  - The formatter may take the input formatting into account in some cases in order to preserve multi-line syntax elements (which would otherwise have been contracted by the rules).
 - Line breaks may be added or removed, but empty lines must not be created. Single empty lines must be preserved, and consecutive empty lines must be collapsed into a single empty line.
   This allows the formatter to expand or compact multi-line expressions, while still allowing grouping of code.
 
@@ -1312,9 +1314,9 @@ else
 
 - Brackets and braces must always have a space (or line break) on the inside, like `[ `, ` ]`, `{ ` and ` }`.
   - Empty lists and attribute sets are written as `[ ]` and `{ }`, respectively.
-- Lists and attribute sets with multiple items should be liberally expanded.
-  - They can only be on a single line if they fit on the line and contain few enough elements.
-  - As described under [bindings](#bindings) below, nested attribute sets are always expanded.
+- Lists and attribute sets can only be on a single line if they fit on the line and contain few enough items.
+- Lists and attribute sets with more items should be liberally expanded.
+- As described under [bindings](#bindings) below, nested attribute sets are always expanded.
 
 **Examples**
 
