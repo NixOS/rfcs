@@ -534,6 +534,11 @@ For list elements, attributes, and function arguments, the following applies:
 ''
   foo \n\t ${bar} baz
 ''
+
+# Even if strings exceed the line length limit, no attempt to make it smaller is made
+''
+  This is a really long string that would not fit within the line length limit
+''
 ```
 
 #### Interpolations
@@ -579,6 +584,146 @@ throw ''Some very long error messages containing ${
   )}
 ''
 ```
+
+### Comments
+
+- `/**` comments must be handled according to [RFC 0145: Doc comments](https://github.com/NixOS/rfcs/pull/145).
+  - Specifically, the expression that the comment is attached to must be maintained by the formatter, as well as the resulting doc string.
+- Empty comments may be deleted.
+  - Often their only purpose is to vertically align lines, which is not allowed.
+- Single-line `/*` comments must be converted to `#` comments.
+- Single-line comments may be moved up or down a line to improve the layout.
+- Anything after the first `#` of single-line comments must be preserved.
+  - This allows the common pattern of prefixing many lines with `#` to comment them out, without the formatter trying to change anything.
+- For multiline `/*` and `/**` comments:
+  - Both `/*`/`/**` and `*/` start on a new line each, and are vertically aligned (i.e. have the same level of indentation).
+  - The left-most line in between have one extra level of indentation (relative to the starting `/*`/`/**`).
+    - Inner-comment indentation is preserved, in a similar way as for multiline strings.
+  - Whitespace immediately after `/*`/`/**` and whitespace before `*/` may not be preserved.
+  - Content after `/*`/`/**` on the same line may get shifted the next line.
+  - Comments where all intermittent lines start with a `*` may have it stripped.
+    - Otherwise, the non-whitespace content of each comment line must be preserved.
+
+**Examples:**
+
+Note that these examples show *allowed* transformations, which may or may not be applied by the formatter.
+
+```nix
+/* foo */
+↓
+# foo
+
+/*bar    */
+# bar
+
+function call ( # trailing comment
+  body
+)
+↓
+function call (
+  # trailing comment
+  body
+)
+
+if /* inline comment */ cond then
+  true
+else
+  false
+↓
+# inline comment
+if cond then
+  true
+else
+  false
+
+if cond /* inline comment */ then
+  true
+then
+  false
+↓
+if
+  cond # inline comment
+then
+  true
+else
+  false
+  
+/* foo */ ''
+  bar
+''
+↓
+# foo
+''
+  bar
+''
+
+/* Foo
+   bar
+   baz */
+↓
+/*
+  Foo
+  bar
+  baz
+*/
+
+/* Foo
+  bar
+  baz
+
+*/
+↓
+/*
+  Foo
+  bar
+  baz
+*/
+
+/* Foo
+ * bar
+ */
+↓
+/*
+  Foo
+  bar
+*/
+
+# Some comment
+#   Some preserved indentation
+#This also stays as is
+```
+
+**Alternatives:**
+- There are some ways of using multi-line comments to comment parts of strings that wouldn't otherwise support comments.
+  For example in bash
+  ```bash
+  some-command \ # Some comment
+    some-arg \ # Some comment
+    another-arg
+  ```
+  is not valid.
+  In Nix we have the ability to use string concatenation and inline comments to add comments between the arguments:
+  ```nix
+  ''
+    some-command \
+  '' + /* Some comment */ ''
+    some-arg \
+  '' + /* Some comment */ ''
+    another-arg
+  ''
+  ```
+  
+  This style of the `+` operator for one isn't consistent with the rest of the formatting rules.
+  
+  Alternatively:
+  ```nix
+  some-command \ ${""/* Some comment */}
+    some-arg \ ${"" /* Some comment */}
+    another-arg
+  ```
+
+  But this is considered too hacky.
+  
 
 ### Function application
 
