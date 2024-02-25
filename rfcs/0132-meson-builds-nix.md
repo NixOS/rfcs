@@ -171,7 +171,7 @@ The alternatives are
 
 - Use Bazel
 
-  For the sake of completeness, there is Bazel, a Google(TM)-backed build system that sells itself as "fast, scalable, multi-language and extensible".
+  For the sake of completeness, there is Bazel, a Google LLC-backed build system that sells itself as "fast, scalable, multi-language and extensible".
 
   Advantages:
 
