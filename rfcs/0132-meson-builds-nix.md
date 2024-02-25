@@ -159,13 +159,13 @@ The alternatives are
 
   However, CMake DSL is arguably more complex and cumbersome, whereas Meson is more polished.
 
-- Evaluate other building systems (waf, premake, bazel, xmake etc.)
+- Evaluate other building systems (waf, scons, premake, xmake etc.)
 
   About this, a principle should be observed:
 
   Per the bootstrap route issue discussed above, build tools strongly tied to other programming languages are severely discouraged.
 
-  E.g. waf is basically a Python library, whereas premake and xmake are Lua libraries. They can't be decoupled of their implementation languages.
+  E.g. waf and scons are Python libraries in essence, whereas premake and xmake are Lua libraries. They can't be decoupled of their implementation languages.
 
   Another indispensable attribute to be considered is cross-compilation support.
 
