@@ -209,14 +209,17 @@ Questions that deserve further inquiry:
 # References
 [references]: #references
 
-- [Meson](https://meson.build/) official site
+- [Meson](https://meson.build/)
   - [Muon](https://muon.build/), a C99 alternative implementation
-- [Ninja](https://ninja-build.org/) official site
+- [Ninja](https://ninja-build.org/)
   - [Samurai](https://github.com/michaelforney/samurai), a C99 alternative implementation
 - [Meson tutorial](https://mesonbuild.com/Porting-from-autotools.html) comparing autotools and Meson
 - [NetBSD tutorial](https://wiki.netbsd.org/pkgsrc/how_to_convert_autotools_to_meson/) comparing Meson and autotools
 - [Boostrappable Builds](https://bootstrappable.org/)
 - [CMake](https://cmake.org/)
+- [Premake](https://premake.github.io/)
+- [Waf](https://waf.io/)
+- [SCons](https://scons.org/)
 - [Xmake](https://xmake.io/)
 - [Bazel](https://bazel.build)
 
