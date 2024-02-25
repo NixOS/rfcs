@@ -182,11 +182,12 @@ The alternatives are
 
   Disadvantages:
 
+  - [Too tied to Google internals](https://bazel.build/about/faq#why_isn%E2%80%99t_all_development_done_in_the_open)
   - [Not fully open source yet](https://bazel.build/about/faq#are_you_done_open_sourcing_bazel)
   - Written in Java
-    - Java bootstrap is fairly complex and completely dependent on _open-source abandonware_, as demonstrated by [Bootstrappable](https://bootstrappable.org/projects/java.html) project.
-    - At the time there is no alternative implementation of Bazel in another language.
-  - Backed by Google(TM).
+    - Java bootstrap is fairly complex, currently relying on _open-source abandonware_, as demonstrated by [Bootstrappable](https://bootstrappable.org/projects/java.html) project.
+    - At the current time there is no alternative implementation of Bazel in another programming language.
+  - Backed by Google.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
