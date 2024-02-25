@@ -189,6 +189,17 @@ The alternatives are
     - At the current time there is no alternative implementation of Bazel in another programming language.
   - Backed by Google.
 
+# Prior Art
+
+For the sake of completeness, and pushed by the advent of [RFC Process updates](https://github.com/NixOS/rfcs/pull/150), we are including here a list of projects that are in different stages of transition to Meson:
+
+- [GNOME](https://wiki.gnome.org/Initiatives/GnomeGoals/MesonPorting)
+- [X.Org Server](https://gitlab.freedesktop.org/xorg/xserver)
+  - [XTS](https://gitlab.freedesktop.org/xorg/test/xts), the X.Org Test Suite
+- [MPV](https://mpv.io), the commandline video player
+- [GIMP](https://gitlab.gnome.org/GNOME/gimp), the GNU Image Manipulation Program
+- [Mesa](https://mesa3d.org/), the open source implementations of many low-level, graphics-related libraries
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
