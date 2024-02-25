@@ -177,7 +177,8 @@ The alternatives are
 
   - Fast, scalable, multi-language and extensible.
     - Your mileage may vary.
-  - Backed by Google(TM).
+  - Trusted by industry leaders.
+  - Backed by Google.
 
   Disadvantages:
 
