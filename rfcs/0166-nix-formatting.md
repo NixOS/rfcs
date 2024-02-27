@@ -457,7 +457,7 @@ This rule has turned out to be very practical at catching code that could be pot
     ```nix
     buildInputs = [
         foo # <-- Bad, indentation increases by 2 levels
-      ] // lib.optionals cond [
+      ] ++ lib.optionals cond [
         bar
       ];
 
