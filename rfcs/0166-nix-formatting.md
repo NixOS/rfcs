@@ -761,7 +761,7 @@ In a function application chain, the first element is treated as the "function" 
 - If there is at most one multi-line argument that can be absorbed and all other arguments before/after fit onto a single line respectively, then that multi-line argument is absorbed.
 - Otherwise, the first argument not fitting onto the first line will start a new line with indentation, and all subsequent arguments will start on their own line as well.
   - All arguments that are not on the same line as the function must be indented by one level.
-- If the last argument is parenthesized, the parentheses get absorbed while its body is put on a new line with indentation.
+- If the last argument is parenthesized, the parentheses should get absorbed while its body is put on a new line with indentation.
   - Exception: If the last argument is parenthesized and its body contains an absorbable term, an alternative and more compact layout may be used instead: The body gets compacted and its term absorbed.
     - In this case, the inner term may be force-expanded.
     - This results in less indentation for many common Nix idioms.
@@ -815,6 +815,9 @@ function
 concatMapString (s: "short string: ${s}") (
   attrsToList foo
 )
+# Good, this is also allowed
+concatMapString (s: "short string: ${s}")
+  (attrsToList foo)
 
 # Bad: The first argument would have fit onto the first line
 concatMapString (
