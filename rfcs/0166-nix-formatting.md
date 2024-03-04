@@ -434,22 +434,53 @@ This rule has turned out to be very practical at catching code that could be pot
 
 - Two spaces must be used for each indentation level.
   - This may be revisited should Nix get proper support for [using tabs for indentation](https://github.com/NixOS/nix/issues/7834) in the future.
-- Vertical alignment must be ignored, both at the start of the line and within lines.
+- No special care is taken to preserve vertical alignment in the AST or comments.
+  - It is non-trivial to specify a rule for preserving vertical alignment, so this is out of scope for now, but could be reconsidered in the future.
   - Examples:
     ```nix
     {
-      # Bad, vertical alignment Within lines
-      linux    = { execFormat = elf;     families = {              }; };
+      # Vertically aligned input like this..
+      foo  = 10; # Foo
+      b    = 10; # - b
+      baz  = 10; #   - baz
+      more = 10; #   - more
+
+      # ..will get formatted like this.
+      # The vertical alignment is not preserved.
+      foo = 10; # Foo
+      b = 10; # - b
+      baz = 10; #   - baz
+      more = 10; #   - more
+
+
+      # Vertically aligned input like this..
       netbsd   = { execFormat = elf;     families = { inherit bsd; }; };
       none     = { execFormat = unknown; families = {              }; };
-      openbsd  = { execFormat = elf;     families = { inherit bsd; }; };
 
-      # Bad, vertical alignment at the start of line
+      # ..will get formatted like this.
+      netbsd = {
+        execFormat = elf;
+        families = {
+          inherit bsd;
+        };
+      };
+      none = {
+        execFormat = unknown;
+        families = { };
+      };
+
+
+      # Vertically aligned input like this..
       optExecFormat =
         lib.optionalString (kernel.name == "netbsd" &&
                             gnuNetBSDDefaultExecFormat cpu != kernel.execFormat
                            )
                            kernel.execFormat.name;
+
+      # ..will get formatted like this.
+      optExecFormat = lib.optionalString (
+        kernel.name == "netbsd" && gnuNetBSDDefaultExecFormat cpu != kernel.execFormat
+      ) kernel.execFormat.name;
     }
     ```
 - Increasing indentation levels must not be "skipped": On subsequent lines, indentation can only increase by at most one level, but may decrease arbitrarily many levels.
