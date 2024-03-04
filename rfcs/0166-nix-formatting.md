@@ -455,30 +455,55 @@ This rule has turned out to be very practical at catching code that could be pot
 - Increasing indentation levels must not be "skipped": On subsequent lines, indentation can only increase by at most one level, but may decrease arbitrarily many levels.
   - Examples:
     ```nix
+    # Bad indentation
     buildInputs = [
-        foo # <-- Bad, indentation increases by 2 levels
+        foo # <-- Not okay, increase by 2 levels
       ] ++ lib.optionals cond [
         bar
       ];
 
+    # Okay indentation, subsequent lines at most one more level
+    buildInputs =
+      [
+        foo 
+      ] ++ lib.optionals cond [
+        bar
+      ];
+
+    # Bad indentation
     attribute = { args }: let
-        foo = "bar" # <-- Bad, indentation increases by 2 levels
+        foo = "bar"; # <-- Not okay, increase by 2 levels
       in
         foo;
 
+    # Okay indentation
+    attribute = { args }:
+      let
+        foo = "bar";
+      in
+        foo;
+
+    # Bad indentation
     (callFunction {
-        foo = "bar"; # <-- Bad, indentation increases by 2 levels
+        foo = "bar"; # <-- Not okay, increase by 2 levels
+      }
+      arg
+    )
+    # Okay indentation
+    (callFunction
+      {
+        foo = "bar";
       }
       arg
     )
 
-    # This is okay, indentation increases only one level per line
+    # Okay indentation
     let
       x = {
         a = foo
           bar
           baz;
-      }; # <-- The decrease by two levels here is okay
+      }; # <-- The decrease by two levels here is okay, only increases are limited to one level
     in
     null
     ```
