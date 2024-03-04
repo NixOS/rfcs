@@ -616,6 +616,7 @@ Note that these examples show *allowed* transformations, which may or may not be
 # foo
 
 /*bar    */
+↓
 # bar
 
 function call ( # trailing comment
