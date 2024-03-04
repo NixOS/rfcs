@@ -1470,7 +1470,7 @@ else
 
 Let bindings, attribute sets and default function arguments share the same syntax for their items, which is discussed here together.
 
-Within bindings, if the first and last line are not indented, the absorbed style is used, otherwise newline and indent
+For each binding value, if only the first and last line are not indented, the absorbed style is used, otherwise newline and indent.
 
 Bindings have the most special cases to accommodate for many common Nixpkgs idioms.
 Generally, the following styles exist, which are used depending on the kind and size of the value:
@@ -1499,6 +1499,12 @@ foo =
     arg2
     arg3;
 
+# There is non-indented line between the first and last line, so this can't use the absorbed style
+bar =
+  if baz == null then
+    10
+  else
+    20;
 ```
 
 Notable special cases are:
