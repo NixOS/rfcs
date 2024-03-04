@@ -1607,29 +1607,30 @@ The semicolon in bindings must always be placed on the same line as the expressi
 
 
 1. On a new line without indentation.
-  - This clearly marks a separation between attributes, however it is wasteful of space.
-  ```nix
-  attr3 =
-    function call
-      many
-      arguments
-  ;
-  attr3 =
-    let
-      foo = "bar";
-    in
-    some statements
-  ;
-  ```
+   - This clearly marks a separation between attributes, however it is wasteful of space.
+   - The lonely semicolon looks odd, and it's not a commonly used style.
+   ```nix
+   attr3 =
+     function call
+       many
+       arguments
+   ;
+   attr3 =
+     let
+       foo = "bar";
+     in
+     some statements
+   ;
+   ```
 2. On a new line with one indentation level.
-  - Just as wasteful on space as (1), but a bit less clear about signaling the end of the binding.
-  ```nix
-  attr3 =
-    function call
-      many
-      arguments
-    ;
-  ```
+   - Just as wasteful on space as (1), but a bit less clear about signaling the end of the binding.
+   ```nix
+   attr3 =
+     function call
+       many
+       arguments
+     ;
+   ```
 3. A mix of (1) and (2), where usually the semicolon is placed directly at the end of the binding.
    But with exceptions in which the semicolon is placed onto the following line instead in cases where the value is a multiline `if` expression or nested operator.
    These are the only syntax elements that may result in the semicolon being placed on a line with arbitrarily deep indentation.
@@ -1655,6 +1656,31 @@ The semicolon in bindings must always be placed on the same line as the expressi
        some function call
        && cond3
    ;
+   ```
+4. Always wrapping multi-line expressions with parenthesis.
+   - The parenthesis help "ground" the bindings on the top-level and don't look anywhere near as odd as the lonely semicolon.
+   - However this is a style not commonly used.
+
+   ```nix
+   {
+     attr3 = (
+       function call
+         many
+         arguments
+     );
+     attr3 = (
+       let
+         foo = "bar";
+       in
+       some statements
+     );
+     attr3 = (
+       if foo == "bar" then
+         function call
+       else
+         some statements
+     );
+   }
    ```
 
 ### inherit
