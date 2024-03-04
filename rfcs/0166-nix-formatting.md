@@ -1621,6 +1621,9 @@ The semicolon in bindings must always be placed on the same line as the expressi
 
 The items must either be all on the same line, or all on a new line each (with indentation),
 in which case the semicolon must be on its own line with indentation.
+- The semicolon placement seems inconsistent between bindings and `inherit`s: For bindings it's on the last line of the expression, while for `inherit`s it's on a new line.
+
+  This is because it's much more common to change items in an `inherit` than other expressions. By placing the semicolon on a new line, items can easily be added and removed at the end.
 
 **Examples**
 
