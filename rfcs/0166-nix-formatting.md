@@ -1055,6 +1055,32 @@ foo
       w = 40;
     };
 }
+
+# Good
+{
+  postPatch =
+    ''
+      patchShebangs .
+    ''
+    + lib.optionalString withFrei0r ''
+      substituteInPlace libavfilter/vf_frei0r.c \
+        --replace /usr/local/lib/frei0r-1 ${frei0r}/lib/frei0r-1
+      substituteInPlace doc/filters.texi \
+        --replace /usr/local/lib/frei0r-1 ${frei0r}/lib/frei0r-1
+    '';
+
+  configureFlags =
+    [
+      # *  Program flags
+      (enableFeature buildFfmpeg "ffmpeg")
+      (enableFeature buildFfplay "ffplay")
+      (enableFeature buildFfprobe "ffprobe")
+    ]
+    ++ optionals withBin [ "--bindir=${placeholder "bin"}/bin" ]
+    ++ [
+      # ...
+    ];
+}
 ```
 
 ### if-then-else
