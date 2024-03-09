@@ -23,22 +23,18 @@ Developer interface for building environment with specific features enabled and
 disabled is more complicated and and involves more "you just have to know it"
 compared to already existing systems.
 
-1. Knowing that package has a feature parameter (out of knowing the upstream)
-   does not mechanically translates to the name of feature parameter, it can be
-   named in multiple ways.
-
-2. Writing generic code is complicated. Even if list of packages all have
+1. Writing generic code is complicated. Even if list of packages all have
    optional dependency on package `foo`, duck-typing like
 
 ```
 map (p: p.override { with_foo = false; }) packages
 ```
 
-won't work because of lack of uniformity, leading ugly code downstream.
+won't work because of lack of uniformity, leading to ugly code downstream.
 
-3. If user wants to globally disable support for optional feature or build
+2. If user wants to globally disable support for optional feature or build
    dependency as much as possible, he needs to set multiple feature parameters,
-   and he still can miss couple. E.g, it is not obvious whether the following
+   and he still can miss some. E.g, it is not obvious whether the following
    list is enough to cover everything X11-related:
 
 ```
@@ -48,11 +44,11 @@ x11Support
 enableX
 ```
 
-4. There is no clear separation between feature parameters and other arguments
+3. There is no clear separation between feature parameters and other arguments
    to the package. With naming mandated by this RFC, distinction is clear to
    cater to automatic queries.
 
-5. Side effect of the proposdd migration plan is compiling of almost
+4. Side effect of the proposdd migration plan is compiling of almost
    exahustive list of known feature parameters.
 
 
@@ -144,7 +140,7 @@ added.
 }:
 
 # Assertions are optional and might be infeasible when package has huge amount
-# of feature flags, but in general improves user experience.
+# of feature flags, but in general improve user experience.
 assert enable_ssl -> with_openssl || with_wolfssl;
 
 stdenv.mkDerivation {
@@ -355,8 +351,8 @@ I picked the `gnuplot` as example since it is the closest to be compliant with p
    will likely conflict with other outstanding changes to the derivation, and potentially
    even with automatic version bumps.
 
-2. While migration is in the process (which is 1 year minimum due the grace
-   period), nixpkgs source will be even less consistent than it is today.
+2. While migration is in the process, nixpkgs source will be even less
+   consistent than it is today.
 
 3. Proposal migration plan slows down evaluation of all packages, including
    ones without any feature parameters by approximately 1.3%
@@ -385,12 +381,10 @@ sdl  => withSDL  (winner by one usage)
 
 ## Other ways to do migration
 
-1. Just don't and call some release a flag day.
-
-2. Put deprecation logic into individual packages. That would avoid evaluation
+1. Put deprecation logic into individual packages. That would avoid evaluation
    penalty for already compliant packages and packages that has no feature
    parameters, but would be quite verbose and require sophisticated automations
-   to introduce and drop.
+   to introduce and drop deprecation logic.
 
 ## Other ways to pass feature parameters
 
@@ -444,6 +438,29 @@ is no different.
 This could be viable and actually more elegant solution if Nix to be extended
 to be able to introspect default parameter values, but that would make nixpkgs
 incompatible with older installations of the Nix.
+
+### Use `foo ? null` instead of `with_foo` feature parameters
+
+Patter of using `foo ? null` where `foo` is a package, and handling
+`foo == null` as request to build without optional dependency on `foo`
+is already used in some places, but it has following drawbacks, so this RFC
+mandates `with_foo` approach:
+
+* Such pattern only applies to with parameters, so it is inconsistent
+  with `enable_*` and `conf_*` parameters.
+
+* Disabling support for something by default requires setting the override
+  at `callPackage` site, spreading package definition across multiple files.
+
+* This pattern makes code than wants to access attributes of `foo`
+  more complicated:
+
+```
+assert (foo == null) or (versionAtLeast foo.version "1.0");
+# versus simpler version that works even when "with_foo = false".
+assert (versionAtLeast foo.version "1.0");
+```
+
 
 ## Other ways to name parameters
 
@@ -568,5 +585,11 @@ There are other configuration scenarios not covered by this RFC:
 24. Change the migration plan to do renaming on the `makeOverrideable` level.
 
 25. Add link to the nix variable name code style. (Thx: @h7x4)
+
+26. Drop motivation part about mechanical translation of upstream parameter names. (Thx: infinisil)
+
+27. Drop mention of grace period, since it is not necessary with new migration plan.
+
+28. Document the `foo ? null` pattern and its drawbacks (Thx: Atemu)
 
 </details>
