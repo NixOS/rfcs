@@ -2,9 +2,9 @@
 feature: nixpkgs Maintainers Requirements and Expectations
 start-date: 2023-12-19
 author: Adam C. Stephens
-co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+co-authors: n/a
+shepherd-team: @Janik-Haag, @RaitoBezarius, @JulienMalka
+shepherd-leader: @Janik-Haag
 related-issues: (will contain links to implementation PRs)
 ---
 
@@ -25,7 +25,7 @@ It is quite simple for users to add themselves to the [maintainer list](https://
 
 The existing [maintainers/README.md](https://github.com/NixOS/nixpkgs/tree/master/maintainers/README.md) in nixpkgs, and the associated maintainer list, spell out a few expectations and requirements for maintainers.
 The requirements in these documents may not be exhaustive and they currently allow for maintainers to opt out of one or more pieces of contact information.
-For example, a maintainer may choose to not provide their user information for the primary nixpkgs hosting platform.
+For example, a maintainer may choose not to provide their user information for the primary nixpkgs hosting platform.
 This opting out for one or more individuals can put extra maintenance overhead on the remaining maintainers; it fragments information which may be important for the overall community; and may even hide information from others working on nixpkgs.
 
 # Detailed design
@@ -52,22 +52,22 @@ In order to do become a maintainer, add yourself to the [`maintainer-list.nix`](
 
 ### How to lose maintainer status
 
-The following spells out reasons why a maintainer may lose this status. The maintainer is welcome to come back at any time once any issues have been resolved.
+The following spells out reasons why a maintainer may lose this status.
+This removal ensures an accurate view of the state of maintenance of packages, including who will update the package or respond to issues and pull requests.
+If a maintainer is removed for inactivity or unreachability, this is not permanent and can be reverted by the maintainer at any time.
 
 #### Inactivity
 
-Maintainers who have become inactive on a given package can be removed.
-This helps us keep an accurate view of the state of maintenance in nixpkgs.
+Maintainers who have become inactive on a given package will be removed as maintainer of the package in question.
 
-The inactivity measure is currently not strictly enforced.
-We would typically look at it if we notice that the author hasn't reacted to package-related notifications for more than 3 months.
+If we notice that the author hasn't reacted to package-related notifications for more than 3 months, or 2 package releases, whichever is longer, then they can be removed.
 
-Removing the maintainer happens by making a pull request on the package, adding that person as a reviewer, and then waiting one week for response or feedback.
+Removing the maintainer happens by making a pull request on the package, adding that person as a reviewer, and then waiting a minimum of one week for response or feedback.
 
 #### Unreachable
 
-Maintainers who do not have an active account on the nixpkgs hosting platform will be removed as maintainers.
-An effort will be made to contact them through provided information prior to removal to provide a chance.
+Maintainers who do not maintain an active account on the nixpkgs hosting platform will be removed as maintainers.
+An effort will be made to contact them through information listed in `maintainer-list.nix` prior to removal.
 Individuals will receive a window of at least one week to respond to contact attempts.
 
 Maintainers who have provided an email address as a point of contact, which when contacted are not available through this email address (e.g. emails bounce and fail to deliver), will have this email address removed. They must be added as a reviewer on the corresponding pull request and given one week for response or feedback prior to merging.
@@ -75,14 +75,25 @@ Maintainers who have provided an email address as a point of contact, which when
 #### Violation of Code of Conduct
 
 Maintainers are not immune to the [NixOS Code of Conduct](https://github.com/NixOS/.github/blob/master/CODE_OF_CONDUCT.md) and must be held to the same standard as non-maintainers.
-Violations of the Code of Conduct severe enough to warrant enforcement should incur removal as maintainer as well.
+Violations of the Code of Conduct severe enough to warrant permanent removal will incur removal as maintainer as well.
 
 ### Removal as maintainer
 
 The above section documents _why_ a maintainer may be removed.
-All removals of a maintainer or a portion of their contact information will require at least a one week waiting period on the removal pull request.
+
+All removals of a maintainer or a portion of their contact information will require **at least a one week** waiting period on the removal pull request.
 All provided contact information from `maintainer-list.nix` will be used to attempt contact.
 The initial contact attempts will be used as the starting point for this one week window.
+
+#### Removal Process
+
+1. Open a pull request removing the maintainer from `maintainer-list.nix` and all files where they are listed as maintainer.
+2. Request review of the maintainer on the pull request
+3. Contact maintainer using all available contact information
+4. Comment in pull request noting which contact information was used
+5. If maintainer is not reachable through any of the contact avenues, initiator must provide relevant information in PR comment. For example, if emails bounce, it should be documented accordingly.
+6. *Wait at least one week for maintainer to respond*
+7. If maintainer does not still respond, the PR will be merged and the maintainer will be removed
 ```
 
 ## Update maintainers/maintainer-list.nix
@@ -98,11 +109,12 @@ Update the preamble in [maintainers/maintainer-list.nix](https://github.com/NixO
       github = "GithubUsername";
       githubId = your-github-id;
 
-      # At least one of email, matrix or discourse must be given in order to provide fallback communications
+      # **At least one** of email, matrix or discourse must be given in order to provide fallback communications
       email = "address@example.org";
       matrix = "@user:example.org";
       discourse = "DiscourseUsername";
 
+      # Optional
       keys = [{
         fingerprint = "AAAA BBBB CCCC DDDD EEEE  FFFF 0000 1111 2222 3333";
       }];
@@ -132,7 +144,7 @@ Update the preamble in [maintainers/maintainer-list.nix](https://github.com/NixO
 
     # GitHub username
 
-    Maintainers must have an active account on the primary nixpkgs hosting platform.
+    Maintainers must maintain an active account on the primary nixpkgs hosting platform.
     GitHub is currently the primary nixpkgs hosting platform, so you are required to provide and keep active a GitHub account.
 
     This information ensures that you:
@@ -140,7 +152,7 @@ Update the preamble in [maintainers/maintainer-list.nix](https://github.com/NixO
     - Get invited to the @NixOS/nixpkgs-maintainers team
     - Are reachable by mention on Issues and Pull Requests, either by a human or a robot.
 
-    `handle == github` is **strongly preferred** whenever the username is an acceptable attribute name.
+    `handle == github` is preferred whenever the username is an acceptable attribute name.
 
     If `github` begins with a numeral, `handle` should be prefixed with an underscore.
     ```nix
@@ -151,8 +163,8 @@ Update the preamble in [maintainers/maintainer-list.nix](https://github.com/NixO
 
     # Alternative form of contact
 
-    Maintainers must provide at least one of the alternative forms of contact. The simplest option would be to provide
-    the same email address you use for git commits.
+    Maintainers *must* provide at least one of the alternative forms of contact. The simplest option would be to provide
+    the same email address you use for git commits as this email address is already public.
 
     # PGP/GPG keys
 
@@ -167,7 +179,7 @@ Update the preamble in [maintainers/maintainer-list.nix](https://github.com/NixO
 
     # Data usage
 
-    By adding yourself to this maintainer-list file, you understand that the information you provided and your contributions are made public. While removal from the maintainer list is possible, in the interests of public good the history of nixpkgs will not be rewritten to remove you from it.
+    By adding yourself to this maintainer-list file, you understand that the information you provided and your contributions are made public. While removal from the maintainer list is possible, the history of nixpkgs is considered a public good and history will not be rewritten to remove all traces of the information provided.
 
     Fields in this file may change in the future. In order to comply with GDPR this file should stay as minimal as possible.
 */
@@ -177,7 +189,7 @@ Update the preamble in [maintainers/maintainer-list.nix](https://github.com/NixO
 
 There may be one or more maintainers who currently fail the criteria of an account on the nixpkgs hosting platform.
 These maintainers will be contacted through their available information and give one month after initial contact to remedy the missing account information, and will be contacted at least three times during the month.
-The maintainer should, themselves, create a Pull Request to provide the account information.
+The maintainer should, themselves, create a Pull Request to provide the required account information.
 In case they decide they still would prefer not to provide nixpkgs hosting platform account information, they will be removed from `maintainers-list.nix`.
 If a maintainer does not respond within the month window, they will be removed from `maintainers-list.nix`.
 
@@ -187,15 +199,13 @@ If a maintainer does not respond within the month window, they will be removed f
 
 This RFC intends to only apply to _maintainers_ and not general contributions from non-maintainers.
 These two roles are distinguished by their expected responsibility.
-While a contributor may use an alternative platform to submit a change, they are not considered a maintainer unless meeting the expectations laid out in this RFC and the resulting nixpkgs documentation.
+While a contributor may use an alternative platform to submit a change, they will be not considered a maintainer unless they are willing and able to meet the expectations laid out in this RFC and the resulting nixpkgs documentation.
 
 # Drawbacks
 
 [drawbacks]: #drawbacks
 
-These changes grant the nixpkgs hosting platform control over who may or may not be a maintainer.
-
-This may elevate the Code of Conduct, and the corresponding Moderation team, to a more prominent place than it currently is.
+These changes grant the nixpkgs hosting platform control over who may or may not be a maintainer. If GitHub bans an account, the maintainer must be removed.
 
 # Alternatives
 
@@ -213,9 +223,9 @@ We have the alternative of doing nothing, and continuing to allow maintainers to
 ### Downsides
 
 - Maintainers without an account cannot be mentioned or referenced on the nixpkgs hosting platform
-- Users and maintainers must leave the nixpkgs hosting platform in order to contact a maintainers, creating fractured communications
+- Users and maintainers must leave the nixpkgs hosting platform in order to contact a maintainer, possibly fracturing communications and losing public history
 - Automation must account for users who do not have an account on the nixpkgs hosting platform
-- Another maintainer/contributor/committer must execute all actions on behalf of a maintainer who does not have an account
+- Another maintainer/contributor/committer must execute all actions on behalf of a maintainer who does not have an account, increasing the workload for other maintainers
 - Automation may need to be written and maintained to accommodate contacting users without an account on the nixpkgs hosting platform
 
 ## Move to another platform that is hosted by the community
@@ -249,7 +259,7 @@ Some of these require an account for _all_ contributions, not just maintenance.
 Is this touching on areas of law that justifies involving legal counsel?
 
 Would implementing a Developer Certificate of Origin (DCO) as a contract or a more explicit grant of personal data provide better understanding for maintainers?
-This could be added for signoff of modifications to `mainters-list.nix` only if it does provide the intendend behavior of granting nixpkgs permission to use data.
+This could be added for signoff of modifications to `maintainers-list.nix` only if it does provide the intendend behavior of granting nixpkgs permission to use data.
 
 Do we need even more explicit contracts, similar to the [Debian declarations of intent](https://wiki.debian.org/DebianMaintainer#step_2_:_Declaration_of_intent)?
 
