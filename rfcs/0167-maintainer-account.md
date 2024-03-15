@@ -190,8 +190,8 @@ Update the preamble in [maintainers/maintainer-list.nix](https://github.com/NixO
 There may be one or more maintainers who currently fail the criteria of an account on the nixpkgs hosting platform.
 These maintainers will be contacted through their available information and give one month after initial contact to remedy the missing account information, and will be contacted at least three times during the month.
 The maintainer should, themselves, create a Pull Request to provide the required account information.
-In case they decide they still would prefer not to provide nixpkgs hosting platform account information, they will be removed from `maintainers-list.nix`.
-If a maintainer does not respond within the month window, they will be removed from `maintainers-list.nix`.
+In case they decide they still would prefer not to provide nixpkgs hosting platform account information, they will be removed from `maintainer-list.nix`.
+If a maintainer does not respond within the month window, they will be removed from `maintainer-list.nix`.
 
 # Examples and Interactions
 
@@ -259,7 +259,7 @@ Some of these require an account for _all_ contributions, not just maintenance.
 Is this touching on areas of law that justifies involving legal counsel?
 
 Would implementing a Developer Certificate of Origin (DCO) as a contract or a more explicit grant of personal data provide better understanding for maintainers?
-This could be added for signoff of modifications to `maintainers-list.nix` only if it does provide the intendend behavior of granting nixpkgs permission to use data.
+This could be added for signoff of modifications to `maintainer-list.nix` only if it does provide the intendend behavior of granting nixpkgs permission to use data.
 
 Do we need even more explicit contracts, similar to the [Debian declarations of intent](https://wiki.debian.org/DebianMaintainer#step_2_:_Declaration_of_intent)?
 
