@@ -2,10 +2,10 @@
 feature: Default name of fetchFromGithub FOD to include revision
 start-date: 2024-03-15
 author: Jonathan Ringer
-co-authors:
-shepherd-team: 
+co-authors: 
+shepherd-team:  
 shepherd-leader: 
-related-issues: TODO: link to old PR
+related-issues:
 ---
 
 # Summary
