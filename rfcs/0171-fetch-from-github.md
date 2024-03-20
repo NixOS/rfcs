@@ -61,20 +61,20 @@ unpacking source archive /build/8c542627d936a01b1d97825e7f26a8e95633f7aa.tar.gz
 
 - All derivations which don't pass a "name" parameter will need to be re-realized
     - This will be a download-intensive one-time cost to realize the new FOD derivations.
-    - NAR hash should not need to be recommputed assuming it was deterministic and not stale.
+    - NAR hash should not need to be recomputed assuming it was deterministic and not stale.
     - Cache should be minimally impacted as NARs are content addressable, thus deterministic sources should not contribute to cache bloat.
     - Potential for sources which are no longer available to be broken.
         - These can have their name manually set to "source" to perserve previous behavior.
-        - Ideally source availability would remedied with more appropriate methods. E.g. being made available.
-- "Interchangability" with other fetchers is diminished as the derivation name is diferent
+        - Ideally source availability would be remedied with more appropriate methods. E.g. being made available.
+- "Interchangeability" with other fetchers is diminished as the derivation name is different
     - In practice, fetchFromGitHub is never used in this way. It is generally the only fetcher, so there is never another FOD to dedupilicate.
 - Out-of-tree repositories may get hash mismatch errors
     - If the cause of the mismatch is staleness, this is good and working as intended
     - If the cause is non-determinism, this is frustrating.
 - Some derivations assume "source" to be the name of sourceRoot
     - This has been mitigated over two years within Nixpkgs
-    - Out-of-tree code may need break if they assume "source" is the name
-        - Can be mitigated with realease notes describing the issue
+    - Out-of-tree code may break if they assume "source" is the name
+        - Can be mitigated with release notes describing the issue
 
 # Alternatives
 [alternatives]: #alternatives
