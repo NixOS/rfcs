@@ -110,5 +110,5 @@ in lib.sanitizeDerivationName "${repo}-${ref}-src";
     - Resolve stale FODs, most of these can be PRs made against master
     - Resolve assumed usage of "source" as `src.name`, most of these changes can be made against master
     - Revert name to "source" for removed source urls.
-- Release notes around potential breakages with usage of "source"
+- Add release notes for potential breakages when assuming the name of the unpacked directory is "source"
 
