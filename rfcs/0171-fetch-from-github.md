@@ -16,7 +16,7 @@ Updating the hash on Fixed-Output Derivations (FODs) is a very error prone proce
 # Motivation
 [motivation]: #motivation
 
-This will hopefully provide immediate feedback that an FOD contains a stale hash. One must either build the FOD without the previous FOD in their Nix store, or run the FOD build with `--check` to verify that the FOD is not stale. Although fetchFromGithub is one of many fetchers; it is very common, and generally has a user specify the source information in granular which makes intent clear.
+This will hopefully provide immediate feedback that an FOD contains a stale hash. One must either build the FOD without the previous FOD in their Nix store, or run the FOD build with `--check` to verify that the FOD is not stale. Although fetchFromGithub is one of many fetchers; it is very common, and generally has a user specify granular source information which makes differentiating between sources easy.
 
 As a secondary effect, this will also give a more meaningful name to the FODs than "source". E.g. `/nix/store/...-source -> /nix/store/...-protobuf-v24.1-src`
 
