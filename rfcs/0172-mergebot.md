@@ -74,7 +74,8 @@ For now we propose that new merge strategies or significant changes to current o
 
 ## Prior Art
 
-*To be completed*
+https://github.com/NixOS/rfcs/pull/50
+https://github.com/NixOS/rfcs/pull/128
 
 ## Unresolved Questions
 
