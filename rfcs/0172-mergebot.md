@@ -8,19 +8,24 @@
 
 ## Summary
 
-This RFC proposes the introduction of four new merge strategies for `nixpkgs`, aiming to provide more nuanced merge permissions. These strategies facilitate automatic updates and backports from trusted sources and allow maintainers the choice between requiring full consensus or just a single approval for merges.
+This RFC proposes the introduction of four new merge strategies for `nixpkgs`, aiming to provide more nuanced merge permissions.
+One of the main goals of this RFC is to extend the capabilities of the mergebot beyond PRs of just r-ryantm.
+These strategies facilitate automatic updates and backports from trusted sources and allow maintainers the choice between requiring full consensus or just a single approval for merges.
 
 ## Motivation
 
 ![](https://pad.lassul.us/uploads/f24e0ff3-117a-4167-8f60-79ca508b8c1c.png)
 
-The current `nixpkgs` contribution model relies heavily on a group of *committers* (approximately 200 at the time of writing), who possess exclusive rights to merge PRs. This model has remained unchanged since its inception and poses limitations on community contributions and maintainer workload. Implementing granular merge permissions will enable a broader contribution base and lessen the burden on existing committers by empowering package maintainers with more control over their respective packages.
+The current `nixpkgs` contribution model relies heavily on a group of *committers* (approximately 200 at the time of writing), who possess exclusive rights to merge PRs.
+This model has remained unchanged since its inception and poses limitations on community contributions and maintainer workload.
+Implementing granular merge permissions will enable a broader contribution base and lessen the burden on existing committers by empowering package maintainers with more control over their respective packages.
 
 ## Detailed Design
 
 The current design of the mergebot is limited in functionality. To tackle this issue we propose to implement per package strategies. These would be set inside a meta attribute in the package.
 
-We propose augmenting package meta fields with a new attribute set that specifies a list of merge strategies. The mergebot will execute all listed strategies in parallel and will proceed with the merge upon one successful strategy, contingent on passing ofborg checks as well.
+We propose augmenting package meta fields with a new attribute set that specifies a list of merge strategies.
+The mergebot will execute all listed strategies in parallel and will proceed with the merge upon one successful strategy, contingent on passing ofborg checks as well.
 
 ![](https://pad.lassul.us/uploads/965545d8-8575-41a8-9746-6bcc66f8bb0e.png)
 
