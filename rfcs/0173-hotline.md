@@ -214,7 +214,7 @@ Fax, Letters, pidgeons. These are not really alternatives though as they are mor
 
 Human operator fallback.
 
-The ability to go to a physical office, but only on the fourth Friday in uneven months between 7:30 and 8:15 am with an appointment via hotline.
+The ability to go to a physical office, but only on the fourth Friday in uneven months between 7:30 and 8:15 am with an appointment via hotline requested at least 2 months in advance.
 
 # Prior art
 [prior-art]: #prior-art
