@@ -86,7 +86,7 @@ With all that reasoning, here are the actions proposed:
 
 There are a few issues present:
 
-- "Nix language" and "Nix package manager" share the name "Nix"
+- "Nix language" and "Nix package manager" are both commonly referred to as "Nix"
 - Further, "Nix package manager" isn't an official term that exists. We just have "Nix", which is a package manager, and the distributed package includes a daemon and a CLI to interact with it
 - Nixpkgs repository is very awkwardly named. When spelled out, "Nixpkgs" sounds the same as "Nix packages". This makes it hard to introduce people to Nix with audio presentation
 - There isn't consistent naming for the community and its activities. Looking at the [community page](https://nixos.org/community/), we can see the following used:
