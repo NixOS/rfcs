@@ -164,7 +164,7 @@ I understood MicNineThree, is this correct?
 - User says no
 
 ```
-Sadly all our speech to text pipelines are busy. Instead we will read to you all pull requests by r-ryantm.
+Sadly all our speech to text pipelines are busy. Instead we will read to you all 515 open pull requests by r-ryantm.
 
 - pull request number 299112: Python 3 point eleven AIO ESP Home API. twentythree point one point zero arrow twentythree point two point zero
 - pull request number 299106: D DNS dash go. six point two point two arrow six point three point zero
