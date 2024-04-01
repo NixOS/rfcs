@@ -170,7 +170,7 @@ Sadly all our speech to text pipelines are busy. Instead we will read to you all
 - pull request number 299106: D DNS dash go. six point two point two arrow six point three point zero
 (etc.)
 
-- please press the number of the pull request you  want to edit.
+- please press the number of the pull request you want to edit.
 ```
 
 - User presses 299106
