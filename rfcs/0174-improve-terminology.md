@@ -11,22 +11,29 @@ related-issues: (will contain links to implementation PRs)
 # Summary
 [summary]: #summary
 
-Historically, the terminology and naming used in the NixOS project had been subpar. This includes, but is not limited to, the following issues:
+The NixOS Project started out as a research. In typical research fashion, it establishes the basic terminology first, and the builds concepts on top of that. This bottom-up style of thinking is still dominant in the ecosystem today.
 
-- Overloaded terms, such as "derivation" (can mean a .drv file in Nix store, a temporary .drv file, a package, or even a dependency - FOD or IFD)
-- Overloaded names. The common example is Nix DSL and Nix package manager being called just "Nix"
-- Confusing names, such as "Nixpkgs". When you say it out loud in English, it sounds indistinguishable from "Nix packages", which leads to issues when giving audial presentations
+Despite being very powerful, this bottom-up approach has its flaws, too. It leads to a number of long-standing issues within the NixOS Project that have been called out frequently:
 
-Those problems span across many NixOS Projects and related resources. They made their way into manuals, official Wiki, <https://nix.dev> learning resource, announcements, and more. They are also ever-present in community-created content and resources. It is impossible to change the status quo without a centralized, coordinated effort that doesn't limit itself to a single project, but covers the entire NixOS Project. Such an effort can be made with an RFC.
+- There's a high barrier to entry. This is a very multifaceted issue, and it comes down to:
+  - "Day one" operations (such as installing a package, uninstalling a package, updating) being described very poorly. This issue is largely solved thanks to the excellent work of Documentation Team
+  - "Day two" operations (such as overriding a package, packaging something new, organizing NixOS configuration) being described very poorly, or not at all. This issue is steadily getting better, especially with the [nix.dev](https://nix.dev) effort and [official wiki](https://wiki.nixos.org)
+  - Existing learning materials not providing *explanations*. People learn how to *do something* with Nix, but they don't build the intuition for what they are doing. As a result, they have a really hard time solving the issues that occur
+- Some of the concepts are notoriously hard to grasp even for experienced Nixers. "Derivation" is a strong example of that
+- A lot of concepts are *intentionally left unexplained*. An extremely common explanation of "derivation" is "it's just a package, don't worry about it". The reason for that is because it's really hard and time-consuming to explain the details
+
+Overall, we as a community are too fixated on having technically correct terminology. While this isn't a bad goal, we do it to such an extent that we ignore user stories and overcomplicate things for the sake of correctness.
 
 This RFC aims to, in order of importance:
 
-1. Identify problematic terms and names that the community agrees on
-2. Settle on better terms or names to be used
-3. Develop a plan on how to handle the transition to new terms and names
+1. Raise a discussion about these problems.
+2. Provide an alternative, focusing more on explanations rather than rigorous definitions. This also includes culling of a lot of widespread definitions that don't end up being useful.
+3. Raise a discussion about the remaining terms. Discuss their necessity and consider renaming to something that aligns better with the explanation-guided approach.
 
 # Motivation
 [motivation]: #motivation
+
+The NixOS Project has long left the walls of academy, and is now a general-use product. As such, we should focus on making the project more user-friendly. Sticking to the formal rules of the academy just won't be enough.
 
 Clearing up the terminology will allow us to have more productive conversations about Nix, and would solve the issues many key parties experience:
 
@@ -34,7 +41,7 @@ Clearing up the terminology will allow us to have more productive conversations 
 - Beginners often get confused on the terminology and naming
 - Teachers have to go on tangents related to terminology and naming, wasting precious time and capacity of their students on complicated terminology instead of education
 
-Additionally, rigorously defining the terminology and naming would benefit SEO, as well as improve the experience of discovering Nix-related materials with search engines. Currently, there are a few issues with doing that:
+Additionally, rethinking the terminology and naming would benefit SEO, as well as improve the experience of discovering Nix-related materials with search engines. Currently, there are a few issues with doing that:
 
 - Depending on your locale, location and other variables, you may encounter unrelated search results. This is because the name "Nix" is also used by other things: [Wikipedia-compiled list](https://en.wikipedia.org/wiki/Nix)
 - Issues that can be attributed to Nix package manager or Nixpkgs are easier searched with "NixOS" in query rather than "Nix". This is partly because the users of Nix and NixOS overlap, and partly because "NixOS" is just a more concrete term to search by
@@ -43,35 +50,101 @@ Additionally, rigorously defining the terminology and naming would benefit SEO, 
 # Detailed design
 [design]: #detailed-design
 
-## Build terminology
+## Problem statement
 
-There's a lot of terminology in the Nix build process that is still used, but isn't very helpful anymore. Let's look at the basic Nix build process:
+There's a lot of terminology in the Nix build process that is still used, but isn't very helpful. Let's look at the basic Nix build process:
 
 ```mermaid
 graph LR;
-  expr[Nix expression that contains a derivation] -->|nix eval| drv[.drv file];
-  drv -->|nix instantiate| storedrv[Store path with .drv file];
-  storedrv -->|nix realise| output[Store path with output];
-``` 
+  expr[Nix expression that contains a derivation] -->|nix-instantiate| storedrv[Store derivation];
+  storedrv -->|nix-store --realise| output[Valid store path];
+```
 
-This is usually done implicitly by the `nix build` command. However, there's a lot more complexity at hand! Let's look at some of the caveats that can apply:
+Here, we see the crux of the issue. There are a total of **six** terms introduced here: [derivation](https://nixos.org/manual/nix/stable/glossary#gloss-derivation), [instantiation](https://nixos.org/manual/nix/stable/glossary#gloss-instantiate), [store derivation](https://nixos.org/manual/nix/stable/glossary#gloss-store-derivation), [realisation](https://nixos.org/manual/nix/stable/glossary#gloss-realise), [store path](https://nixos.org/manual/nix/stable/glossary#gloss-store-path) and [valid](https://nixos.org/manual/nix/stable/glossary#gloss-validity). Indirectly, we are also introducing *nine* more terms: [store](https://nixos.org/manual/nix/stable/glossary#gloss-store), [store path](https://nixos.org/manual/nix/stable/glossary#gloss-store-path), [store object](https://nixos.org/manual/nix/stable/glossary#gloss-store-object), [substituter](https://nixos.org/manual/nix/stable/glossary#gloss-substituter), [binary cache](https://nixos.org/manual/nix/stable/glossary#gloss-binary-cache), [output path](https://nixos.org/manual/nix/stable/glossary#gloss-output-path), [closure](https://nixos.org/manual/nix/stable/glossary#gloss-closure), [content-addressed derivation](https://nixos.org/manual/nix/stable/glossary#gloss-content-addressed-derivation) and [Nix database](https://nixos.org/manual/nix/stable/glossary#gloss-nix-database). That's 15 terms to understand how the build works!
 
-- Nix expression doesn't necessarily contain a derivation. Using `nix eval` to evaluate it will produce a result without producing a .drv file
-- Nix can be configured to not keep .drv files in the store using a setting `keep-derivations` (default is `true`)
-- Fixed-Output Derivations, or FODs, are mostly not about derivations. They are about a type of store path that has a well-known hash that is compared with the actual hash
-- Import From Derivation, or IFD, isn't about derivations, either! It is about reading data from a store path
-- Packages that exist in Nixpkgs are often called "derivations", despite the existence of a buildspec in .drv file being an implementation detail
-- Nix store outputs that aren't exposed in Nixpkgs are called "derivations". Examples include store paths passed to `src`, symlink farms and other kinds of store paths used in implementation, but not exposed to the end user
+The worst part is, even if you take your time to read all the 15 definitions and piece together the meaning, you still won't understand the whole thing. The [definition for derivation](https://nixos.org/manual/nix/stable/glossary#gloss-derivation) is useless: essentially, a derivation is an *internal data format* that is used by Nix. It is an implementation detail that is mistreated as a concept that the user needs to learn.
 
-In summary, "derivation" concept is an implementation detail. The term, however, is applied to many user-facing scenarios. As a result, the term becomes overloaded, confusing and difficult to comprehend. We should treat derivations as an implementation detail.
+What's most unfortunate is, this build process isn't even described anywhere. The explanation of it doesn't exist in [Nix store chapter](https://nixos.org/manual/nix/stable/store/) of the manual; it's not in [package management chapter](https://nixos.org/manual/nix/stable/package-management/) either; [architecture overview](https://nixos.org/manual/nix/stable/architecture/architecture#overview) doesn't touch on it in detail either. You have to look at the [nix-build man page](https://nixos.org/manual/nix/stable/command-ref/nix-build) to see that it is a wrapper around `nix-instantiate` and `nix-store --realise`, and then you should look at the man pages for [nix-instantiate](https://nixos.org/manual/nix/stable/command-ref/nix-instantiate) and [nix-store --realise](https://nixos.org/manual/nix/stable/command-ref/nix-store/realise) to reconstruct the build process flow.
 
-Continuing on the topic of derivations, it is clear that store path outputs aren't always directly produced by a derivation. It is not very useful to think in "derivation -> output" chains. Instead, we can use a term "installable" that is [already established](https://nixos.org/manual/nix/stable/command-ref/new-cli/nix#installables) to simplify the terminology:
+To recap, in order to truly understand the build process of Nix, you would need to:
 
-- `nix build` is a command that converts an installable to an output store path or fails. It is a simple "input -> output" relationship
-- In this model, what is written to the store (aside from the output) are just *dependencies*. This includes plain dependencies (like software libraries), FODs, implementation-based store paths and .drv files
-- Installables are usually packages or runnable scripts. That makes them easy to conceptualize, and might give additional intuition into the future Flake transition. The current unstable schema for Flakes uses installables for all outputs. That said, Flakes also allow definining custom outputs that can be arbitrary
+1. Read the man page for `nix-build`
+2. Read the man page for `nix-instantiate`
+3. Read the man page for `nix-store --realise`
+4. Put together the contents of those man pages to get the accurate flow of `nix-build`
+5. Read 15 glossary definitions to formalize your knowledge
+6. Give up on trying to understand what is the derivation, because it's essentially just a type in Nix language
 
-With all that reasoning, here are the actions proposed:
+This is an unacceptable amount of indirection for understanding how the build process works. The build process that Nix uses isn't complicated, and it is also not part of the advanced functionality: building packages is a basic functionality of a package manager. The complexity here comes not from the underlying mechanism, but from the way knowledge is structured: instead of an explanation, the user is offered formal definitions that link to other formal definition. Instead of reading a comperehensive summary or looking at a graph (like the one provided earlier), the user needs to play detective, putting clues from different sources together to form a coherent picture.
+
+Part of the issue comes from the format of a *manual*. Manuals are commonly focused on theory with some practical examples. Good manuals have a set of [practical examples](https://diataxis.fr/how-to-guides/), some reasonable [explanations](https://diataxis.fr/explanation/) and a complete [reference](https://diataxis.fr/reference/). We have fine examples, and our reference is incredibly rich (but a little hard to read due to the amount of links to terms that we have). But explanations are *pretty much non-existent*.
+
+Another learning resource worth discussing is [nix.dev](https://nix.dev). It makes heavy use of the [Diataxis framework](https://diataxis.fr/) of structuring documentation. It provides excellent tutorials and guides. For reference materials, it links to the Nix manual and other manuals. But explanations are, once again, lacking: there are only two entries in [explanation-focused part](https://nix.dev/concepts/#concepts).
+
+Lastly, there are [Nix Pills](https://nixos.org/guides/nix-pills/index.html). They are a little old, but they are still regarded as a good read. There's a good reason for it: Nix Pills focus extensively on [tutorials](https://diataxis.fr/tutorials/) and [explanations](https://diataxis.fr/explanation/). The series helps you *understand* things. It even [describes derivations](https://nixos.org/guides/nix-pills/our-first-derivation)!
+
+In short, there're lots of materials that teach you how to *use* Nix. There's also a large and extensive reference that *describes Nix itself*. However, for materials that *make you understand Nix* - there's a giant void. This seems to suggest that there's a large gap between *using* Nix and *understanding* Nix. This gap seems to be the reason why Nix is considered **difficult**.
+
+To be clear, the issue isn't *just* as lacking good explanation materials. The issue is also our reference material being only useful to people that already know what they want and need. Nix manual is quite useless if you don't already *understand* Nix - and there's barely anything that helps you do that.
+
+There are two problems at play: we don't have explanation materials, and our reference is exceedingly unhelpful. What follows is a discussion on how to solve those problems.
+
+## Adding explanations
+
+This is part of the responsibility of [Documentation Team](https://nixos.org/community/teams/documentation/). Some of the possible actions include:
+
+- Adding more explanations to [nix.dev](https://nix.dev/)
+- Migrating useful explanations from [Nix Pills](https://nixos.org/guides/nix-pills/) to [nix.dev](https://nix.dev/)
+
+Overall, this part is already handled by the Documentation Team. The discussion surrounding adding explanations should be held as part of it. This discussion is out of scope of this RFC.
+
+## Restructuring Nix manual
+
+While this is also part of the responsibility of [Documentation Team](https://nixos.org/community/teams/documentation/), there's a lot of value in discussing the issue very publicly in this case. As demonstrated above, the manual contains very little helpful information as a result of conforming to a bottom-up design. Man pages that redirect you to other man pages, that in turn redirect you to glossary definitions, that can also redirect you to other glossary definitions, is a direct consequence of that.
+
+We should re-evaluate how we think about the Nix manual in its entirety, and we should focus much more on the top-down format. Let's discuss the build process again, keeping the goal of simplification in mind:
+
+1. There is a `nix-build` command. This command takes in a file with Nix code, and produces an *optional* output
+2. There's *some* output only when the code uses a special function, `builtins.derivation`. Otherwise, the output is *none* - the command will finish succesfully, but nothing will be built!
+3. `builtins.derivation` is a convenience function that creates an attribute set with some magic attributes. Attribute sets with those magic attributes can be built with Nix. So basically, Nix looks for attribute sets with those magic attributes, and builds them
+4. The build itself has two stages: evaluation stage and build stage. Evaluation stage creates a `.drv` file in the store, which contains a build plan. The build stage executes this build plan to create our output in the store
+5. To recap: `nix-build` takes Nix code, and if this Nix code contains an attribute set with some magic attributes - it puts a `.drv` file in the store, as well as the build output
+
+Notice how this top-down approach helps. It introduces new concepts as they appear; it also highlights how arbitrary some of the conventions are (what is a "derivation", and what is a `.drv` file). The explanation is self-contained, and it provides a clear path from start to finish. It is also easy to extend - adding new magic attributes to "derivation" requires just listing them in reference, and a lot of the things mentioned can be explained separately - such as why we even want to have "build plans" in the store, or what things can and can't be done in evaluation/build stages.
+
+This also lets us build a flowchart that's easy to parse at a glance:
+
+```mermaid
+graph LR;
+  start[nix-build] -->|no magic attrset| noop[success, no output]
+  start -->|magic attrset| drv[create .drv in store]
+  drv -->|build| out[build output in store]
+```
+
+Reading the flowchart doesn't require familiarizing yourself with 15 terms, either.
+
+## Rethinking terminology
+
+When we have explanations, we can afford to rethink a lot of the terminology that we are currently using. Terminology is harmful to an explanation - it takes time to understand what the term means, and to get used to it. Explanation also bridges practice with understanding. That means that we no longer require the terminology to be vast and technically accurate for people to understand what is happening.
+
+Simply put, rigorously defining a "derivation" isn't necessary, when the intuition of "it's just an attrset with some magic attributes" is in place. It can be useful to have a word for it, so that we can talk about a concept without a long explanation beforehand, but it's no longer a basis of our documentation.
+
+Concretely, we can finally give a useful definition to the word "derivation":
+
+> An attribute set with some magic parameters. When Nix package manager evaluates it, it also creates a .drv file in the store with the evaluated contents. This .drv file can then be built with Nix package manager. Derivations are often created with an utility function `builtins.derivation`, or - more commonly - one of the library functions from Nixpkgs, such as `lib.mkDerivation`.
+
+This definition is also self-contained and clear. It's not as formal and rigorous, but it's a lot more readable as a result. We don't reference a definition for "store derivation", or "store path", either.
+
+This approach also helps us explain some of the trickier terms:
+
+> IFD (Import From Derivation) is a pattern in Nix Language. This pattern occurs when you pass a derivation to a built-in function that reads from filesystem. Those functions are executed at the evaluation stage. When they depend on a derivation, the evaluation has to be paused, and the derivation has to be evaluated and built first. Essentially, IFD occurs when your evaluation depends on the build result of something else.
+> FOD (Fixed-Output Derivation) is a derivation that has optional attributes `outputHash`, `outputHashAlgo` and `outputHashMode`. These attributes allow you to specify the expected hash of the contents in advance. This expected hash will be compared with the actual hash of the contents. This is useful for making internet downloads reproducible: if the link stays the same, but the contents change, the hashes will be different and the build will fail. Additionally, if the URL changed (such as when the original server is down), but the contents are the same - the hashes will match, and nothing will be rebuilt.
+
+Interestingly, this also opens up the conversation about the necessity of those terms. When we focus on the whole picture instead of concrete definitions, we are able to reframe the problem entirely.
+
+It is very possible that we'll no longer need the terms "IFD" and "FOD". Perhaps, those terms aren't even needed: they don't describe a concept, they merely describe the properties of established concepts. Perhaps we can do a better job at explaining those established concepts, which will lend itself naturally into describing the corner cases such as IFD and FOD.
+
+Lastly, there's an opportunity to rethink our naming. Perhaps there's an opportunity to come up with a much more descriptive name, once we're less focused on having strict definitions. Here are some potential things that can be discussed:
 
 - Consider renaming IFD (Import From Derivation). Here are possible options:
   - Import From Store Path (IFSP)
@@ -103,36 +176,8 @@ With all that reasoning, here are the actions proposed:
     - Hints at what the usecase for FOD is: validating that a result matches expectation
     - Isn't particularly descriptive otherwise
   - Other options. This is an open question
-- Converge on using "package" term for introductory materials
-- Converge on using "installable" term for more advanced materials. This includes cases when an installable is a runnable script, such as when building a closure of NixOS system. The term should also be used in manuals and references
-- Rename "derivation" to "derivation file", keeping the current definition. Define "derivation" as "an old term that is no longer used, which usually means derivation files"
-- Consider renaming "derivation"
-  - Derivation can be renamed to "build plan". That's essentially what a derivation is
-  - We don't need to define what a "build plan" is. Those two words encompass the whole definition
-  - Then, "derivation" can be defined as "a historical term for a build plan"
-  - The only thing we need to describe about "build plan" is its properties. Those are:
-    - Executing a "build plan" results in creating a new store object
-    - "Build plans" are also store objects
-    - "Build plans" are stored in the .drv files. Those files serialize the build plan in aTerm format for historical reasons
-    - While "build plans" are currently stored in .drv files in aTerm format, it is not at all required. Since we are just listing properties and not coming up with a rigorous definition, it is trivial to extend: if we decide to store build plans in JSON, it is very easy to say "build plans can be expressed in JSON format"
-    - Nix package manager can compile Nix expressions into build plans using `builtins.derivation` primitive
-- Treat every other usage of the word "derivation" as **incorrect documentation**
-- Remove the word "instantiate". For all intents and purposes, "instantiation" is just putting a derivation file into Nix store; this is an implementation detail
-- Replace the words "realise", "realisation" with "install", "installation". Nix operates on installables, and it installs them; there's no need for an arcane term
-- Alias `lib.mkDerivation` function to `lib.mkPackage`, and do a treewide rename to Nixpkgs. While mkDerivation can be used for defining FOD or IFD, it usually isn't, so we dodge the edge cases where "derivation is not technically a package"
-  - The main point of this RFC is to drastically decrease the amount of "this is a weird name due to legacy reasons" gotchas. Without renaming one of the most essential library functions, we risk having to explain the weird name very early, which is currently the status quo
-  - The diff for rename will be huge. A rough estimate is that there are 51,000 lines with `mkDerivation` currently in Nixpkgs across 13,000 .nix files
-    - Arguably, it is still worth it. This is a one-time cost to pay, and the benefit in terms of documentation are very substantial
-  - There's also an option to outright remove `lib.mkDerivation` in favor of the `lib.mkPackage`. This is a huge breaking change to all downstream consumers, so it's very undersirable
-- Alias `builtins.derivation` to `builtins.drvFile`
-  - In Nixpkgs, there seems to be only one use of this function. It's unlikely to be used in other projects too, due to how low-level it is
-  - Removing `builtins.derivation` instead of aliasing it would be a major breaking change for Nix DSL. It is hard to make an argument in favor of it
-  - This is a change to the core Nix DSL. Changes like that are very hard to make
-  - Renaming `lib.mkDerivation` without renaming `builtins.derivation` might lead to a lot of confusion if `lib.mkPackage` still creates something that is called "derivation" in Nix DSL, such as inspecting the result of `nix eval` or `nix repl` execution
-  - Open question: is this a common use case? Should we expect the users of NixOS Project to poke the language with `nix eval` before they read the documentation for how `lib.mkPackage` works?
-  - Open question: is it possible to create a warning for this scenario? Recent versions of Nix have changed the interpretation of store paths ending in `.drv`, and print the following warning: `warning: The interpretation of store paths arguments ending in `.drv` recently changed. If this command is now failing try again with '/nix/store/p7gp6lxdg32h4ka1q398wd9r2zkbbz2v-hello-2.10.drv^*'`. Is this possible to use a similar warning here too?
 
-## Projects
+## Rethinking branding
 
 There are a few issues present:
 
@@ -184,7 +229,7 @@ Here's the solution proposed:
   - NixOS also is, arguably, the flagship product of NixOS Project. It utilizes Nix package manager to its utmost extent, providing the most features
   - There's an argument to name communities and activities after the most relevant project. If it's primarily about Nix package manager, it would be "Nix"; if it's primarialy about NixOS, it would be "NixOS". This seems to be similar to the status quo
 - A possible activity that shouldn't be named after NixOS is NixCon. NixOSCon sounds like a mouthful, and having an exception or two is acceptable, as long as we are recognizable (keep the "Nix" part) and get rid of other sources of confusion
-- Another possible exception is nix.dev website. This is, however, an open question
+- Another possible exception is [nix.dev](https://nix.dev) website. This is, however, an open question
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
