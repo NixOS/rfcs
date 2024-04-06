@@ -64,7 +64,7 @@ unpacking source archive /build/8c542627d936a01b1d97825e7f26a8e95633f7aa.tar.gz
     - NAR hash should not need to be recomputed assuming it was deterministic and not stale.
     - Cache should be minimally impacted as NARs are content addressable, thus deterministic sources should not contribute to cache bloat.
     - Potential for sources which are no longer available to be broken.
-        - These can have their name manually set to "source" to perserve previous behavior.
+        - These can have their name manually set to "source" to preserve previous behavior.
         - Ideally source availability would be remedied with more appropriate methods. E.g. being made available.
 - "Interchangeability" with other fetchers is diminished as the derivation name is different.
     - Since Nixpkgs 23.11, `sourceRoot` is required to be `src.name` or its sub-directrory when `src` is produced by `fetchzip`-based fetchers. This guarantees the interchangeability of these fetchers.
