@@ -177,59 +177,21 @@ Lastly, there's an opportunity to rethink our naming. Perhaps there's an opportu
     - Isn't particularly descriptive otherwise
   - Other options. This is an open question
 
-## Rethinking branding
+## Rethinking ecosystem names
 
 There are a few issues present:
 
-- "Nix language" and "Nix package manager" are both commonly referred to as "Nix"
+- "Nix language" and "Nix package manager" are both commonly referred to as just "Nix". It is not always clear from the context which is being talked about, and it's unnecessarily confusing
 - Further, "Nix package manager" isn't an official term that exists. We just have "Nix", which is a package manager, and the distributed package includes a daemon and a CLI to interact with it
 - Nixpkgs repository is very awkwardly named. When spelled out, "Nixpkgs" sounds the same as "Nix packages". This makes it hard to introduce people to Nix with audio presentation
-- There isn't consistent naming for the community and its activities. Looking at the [community page](https://nixos.org/community/), we can see the following used:
-  - The website itself is under domain nixos.org (implying that related organization/community is NixOS)
-  - "Nix community" is used to describe the whole community
-  - The official Matrix space is also hosted under nixos.org
-  - Mastodon and Twitter, which are described as "official spaces", are also tagged under NixOS
-  - Stackoverflow link to "official space" looks for tags: "Nix", "Nixpkgs", "NixOS", "NixOps"
-  - NixCon is named after Nix, not NixOS
-  - The link under "RFC process" leads to the official organization on Github, which is called NixOS
-  - Under the "foundation board" entry, "NixOS project" is mentioned
-  - Under the "security team" entry, "NixOS community" is mentioned
-  - Under the "infrastructure team", both "Nix community" and "NixOS community" are mentioned; likewise for "NixCon team"
-  - Under the "marketing team", "Nix user base" is mentioned
-  - Under the "CUDA team", both "Nix" and "NixOS" are mentioned
-  - There's a "Nix team", which is responsible for Nix package manager specifically; makes sense
-  - There's a "Nix formatting team", which creates a standard format for "Nix". It is ambiguous if the team creates a standard format for Nix package manager or for Nix DSL
-  - NixOS Foundation is mentioned, which once again suggests that the project is NixOS
+
+There is also an issue with NixOS/Nix naming confusion. The project is "NixOS Project", but there are also mentions of "Nix community". This issue is worth mentioning, but it already has [an existing effort working towards solving it](https://github.com/nix-rfc-canonical-domain/rfcs).
 
 Here's the solution proposed:
 
-- Give an official name to Nix DSL. Options:
-  - "Nix DSL" - descriptive, but potentially confusing. Not everyone knows that DSL acronym means "Domain-Specific Language"
-  - "Nix Language" - this phrase is already used across the various documentation, although inconsistently. Using this would require little work overall, and it's very descriptive
-  - "NixLang" - similar to Golang. Shorter to pronounce, but risks going back to the status quo: "NixLang -> Nix" (similar to "GoLang -> Go")
-  - "Nix Language" with "NixLang" abbreviation - something in-between. There's little benefit to this option, as it would expose us to the biggest downsides of both options simultaneously
-- Nix DSL should be recognized as a distinct part of the NixOS Project. It should have its own manual entry, and it should also have a dedicated repository. The repository should contain the specification to Nix DSL, and optionally a reference interpreter of Nix DSL
-  - This decision is orthogonal to the topic of this RFC, and arguably deserves an RFC on its own. Still, for the discussion at hand, it is very useful to decouple the concept of "Nix Package Manager" from "Nix DSL"
-  - Recognizing Nix DSL as a project on its own can open up additional discussions in the future regarding LSP servers and treesitter grammars
-  - Writing a complete language specification for Nix DSL is very error-prone and tedious, due to a number of Nix DSL gotchas. Separating the Nix DSL related parts from Nix package manager to a separate repository might also be hard, requiring changes to build system and code refactoring
-  - There is a low-effort solution to create a separate repository, but only add a README to it, stating that the project is officially recognized as separate, but no work on separating it having been done. This is potentially even more confusing
+- Enforce the usage of "Nix Language" terminology. It's already used a lot across the documentation, just not consistently
 - Nix project should be given a better name to reflect what it does. Nix project can be renamed to "Nix package manager", or to "NixPM", whichever is preferred. That would involve renaming the Github repository. Nix package manager includes a daemon implementation, as well as a CLI tool to interact with the daemon
-- Nixpkgs should be renamed
-  - There's a strong argument against renaming the Github repository. Despite leaving some place for confusion, renaming a repository is a massive and painful chore
-  - It is very probable that renaming the Github repository is pointless. People who are already contributing to Nixpkgs expect the link to stay the same. People who haven't seen the repository yet will likely discover it through the links given in the learning materials provided by NixOS Project. Furthermore, "Nixpkgs" is already a very intuitive name
-  - We could change the H1 title given in the README, as well as put out a small announcement about the Nixpkgs repository having a new name and explain the reasoning
-    - We could just call it "Nixpkgs repository". This requires little change. "Packages built with Nix are stored in Nixpkgs" becomes "packages built with Nix package manager are stored in Nixpkgs repository"
-      - This makes much more sense than "Packages built with Nix package manager are stored in Nixpkgs" when saying out loud
-      - This implies that Nixpkgs repository is the primary source for packages. This is not a wrong intuition, though; we already connect Nix package manager to Nixpkgs in the installation process
-      - The intuition of there being the primary repository is very solid. Most language ecosystems have a primary repository, with possibility of connecting additional smaller repositories. This is also the case for Nix ecosystem
-- Community, activities and the like should be consistently named "NixOS"
-  - Most things are already called after "NixOS"
-  - We've already invested into NixOS brand. The domain we have is named after NixOS, and the legal entity NixOS Foundation is also named after NixOS
-  - NixOS is, arguably, the entry point to Nix package manager
-  - NixOS also is, arguably, the flagship product of NixOS Project. It utilizes Nix package manager to its utmost extent, providing the most features
-  - There's an argument to name communities and activities after the most relevant project. If it's primarily about Nix package manager, it would be "Nix"; if it's primarialy about NixOS, it would be "NixOS". This seems to be similar to the status quo
-- A possible activity that shouldn't be named after NixOS is NixCon. NixOSCon sounds like a mouthful, and having an exception or two is acceptable, as long as we are recognizable (keep the "Nix" part) and get rid of other sources of confusion
-- Another possible exception is [nix.dev](https://nix.dev) website. This is, however, an open question
+- Enforce the usage of "Nixpkgs repository" terminology. It's too costly to rename the Github repository; that said, it's worth emphasizing that Nixpkgs is just a Github repository in our documentation. That would also solve the possible confusion in speech and for beginners
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
@@ -271,9 +233,9 @@ TODO
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-- What do we do with Nix Pills?
+TODO
 
 # Future work
 [future]: #future-work
 
-Need to rewrite parts of the existing documentation
+TODO
