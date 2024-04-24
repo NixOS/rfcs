@@ -88,89 +88,108 @@ The initial contact attempts will be used as the starting point for this one wee
 
 Update the preamble in [maintainers/maintainer-list.nix](https://github.com/NixOS/nixpkgs/blob/master/maintainers/maintainer-list.nix)
 
-````
-/* List of NixOS maintainers.
-    ```nix
-    handle = {
-      # Required
-      name = "Your name";
-      github = "GithubUsername";
-      githubId = your-github-id;
+````diff
+diff --git a/maintainers/maintainer-list.nix b/maintainers/maintainer-list.nix
+index 7641288dceaf..f7e98452aaf5 100644
+--- a/maintainers/maintainer-list.nix
++++ b/maintainers/maintainer-list.nix
+@@ -3,12 +3,13 @@
+     handle = {
+       # Required
+       name = "Your name";
++      github = "GithubUsername";
++      githubId = your-github-id;
 
-      # At least one of email, matrix or discourse must be given in order to provide fallback communications
-      email = "address@example.org";
-      matrix = "@user:example.org";
-      discourse = "DiscourseUsername";
+-      # Optional, but at least one of email, matrix or githubId must be given
++      # At least *one* of email, matrix or discourse must be given in order to provide fallback communications
+       email = "address@example.org";
+       matrix = "@user:example.org";
+-      github = "GithubUsername";
+-      githubId = your-github-id;
++      discourse = "DiscourseUsername";
 
-      keys = [{
-        fingerprint = "AAAA BBBB CCCC DDDD EEEE  FFFF 0000 1111 2222 3333";
-      }];
-    };
-    ```
+       keys = [{
+         fingerprint = "AAAA BBBB CCCC DDDD EEEE  FFFF 0000 1111 2222 3333";
+@@ -18,20 +19,35 @@
 
-    where
+     where
 
-    - `handle` is the handle you are going to use in nixpkgs expressions, strongly preferred to match `github`
-    - `name` is a name that people would know and recognize you by,
-    - `github` is your GitHub handle (as it appears in the URL of your profile page, `https://github.com/<userhandle>`),
-    - `githubId` is your GitHub user ID, which can be found at `https://api.github.com/users/<userhandle>`,
-    - `email` is your maintainer email address,
-    - `matrix` is your Matrix user ID,
-    - `discourse` is your `https://discourse.nixos.org` username,
-    - `keys` is a list of your PGP/GPG key fingerprints.
+-    - `handle` is the handle you are going to use in nixpkgs expressions,
++    - `handle` is the handle you are going to use in nixpkgs expressions, strongly preferred to match `github`
+     - `name` is a name that people would know and recognize you by,
+-    - `email` is your maintainer email address,
+-    - `matrix` is your Matrix user ID,
+     - `github` is your GitHub handle (as it appears in the URL of your profile page, `https://github.com/<userhandle>`),
+     - `githubId` is your GitHub user ID, which can be found at `https://api.github.com/users/<userhandle>`,
++    - `email` is your maintainer email address,
++    - `matrix` is your Matrix user ID,
++    - `discourse` is your `https://discourse.nixos.org` username,
+     - `keys` is a list of your PGP/GPG key fingerprints.
 
-    # Editing
+-    Specifying a GitHub account ensures that you automatically:
+-    - get invited to the @NixOS/nixpkgs-maintainers team ;
+-    - once you are part of the @NixOS org, OfBorg will request you review
+-      pull requests that modify a package for which you are a maintainer.
++    # Editing
 
-    When editing this file:
-     * keep the list alphabetically sorted, check with:
-         nix-instantiate --eval maintainers/scripts/check-maintainers-sorted.nix
-     * test the validity of the format with:
-         nix-build lib/tests/maintainers.nix
+-    `handle == github` is strongly preferred whenever `github` is an acceptable attribute name and is short and convenient.
++    When editing this file:
++     * keep the list alphabetically sorted, check with:
++         nix-instantiate --eval maintainers/scripts/check-maintainers-sorted.nix
++     * test the validity of the format with:
++         nix-build lib/tests/maintainers.nix
++
++    See `./scripts/check-maintainer-github-handles.sh` for an example on how to work with this data.
++
++    # GitHub username
++
++    Maintainers must provide and maintain an active account on the primary nixpkgs hosting platform, which is currently GitHub.
++
++    This information ensures that you:
++    - Can actively participate in Issues and Pull Requests
++    - Get invited to the @NixOS/nixpkgs-maintainers team
++    - Are reachable by mention on Issues and Pull Requests, either by a human or a robot.
++
++    `handle == github` is **strongly preferred** whenever the username is an acceptable attribute name.
 
-    See `./scripts/check-maintainer-github-handles.sh` for an example on how to work with this data.
+     If `github` begins with a numeral, `handle` should be prefixed with an underscore.
+     ```nix
+@@ -40,6 +56,13 @@
+     };
+     ```
 
-    # GitHub username
++    # Alternative form of contact
++
++    Maintainers *must* provide at least one of the alternative forms of contact. The simplest option would be to provide
++    the same email address you use for git commits.
++
++    # PGP/GPG keys
++
+     Add PGP/GPG keys only if you actually use them to sign commits and/or mail.
 
-    Maintainers must have an active account on the primary nixpkgs hosting platform.
-    GitHub is currently the primary nixpkgs hosting platform, so you are required to provide and keep active a GitHub account.
+     To get the required PGP/GPG values for a key run
+@@ -49,19 +72,11 @@
 
-    This information ensures that you:
-    - Can actively participate in Issues and Pull Requests
-    - Get invited to the @NixOS/nixpkgs-maintainers team
-    - Are reachable by mention on Issues and Pull Requests, either by a human or a robot.
+     !!! Note that PGP/GPG values stored here are for informational purposes only, don't use this file as a source of truth.
 
-    `handle == github` is **strongly preferred** whenever the username is an acceptable attribute name.
+-    More fields may be added in the future, however, in order to comply with GDPR this file should stay as minimal as possible.
++    # Data usage
 
-    If `github` begins with a numeral, `handle` should be prefixed with an underscore.
-    ```nix
-    _1example = {
-      github = "1example";
-    };
-    ```
+-    When editing this file:
+-     * keep the list alphabetically sorted, check with:
+-         nix-instantiate --eval maintainers/scripts/check-maintainers-sorted.nix
+-     * test the validity of the format with:
+-         nix-build lib/tests/maintainers.nix
+-
+-    See `./scripts/check-maintainer-github-handles.sh` for an example on how to work with this data.
++    By adding yourself to this maintainer-list file, you understand that the information you provided and your contributions are made public. While removal from the maintainer list is possible, in the interests of public good the history of nixpkgs will not be rewritten to remove you from it.
 
-    # Alternative form of contact
-
-    Maintainers must provide at least one of the alternative forms of contact. The simplest option would be to provide
-    the same email address you use for git commits.
-
-    # PGP/GPG keys
-
-    Add PGP/GPG keys only if you actually use them to sign commits and/or mail.
-
-    To get the required PGP/GPG values for a key run
-    ```shell
-    gpg --fingerprint <email> | head -n 2
-    ```
-
-    !!! Note that PGP/GPG values stored here are for informational purposes only, don't use this file as a source of truth.
-
-    # Data usage
-
-    By adding yourself to this maintainer-list file, you understand that the information you provided and your contributions are made public. While removal from the maintainer list is possible, in the interests of public good the history of nixpkgs will not be rewritten to remove you from it.
-
-    Fields in this file may change in the future. In order to comply with GDPR this file should stay as minimal as possible.
-*/
-````
+-    When adding a new maintainer, be aware of the current commit conventions
+-    documented at [CONTRIBUTING.md](https://github.com/NixOS/nixpkgs/blob/master/CONTRIBUTING.md#commit-conventions)
+-    file located in the root of the Nixpkgs repo.
++    Fields in this file may change in the future. In order to comply with GDPR this file should stay as minimal as possible.
+ */
+ ````
 
 ## Resolution of maintainers failing the criteria
 
