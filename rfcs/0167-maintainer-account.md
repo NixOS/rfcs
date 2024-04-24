@@ -72,10 +72,9 @@ Individuals will receive a window of at least one week to respond to contact att
 
 Maintainers who have provided an email address as a point of contact, which when contacted are not available through this email address (e.g. emails bounce and fail to deliver), will have this email address removed. They must be added as a reviewer on the corresponding pull request and given one week for response or feedback prior to merging.
 
-#### Violation of Code of Conduct
+#### Community Moderation
 
-Maintainers are not immune to the [NixOS Code of Conduct](https://github.com/NixOS/.github/blob/master/CODE_OF_CONDUCT.md) and must be held to the same standard as non-maintainers.
-Violations of the Code of Conduct severe enough to warrant enforcement should incur removal as maintainer as well.
+Actions taken through community moderation can impact your ability to remain a maintainer. Individuals who have been permanently banned from NixOS spaces through moderation will also be removed as maintainers.
 
 ### Removal as maintainer
 
