@@ -93,6 +93,10 @@ In response to recent contentious events and the existing moderation team's fail
 
 - [Appendix of Evidences & Experiences][evidences]
 
+In addition, since we have been banned from participating in the discussion immediately after posting the RFC, we decided to start responding to some of the more egregious posts in a separate document in order to defend our postion.
+
+- [Appendix of Comment Responses][responses]
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
@@ -162,4 +166,5 @@ After considering the alternatives, it becomes evident that while each option ha
 These unresolved questions highlight areas where further discussion and planning may be necessary to ensure the successful implementation and operation of the proposed *Memorandum* and *Appeals Council*. Addressing these questions will help to anticipate challenges and prepare more comprehensive solutions.
 
 [evidences]: https://github.com/nrdxp/rfc-evidence/blob/master/rfc_evidences_experiences.md
+[responses]: https://github.com/nrdxp/rfc-evidence/blob/master/thread_responses.md
 [coc]: https://github.com/NixOS/.github/blob/master/CODE_OF_CONDUCT.md
