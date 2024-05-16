@@ -58,6 +58,10 @@ information get written into nix store in plaintext (for example the wpa_supplic
 [drawbacks]: #drawbacks
 
 - Adding private derivations further complicates the nix store model.
+- In the intended use case, the credential remains plaintext at all time, and while the resulting derivation is unreadable, the inputs aren't.
+  This means the necessary materials that can be used to reconstruct the credential are exposed during build until the inputs are
+  garbage collected. A dedicated attacker can in theory monitor for file system changes, save the inputs before they are being GC'd
+  and later reconstruct the final derivation.
 
 # Alternatives
 [alternatives]: #alternatives
