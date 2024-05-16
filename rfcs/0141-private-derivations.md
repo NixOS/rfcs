@@ -35,6 +35,12 @@ The only difference between a private derivation and a normal derivation, apart
 from the hash, is that upon instantiation and after building, the read bit of
 the `.drv` file and the output path will be removed (recursively).
 
+
+## Credential Managers
+
+In our design, the responsibility of access control is to be delegated to a separate process called the credential manager, which is a process with
+the `CAP_DAC_OVERRIDE` capability. This frees us from further bloating the store model.
+
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
