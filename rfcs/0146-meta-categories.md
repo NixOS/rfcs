@@ -260,8 +260,6 @@ found are listed above (linked at [references section](#references))
 Still unsolved is what data structure is better suited to represent a category.
 
 - For now we stick to a set `{ name, description }`.
-- Given the redundancy of the option above, another possibility is something
-  like `nameOfCategory = { description = ""; . . . }`
 
 # Future work
 [future]: #future-work
