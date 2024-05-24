@@ -291,6 +291,8 @@ to categorization, including but not limited to:
 
 - [Debtags](https://wiki.debian.org/Debtags)
 
+  - [Debtags FAQ](https://wiki.debian.org/Debtags/FAQ)
+
 - [NetBSD pkgsrc guide](https://www.netbsd.org/docs/pkgsrc/)
   - Especially, [Chapter 12, Section
     1](https://www.netbsd.org/docs/pkgsrc/components.html#components.Makefile)
