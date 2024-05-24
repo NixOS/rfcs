@@ -304,6 +304,7 @@ There are some still unsolved issues:
 - Carry out the duties correlated to categorization, including but not limited
   to:
 
+  - Decide between possibilities of implementation;
   - Documentation updates;
   - Category curation, integration and updates;
   - Continuous Integration updates and adaptations;
