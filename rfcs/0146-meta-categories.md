@@ -274,7 +274,7 @@ to categorization, including but not limited to:
 - Update Continuous Integration.
 - Integrate categorization over the current codebase.
 
-Such a team should receive authority to carry out:
+Such a team should receive authority to carry out their duties:
 
 - Coordinaton of efforts to import, integrate and update categorization of
   packages.
