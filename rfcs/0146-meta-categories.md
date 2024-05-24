@@ -311,9 +311,9 @@ There are some still unsolved issues:
   - Coordinaton of efforts to import, integrate and update categorization of
     packages;
   - Litigations and disputations:
-    - Solve disputations over categorization, especially corner cases;
-    - Solve and enforce implementation issues from CI checks
-      - When should a CI check about categorization be treated as blocking?
+    - Solve them, especially in corner cases;
+    - Enforce implementation issues
+      - Decide when a CI check should block
 
 # References
 [references]: #references
