@@ -95,6 +95,9 @@ the above mess: new `meta` attributes.
 # Detailed design
 [design]: #detailed-design
 
+## Code Implementation
+[code-implementation]: #code-implementation
+
 A new attribute, `meta.categories`, will be included for every Nix expression
 living inside Nixpkgs.
 
@@ -258,9 +261,15 @@ found are listed below (linked at [references section](#references)):
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-Still unsolved is what data structure is better suited to represent a category.
+There are some still unsolved issues:
 
-- For now we stick to a set `{ name, description }`.
+- What data structure is suitable to represent a category?
+
+  - For now we stick to the most natural: a set `{ name, description }`.
+
+- Should we have a set of primary, "most important" categories with mandatory
+  status, in the sense each package should set at least one of them?
+  - The answer is most certainly positive.
 
 # Future work
 [future]: #future-work
