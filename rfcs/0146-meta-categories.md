@@ -154,22 +154,6 @@ Given that `meta.categories` is implemented as a list, it is interesting to
 treat the first element of this list as the "most important" categorization, the
 one that mostly identifies with the software being classified.
 
-### Hybrid approach
-[hybrid-approach]: #hybrid-approach
-
-A hybrid approach for code implementation would be implement two meta
-attributes, namely
-
-- `meta.categories` for Appstream-based categories
-  -  the corresponding `lib.categories` should follow Appstream closely, with
-     few room to custom/extra categories
-- `meta.tags` for Debtags-like tags
-  - while being inspired from the venerable Debtags work, the corresponding
-    `lib.tags` is completely free to modify and even divert from Debtags,
-    following its own way
-- generally speaking, `lib.tags` should be less bureaucratic than
-  `lib.categories`
-
 ## Categorization Team
 [categorization-team]: #categorization-team
 
@@ -279,6 +263,24 @@ The most immediate drawbacks are:
      - code forges, from Sourceforge to Gitlab
      - as said above, software collections from pkgsrc to slackbuilds
      - organization and preservation (as Software Heritage)
+
+3. Debtags/Appstream hybrid approach
+
+A hybrid approach for code implementation would be implement two meta
+attributes, namely
+
+- `meta.categories` for Appstream-based categories
+  -  the corresponding `lib.categories` should follow Appstream closely, with
+     few room to custom/extra categories
+- `meta.tags` for Debtags-like tags
+  - while being inspired from the venerable Debtags work, the corresponding
+    `lib.tags` is completely free to modify and even divert from Debtags,
+    following its own way
+- generally speaking, `lib.tags` should be less bureaucratic than
+  `lib.categories`
+
+However, this approach arguably elevates the complexity of the whole work, and
+adds too much redundancy.
 
 # Prior art
 [prior-art]: #prior-art
