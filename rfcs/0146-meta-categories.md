@@ -313,7 +313,7 @@ There are some still unsolved issues:
   - Litigations and disputations:
     - Solve them, especially in corner cases;
     - Enforce implementation issues
-      - Decide when a CI check should block
+      - Decide when a CI check should be converted to block
 
 # References
 [references]: #references
