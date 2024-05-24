@@ -147,6 +147,22 @@ A typical snippet of `lib.categories` will be similar to:
 
 ```
 
+### Hybrid approach
+[hybrid-approach]: #hybrid-approach
+
+A hybrid approach for code implementation would be implement two meta
+attributes, namely
+
+- `meta.categories` for Appstream-based categories
+  -  the corresponding `lib.categories` should follow Appstream closely, with
+     few room to custom/extra categories
+- `meta.tags` for Debtags-like tags
+  - while being inspired from the venerable Debtags work, the corresponding
+    `lib.tags` is completely free to modify and even divert from Debtags,
+    following its own way
+- generally speaking, `lib.tags` should be less bureaucratic than
+  `lib.categories`
+
 ## Categorization Team
 [categorization-team]: #categorization-team
 
