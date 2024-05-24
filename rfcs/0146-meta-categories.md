@@ -264,10 +264,15 @@ Still unsolved is what data structure is better suited to represent a category.
 # Future work
 [future]: #future-work
 
+## Categorization Team
+[categorization-team]: #categorization-team
+
 Given the typical complexities that arise from categorization, and expecting
-that regular maintainers are not expected to understand its minuteness, it is
-strongly recommended the creation of a team entrusted to manage issues related
-to categorization, including but not limited to:
+that regular maintainers are not expected to understand its minuteness
+(according to the experience from [Debtags
+Team](https://wiki.debian.org/Debtags/FAQ#Why_don.27t_you_just_ask_the_maintainers_to_tag_their_own_packages.3F)),
+it is strongly recommended the creation of a team entrusted to manage issues
+related to categorization, including but not limited to:
 
 - Update documentation.
 - Curate the categories.
