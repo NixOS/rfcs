@@ -147,6 +147,16 @@ A typical snippet of `lib.categories` will be similar to:
 
 ```
 
+## Categorization Team
+[categorization-team]: #categorization-team
+
+Given the typical complexities that arise from categorization, and expecting
+that regular maintainers are not expected to understand its minuteness
+(according to the experience from [Debtags
+Team](https://wiki.debian.org/Debtags/FAQ#Why_don.27t_you_just_ask_the_maintainers_to_tag_their_own_packages.3F)),
+it is strongly recommended the creation of a team entrusted with authority to
+manage issues related to categorization and carry their corresponding duties.
+
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
@@ -274,30 +284,6 @@ There are some still unsolved issues:
 # Future work
 [future]: #future-work
 
-## Categorization Team
-[categorization-team]: #categorization-team
-
-Given the typical complexities that arise from categorization, and expecting
-that regular maintainers are not expected to understand its minuteness
-(according to the experience from [Debtags
-Team](https://wiki.debian.org/Debtags/FAQ#Why_don.27t_you_just_ask_the_maintainers_to_tag_their_own_packages.3F)),
-it is strongly recommended the creation of a team entrusted to manage issues
-related to categorization, including but not limited to:
-
-- Update documentation.
-- Curate the categories.
-- Update Continuous Integration.
-- Integrate categorization over the current codebase.
-
-Such a team should receive authority to carry out their duties:
-
-- Coordinaton of efforts to import, integrate and update categorization of
-  packages.
-- Disputations over categorization, especially corner cases.
-- Decisions about when a Continuous Integration check for categorisation is
-  ready to be developed with gray/neutral failure statuses, and when a CI check
-  with a good track record in gray mode can be upgraded to red/blocking
-  failures.
 
 # References
 [references]: #references
