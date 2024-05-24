@@ -274,6 +274,16 @@ to categorization, including but not limited to:
 - Update Continuous Integration.
 - Integrate categorization over the current codebase.
 
+Such a team should receive authority to carry out:
+
+- Coordinaton of efforts to import, integrate and update categorization of
+  packages.
+- Disputations over categorization, especially corner cases.
+- Decisions about when a Continuous Integration check for categorisation is
+  ready to be developed with gray/neutral failure statuses, and when a CI check
+  with a good track record in gray mode can be upgraded to red/blocking
+  failures.
+
 # References
 [references]: #references
 
