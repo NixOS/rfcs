@@ -249,10 +249,11 @@ The most immediate drawbacks are:
 
 As said above, categorization is very traditional among software collections. It
 is not hard to cite examples in this arena; the most interesting ones I have
-found are listed above (linked at [references section](#references))
+found are listed below (linked at [references section](#references)):
 
 - FreeBSD Ports;
 - Debtags;
+- Appstream Project;
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
