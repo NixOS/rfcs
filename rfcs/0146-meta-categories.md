@@ -266,9 +266,11 @@ Still unsolved is what data structure is better suited to represent a category.
 # Future work
 [future]: #future-work
 
-- Curate the categories.
-- Update documentation.
-- Update Continuous Integration.
+- Create a team to manage categorization-related issues, including but not
+  limited to:
+  - Curate the categories.
+  - Update documentation.
+  - Update Continuous Integration.
 
 # References
 [references]: #references
@@ -293,6 +295,6 @@ Still unsolved is what data structure is better suited to represent a category.
     contains a short list of CATEGORIES.
 
 - [FreeBSD Porters
-  Handbook](https://docs.freebsd.org/en/books/porters-handbook/makefiles/#porting-categories)
+  Handbook](https://docs.freebsd.org/en/books/porters-handbook/)
   - Especially
     [Categories](https://docs.freebsd.org/en/books/porters-handbook/makefiles/#porting-categories)
