@@ -284,6 +284,19 @@ There are some still unsolved issues:
 # Future work
 [future]: #future-work
 
+- Create the [categorization team](#categorization-team)
+- Carry out the duties correlated to categorization, including but not limited
+  to:
+
+  - Documentation updates;
+  - Category curation, integration and updates;
+  - Continuous Integration updates and adaptations;
+  - Coordinaton of efforts to import, integrate and update categorization of
+    packages;
+  - Litigations and disputations:
+    - Solve disputations over categorization, especially corner cases;
+    - Solve and enforce implementation issues from CI checks
+      - When should a CI check about categorization be treated as blocking?
 
 # References
 [references]: #references
