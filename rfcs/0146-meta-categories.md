@@ -264,11 +264,15 @@ Still unsolved is what data structure is better suited to represent a category.
 # Future work
 [future]: #future-work
 
-- Create a team to manage categorization-related issues, including but not
-  limited to:
-  - Curate the categories.
-  - Update documentation.
-  - Update Continuous Integration.
+Given the typical complexities that arise from categorization, and expecting
+that regular maintainers are not expected to understand its minuteness, it is
+strongly recommended the creation of a team entrusted to manage issues related
+to categorization, including but not limited to:
+
+- Update documentation.
+- Curate the categories.
+- Update Continuous Integration.
+- Integrate categorization over the current codebase.
 
 # References
 [references]: #references
