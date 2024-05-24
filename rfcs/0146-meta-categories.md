@@ -39,7 +39,7 @@ However this system of categorization has serious problems:
          forcing an uncomfortable lowest common denominator.
        - Some operating systems can impose additional constraints over otherwise
          full-featured filesystems because of backwards compatibility (8 dot
-         3,anyone?).
+         3, anyone?).
 
 2. It requires a local checkout of the tree.
 
