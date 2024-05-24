@@ -242,7 +242,7 @@ The most immediate drawbacks are:
      - specialized search engines (from Repology to MELPA)
      - code forges, from Sourceforge to Gitlab
      - as said above, software collections from pkgsrc to slackbuilds
-     - to organization and preservation (as Software Heritage)
+     - organization and preservation (as Software Heritage)
 
 # Prior art
 [prior-art]: #prior-art
