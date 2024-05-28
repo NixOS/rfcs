@@ -205,6 +205,8 @@ At any point of time the author can either remove the Draft status from the RFC 
 If an RFC is unable to find an adequate number of shepherds after 1 month of being open, the following message will be added to the PR to suggest ways to find more support:
 
 ```markdown
+RFCSC:
+
 This RFC has not acquired enough shepherds. This typically shows lack of interest from the community. In order to progress [a full shepherd team is required](https://github.com/NixOS/rfcs/#shepherd-team). Consider trying to raise interest by [posting in Discourse](https://discourse.nixos.org/), [talking in Matrix](https://matrix.to/#/#community:nixos.org) or reaching out to people that you know.
 
 If not enough shepherds can be found in the next month we will close this RFC until we can find enough interested participants. The PR can be reopened at any time if more shepherd nominations are made.
@@ -215,7 +217,7 @@ If not enough shepherds can be found in the next month we will close this RFC un
 If another month elapses after and a shepherd team still hasn't been assembled the following message will be posted, the `status: insufficient interest` label will be added and the issue will be closed.
 
 ```markdown
-This RFC is being closed due to lack interest. If enough shepherds are found this issue can be reopened. If you don't have permission to reopen please [open an issue for the NixOS RFC Steering Committee](https://github.com/NixOS/rfc-steering-committee/issues/new) linking to this PR.
+RFCSC: This RFC is being closed due to lack interest. If enough shepherds are found this issue can be reopened. If you don't have permission to reopen please [open an issue for the NixOS RFC Steering Committee](https://github.com/NixOS/rfc-steering-committee/issues/new) linking to this PR.
 ```
 
 ## The RFC life-cycle
