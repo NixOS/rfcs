@@ -296,10 +296,9 @@ found are listed below (linked at [references section](#references)):
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-There are some still unsolved issues:
+There are remaining issues to be solved by the categorization team:
 
 - What data structure is suitable to represent a category?
-
   - For now we stick to the most natural: a set `{ name, description }`.
 
 - Should we have a set of primary, "most important" categories with mandatory
@@ -323,6 +322,7 @@ There are some still unsolved issues:
     - Solve them, especially in corner cases;
     - Enforce implementation issues
       - Decide when a CI check should be converted to block
+      - Grace periods
 
 # References
 [references]: #references
