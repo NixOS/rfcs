@@ -3,7 +3,7 @@ feature: Decouple filesystem from categorization
 start-date: 2023-04-23
 author: Anderson Torres (@AndersonTorres)
 co-authors:
-shepherd-team: @7c6f434c @natsukium @fgaz @infinisil
+shepherd-team: @7c6f434c @natsukium @fgaz
 shepherd-leader: @7c6f434c
 related-issues: (will contain links to implementation PRs)
 ---
