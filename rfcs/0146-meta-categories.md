@@ -215,6 +215,8 @@ The most immediate drawbacks are:
    easier to create such categories using Nix language when compared to other
    software collections.
 
+   Further, the creation of a categorization team can resolve those litigations.
+
 3. Superfluous
 
    It can be argued that there are other ways to discover similar or related
