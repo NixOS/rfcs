@@ -3,7 +3,7 @@ feature: list-index-syntax
 start-date: 2024-07-14
 author: rhendric
 co-authors:
-shepherd-team:
+shepherd-team: @infinisil
 shepherd-leader:
 related-issues: https://github.com/NixOS/nix/issues/10949, https://github.com/NixOS/rfcs/pull/137
 ---
