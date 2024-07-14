@@ -3,7 +3,7 @@ feature: list-index-syntax
 start-date: 2024-07-14
 author: rhendric
 co-authors:
-shepherd-team: @infinisil
+shepherd-team: infinisil
 shepherd-leader:
 related-issues: https://github.com/NixOS/nix/issues/10949, https://github.com/NixOS/rfcs/pull/137
 ---
@@ -11,7 +11,7 @@ related-issues: https://github.com/NixOS/nix/issues/10949, https://github.com/Ni
 # Summary
 [summary]: #summary
 
-This proposal extends the attrpath syntax to include `'[' INT ']'` elements that refer to values in lists.
+This proposal extends the attrpath syntax to include `'[' INT ']'` components that refer to elements in lists.
 This would enable expressions such as the following:
 
 ```nix
