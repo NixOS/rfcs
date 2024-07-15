@@ -248,15 +248,15 @@ If the practical barriers to introducing backwards incompatibilities into Nix we
 An implementation of this option is also available at <https://gitlab.com/rhendric/nix-list-index-syntax/>, and I'm using it as my main Nix package.
 (This patch is marginally more complex than the other because the lexer needs to be persuaded not to see a float in `expr.1.2`, but this is _not_ a grammar conflict because `expr . 1.2` doesn't parse as anything.)
 
-#### `expr@4` (or other character)
+#### `expr!4` (or other character)
 
 To get the parsimony of `expr.3` but without the fuss of dealing with the float conflict, we could choose another symbolic character that isn't already an infix operator.
 Ideally this character would be somewhat mnemonic.
 Pros and cons of various choices briefly covered below, in highly subjective best-to-worst order.
 
+* `!` (+ Haskelly, resembles `.` but, like, different)
 * `@` (+ evokes `elemAt`; − apparently we want this to be reserved for things that create bindings)
 * `\` (okay I guess?)
-* `!` (+ Haskelly, resembles `.` but, like, different; − conflict with prefix `!` would have to be resolved backward-incompatibly)
 * `&` (− association with bitwise-and, but possibly in Nix that's a sufficiently remote concept to be irrelevant)
 * `|` (− ditto for bitwise-or)
 * `$` (− strong Haskell association with a different concept)
