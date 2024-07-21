@@ -106,7 +106,7 @@ Having a dedicated operator also increases visibility and discoverability of the
 
 A new operator `|>` is introduced into the Nix language.
 It is defined as function application with the order of arguments swapped: `f a` = `a |> f`.
-It is left-associative and has a binding strength one weaker than function application:
+It is left-associative and has a binding strength weaker than function application:
 `a |> f |> g b |> h` = `h ((g b) (f a))`.
 
 ## `builtins.pipe`
@@ -307,6 +307,7 @@ which would require solving language versioning first (see RFC #137).
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
+- What is the precise binding strength of the operator?
 - Who is going to implement this in Nix?
 - How difficult will the implementation be?
 - Will this affect evaluation performance in some way?
