@@ -248,8 +248,8 @@ having `<|` weaker than `|>` like Haskell's `$` and `&` would be a bad idea.
 ## Change the `pipe` function signature
 
 There are many equivalent ways to declare this function, instead of just using the current design.
-For example, one could flip its arguments to allow a partially-applied point-free style (see above).
-One could also make this a single-argument function so that it only takes the list as argument.
+For example, one could flip its arguments so that it becomes function composition on list of functions.
+Not only can this function trivially replace pipe; it can also be readily used where a function is expected, such as in `map`.
 
 The current design of `pipe` has the advantage that its asymmetry points at its operating direction, which is quite valuable.
 
