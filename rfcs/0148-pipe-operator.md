@@ -271,6 +271,9 @@ f (g x)
 The biggest disadvantage with it is backwards compatibility of adding a new keyword into the language,
 which would require solving language versioning first (see RFC #137).
 
+This approach would be roughly equivalent to introducing a `<|` operator.
+See the above for a discussion on the overall design space of that.
+
 ## `builtins.pipe`
 
 `lib.pipe`'s functionality could be implemented as a built-in function.
