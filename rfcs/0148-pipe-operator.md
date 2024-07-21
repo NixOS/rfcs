@@ -109,29 +109,6 @@ It is defined as function application with the order of arguments swapped: `f a`
 It is left-associative and has a binding strength weaker than function application:
 `a |> f |> g b |> h` = `h ((g b) (f a))`.
 
-## `builtins.pipe`
-
-`lib.pipe`'s functionality is implemented as a built-in function.
-
-The main motivation for this is that it allows to give better error messages
-like line numbers when some part of the pipeline fails:
-Currently `lib.pipe` internally uses a fold over the list,
-therefore any type mismatches will give a trace which points into `lib.fold`,
-leaving the user without the information at which stage of the pipeline it failed.
-(This is less of a problem when used in packages, but significant enough that currently,
-`lib.pipe` unfortunately should not be used in the implementation of any library functions.)
-This could probably be fixed within Nixpkgs alone,
-however not without incurring a significant performance penalty for using "reflection".
-A built-in operator would be able to provide this more detailed error information basically for free.
-
-Additionally, it allows easy usage outside of Nixpkgs and increases discoverability.
-
-While Nixpkgs is bound to minimum Nix versions and thus `|>` won't be available until
-several years after its initial implementation,
-it can directly benefit from `builtins.pipe` and its better error diagnostic by overriding `lib.pipe`.
-Elevating a Nixpkgs library function to a builtin has been done several times before,
-for example `bitAnd`, `splitVersion` and `concatStringsSep`.
-
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
@@ -145,12 +122,8 @@ No fundamentally new semantics are introduced to the language.
 
 ## Nixpkgs interaction
 
-`lib.pipe` will default to `builtins.pipe` and use its current implementation only as a fallback.
-
-Documentation will be updated to encourage using `builtins.pipe` more.
-
 As soon as the Nixpkgs minimum version contains `|>`, using it will be allowed and encouraged in the documentation.
-There might be efforts to automatically convert existing `builtins.pipe` usage or even discourage/deprecate using that,
+There might be efforts to automatically convert existing `lib.pipe` usage or even discourage/deprecate using that,
 see future work.
 
 ### Existing lib functions
@@ -298,11 +271,37 @@ f (g x)
 The biggest disadvantage with it is backwards compatibility of adding a new keyword into the language,
 which would require solving language versioning first (see RFC #137).
 
+## `builtins.pipe`
+
+`lib.pipe`'s functionality could be implemented as a built-in function.
+
+The main motivation for this is that it allows to give better error messages
+like line numbers when some part of the pipeline fails:
+Currently `lib.pipe` internally uses a fold over the list,
+therefore any type mismatches will give a trace which points into `lib.fold`,
+leaving the user without the information at which stage of the pipeline it failed.
+(This is less of a problem when used in packages, but significant enough that currently,
+`lib.pipe` unfortunately should not be used in the implementation of any library functions.)
+This could probably be fixed within Nixpkgs alone,
+however not without incurring a significant performance penalty for using "reflection".
+A built-in operator would be able to provide this more detailed error information basically for free.
+
+Additionally, it allows easy usage outside of Nixpkgs and increases discoverability.
+
+While Nixpkgs is bound to minimum Nix versions and thus `|>` won't be available until
+several years after its initial implementation,
+it can directly benefit from `builtins.pipe` and its better error diagnostic by overriding `lib.pipe`.
+Elevating a Nixpkgs library function to a builtin has been done several times before,
+for example `bitAnd`, `splitVersion` and `concatStringsSep`.
+
+The main drawback is that once `|>` is available, there is little use for `builtins.pipe` anymore,
+so the main purpose of that would be as a stop-gap for Nixpkgs
+until the minimum Nix version is sufficiently high to allow using `|>`.
+
 # Drawbacks
 [drawbacks]: #drawbacks
 
 - Introducing `|>` has the drawback of adding complexity to the language, and it will break older tooling.
-- The main purpose of `builtins.pipe` is as a stop-gap until Nixpkgs can use `|>`. After that, it will be mostly redundant.
 
 # Unresolved questions
 [unresolved]: #unresolved-questions
