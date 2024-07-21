@@ -2,8 +2,8 @@
 feature: pipe-operator
 start-date: 2023-05-23
 author: @piegamesde
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @roberth @rhendric @illustris @adrian-gierakowski
+shepherd-leader: @rhendric
 related-issues: (will contain links to implementation PRs)
 ---
 
