@@ -2,7 +2,7 @@
 feature: I'm Gonna Build My Own Home Tool With Blackjack and Modules!
 start-date: 2024-09-20
 author: Anderson Torres
-co-authors: nyanbinary
+co-authors: @nyabinary
 shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: (will contain links to implementation PRs)
