@@ -215,7 +215,9 @@ $> hometool generations remove 1-8
   - a similar argument for the increase in size can be crafted here.
 
   The perceived advantages of having this module system surpasses these small
-  disadvantages
+  disadvantages about size and evaluation time.
+
+  Further, there are initiatives focused on optimizing the Nix evaluators.
 
 # Alternatives
 [alternatives]: #alternatives
