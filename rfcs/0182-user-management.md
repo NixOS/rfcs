@@ -250,8 +250,8 @@ As an example of prior art, there is our Scheme-based cousin, Guix Software
 Distribution. Since at least 2022 AD they bring a similar tool, conveniently
 called Guix Home.
 
-The nicest thing about this tool is that it is tightly integrated with Guix, to
-the point of `home` being a mere subcommand of `guix`.
+The nicest thing about this tool is its tight integration with Guix as a whole,
+to the point of `home` being a mere subcommand of `guix`.
 
 ## Home Manager
 
