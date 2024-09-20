@@ -1,8 +1,8 @@
 ---
-feature: I'm Gonna Build My Own Manager With Blackjack and Modules!
-start-date: (fill me in with today's date, YYYY-MM-DD)
+feature: I'm Gonna Build My Own Home Tool With Blackjack and Modules!
+start-date: 2024-09-20
 author: Anderson Torres
-co-authors: (find a buddy later to help out with the RFC)
+co-authors: nyanbinary
 shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
 related-issues: (will contain links to implementation PRs)
