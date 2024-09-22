@@ -101,17 +101,17 @@ $> ### because we like to tweak things a bit
 $> emacs user-configuration.nix
 $> ### build it first without deploying it yet
 $> hometool build
-$> ### a container to test it before deploying - for us paranoids!
-$> hometool container
+$> ### a VM to test it before deploying - for us paranoids!
+$> hometool build-vm
 $> ### now install it!
-$> hometool install
+$> hometool switch
 $> ### list the generations
 $> hometool generations list
 $> ### list differences between generations
 $> hometool generations diff 9 10
 $> ### select a specific generation
-$> hometool generations select 10
-$> ### remove older generations, marking them to be garbage-collected
+$> hometool generations switch 10
+$> ### remove older generations -- marking them to be garbage-collected
 $> hometool generations remove 1-8
 ```
 
