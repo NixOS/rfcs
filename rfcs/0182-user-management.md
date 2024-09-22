@@ -276,7 +276,7 @@ be dealt?
 # Future work
 [future]: #future-work
 
-- Update an extend the CI
+- Update and extend the CI
 - Set expectations on portability among present and future platforms Nixpkgs
   supports
   - Especially outside NixOS
