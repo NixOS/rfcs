@@ -346,3 +346,5 @@ be dealt?
   - https://github.com/akavel/nix-config/blob/510f36861cc4a641bd976ad25dd339949b47339d/.nixpkgs/nix-home.sh
   - https://github.com/akavel/nix-config/blob/510f36861cc4a641bd976ad25dd339949b47339d/.nixpkgs/config.nix#L57
 - [GNU Stow](https://www.gnu.org/software/stow/)
+- [Dropping Home Manager](https://ayats.org/blog/no-home-manager), an article from ViperML
+  containing some criticism about home-manager
