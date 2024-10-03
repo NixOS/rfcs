@@ -318,8 +318,7 @@ be dealt?
 [future]: #future-work
 
 - Update and extend the CI
-- Set expectations on portability among present and future platforms Nixpkgs
-  supports
+- Set expectations on portability
   - Especially outside NixOS
   - Especially outside Linux
 
