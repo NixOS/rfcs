@@ -302,6 +302,11 @@ applications without adding files into `~/.config`. This is done by creating
 wrapper scripts that set the appropriate environment set - variables, flags,
 configuration files etc. - to the wrapped program.
 
+## nixos-rebuild
+
+In the Nix world, nixos-rebuild is the master tool in terms of deployment of a
+Nix-based configuration, albeit being system-wide.
+
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
