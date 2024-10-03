@@ -41,16 +41,30 @@ In this panorama, the average user has two extreme options here:
 This RFC proposes to fill this gap: a structured model of system management for
 basic users that does not require superuser privileges to be deployed.
 
+Let's call it `hometool`.
+
 # Detailed Design
 [design]: #detailed-design
 
-In a dedicated directory inside the Nixpkgs monorepo a well-crafted set of core
-modules, plus some companion modules, will be created and maintained.
+`hometool` has two components:
 
-Further, a companion toolset (henceforth called `hometool`) to manipulate and
-deploy the home environment will be provided.
+1. A driver program, hereinafter called `hometool`.
 
-This toolset plus module set should provide the following properties:
+   Among other related tasks, this tool has the role of realizing the
+   description of a home environment.
+
+   As expected from a driver, this tool will rely on other programs to execute
+   its intents; the most immediate one being the Nix evaluator.
+
+2. A set of carefully crafted modules, leveraged by Nix Module System.
+
+   The moduleset should reside in `hometool/` directory at the root of Nixpkgs
+   monorepo, similar to how it happens to `nixos/` nowadays.
+
+# Expectations
+[expectations]: #expectations
+
+The set of components above should provide the following properties:
 
 - Declarativeness
 
@@ -69,8 +83,7 @@ This toolset plus module set should provide the following properties:
 
 - Extensibility
 
-  Users can extend the module set by writing their own, leveraged by overlay and
-  other Nix language constructs.
+  Users can extend the module set by writing their own.
 
 - Scalability
 
@@ -89,13 +102,12 @@ This toolset plus module set should provide the following properties:
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-Let's call `hometool` the tool used by the basic users to deploy and deal with
-their configurations.
+Here is a small example of what is expected
 
-```shell
+```console
 $> ### help message, possibly pointing to further detailed and/or specialized help, like `--all`, `--modules`
 $> hometool help
-$> ### generate a sample config; can be enhanced with a wizard
+$> ### generate a sample config
 $> hometool sample-config > user-configuration.nix
 $> ### because we like to tweak things a bit
 $> emacs user-configuration.nix
@@ -111,7 +123,7 @@ $> ### list differences between generations
 $> hometool generations diff 9 10
 $> ### select a specific generation
 $> hometool generations switch 10
-$> ### remove older generations -- marking them to be garbage-collected
+$> ### remove older generations
 $> hometool generations remove 1-8
 ```
 
@@ -193,7 +205,7 @@ $> hometool generations remove 1-8
   - Code sharing
 
     Code that was initially projected for basic user management can be found
-    useful for superuser management too.
+    useful for superuser management too; and vice-versa.
 
 - Code duplications.
 
@@ -217,29 +229,53 @@ $> hometool generations remove 1-8
   The perceived advantages of having this module system surpasses these small
   disadvantages about size and evaluation time.
 
-  Further, there are initiatives focused on optimizing the Nix evaluators.
+  Further, outside the scope of Nixpkgs, there are initiatives focused on
+  optimizing the Nix evaluators.
 
 # Alternatives
 [alternatives]: #alternatives
 
-- The trivial "do nothing".
+## The trivial "do nothing"
 
-- Promote an alternative toolset.
+Trivially keeping the status quo.
 
-  The most viable alternative in this field is home-manager. However it is not
-  so easy to assimilate a consolidated project within another consolidated
-  project, not only in terms of source code, but also in terms of community and
-  decision-making.
+## Promote `guix-home`
 
-  A better approach would be promote some form of a healthy competition, in
-  which home-manager and hometool are different projects competing for the same
-  niche, each with their own teams, communities, design projects etc.; further,
-  both teams are free to share code between them, provided they follow their
-  corresponding licenses in doing so.
+What? Lisp is cool!
 
-- Promote `guix home`
+## Promote `home-manager`
 
-  What? Lisp is cool!
+Now a serious alternative worthy of consideration.
+
+Home Manager has the most obvious and the most powerful advantage:
+
+It exists and is working well. Further, it is battle-tested and encodes a lot of
+knowledge in its 8 years lifespan and more than 3.7k commits.
+
+However, it has some non-negligible disadvantages:
+
+- The current code does not follow the same standards of the current Nixpkgs
+  monorepo
+
+  - many modules rely on stringly `extraConfig` instead of structured
+    `settings`, contra RFC 0042;
+
+- Many instances of technical debt, something expected in such a long-lived
+    project:
+
+    - excessive uses of `with lib;`
+
+    - hacky solutions like the dangerous `mkOutOfStoreSymlink`:
+      https://github.com/nix-community/home-manager/issues/3032
+
+    - under-documented workarounds
+
+    - too much reliance on Bash and its nasty idiosyncrasies
+
+On the other hand, starting from a cleaner slate has the opposite set of
+advantages and disadvantages: the kickstart of a project is too wide and it is
+easier to get lost. On the other hand, there is considerably more freedom to
+prototype and test ideas, older and newer.
 
 # Prior art
 [prior-art]: #prior-art
