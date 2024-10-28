@@ -1,0 +1,29 @@
+name: Update PR labels
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  after-merge:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - uses: cachix/install-nix-action@v30
+
+      - run: nix-env -iA nixpkgs.github-cli
+
+      - name: Update PR Labels
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          # Remove `status: accepted` label, if present
+          gh pr edit $PR_NUMBER --remove-label "status: accepted" --repo $REPO || true
+          
+          # Add `status: merged` label
+          gh pr edit $PR_NUMBER --add-label "status: merged" --repo $REPO
