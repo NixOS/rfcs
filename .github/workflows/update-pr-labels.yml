@@ -16,14 +16,14 @@ jobs:
 
       - run: nix-env -iA nixpkgs.github-cli
 
-      - name: Update PR Labels
+      - name: Update labels on accepted RFCs
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
           REPO: ${{ github.repository }}
         run: |
-          # Remove `status: accepted` label, if present
-          gh pr edit $PR_NUMBER --remove-label "status: accepted" --repo $REPO || true
-          
-          # Add `status: merged` label
-          gh pr edit $PR_NUMBER --add-label "status: merged" --repo $REPO
+          # Only operate on PR if it has the `status: accepted` label
+          if gh pr view $PR_NUMBER --repo $REPO --json labels -q 'any(.[].name == "status: accepted")'; then
+            gh pr edit $PR_NUMBER --remove-label "status: accepted" --repo $REPO
+            gh pr edit $PR_NUMBER --add-label "status: merged" --repo $REPO
+          fi
