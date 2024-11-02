@@ -6,7 +6,8 @@ on:
 
 jobs:
   after-merge:
-    if: github.event.pull_request.merged == true
+    if: |
+      github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'status: FCP')
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -15,11 +16,7 @@ jobs:
       - name: Update labels on accepted RFCs
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
-          REPO: ${{ github.repository }}
         run: |
-          # Only operate on PR if it has the `status: accepted` label
-          if gh pr view $PR_NUMBER --repo $REPO --json labels -q 'any(.[].name == "status: accepted")'; then
-            gh pr edit $PR_NUMBER --remove-label "status: accepted" --repo $REPO
-            gh pr edit $PR_NUMBER --add-label "status: merged" --repo $REPO
-          fi
+          gh pr edit $PR_NUMBER --remove-label "status: FCP" --add-label "status: accepted"
