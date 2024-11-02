@@ -12,10 +12,6 @@ jobs:
       pull-requests: write
 
     steps:
-      - uses: cachix/install-nix-action@v30
-
-      - run: nix-env -iA nixpkgs.github-cli
-
       - name: Update labels on accepted RFCs
         env:
           GH_TOKEN: ${{ github.token }}
