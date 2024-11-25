@@ -1,4 +1,4 @@
-name: Update PR labels
+name: Merged RFC
 
 on:
   pull_request:
