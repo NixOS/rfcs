@@ -1,0 +1,22 @@
+name: Update PR labels
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  after-merge:
+    if: |
+      github.event.pull_request.merged == true && contains(github.event.pull_request.labels.*.name, 'status: FCP')
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Update labels on accepted RFCs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr edit $PR_NUMBER --remove-label "status: FCP" --add-label "status: accepted"
