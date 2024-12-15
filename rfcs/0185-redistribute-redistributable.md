@@ -20,7 +20,7 @@ Currently, Hydra builds only free software and unfree redistributable firmware.
 This means that unfree redistributable software needs to be rebuilt by all the users.
 For example, using MongoDB on a Raspberry Pi 4 (aarch64, which otherwise has access to hydra's cache) takes literally days and huge amounts of swap.
 
-Hydra could provide builds for unfree redistributable firmware, at minimal added costs.
+Hydra could provide builds for unfree redistributable software, at minimal added costs.
 This would make life much better for users of such software.
 Especially when the software is still source-available even without being free software, like MongoDB.
 
