@@ -64,19 +64,19 @@ The only benefit we currently get out of not building unfree redistributable sof
 # Alternatives
 [alternatives]: #alternatives
 
-## Having Hydra actually only build FOSS derivations, not even unfree redistributable firmware
+### Having Hydra actually only build FOSS derivations, not even unfree redistributable firmware
 
 This would likely break many installation scenarios, but would bring us to a consistent ethical standpoint, though it's not mine.
 
-## Keeping the statu quo
+### Keeping the statu quo
 
 This results in very long builds for lots of software, as exhibited by the number of years people have been complaining about it.
 
-## Implementing this RFC
+### Implementing this RFC
 
 See above for the details
 
-## Implementing this RFC, plus adding a check on Hydra to validate no unfree software enters the ISO image
+### Implementing this RFC, plus adding a check on Hydra to validate no unfree software enters the ISO image
 
 This would likely be harder to implement.
 It could be a job override, that would make hydra allow unfree redistributable software for all jobs except for the ISO image, which would only allow unfree redistributable firmware.
@@ -84,7 +84,7 @@ It could be a job override, that would make hydra allow unfree redistributable s
 The drawback of this alternative is that it would be more effort to implement, especially as manpower around Hydra is very scarce and limited.
 However, it would solve the only previously listed drawback.
 
-## Building all software, including unfree non-redistributable software
+### Building all software, including unfree non-redistributable software
 
 This is quite obviously illegal, and thus not an option.
 
