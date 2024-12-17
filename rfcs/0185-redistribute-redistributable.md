@@ -11,7 +11,7 @@ related-issues: https://github.com/NixOS/nixpkgs/issues/83884
 # Summary
 [summary]: #summary
 
-Make Hydra build and provide all redistributable software.
+Make Hydra build and provide all redistributable software, while making sure installation methods stay as fully free as today.
 
 # Motivation
 [motivation]: #motivation
@@ -28,11 +28,36 @@ Especially when the software is still source-available even without being free s
 [design]: #detailed-design
 
 Hydra will build all packages with licenses for which `redistributable = true`.
+It will still fail evaluation if the ISO image build or the Amazon AMIs were to contain unfree software.
+
+This will be done by evaluating Nixpkgs twice in `release.nix`.
+Once with `allowUnfree = false` like today, plus once with `allowlistedLicenses = builtins.filter (l: l.redistributable) lib.licenses`.
+Then, most of the jobs will be taken from the allowlisted nixpkgs, while only the builds destined for installation will be taken from the no-unfree nixpkgs.
+
+The list of jobs destined for installation, that cannot contain unfree software is:
+- `amazonImage`
+- `amazonImageAutomaticSize`
+- `amazonImageZfs`
+- `iso_gnome`
+- `iso_minimal`
+- `iso_minimal_new_kernel`
+- `iso_minimal_new_kernel_no_zfs`
+- `iso_plasma5`
+- `iso_plasma6`
+- `sd_image`
+- `sd_image_new_kernel`
+- `sd_image_new_kernel_no_zfs`
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-With this change, Hydra will start building, among others:
+With these changes, here is what would happen as things currently stand.
+This is not meant to be indicative of what should happen or not, but indicative of what would happen.
+Each package's individual `license` field setup is left to its maintainers, and nixpkgs governance should conflict arise.
+This RFC does not mean to indicate that it is right or wrong, and is not the right place to discuss changes to this field.
+Should one have disagreements on any specific package in this list, please bring that up to that package's maintainers.
+
+With this in mind, Hydra will start building, among others:
 - CUDA
 - DragonflyDB
 - MongoDB
@@ -44,8 +69,9 @@ With this change, Hydra will start building, among others:
 - Terraform
 - Unrar
 - Vagrant
+- NixOS tests that involve such software (eg. MongoDB or Nomad)
 
-Hydra will keep not building, among others:
+And Hydra will keep not building, among others:
 - CompCert
 - DataBricks
 - Elasticsearch
@@ -55,34 +81,33 @@ Hydra will keep not building, among others:
 # Drawbacks
 [drawbacks]: #drawbacks
 
-The only previously listed drawback is that NixOS could end up including unfree software in the ISO image without noticing.
-However, as there is already unfree firmware, this fight is already half-lost.
+The main risk is that NixOS could end up including unfree software in an installation image if:
+1. we forgot to add it to the list of no-allowed-unfree jobs, and
+2. a maintainer did actually add unfree software to that build.
 
-Also, adding unfree software to the ISO image would still require a NixOS maintainer to actually add it there.
-The only benefit we currently get out of not building unfree redistributable software, is that the hydra builds for the ISO would fail if someone were to make a mistake.
+This seems exceedingly unlikely, making this change basically risk-free.
+
+The only remaining drawback is that Hydra would have to evaluate Nixpkgs twice, thus adding to eval times.
+However, the second eval (with no-unfree) should be reasonably small and not actually evaluate all packages, as it is only used for installation media.
 
 # Alternatives
 [alternatives]: #alternatives
 
-### Having Hydra actually only build FOSS derivations, not even unfree redistributable firmware
+### Having Hydra actually only build FOSS derivations, not even unfree redistributable firmware
 
 This would likely break many installation scenarios, but would bring us to a consistent ethical standpoint, though it's not mine.
 
-### Keeping the statu quo
+### Keeping the status quo
 
 This results in very long builds for lots of software, as exhibited by the number of years people have been complaining about it.
 
-### Implementing this RFC
+### Having Hydra redistribute redistributable software, without verifying installation media
 
-See above for the details
+This would be slightly simpler to implement, but would not have the benefit of being 100% sure our installation media are free.
 
-### Implementing this RFC, plus adding a check on Hydra to validate no unfree software enters the ISO image
+### Having Hydra redistribute redistributable software, with a check for the installation media
 
-This would likely be harder to implement.
-It could be a job override, that would make hydra allow unfree redistributable software for all jobs except for the ISO image, which would only allow unfree redistributable firmware.
-
-The drawback of this alternative is that it would be more effort to implement, especially as manpower around Hydra is very scarce and limited.
-However, it would solve the only previously listed drawback.
+This is the current RFC.
 
 ### Building all software, including unfree non-redistributable software
 
@@ -99,10 +124,11 @@ Recent exchanges have been happening in [this issue](https://github.com/NixOS/ni
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-None.
+Is the list of installation methods correct?
+I took it from my personal history as well as the NixOS website, but there may be others.
+Also, I may have the wrong job name, as I tried to guess the correct job name from the various links.
 
 # Future work
 [future]: #future-work
 
-If this RFC lands as-is, future work could be around adding the check on hydra listed in the alternatives section.
-This would validate that no unfree redistributable software enters the ISO image.
+None.
