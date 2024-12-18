@@ -27,11 +27,13 @@ Especially when the software is still source-available even without being free s
 # Detailed design
 [design]: #detailed-design
 
-Hydra will build all packages with licenses for which `redistributable = true`.
-It will still fail evaluation if the ISO image build or the Amazon AMIs were to contain unfree software.
+We will add a `runnableOnHydra` field on all licenses, that will be initially set to its `free` field, and set to `true` only for well-known licenses.
+
+Hydra will build all packages with licenses for which `redistributable && runnableOnHydra`.
+It will still fail evaluation if the ISO image build or the Amazon AMIs were to contain any unfree software.
 
 This will be done by evaluating Nixpkgs twice in `release.nix`.
-Once with `allowUnfree = false` like today, plus once with `allowlistedLicenses = builtins.filter (l: l.redistributable) lib.licenses`.
+Once with `allowUnfree = false` like today, plus once with `allowlistedLicenses = builtins.filter (l: l.redistributable && l.runnableOnHydra) lib.licenses`.
 Then, most of the jobs will be taken from the allowlisted nixpkgs, while only the builds destined for installation will be taken from the no-unfree nixpkgs.
 
 The list of jobs destined for installation, that cannot contain unfree software is:
@@ -51,13 +53,13 @@ The list of jobs destined for installation, that cannot contain unfree software 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-With these changes, here is what would happen as things currently stand.
-This is not meant to be indicative of what should happen or not, but indicative of what would happen.
+With these changes, here is what could happen as things currently stand, if the licenses were all to be marked `runnableOnHydra`.
+This is not meant to be indicative of what should happen or not, but indicative of what could happen.
 Each package's individual `license` field setup is left to its maintainers, and nixpkgs governance should conflict arise.
 This RFC does not mean to indicate that it is right or wrong, and is not the right place to discuss changes to this field.
 Should one have disagreements on any specific package in this list, please bring that up to that package's maintainers.
 
-With this in mind, Hydra will start building, among others:
+With this in mind, Hydra could start building, among others:
 - CUDA
 - DragonflyDB
 - MongoDB
@@ -113,6 +115,14 @@ This is the current RFC.
 
 This is quite obviously illegal, and thus not an option.
 
+### Not having the `runnableOnHydra` field on licenses
+
+This would make it impossible for Hydra to build them as things currently stand:
+Hydra would then risk actually running these packages within builds for other derivations (eg. NixOS tests).
+
+This would thus only be compatible with changes to Hydra, that would allow to tag a package as not allowed to run, but only to redistribute.
+Such a change to Hydra would most likely be pretty invasive, and is thus left as future work.
+
 # Prior art
 [prior-art]: #prior-art
 
@@ -131,4 +141,5 @@ Also, I may have the wrong job name, as I tried to guess the correct job name fr
 # Future work
 [future]: #future-work
 
-None.
+Modifying Hydra to allow building and redistributing packages that it is not legally allowed to run.
+This would be a follow-up project that is definitely not covered by this RFC due to its complexity, and would require a new RFC before implementation.
