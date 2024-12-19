@@ -59,6 +59,12 @@ Each package's individual `license` field setup is left to its maintainers, and 
 This RFC does not mean to indicate that it is right or wrong, and is not the right place to discuss changes to this field.
 Should one have disagreements on any specific package in this list, please bring that up to that package's maintainers.
 
+It is also suggested in this RFC that people, upon marking licenses as `runnableOnHydra`, check all the derivations that use this license.
+They could then have to mark them as either `hydraPlatforms = []`, `preferLocalBuild = true` and/or `allowSubstitutes = false`.
+This might be useful for packages like TPTP:
+they may not yet be marked as such due to these flags having no impact on unfree packages;
+but would take gigabytes on Hydra for basically no local build time improvement
+
 With this in mind, Hydra could start building, among others:
 - CUDA
 - DragonflyDB
@@ -137,6 +143,9 @@ Recent exchanges have been happening in [this issue](https://github.com/NixOS/ni
 Is the list of installation methods correct?
 I took it from my personal history as well as the NixOS website, but there may be others.
 Also, I may have the wrong job name, as I tried to guess the correct job name from the various links.
+
+How large are the packages Hydra would need to additionally store?
+This could be another drawback, if it is large enough to not be negligible compared to free software only.
 
 # Future work
 [future]: #future-work
