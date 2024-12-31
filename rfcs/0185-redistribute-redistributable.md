@@ -132,7 +132,7 @@ Such a change to Hydra would most likely be pretty invasive, and is thus left as
 # Prior art
 [prior-art]: #prior-art
 
-According to [this discussion](https://github.com/NixOS/nixpkgs/issues/83433), the current statu quo dates back to the 20.03 release meeting.
+According to [this discussion](https://github.com/NixOS/nixpkgs/issues/83433), the current status quo dates back to the 20.03 release meeting.
 More than four years have passed, and it is likely worth rekindling this discussion, especially now that we actually have a Steering Committee.
 
 Recent exchanges have been happening in [this issue](https://github.com/NixOS/nixpkgs/issues/83884).
@@ -144,8 +144,14 @@ Is the list of installation methods correct?
 I took it from my personal history as well as the NixOS website, but there may be others.
 Also, I may have the wrong job name, as I tried to guess the correct job name from the various links.
 
-How large are the packages Hydra would need to additionally store?
-This could be another drawback, if it is large enough to not be negligible compared to free software only.
+### How large are the packages Hydra would need to additionally store?
+
+`nix-community`'s Hydra instance can give us approximations.
+Its `unfree-redist-full` channel is currently 215G large, including around 200G of NVidia kernel packages and 15G for all the rest of unfree redistributable software.
+Its `cuda` channel is currently 482G large.
+
+It might make sense not to build the cuda/nvidia builds on Hydra for now, at least not before culling a bit the packages, considering there are eg. more than a hundred different NVidia kernel packages.
+Hence, this RFC suggests not setting `runnableOnHydra` for the relevant derivations before cleaning up a bit the NVidia ecosystem in nixpkgs.
 
 # Future work
 [future]: #future-work
