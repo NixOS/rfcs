@@ -93,6 +93,8 @@ And Hydra will keep not building, among others:
 # Drawbacks
 [drawbacks]: #drawbacks
 
+## Technical drawbacks
+
 The main risk is that NixOS could end up including unfree software in an installation image if:
 1. we forgot to add it to the list of no-allowed-unfree jobs, and
 2. a maintainer did actually add unfree software to that build.
@@ -101,6 +103,29 @@ This seems exceedingly unlikely, making this change basically risk-free.
 
 The only remaining drawback is that Hydra would have to evaluate Nixpkgs twice, thus adding to eval times.
 However, the second eval (with no-unfree) should be reasonably small and not actually evaluate all packages, as it is only used for installation media.
+
+## Political drawbacks
+
+Whether distributing unfree software is a political drawback is left to each reader's opinion.
+
+Besides that, there are three main political risks.
+First is, this RFC could end up completely unused.
+Maybe, with proper license investigation, we will notice that none of the packages listed above can actually be redistributed by Hydra.
+
+The second risk is one of manpower.
+We may need the Foundation's input on whether a specific license is ok to redistribute or not.
+This could require some manpower from the Foundation's side.
+
+Finally, the third risk is one of propagation.
+With both hydra and some nixos maintainers running with `allowUnfree`, there is a risk that free packages start unnecessarily depending on unfree packages.
+This would then break the setup of the people not actually running with `allowUnfree`.
+
+This being said, all these risks are probably less impactful than the current statu quo.
+Indeed, we currently have packages for Mac that are not marked with any license, because they would otherwise have to be marked unfree,
+yet we do want to build and test them.
+This means that we are already lying on licenses in order to get them through Hydra.
+And, in particular, this means they could actually reach the machine of users without `allowUnfree`.
+This situation is entirely due to the absence of this RFC, and could only be improved by it.
 
 # Alternatives
 [alternatives]: #alternatives
@@ -163,6 +188,15 @@ Is the list of installation methods correct?
 I took it from my personal history as well as the NixOS website, but there may be others.
 Also, I may have the wrong job name, as I tried to guess the correct job name from the various links.
 
+Do we need a specific `redistributableWhenPatched` field on the license?
+It feels like this would be a bit too much, and probably `redistributable` would be enough.
+However, we may need to have it still.
+
+Will we need to redistribute some derivations with `runnableOnHydra = false`?
+For example, some firmware might not be legal to run on hydra.
+However, Hydra will never actually try to run it, as it cannot be used at runtime to build other packages.
+Maybe even `runnableOnHydra` could be better named to encompass this case too?
+
 # Future work
 [future]: #future-work
 
@@ -182,3 +216,10 @@ Also, I may have the wrong job name, as I tried to guess the correct job name fr
 
 - **Modifying Hydra to allow building and redistributing packages that it is not legally allowed to run.**
   This would be a follow-up project that is definitely not covered by this RFC due to its complexity, and would require a new RFC before implementation.
+
+- **Validating licenses and dependencies.**
+  We may be interested in figuring out the aggregate license of one derivation.
+  This could be automatically computed by evaluating the Nix scripts.
+  In particular, we could have a specific `enforceFree` meta argument that'd enforce that this derivation as well as all dependencies are transitively free.
+  Implementing this may be doable in pure nix, or could require an additional hydra check.
+  This is left as future work, because even without validating licenses this RFC probably reduces the risk for FOSS users from installing proprietary software.
