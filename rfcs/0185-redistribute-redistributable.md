@@ -137,12 +137,7 @@ More than four years have passed, and it is likely worth rekindling this discuss
 
 Recent exchanges have been happening in [this issue](https://github.com/NixOS/nixpkgs/issues/83884).
 
-# Unresolved questions
-[unresolved]: #unresolved-questions
-
-Is the list of installation methods correct?
-I took it from my personal history as well as the NixOS website, but there may be others.
-Also, I may have the wrong job name, as I tried to guess the correct job name from the various links.
+# Resolved questions
 
 ### How large are the packages Hydra would need to additionally store?
 
@@ -150,11 +145,36 @@ Also, I may have the wrong job name, as I tried to guess the correct job name fr
 Its `unfree-redist-full` channel is currently 215G large, including around 200G of NVidia kernel packages and 15G for all the rest of unfree redistributable software.
 Its `cuda` channel is currently 482G large.
 
-It might make sense not to build the cuda/nvidia builds on Hydra for now, at least not before culling a bit the packages, considering there are eg. more than a hundred different NVidia kernel packages.
-Hence, this RFC suggests not setting `runnableOnHydra` for the relevant derivations before cleaning up a bit the NVidia ecosystem in nixpkgs.
+Currently, NixOS' hydra pushes around 2TB per month to S3, with rebuilds taken into account.
+Noteworthy is the fact that these 2TB are of compressed data.
+Hence, the expected increase would not be 700G per rebuild, but something lower than this, which is hard to pre-compute.
+
+Regardless, Hydra should be able to deal pretty well even with a one-time 700G data dump.
+The issues would come only if compression were not good, in addition to rebuilds being frequent enough to significantly increase the amount of data Hydra pushes to S3.
+
+# Unresolved questions
+[unresolved]: #unresolved-questions
+
+Is the list of installation methods correct?
+I took it from my personal history as well as the NixOS website, but there may be others.
+Also, I may have the wrong job name, as I tried to guess the correct job name from the various links.
 
 # Future work
 [future]: #future-work
 
-Modifying Hydra to allow building and redistributing packages that it is not legally allowed to run.
-This would be a follow-up project that is definitely not covered by this RFC due to its complexity, and would require a new RFC before implementation.
+- **Actually tagging licenses and packages as `runnableOnHydra`.**
+  Without this, this RFC would have no impact.
+  This will be done package-by-package, and should require no RFC, unless there are significant disagreements on whether a license should be runnable on hydra or not.
+
+- **Monitoring Hydra to confirm it does not push too much data to S3.**
+  If this change causes Hydra to push an economically non-viable amount of data to S3, then we should revert the addition of `runnableOnHydra` to the relevant packages and reconsider.
+
+- **Culling NVidia kernels and CUDA derivations.**
+  We suggest not caring too much about S3 size increases in the first step, considering the numbers from the resolved questions section.
+  However, if compression is less efficient than could be expected, we could be required to cull old NVidia kernels and/or CUDA derivations.
+  This would reduce the availability of older or more niche configurations, in exchange with reducing Hydra closure size.
+  Or we could move them to a set in which Hydra does not recurse.
+  For now, this is left as future work, that should be handled close to tagging the relevant derivations as `runnableOnHydra`.
+
+- **Modifying Hydra to allow building and redistributing packages that it is not legally allowed to run.**
+  This would be a follow-up project that is definitely not covered by this RFC due to its complexity, and would require a new RFC before implementation.
