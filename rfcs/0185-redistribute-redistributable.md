@@ -50,6 +50,10 @@ The list of jobs destined for installation, that cannot contain unfree software 
 - `sd_image_new_kernel`
 - `sd_image_new_kernel_no_zfs`
 
+This RFC offers absolutely no more guarantees than the current statu quo, as to whether proprietary packages will or not build on hydra.
+In particular, proprietary packages will not necessarily be part of the Zero Hydra Failures project upon release,
+though release managers could, at their own discretion, decide to include some specific proprietary packages in there.
+
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
