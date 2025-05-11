@@ -1,9 +1,9 @@
 ---
 feature: use-matrix-for-official-chat
 start-date: 2020-05-19
-author: @ryantm and others
-shepherd-team: @grahamc, @joepie91, @andir, @mweinelt
-shepherd-leader: @grahamc
+author: "@ryantm and others"
+shepherd-team: "@grahamc, @joepie91, @andir, @mweinelt"
+shepherd-leader: "@grahamc"
 ---
 
 # Summary

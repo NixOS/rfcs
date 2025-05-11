@@ -3,8 +3,8 @@ feature: nix-store-perms
 start-date: 2021-07-04
 author: Las Safin
 co-authors:
-shepherd-team: @kevincox @7c6f434c @edolstra
-shepherd-leader: @edolstra
+shepherd-team: "@kevincox @7c6f434c @edolstra"
+shepherd-leader: "@edolstra"
 related-issues:
 ---
 

@@ -3,8 +3,8 @@ feature: doc-comment-standard
 start-date: 2023-03-27
 author: hsjobeki
 co-authors: --
-shepherd-team: @DavHau; @sternenseemann; @asymmetric
-shepherd-leader: @lassulus
+shepherd-team: "@DavHau; @sternenseemann; @asymmetric"
+shepherd-leader: "@lassulus"
 related-issues: (will contain links to implementation PRs)
 ---
 

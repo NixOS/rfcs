@@ -3,9 +3,9 @@ feature: nixos-release-stablization
 start-date: 2021-01-17
 author: Jonathan Ringer (@jonringer)
 co-authors:
-shepherd-team: @ryantm, @garbas, @Mic92
-shepherd-leader: @ryantm
-related-issues: [NixOS release schedule](https://github.com/NixOS/rfcs/pull/80)
+shepherd-team: "@ryantm, @garbas, @Mic92"
+shepherd-leader: "@ryantm"
+related-issues: "[NixOS release schedule](https://github.com/NixOS/rfcs/pull/80)"
 ---
 
 # Summary

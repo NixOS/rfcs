@@ -3,8 +3,8 @@ feature: retired-committers-amendment
 start-date: 2020-07-09
 author: worldofpeace
 co-authors: Graham Christensen (@grahamc), Jan Tojnar (@jtojnar)
-shepherd-team: @lheckemann, @tilpner, @alyssais
-shepherd-leader: @tilpner
+shepherd-team: "@lheckemann, @tilpner, @alyssais"
+shepherd-leader: "@tilpner"
 related-issues: 0055
 ---
 
