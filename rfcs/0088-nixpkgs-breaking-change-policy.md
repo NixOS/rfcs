@@ -3,8 +3,8 @@ feature: nixpkgs-breaking-change-policy
 start-date: 2020-09-24
 author: Kevin Cox
 co-authors: (TBD)
-shepherd-team: @blaggacao, @jonringer, @nrdxp
-shepherd-leader: @blaggacao
+shepherd-team: "@blaggacao, @jonringer, @nrdxp"
+shepherd-leader: "@blaggacao"
 related-issues: (TBD)
 ---
 

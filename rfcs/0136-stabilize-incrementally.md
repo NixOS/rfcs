@@ -3,8 +3,8 @@ feature: stabilize-incrementally
 start-date: 2022-09-15
 author: John Ericson
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: @thufschmitt @tomberek @infinisil
-shepherd-leader: @tomberek
+shepherd-team: "@thufschmitt @tomberek @infinisil"
+shepherd-leader: "@tomberek"
 related-issues: (will contain links to implementation PRs)
 ---
 

@@ -3,8 +3,8 @@ feature: bootspec
 start-date: 2022-05-09
 author: Graham Christensen
 co-authors: Cole Helbling
-shepherd-team: @lheckemann, @06kellyjac, @GovanifY, @RaitoBezarius
-shepherd-leader: @lheckemann
+shepherd-team: "@lheckemann, @06kellyjac, @GovanifY, @RaitoBezarius"
+shepherd-leader: "@lheckemann"
 related-issues: https://github.com/NixOS/nixpkgs/pull/172237
 ---
 

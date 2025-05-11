@@ -3,7 +3,7 @@ feature: nixos-release-schedule
 start-date: 2020-11-28
 author: Jonathan Ringer (@jonringer)
 co-authors: Frederik Rietdijk (@FRidh)
-shepherd-team: @ryantm, @domenkozar and @garbas
+shepherd-team: "@ryantm, @domenkozar and @garbas"
 related-issues:
 ---
 

@@ -2,9 +2,9 @@
 feature: meson_builds_nix
 start-date: 2022-08-25
 author: Anderson Torres
-co-authors: @p01arst0rm
-shepherd-team: @Ericson2314 @edolstra @thufschmitt
-shepherd-leader: @Ericson2314
+co-authors: "@p01arst0rm"
+shepherd-team: "@Ericson2314 @edolstra @thufschmitt"
+shepherd-leader: "@Ericson2314"
 related-issues:
 ---
 

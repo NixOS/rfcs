@@ -3,8 +3,8 @@ feature: stalled-rfcs
 start-date: 2022-06-01
 author: kevincox
 co-authors: spacekookie
-shepherd-team: @ryantm, @tomberek, @7c6f434c 
-shepherd-leader: @ryantm
+shepherd-team: "@ryantm, @tomberek, @7c6f434c" 
+shepherd-leader: "@ryantm"
 related-issues: (will contain links to implementation PRs)
 ---
 

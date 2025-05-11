@@ -3,8 +3,8 @@ feature: mark-stale-issues
 start-date: 2019-08-24
 author: Ryan Mulligan
 co-authors: (find a buddy later to help our with the RFC)
-shepherd-team: @globin, @grahamc, and @peti
-shepherd-leader: @peti
+shepherd-team: "@globin, @grahamc, and @peti"
+shepherd-leader: "@peti"
 related-issues: (will contain links to implementation PRs)
 ---
 

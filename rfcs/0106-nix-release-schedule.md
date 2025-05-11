@@ -3,8 +3,8 @@ feature: Nix release schedule
 start-date: 2021-09-23
 author: Eelco Dolstra
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: @Ericson2314, @regnat, @Ma27, @tomberek
-shepherd-leader: @tomberek
+shepherd-team: "@Ericson2314, @regnat, @Ma27, @tomberek"
+shepherd-leader: "@tomberek"
 related-issues: N/A
 ---
 

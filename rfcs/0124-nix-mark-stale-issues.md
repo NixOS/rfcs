@@ -3,8 +3,8 @@ feature: nix-mark-stale-issues
 start-date: 2022-04-18
 author: John Ericson (@Ericson2314)
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: @ryantm, @nh2, @infinisil
-shepherd-leader: @ryantm
+shepherd-team: "@ryantm, @nh2, @infinisil"
+shepherd-leader: "@ryantm"
 related-issues: (will contain links to implementation PRs)
 ---
 

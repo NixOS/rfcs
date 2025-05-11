@@ -3,8 +3,8 @@ feature: moderation team
 start-date: 2021-08-18
 author: tomberek
 co-authors: blaggacao
-shepherd-team: @ryantm, @7c6f434c, @IreneKnapp
-shepherd-leader: @zimbatm
+shepherd-team: "@ryantm, @7c6f434c, @IreneKnapp"
+shepherd-leader: "@zimbatm"
 related-issues: https://github.com/NixOS/rfcs/pull/98
 ---
 
