@@ -3,8 +3,8 @@ feature: redistribute-redistributable
 start-date: 2024-12-15
 author: Ekleog
 co-authors: (find a buddy later to help out with the RFC)
-shepherd-team: (names, to be nominated and accepted by RFC steering committee)
-shepherd-leader: (name to be appointed by RFC steering committee)
+shepherd-team: @Mic92, @roberth, @Lassulus 
+shepherd-leader: @Mic92
 related-issues: https://github.com/NixOS/nixpkgs/issues/83884
 ---
 
