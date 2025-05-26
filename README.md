@@ -1,3 +1,7 @@
+
+> [!note]
+> Due to the decreased activity in the RFC repository, and as also discussed in the previous meeting notes, we will transition the RFC process to a new on-demand work flow. More info [here](https://discourse.nixos.org/t/rfcsc-meeting-2025-05-26/64791).
+
 # Nix RFCs (Request For Comments)
 
 Many changes, including bug fixes and documentation improvements can be
