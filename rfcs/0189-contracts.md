@@ -9,14 +9,12 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/432529
 ---
 
 # Summary
-[summary]: #summary
 
 In nixpkgs, modules include a lot of duplicate code to set up their dependencies.
 We introduce a pattern for moving this custom code out of the modules and making it shareable
 in an incremental, backwards-compatible, extensible, and testable way.
 
 # Motivation
-[motivation]: #motivation
 
 As a motivating example, let's take a module
 that sets up a service that needs a database
@@ -46,11 +44,11 @@ This proposal resolves all those issues, as well as allowing a few things that a
 - Using stubs in NixOS tests.
 
 # Detailed design
-[design]: #detailed-design
 
 The core idea is to decouple the use of a feature from its implementation.
 
 Let's first introduce some nomenclature:
+
 - _consumer_: The module using or needing a feature.
   Example: Nextcloud, Vaultwarden and others require a database.
 - _provider_: The module implementing a feature.
@@ -76,6 +74,7 @@ which will translate options from the contract
 into options already defined by the existing module.
 
 Some examples of possible contracts:
+
 - File backup
 - Streaming backup (for databases)
 - Secrets (out of store values) provisioning
@@ -95,22 +94,17 @@ nor to identify an exhaustive list of existing contracts, but to define a patter
 These contracts will live under a new option path `contracts`
 like `contracts.fileBackup` and `contracts.streamingBackup`.
 
-See [prior-art][] for some useful comparisons that can help you get a better picture.
+See [prior art] for some useful comparisons that can help you get a better picture.
 
 # Implementation
-[implementation]: #implementation
 
-The implementation was worked out initially in the [SelfHostBlocks][] repo and perfected in the [module interfaces][] repo.
-There are some slight variations proposed in this RFC relative to the module interfaces repo to get it out sooner rather than later. See the [corresponding unresolved section][unresolved-duallink].
+The implementation was worked out initially in the [SelfHostBlocks] repo and perfected in the [module interfaces] repo.
+There are some slight variations proposed in this RFC relative to the module interfaces repo to get it out sooner rather than later. See the [corresponding unresolved section](#dual-link).
 
 It is important to keep in mind that the proposed implementation comes from
 seeing this pattern emerge naturally "in the wild" from trying to increase code reuse, providing solid evidence on the utility of this approach.
 
-[SelfHostBlocks]: https://github.com/ibizaman/selfhostblocks/tree/main/modules/contracts
-[module interfaces]: https://github.com/fricklerhandwerk/module-interfaces
-
 ## Actors
-[actors]: #actors
 
 Before looking at the code, it is useful to get a mental model of the actors involved.
 There are up to 4 different individuals or teams involved for one contract:
@@ -127,9 +121,9 @@ flowchart TD
 ```
 
 1. `Contract Team`: The team maintaining a contract.
-2. `Provider Team`: The team maintaining one module provider of that contract. Each provider of a same contract can have its own team.
-3. `Consumer Team`: The team maintaining one module consumer of that contract. Each consumer of a same contract can have its own team.
-4. `End User`: The end user linking one consumer of their choice with one provider of their choice for that contract.
+1. `Provider Team`: The team maintaining one module provider of that contract. Each provider of a same contract can have its own team.
+1. `Consumer Team`: The team maintaining one module consumer of that contract. Each consumer of a same contract can have its own team.
+1. `End User`: The end user linking one consumer of their choice with one provider of their choice for that contract.
 
 Note that the `Contract` is the central component here.
 The provider and the consumer teams do not need to know what the other team is doing,
@@ -140,7 +134,6 @@ One nice property here is the `End User` can add a new provider or consumer them
 A module can consume or provide multiple instances of the same or different contracts, for example a single HTTP server module might provide `Web Server` and `Reverse Proxy` contracts.
 
 ## Data Flow
-[dataflow]: #dataflow
 
 Another consideration before looking at the code is how data flows through a contract.
 
@@ -167,21 +160,18 @@ sequenceDiagram
 ```
 
 1. A `Consumer` sets the `input` option of the contract.
-2. The `Provider` reads from that `input` option.
-3. The `Provider` optionally accepts provider-specific options set by the `End User`.
-4. The `Provider` does some side effect (otherwise, there's no point).
-5. The `Provider` optionally writes to the `output` of the contract.
-6. The `Consumer` optionally reads from the `output` of the contract.
+1. The `Provider` reads from that `input` option.
+1. The `Provider` optionally accepts provider-specific options set by the `End User`.
+1. The `Provider` does some side effect (otherwise, there's no point).
+1. The `Provider` optionally writes to the `output` of the contract.
+1. The `Consumer` optionally reads from the `output` of the contract.
 
 If you squint, this looks just like a functional application, only applied at the module level.
 
 ## Contract Interface
-[Contract Interface]: #contract-interface
 
-_The following snippets are taken from the [draft PR][draftPR]._
+_The following snippets are taken from the [draft PR][draftpr]._
 _The intended reading order is first this document, then the PR._
-
-[draftPR]: https://github.com/NixOS/nixpkgs/pull/432529
 
 Links to relevant commits:
 
@@ -286,6 +276,7 @@ Now that we have the ability to declare the `input` and `output` options of a co
 we can declare matching `consumer` and `provider` options using dependent types.
 
 - `consumer`: Submodule option with 3 nested options:
+
   - `provider`: The linked `provider` for this consumer.
     This has to be set by the `end user` as they choose which consumer and provider to link.
   - `input`: An option whose type comes from the top-level `input` `deferredModule`.
@@ -295,6 +286,7 @@ we can declare matching `consumer` and `provider` options using dependent types.
     Its default value comes from the linked `provider`'s `output`.
 
 - `provider`: Submodule option with 3 nested options:
+
   - `consumer`: The linked `consumer` for this provider.
     This has to be set by the `end user` as they choose which consumer and provider to link.
     This option is made nullable because the end user is not necessarily required to use a contract.
@@ -327,16 +319,14 @@ config = {
 ```
 
 Notice the `end user` must link the consumer and provider in both directions.
-This is discussed in [the unresolved section][unresolved].
+This is discussed in [the unresolved section](#unresolved-questions).
 
 # Examples and Interactions
-[examples-and-interactions]: #examples-and-interactions
 
 In this section we will explain, for each contract implemented in the PR,
 why they are useful, and their interesting properties. See the PR for actual code.
 
 ## File Backup Contract
-[fileBackupContract]: #file-backup-contract
 
 Links to relevant commits:
 
@@ -429,7 +419,6 @@ They also allow creating automated backups on deploys,
 and restoring from backups on rollbacks too.
 
 ## Streaming Backup Contract
-[streamingBackupContract]: #streaming-backup-contract
 
 Links to relevant commits:
 
@@ -451,7 +440,6 @@ Here though, instead of engineering a stub for a stream, we use
 the `streamingBackup consumer` added to `services.postgresql` directly.
 
 ## Secrets Contract
-[secretsContract]: #secrets-contract
 
 Links to relevant commits:
 
@@ -503,17 +491,15 @@ This new provider has been tested using the [contract's behavior test](https://g
 and has been used in [`services.stash`'s module](https://github.com/NixOS/nixpkgs/pull/432529/commits/19419ad95913fbed4636d0b24d95c80517c18340) as an example.
 
 # Drawbacks
-[drawbacks]: #drawbacks
 
 We are not aware of any because this solution is fully backwards compatible,
 incremental, and has many advantages. It also arose from a real practical need.
 
 Care should be taken to not abuse this pattern though. It should be reserved
 for contracts where abstracting away a `consumer` and `provider` makes sense.
-We didn't find a general rule for that but a good indicator of an unnecessary contract is where we only find one instance of a `consumer` and `provider` pair in the whole of nixpkgs.
+We didn't find a general rule for that, but a good indicator of an unnecessary contract is where we only find one instance of a `consumer` and `provider` pair in the whole of nixpkgs.
 
 # Alternatives
-[alternatives]: #alternatives
 
 This design arose from trying to maximize code reuse.
 We started by fiddling with nix code and the implementation emerged naturally.
@@ -523,7 +509,6 @@ mostly because our attempts to tweak the code often led us often to infinite rec
 so we couldn't stray too far from the way it already works.
 
 # Prior art
-[prior-art]: #prior-art
 
 We did not find any discussion about any of this by the nix community.
 It is a bit self-centered, but the two talks I (`ibizaman`) gave on this subject in nixpkgs can be considered prior art.
@@ -542,10 +527,8 @@ A few useful comparisons beyond nixpkgs:
 - Contracts are reminiscent of the [reverse dependency principle](https://en.wikipedia.org/wiki/Dependency_inversion_principle) which is used in many places.
 
 # Unresolved questions
-[unresolved]: #unresolved-questions
 
 ## Dual Link
-[unresolved-duallink]: #unresolved-questions-duallink
 
 The current implementation requires the `end user` to link the consumer and provider
 in both directions:
@@ -567,19 +550,18 @@ In the snippet above, this would remove the need for the `provider to consumer` 
 The issue comes from the `consumer` and `provider` option in the top-level `contracts` definition to be of type `optionType`.
 They don't have access to the actual `input` and `output` values of an instantiated contract.
 
-There are some experiments on this in the [module interfaces][] repo.
+There are some experiments on this in the [module interfaces] repo.
 There, we set the `provider` option as a function which takes an argument
 which is the instantiated `consumer`, so it is not of type `optionType` but of type `submodule`, and has access to the real input and output values.
 Unfortunately, this has two downsides:
 
 1. It requires one more line in each provider definition. This would be okay except for the following downside:
-2. There's no way to write side effects. This means the `provider` can only write to its own `output`, which misses the whole point of having contracts in the first place.
+1. There's no way to write side effects. This means the `provider` can only write to its own `output`, which misses the whole point of having contracts in the first place.
 
 There may be a way to solve this, but we have not yet figured it out. Help would be appreciated!
 Beware though; you will be crossing the edge of the module system and entering the land of infinite recursion.
 
 ## Documentation
-[unresolved-documentation]: #unresolved-questions-documentation
 
 It is not currently possible to build the manual; doing so results in an error:
 
@@ -596,13 +578,16 @@ $ (cd nixos/; nix-build release.nix -A manual.x86_64-linux)
           436|         description = "Path to file containing a secret used to sign JWT tokens.";
 ```
 
-Comments in the [draft PR][draftPR] have been added to indicate what has been tried.
+Comments in the [draft PR][draftpr] have been added to indicate what has been tried.
 We would appreciate help in solving this.
 
 # Future work
-[future]: #future-work
 
-- Solve the [documentation][unresolved-documentation] issue.
+- Solve the [documentation](#documentation) issue.
 - Identify useful contracts and their inputs, outputs, and behavior tests.
 - Identify services that would benefit from being consumers and providers of contracts and add the necessary options.
-- Optionally solve the [dual-link][unresolved-duallink] issue.
+- Optionally solve the [dual-link](#dual-link) issue.
+
+[draftpr]: https://github.com/NixOS/nixpkgs/pull/432529
+[module interfaces]: https://github.com/fricklerhandwerk/module-interfaces
+[selfhostblocks]: https://github.com/ibizaman/selfhostblocks/tree/main/modules/contracts
