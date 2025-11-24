@@ -65,7 +65,7 @@ In addition to `pkgs/by-name/{shard}/{pname}/package.nix` there can also be
 I think you know where this is going.
 
 Packages with a `pin.nix` will have the versions of packages pinned
-accordingly. This can be easily archived with:
+accordingly. This can be easily achieved with:
 
 ```nix
 if lib.pathExists (packageDirectory + "/pins.nix") then
