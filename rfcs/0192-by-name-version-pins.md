@@ -93,7 +93,36 @@ Probably longer eval time, this has to be tested however.
 
 - Keep the current situation: version pins are either in `all-packages.nix` or
   directly in the `package.nix`.
+
 - Some more generalized `overrides.nix` without the strict requirements.
+  - This would be less useful for automation of dependency pin removal.
+  
+- Inline dependency pins in `package.nix` as default values in the function arguments.
+  ```nix
+  {
+    package-a_version,
+    package-a ? package-a_version,
+  # ...
+  }:
+  # ...
+  ```
+  This would require a custom `callPackage` for `pkgs/by-name` that prefers default values over
+  values from the `pkgs`.
+  - Confusing for contributors if something works differently through the normal `callPackage`.
+
+- Inline dependency pins in `package.nix` with `let in` syntax.
+  ```nix
+  {
+    package-a_version,
+    # ...
+  }:
+  let
+    package-a = package-a_version;
+  in
+  # ...
+  ```
+  - Possibly harder to automate dependency pin removal.
+
 - Your suggestion here.
 
 # Prior art
