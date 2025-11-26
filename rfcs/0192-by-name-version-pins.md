@@ -108,3 +108,5 @@ Probably longer eval time, this has to be tested however.
 # Future work
 [future]: #future-work
 
+- pinning versions of packages, e.g. having ffmpeg_7 as a subattribute of ffmpeg
+  (not dependency pinning, what this rfc is about)
