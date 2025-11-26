@@ -11,8 +11,8 @@ related-issues: https://github.com/NixOS/nixpkgs/pull/464396
 # Summary
 [summary]: #summary
 
-Add an additional file `pins.nix` to the `pkgs/by-name` structure that allows overriding/pinning
-package versions.
+Add an additional file `pins.nix` to the `pkgs/by-name` structure that allows
+overriding/pinning versions of package dependencies.
 
 # Motivation
 [motivation]: #motivation
@@ -21,20 +21,20 @@ package versions.
 
 - The `pkgs/by-name` structure doesn't have support for overriding packages yet
   leading to a lot of remaining entries in `pkgs/top-level/all-packages.nix`.
-- Packages with version pins often get neglected and stay on the old version
-  for a long time, even though it already supports the new version. By having
-  version pins in a defined location with a defined structure, package update
-  bots or scripts could check if the package works without the pin and remove it
-  automatically on update.
+- Packages with dependency version pins often get neglected and stay on the old
+  version for a long time, even though it already supports the new version. By
+  having dependency version pins in a defined location with a defined structure,
+  package update bots or scripts could check if the package works without the
+  pin and remove it automatically on update.
 
 > What use cases does it support?
 
-- Pinning package versions of packages.
+- Pinning dependency versions of packages.
 
 > What is the expected outcome?
 
-- Less confusion if package pins should go into `all-packages.nix` or be inlined
-  in the `package.nix`.
+- Less confusion if dependency pins should go into `all-packages.nix` or be
+  inlined in the `package.nix`.
 - Less maintenance burden due to possible automation of pin removal.
 
 # Detailed design
@@ -47,12 +47,12 @@ In addition to `pkgs/by-name/{shard}/{pname}/package.nix` there can also be
 {
   package-a_version,
   package-b_version,
-  # [...]
+  # ...
 }:
 {
   package-a = package-a_version;
   package-b = package-b_version;
-  # [...]
+  # ...
 }
 ```
 
@@ -64,19 +64,20 @@ In addition to `pkgs/by-name/{shard}/{pname}/package.nix` there can also be
 
 I think you know where this is going.
 
-Packages with a `pin.nix` will have the versions of packages pinned
+Packages with a `pin.nix` will have the versions of dependencies pinned
 accordingly. This can be easily achieved with:
 
 ```nix
 if lib.pathExists (packageDirectory + "/pins.nix") then
-  callPackage (packageDirectory + "/package.nix") (
-    lib.removeAttrs (callPackage (packageDirectory + "/pins.nix") { }) [
+  let
+    pins = lib.removeAttrs (callPackage (packageDirectory + "/pins.nix") { }) [
       "override"
       "overrideDerivation"
-    ]
-  )
+    ];
+  in
+  callPackage (packageDirectory + "/package.nix") pins
 else
-  callPackage (packageDirectory + "/package.nix")
+  callPackage (packageDirectory + "/package.nix") { }
 ```
 
 # Examples and Interactions
