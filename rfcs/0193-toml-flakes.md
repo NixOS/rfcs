@@ -18,6 +18,8 @@ separating input specifications from output definitions.
 The `flake.toml` file contains declarative metadata and input declarations,
 while `flake.nix` (read by the default entrypoint) or a framework focuses on output definitions.
 
+Fixes [#4945 What language is flake.nix written in?](https://github.com/NixOS/nix/issues/4945)
+
 # Motivation
 [motivation]: #motivation
 
