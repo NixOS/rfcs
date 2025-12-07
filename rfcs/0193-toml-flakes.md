@@ -27,7 +27,7 @@ This creates several problems:
 
 1. **User uncertainty**: The current structure creates confusion about what language features are available
    and when evaluation restrictions apply,
-   because inputs and outputs are mixed in the same file.
+   because inputs and outputs are mixed in the same file, and inputs are not allowed to be arbitrary Nix expressions.
    See [issue #4945](https://github.com/NixOS/nix/issues/4945).
    Note that while the question was originally asked in a partly rhetorical manner,
    it is still a valid question,
