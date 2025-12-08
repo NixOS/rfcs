@@ -16,7 +16,7 @@ Make flakes easier to use, automate and learn.
 Introduce `flake.toml` as the new leading file for flakes,
 separating input specifications from output definitions.
 The `flake.toml` file contains declarative metadata and input declarations,
-while `flake.nix` (read by the default entrypoint) or a framework focuses on output definitions.
+while `flake.nix` (read by the built-in entrypoint) or a framework focuses on output definitions.
 
 Fixes [#4945 What language is flake.nix written in?](https://github.com/NixOS/nix/issues/4945)
 
@@ -54,15 +54,14 @@ and create a clearer separation of concerns between dependency declarations and 
 ## File structure
 
 `flake.toml` becomes the leading file,
-containing input sources, follows relationships, and entrypoint selection.
+containing input sources and follows relationships.
 It complies with the [Nix JSON guideline](https://nix.dev/manual/nix/latest/development/json-guideline.html) (modulo `null`).
 
 Flake output invocation is changed to go through an "entrypoint", which is the flake that provides a function to help produce the flake output attributes based on the source tree of `flake.toml`.
-If `flake.toml` has an `entrypoint` field, it must name one of the `inputs` which will serve as the entrypoint.
-Otherwise, if an input named `"entrypoint"` exists, it becomes the entrypoint.
-Finally if `flake.nix` exists, the entrypoint is the default entrypoint.
+If `inputs.entrypoint` exists, it becomes the entrypoint.
+Otherwise if `flake.nix` exists, the built-in entrypoint is used.
 
-`flake.nix` is read by the default entrypoint and defines outputs.
+`flake.nix` is read by the built-in entrypoint and defines outputs.
 
 ## Choice of TOML
 
@@ -75,15 +74,15 @@ It has a wide ecosystem of libraries for parsing, as well as good number of libr
 ## Relationship to existing files
 
 - `flake.lock` remains unchanged
-- Alternative entrypoints (referenced in `flake.toml`) can read different files
-- `flake.nix` remains supported as the default entrypoint, and as a legacy format for the `inputs` and other metadata.
+- Alternative entrypoints (specified via `inputs.entrypoint` in `flake.toml`) can read different files
+- `flake.nix` remains supported as the file read by the built-in entrypoint, and as a legacy format for the `inputs` and other metadata.
 
 ## Compatibility
 
 The design should support reading legacy `flake.nix` files that contain inline input specifications.
 
 The following negative space is changed and may require a few projects to adapt if they already use these:
-- A flake input named `entrypoint` is assigned meaning, changing how flake outputs are formed.
+- `inputs.entrypoint` is assigned meaning, changing how flake outputs are formed.
 - A file named `flake.toml` will shadow `flake.nix` in file discovery
 
 Flakes that do not have any of the above elements remain compatible.
@@ -127,7 +126,7 @@ description = "A simple example flake exporting GNU hello for x86_64-linux"
 url = "github:NixOS/nixpkgs/nixos-unstable"
 ```
 
-**flake.nix** (read by default entrypoint):
+**flake.nix** (read by built-in entrypoint):
 ```nix
 {
   outputs = { self, nixpkgs }:
@@ -158,7 +157,7 @@ url = "github:hercules-ci/flake-parts"
 follows = "nixpkgs"
 ```
 
-**parts.nix** (read by default entrypoint):
+**parts.nix** (read by flake-parts entrypoint):
 ```nix
 { ... }: {
   perSystem = { pkgs }: {
@@ -210,8 +209,8 @@ An entrypoint is invoked as `<flake outputs>.lib.callFlakeEntrypoint`:
 }
 ```
 
-The default entrypoint reads `flake.nix` and expects an `outputs` attribute.
-Alternative entrypoints (specified in `flake.toml`) can implement different conventions.
+The built-in entrypoint reads `flake.nix` and expects an `outputs` attribute.
+Alternative entrypoints (specified via `inputs.entrypoint`) can implement different conventions.
 
 The exact schema shown above is illustrative.
 The final design will follow the Nix JSON guideline for extensibility,
@@ -237,6 +236,27 @@ Maintain the status quo including drawbacks described in the [motivation].
 Improve Nix AST manipulation tools instead of introducing a new format.
 Does not solve user uncertainty.
 Does not solve boilerplate.
+
+## Explicit `entrypoint` field in flake.toml
+
+An earlier design included an explicit `entrypoint` field in `flake.toml`:
+
+```toml
+entrypoint = "my-framework"
+
+[inputs.my-framework]
+url = "github:..."
+```
+
+This would take precedence over the `inputs.entrypoint` convention.
+
+It seemed beneficial for the initial migration,
+where flakes that already had an `entrypoint` input for other reasons (unlikely) would not have to rename that input.
+However, that was not a real solution,
+and a special null value would have to be added in order to select the built-in (`flake.nix`) entrypoint,
+since TOML does not have a distinct `null` type.
+This would not have lead to a great solution,
+and wasn't worth the permanent complexity of an unnecessary indirection.
 
 ## Use JSONC
 
