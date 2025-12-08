@@ -16,7 +16,7 @@ Make flakes easier to use, automate and learn.
 Introduce `flake.toml` as the new leading file for flakes,
 separating input specifications from output definitions.
 The `flake.toml` file contains declarative metadata and input declarations,
-while `flake.nix` (read by the built-in entrypoint) or a framework focuses on output definitions.
+while `flake.nix` focuses on output definitions.
 
 Fixes [#4945 What language is flake.nix written in?](https://github.com/NixOS/nix/issues/4945)
 
@@ -40,9 +40,6 @@ This creates several problems:
 2. **Limited automation**: Programmatically editing flake inputs requires Nix AST manipulation,
    which is complex and error-prone compared to editing structured data formats.
 
-3. **Boilerplate**: Common flake patterns require repetitive Nix code
-   that could be handled by frameworks if inputs were separated from implementation.
-
 By moving input specifications to a simpler format,
 we enable better tooling,
 reduce user confusion about evaluation restrictions,
@@ -57,11 +54,7 @@ and create a clearer separation of concerns between dependency declarations and 
 containing input sources and follows relationships.
 It complies with the [Nix JSON guideline](https://nix.dev/manual/nix/latest/development/json-guideline.html) (modulo `null`).
 
-Flake output invocation is changed to go through an "entrypoint", which is the flake that provides a function to help produce the flake output attributes based on the source tree of `flake.toml`.
-If `inputs.entrypoint` exists, it becomes the entrypoint.
-Otherwise if `flake.nix` exists, the built-in entrypoint is used.
-
-`flake.nix` is read by the built-in entrypoint and defines outputs.
+`flake.nix` remains and defines outputs.
 
 ## Choice of TOML
 
@@ -74,18 +67,16 @@ It has a wide ecosystem of libraries for parsing, as well as good number of libr
 ## Relationship to existing files
 
 - `flake.lock` remains unchanged
-- Alternative entrypoints (specified via `inputs.entrypoint` in `flake.toml`) can read different files
-- `flake.nix` remains supported as the file read by the built-in entrypoint, and as a legacy format for the `inputs` and other metadata.
+- `flake.nix` remains and defines outputs, and as a legacy format for the `inputs` and other metadata.
 
 ## Compatibility
 
 The design should support reading legacy `flake.nix` files that contain inline input specifications.
 
 The following negative space is changed and may require a few projects to adapt if they already use these:
-- `inputs.entrypoint` is assigned meaning, changing how flake outputs are formed.
 - A file named `flake.toml` will shadow `flake.nix` in file discovery
 
-Flakes that do not have any of the above elements remain compatible.
+Flakes that do not have a `flake.toml` file remain compatible.
 
 A TOML flake can not be evaluated by older implementations of Nix.
 
@@ -126,7 +117,7 @@ description = "A simple example flake exporting GNU hello for x86_64-linux"
 url = "github:NixOS/nixpkgs/nixos-unstable"
 ```
 
-**flake.nix** (read by built-in entrypoint):
+**flake.nix**:
 ```nix
 {
   outputs = { self, nixpkgs }:
@@ -141,76 +132,36 @@ url = "github:NixOS/nixpkgs/nixos-unstable"
 
 **flake.lock** remains unchanged.
 
-## Proposed structure, framework entrypoint
+## Proposed structure with follows
 
 **flake.toml**:
 ```toml
-description = "A simple example flake exporting GNU hello for x86_64-linux"
+description = "Example with follows relationships"
 
 [inputs.nixpkgs]
 url = "github:NixOS/nixpkgs/nixos-unstable"
 
-[inputs.entrypoint]
+[inputs.flake-parts]
 url = "github:hercules-ci/flake-parts"
 
-[inputs.entrypoint.inputs.nixpkgs-lib]
+[inputs.flake-parts.inputs.nixpkgs-lib]
 follows = "nixpkgs"
 ```
 
-**parts.nix** (read by flake-parts entrypoint):
-```nix
-{ ... }: {
-  perSystem = { pkgs }: {
-    packages.default = pkgs.hello;
-  };
-}
-```
-
-**flake.lock** remains unchanged.
-
-## Entrypoint function
-
-`flake.nix` serves as the base that bootstraps entrypoints.
-This example shows what authoring a framework looks like.
-An entrypoint is invoked as `<flake outputs>.lib.callFlakeEntrypoint`:
-
+**flake.nix**:
 ```nix
 {
-  outputs = { self, nixpkgs }:
-    let
-      system = "x86_64-linux";
-      pkgs = nixpkgs.legacyPackages.${system};
-    in {
-      packages.${system}.default = pkgs.hello;
-
-      # Entrypoints are accessed here
-      lib.callFlakeEntrypoint =
-        { 
-          # The resolved and invoked/dependency-injected flake inputs
-          inputs,
-          # The parsed flake.toml
-          flakeToml,
-          # The invoked/dependency-injected *result*
-          self,
-          # The base directory of flake.toml
-          flakeDir,
-          # The sourceInfo, where `sourceInfo.outPath` may be `flakeDir` or any
-          # parent of it (if applicable; subdirectory flakes)
-          sourceInfo,
-          # ... is mandatory for forward compatibility
-          ...
-        }:
-        # Imagine some useful expression, returning the usual flake outputs
-        {
-          packages = { ... };
-          apps = { ... };
-        };
+  outputs = { self, nixpkgs, flake-parts }:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [ "x86_64-linux" ];
+      perSystem = { pkgs, ... }: {
+        packages.default = pkgs.hello;
+      };
     };
 }
 ```
 
-The built-in entrypoint reads `flake.nix` and expects an `outputs` attribute.
-Alternative entrypoints (specified via `inputs.entrypoint`) can implement different conventions.
+**flake.lock** remains unchanged.
 
 The exact schema shown above is illustrative.
 The final design will follow the Nix JSON guideline for extensibility,
@@ -235,28 +186,6 @@ Maintain the status quo including drawbacks described in the [motivation].
 
 Improve Nix AST manipulation tools instead of introducing a new format.
 Does not solve user uncertainty.
-Does not solve boilerplate.
-
-## Explicit `entrypoint` field in flake.toml
-
-An earlier design included an explicit `entrypoint` field in `flake.toml`:
-
-```toml
-entrypoint = "my-framework"
-
-[inputs.my-framework]
-url = "github:..."
-```
-
-This would take precedence over the `inputs.entrypoint` convention.
-
-It seemed beneficial for the initial migration,
-where flakes that already had an `entrypoint` input for other reasons (unlikely) would not have to rename that input.
-However, that was not a real solution,
-and a special null value would have to be added in order to select the built-in (`flake.nix`) entrypoint,
-since TOML does not have a distinct `null` type.
-This would not have lead to a great solution,
-and wasn't worth the permanent complexity of an unnecessary indirection.
 
 ## Use JSONC
 
@@ -281,28 +210,21 @@ where binary caches aren't shared between Nix versions and old expressions produ
 It incorporated a "poor man's module system" into Nix where it would be of very limited functionality,
 while it ossifies due the consequences in Nix of [Hyrum's law](https://www.hyrumslaw.com/) and the second order effects of reproducibility.
 
+## Flake entrypoints RFC
+
+A companion RFC proposes a flake entrypoint mechanism that allows frameworks to handle output generation.
+Combined with TOML flakes,
+this provides the bigger picture of removing custom Nix code from flake metadata altogether,
+allowing frameworks to handle both input processing and output generation declaratively.
+
+The entrypoint mechanism can be implemented independently of TOML,
+but the two features work well together.
+
 ## devenv
 
 The devenv tool uses a separate configuration format for specifying dependencies
 and generating Nix configurations,
 demonstrating that declarative input specifications can work well in practice.
-
-They have also integrated input declarations and input usage in their application of the module system.
-This RFC could be extended or followed up with a metadata feature that generalizes this idea and allows an entrypoint to achieve a similar effect.
-
-```toml
-[inputs.entrypoint]
-url = "github:cachix/git-hooks.nix"
-# forwarded as e.g. `inputUsages.<input>` to entrypoint, so it can import/enable/etc as intended.
-usage = [ "flake-parts" ]
-```
-
-## flake-parts, flake-utils-plus and blueprint
-
-Framework systems like flake-parts, flake-utils-plus and blueprint already provide abstractions over flake outputs.
-This proposal would enable these frameworks to be specified declaratively,
-in a standard way,
-without boilerplate.
 
 ## Other language ecosystems
 
