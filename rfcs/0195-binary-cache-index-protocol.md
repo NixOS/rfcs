@@ -41,7 +41,7 @@ When a path is missing, the client moves to the next cache in its substituter li
 
 2. **Multi-Cache Federation**: Organizations often chain caches (private → community → cache.nixos.org). An index allows intelligent cache selection without sequential probing.
 
-3. **Offline-First Workflows**: Developers can sync an index and determine buildability without continuous network access.
+3. **Offline-First Workflows**: Developers can sync an index and determine substitutability without continuous network access.
 
 4. **Cache Analytics**: Operators can analyze index files to understand cache composition, hit rates, and optimize retention policies. Since HLSSI stores actual hashes (not lossy Bloom filter bits), operators can: count exact items, analyze hash distribution across shards, compare indices between caches to measure overlap, and identify "miss patterns" to improve cache coverage.
 
@@ -50,7 +50,7 @@ When a path is missing, the client moves to the next cache in its substituter li
 A client implementing this protocol will:
 - Reduce cache lookup latency by 90%+ for cache misses
 - Eliminate unnecessary HTTP requests entirely for definitive misses
-- Support caches from 100 to 1,000,000,000+ items with proportional bandwidth costs
+- Support caches from 10,000 to 1,000,000,000+ items with proportional bandwidth costs
 - Discover newly-pushed artifacts within seconds
 - Operate correctly as caches perform garbage collection
 
@@ -131,7 +131,7 @@ The manifest is a JSON file at a well-known path that describes the index topolo
 
 **Path**: `/nix-cache-index/manifest.json`
 
-**Schema**:
+**Example**:
 ```json
 {
   "version": 1,
@@ -184,7 +184,7 @@ The manifest is a JSON file at a well-known path that describes the index topolo
 - `epoch.previous`: Previous shard generation (for grace period support; see Section 9)
 - `deltas.enabled`: Whether differential updates are available (see Section 10)
 - `deltas.oldest_base`: Oldest epoch from which deltas can be applied. Clients with a local epoch older than this must perform a full download.
-- `deltas.compression`: Compression algorithm for delta files (`none`, `gzip`, `zstd`)
+- `deltas.compression`: Compression algorithm for delta files (`none`, `zstd`)
 
 **Caching**: Clients SHOULD cache the manifest with a short TTL (30–120 seconds) and revalidate using `If-Modified-Since` or `ETag`.
 
@@ -1177,6 +1177,8 @@ Unlike Bloom filters, the HLSSI format stores actual hashes, allowing enumeratio
 **Mitigation**:
 - For truly private caches, consider HMAC-transforming hashes with a shared secret
 - Or accept this as a reasonable trade-off given that `.narinfo` URLs are already guessable
+- The latency of a non-indexed binary cache may be acceptable.
+- Critical private caches should require authentication. Authorization may be simple, or rely on HMAC instead.
 
 ## 4. Client Implementation Effort
 
@@ -1470,14 +1472,14 @@ How should clients handle corrupted or malicious index files? Options:
 
 **Recommendation**: Treat index as advisory. On any parse error or inconsistency, fall back to standard HTTP probing. Cryptographic signing is deferred to future work.
 
-## 5. Multi-Output Derivations
+## 5. Build traces (CA realisations)
 
-Store paths include `-<name>` suffixes (e.g., `-dev`, `-lib`). Should the index:
-- Store only hashes (current design)
-- Store hash-name pairs
-- Have separate indices per output type
+(Note: CA realisations are getting renamed to build traces)
+In the current implementation of content addressing derivations in the binary cache, realisations (= build traces) are stored in a separate directory.
+Either a separate index could be created for build traces, or they could be mapped into the same index.
+A client knows whether it it wants a realisation or narinfo, and since realisation and narinfo hashes do not collide (probabilistic truth of course), we do not expect any problems there.
+Remaining question: does a separate realisation index improve or degrade performance?
 
-**Recommendation**: Store only hashes. The `.narinfo` fetched on hit contains the full `StorePath` field. The index is merely a pointer to the `.narinfo`, not a replacement for it.
 
 # Future work
 [future]: #future-work
