@@ -634,7 +634,6 @@ Delta files use a simple line-oriented format listing the operations needed to t
 
 **Compression**: Delta files SHOULD be served with compression. The manifest field `deltas.compression` indicates the algorithm:
 - `none`: No compression
-- `gzip`: Gzip compression (`.delta.gz`)
 - `zstd`: Zstandard compression (`.delta.zst`) — RECOMMENDED for best ratio/speed
 
 ### 10.3 Checksum Files
