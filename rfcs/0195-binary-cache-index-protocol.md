@@ -184,7 +184,7 @@ The manifest is a JSON file at a well-known path that describes the index topolo
 - `deltas.oldest_base`: Oldest epoch from which deltas can be applied. Clients with a local epoch older than this must perform a full download.
 - `deltas.compression`: Compression algorithm for delta files (`none`, `zstd`)
 
-**Caching**: Clients SHOULD cache the manifest with a short TTL (30–120 seconds) and revalidate using `If-Modified-Since` or `ETag`.
+**Caching**: Servers SHOULD use the `Cache-Control` HTTP header to specify the caching duration of the manifest. Clients SHOULD respect this header to allow the server to control how long the manifest is cached. Revalidation using `If-Modified-Since` or `ETag` SHOULD also be used.
 
 **Integrity Verification**: Clients SHOULD verify manifest integrity using HTTP-level mechanisms (`ETag`, `Content-MD5`). Cryptographic signing of index files is deferred to future work (see Future Work: Index Signing and Trust).
 
@@ -535,9 +535,9 @@ The client read a valid manifest but could not fetch the shards it referenced.
 1. The manifest MUST include both `epoch.current` and `epoch.previous` fields.
 2. Shards for `epoch.previous` MUST remain available for a **minimum grace period** of:
    ```
-   grace_period >= 2 × manifest_ttl + max_request_duration
+   grace_period >= 2 × max_manifest_cache_duration + max_request_duration
    ```
-   For typical values (manifest TTL = 120s, max request = 30s):
+   Where `max_manifest_cache_duration` is the maximum value used in the `Cache-Control` header for the manifest. For typical values (max cache duration = 120s, max request = 30s):
    ```
    grace_period >= 2 × 120 + 30 = 270 seconds (4.5 minutes)
    ```
@@ -1163,7 +1163,7 @@ Cache operators must run a compaction process (cron job or similar) to maintain 
 
 There is an inherent delay between when an artifact is pushed and when the index reflects it. With 5-minute journal segments, the worst-case staleness is ~5 minutes for clients that don't fetch the current journal.
 
-**Mitigation**: Clients SHOULD always fetch the current journal segment with a short cache TTL.
+**Mitigation**: Clients SHOULD always fetch the current journal segment. Servers SHOULD use the `Cache-Control` HTTP header to specify a short caching duration for journal segments, and clients SHOULD respect it.
 
 ## 3. Privacy Concerns
 
