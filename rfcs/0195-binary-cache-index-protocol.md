@@ -150,7 +150,6 @@ The manifest is a JSON file at a well-known path that describes the index topolo
   },
   "journal": {
     "current_segment": 1705147200,
-    "segment_duration_seconds": 300,
     "retention_count": 12
   },
   "epoch": {
@@ -178,7 +177,6 @@ The manifest is a JSON file at a well-known path that describes the index topolo
 - `encoding.hash_bits`: Total bits in a full store path hash (160 for Nix)
 - `encoding.prefix_bits`: Bits consumed by the shard prefix, used to compute suffix size. For depth=2, this is 10 bits (2 characters × 5 bits each).
 - `journal.current_segment`: Unix timestamp of the active journal segment
-- `journal.segment_duration_seconds`: How often segments rotate (e.g., 300 = 5 minutes)
 - `journal.retention_count`: Number of journal segments retained before archival into shards
 - `epoch.current`: Current shard generation number
 - `epoch.previous`: Previous shard generation (for grace period support; see Section 9)
@@ -210,7 +208,7 @@ The journal captures recent mutations with minimal latency.
 
 **Segment Lifecycle**:
 1. Writer appends to current segment file
-2. Every `segment_duration_seconds`, a new segment begins
+2. The segment is rotated at the discretion of the cache operator.
 3. Segments older than `retention_count` are archived into shards during compaction
 4. Archived segments are deleted after successful compaction
 
@@ -854,7 +852,6 @@ FUNCTION generate_deltas(old_shards, new_shards, manifest):
   },
   "journal": {
     "current_segment": 1705147200,
-    "segment_duration_seconds": 3600,
     "retention_count": 24
   },
   "epoch": { "current": 3, "previous": 2 },
@@ -922,7 +919,6 @@ Latency: 1 HTTP request (shard cached from previous query)
   },
   "journal": {
     "current_segment": 1705147200,
-    "segment_duration_seconds": 300,
     "retention_count": 12
   },
   "epoch": { "current": 156, "previous": 155 },
