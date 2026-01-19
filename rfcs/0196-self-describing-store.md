@@ -196,6 +196,10 @@ losing the actual file, and new Nix versions can recover or regenerate it.
 
 The file resides at the root: e.g., `https://cache.nixos.org/nix-store.json`
 
+### Build sandbox
+
+The build sandbox store is intentionally out of scope; see [Future work](#future-work).
+
 ### Client behavior
 
 1. Query `nix-store.json`.
@@ -396,3 +400,17 @@ Examples:
 A JSON Schema file may be maintained.
 We recommend it to be lenient,
 and for `$schema` to reference a mutable resource that provides the latest schema.
+
+## Build sandbox store
+
+The build sandbox is intentionally kept minimal to control build impurities.
+Making this "build store" self-describing is a worthwhile goal,
+but should be done with great care and is out of scope for this RFC.
+
+Considerations:
+- Should only appear if requested by the derivation
+- Should only contain the bare minimum information that is useful to a build
+- The set of relevant contents may depend on ongoing work on dynamic derivations and content-addressed derivations
+- Mounting the correct `nix-store.json` requires a recombination of mounts instead of mere yes/no filtering of the normal user-visible store;
+  this may unnecessarily complicate some platforms' sandbox implementations and/or reduce portability
+- Possible alternative: provide the JSON location or contents through an environment variable that applies only to the store at `$NIX_STORE`
