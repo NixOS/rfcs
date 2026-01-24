@@ -37,6 +37,8 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538 
 ## Advantages
 
 - flexibility
+- easy transition
+  - for a lot of package sets just move the folder and rename the `default.nix` to `packageset.nix`
 
 ## Drawbacks
 
