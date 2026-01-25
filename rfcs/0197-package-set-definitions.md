@@ -16,9 +16,12 @@ Different ideas on how to handle package sets in nixpkgs.
 # Motivation
 [motivation]: #motivation
 
-- get rid of the package categories as directories.
-- make packages in package sets take advantage of the by-name greatness
-  - auto updates with r-ryantm + merge bot maintainer merging
+- get rid of the package categories as directories (decided in RFC 140 and 146)
+- bring the benefits of by-name to package sets
+  - merge bot maintainer merging
+  - scaleability
+  - isolation
+  - vetting
 - *your goal here*
 
 <details>
