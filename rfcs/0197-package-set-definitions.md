@@ -151,6 +151,7 @@ pkgs
 - unresolved questions
 - some package sets like `lixPackages` (behind all `lib*` packages) will not be accessible through
   GitHub UI
+- having package sets in `pkgs/by-name` may not fit the spirit of rfc 140
 - *your drawback here*
 
 ## Unresolved Questions
@@ -210,6 +211,7 @@ pkgs
     huge as well.
 - some package sets like `lixPackages` (behind all `lib*` packages) will not be accessible through
   GitHub UI
+- having package sets in `pkgs/by-name` may not fit the spirit of rfc 140
 - directory names as attrpaths is sketchy
 - unresolved questions
 
