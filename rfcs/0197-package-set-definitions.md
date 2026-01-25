@@ -111,12 +111,6 @@ TODO
 - only allows top level package sets
 - *your drawback here*
 
-## Unresolved Questions
-
-- Does the handling of versioned package sets work like this?
-- How do we move large package sets?
-- *your question here*
-
 # Alternatives
 [alternatives]: #alternatives
 
@@ -250,7 +244,9 @@ pkgs
 # Unresolved questions
 [unresolved]: #unresolved-questions
 
-What parts of the design are still TBD or unknowns?
+- Does the handling of versioned package sets work like this?
+- How do we move large package sets?
+- *your question here*
 
 # Future work
 [future]: #future-work
