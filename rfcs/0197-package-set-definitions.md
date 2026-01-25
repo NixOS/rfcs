@@ -28,7 +28,7 @@ Different ideas on how to handle package sets in nixpkgs.
 
 </summary>
 
-Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538 and https://github.com/NixOS/nixpkgs/pull/482543
+Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538
 
 ## Detailed design
 
@@ -92,6 +92,7 @@ pkgs
 ## Drawbacks
 
 - autocalling logic has to be duplicated for each package set
+- only allows top level package sets
 - *your drawback here*
 
 ## Unresolved Questions
@@ -145,6 +146,7 @@ pkgs
 - clear package separation
 - reuse of RFC 140 concepts
 - making maintainer merging work for this is probably relatively simple
+- allows nested package sets
 
 ## Drawbacks
 
@@ -201,6 +203,7 @@ pkgs
 - clear package separation
 - reuse of RFC 140 concepts
 - making maintainer merging work for this is probably easy
+- allows nested package sets
 
 ## Drawbacks
 
