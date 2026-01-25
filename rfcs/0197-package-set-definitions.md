@@ -1,17 +1,20 @@
 ---
-feature: nixpkgs package set location
+feature: nixpkgs package sets by-name
 start-date: 2026-01-24
 author: quantenzitrone
 co-authors: (find a buddy later to help out with the RFC)
 shepherd-team: (names, to be nominated and accepted by RFC steering committee)
 shepherd-leader: (name to be appointed by RFC steering committee)
-related-issues: (will contain links to implementation PRs)
+related-issues: https://github.com/NixOS/nixpkgs/pull/482538
 ---
 
 # Summary
 [summary]: #summary
 
-Different ideas on how to handle package sets in nixpkgs.
+Package sets like `fishPlugins` or `python3Packages` move to a `pkgs/by-name` like structure in
+`pkgs/sets-by-name/<setname>`.
+
+This doesn't apply to package sets that are auto-generated like `haskellPackages`.
 
 # Motivation
 [motivation]: #motivation
@@ -27,13 +30,8 @@ Different ideas on how to handle package sets in nixpkgs.
 <details>
 <summary>
 
-# Idea 1: `pkgs/sets-by-name`
-
-</summary>
-
-Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538
-
-## Detailed design
+# Detailed design
+[design]: #detailed-design
 
 - Create a new directory under `pkgs/`, e.g. `pkgs/sets-by-name` that contains package sets.
   - For example `pkgs/sets-by-name/fishPlugins`, `pkgs/sets-by-name/python3Packages`.
@@ -103,41 +101,44 @@ pkgs
     └── package-sets-by-name.nix <- autocalls all sets by name
 ```
 
-## Advantages
+Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538
 
-- accessibility through github ui navigation (better than idea 2 and 3)
-- clear package separation
-- reuse of RFC 140 concepts
-- making maintainer merging and nixpkgs-vet work for this is probably relatively simple
-  - implement tooling to work for multiple directories https://github.com/NixOS/nixpkgs-vet/pull/180
-  - enable tooling on all subdirectories of `pkgs/sets-by-name`
+# Examples and Interactions
+[examples-and-interactions]: #examples-and-interactions
 
-## Drawbacks
+TODO
+
+# Drawbacks
+[drawbacks]: #drawbacks
 
 - only allows top level package sets
 - *your drawback here*
 
 ## Unresolved Questions
 
+- Does the handling of versioned package sets work like this?
+- How do we move large package sets?
 - *your question here*
 
-</details>
+# Alternatives
+[alternatives]: #alternatives
 
 <details>
 <summary>
 
-# Idea 2: nested by-name structure
+## Idea 2: nested by-name structure
 
 </summary>
 
-Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483432
+outdated Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483432
 
-## Detailed design
+### Detailed design
 
-- Package sets are done in a nested `by-name` structure under `pkgs/by-name`, e.g.
+- Idea 1, but sets are in the existing `pkgs/by-name` structure instead of `pkgs/sets-by-name`, e.g.
   `fishPlugins.puffer` would be in `by-name/fi/fishPlugins/pu/puffer`.
-- A marker is required in order to distinguish package sets from simple packages, such as using a `.packageset` file (example: `by-name/fi/fishPlugins/.packageset`)
-  if not the `package.nix` must exist and is called as a package.
+- Additionally a marker is required in order to distinguish package sets from simple packages,
+  such as using a `.packageset` file (example: `by-name/fi/fishPlugins/.packageset`).
+  If not the `package.nix` must exist and is called as a package.
 
 ```
 pkgs
@@ -162,59 +163,29 @@ pkgs
     ...
 ```
 
-## Advantages
+### Advantages
 
-- clear package separation
-- reuse of RFC 140 concepts
-- making maintainer merging work for this is probably relatively simple
+- no new directory, just extend `pkgs/by-name`
 - allows nested package sets
 
-## Drawbacks
+### Drawbacks
 
-- unresolved questions
 - `lixPackages` (behind all `lib*` packages) will not be accessible through GitHubs UI
-- having package sets in `pkgs/by-name` may not fit the spirit of rfc 140
+- having package sets in `pkgs/by-name` may not fit the spirit of RFC 140
 - *your drawback here*
 
-## Unresolved Questions
-
-- How do we handle functions like `fishPlugins.buildFishPlugin`?
-- How do we handle aliases?
-- How do we handle versioned package sets?
-- How do we move large package sets?
-
 </details>
-
-# Detailed design
-[design]: #detailed-design
-
-TODO: decide for one of the above ideas
-
-# Examples and Interactions
-[examples-and-interactions]: #examples-and-interactions
-
-TODO
-
-# Drawbacks
-[drawbacks]: #drawbacks
-
-TODO
-
-# Alternatives
-[alternatives]: #alternatives
-
-TODO: move other designs here once decided
 
 <details>
 <summary>
 
-# Idea 3: package sets in `pkgs/by-name` (scrapped)
+## Idea 3: package sets in `pkgs/by-name` (scrapped)
 
 </summary>
 
 Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483128
 
-## Detailed design
+### Detailed design
 
 - Instead of `by-name/<shard>/<pname>` we have `by-name/<shard>/<attrpath>`, so e.g.
   `fishPlugins.puffer` would go in `by-name/fi/fishPlugins.puffer`.
@@ -239,14 +210,12 @@ pkgs
     ...
 ```
 
-## Advantages
+### Advantages
 
-- clear package separation
-- reuse of RFC 140 concepts
-- making maintainer merging work for this is probably easy
+- no new directory, just extend `pkgs/by-name`
 - allows nested package sets
 
-## Drawbacks
+### Drawbacks
 
 - huge shards due to package sets
   - currently only few shards like `li` are too large for GitHubs UI, but with this idea more shards
@@ -258,12 +227,12 @@ pkgs
       inaccessible.
 - some package sets like `lixPackages` (behind all `lib*` packages) will not be accessible through
   GitHub UI
-- having package sets in `pkgs/by-name` may not fit the spirit of rfc 140
+- having package sets in `pkgs/by-name` may not fit the spirit of RFC 140
 - it's called pkgs/by-**name** and not pkgs/by-**attrpath**
 - directory names as attrpaths is sketchy
 - unresolved questions
 
-## Unresolved Questions
+### Unresolved Questions
 
 - How do we handle functions like `fishPlugins.buildFishPlugin`?
 - How do we handle aliases?
