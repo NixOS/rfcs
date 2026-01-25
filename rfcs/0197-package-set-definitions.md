@@ -149,8 +149,7 @@ pkgs
 ## Drawbacks
 
 - unresolved questions
-- some package sets like `lixPackages` (behind all `lib*` packages) will not be accessible through
-  GitHub UI
+- `lixPackages` (behind all `lib*` packages) will not be accessible through GitHubs UI
 - having package sets in `pkgs/by-name` may not fit the spirit of rfc 140
 - *your drawback here*
 
@@ -206,9 +205,13 @@ pkgs
 ## Drawbacks
 
 - huge shards due to package sets
-  - currently only few shards like `li` are too large for GitHubs UI, but with this idea a lot of
-    shards like `py` (`python3Packages`), `ha` (`haskellPackages`) or `vi` (`vimPlugins`) will be
-    huge as well.
+  - currently only few shards like `li` are too large for GitHubs UI, but with this idea more shards
+    will be huge as well
+    - specifically 12 more shards `em`, `gn`, `ha`, `ho`, `oc`, `pe`, `py`, `rp`, `sb`,
+      `te`, `ty`, `vi` and `vi` (for `emacsPackages`, `gnomeExtensions`, `haskellPackages`,
+      `home-assistant-component-tests`, `ocamlPackages`, `pearlPackages`, `python3Packages`,
+      `rPackages`, `sbclPackages`, `texlivePackages`, `typstPackages` and `vimPlugins`) will be
+      inaccessible.
 - some package sets like `lixPackages` (behind all `lib*` packages) will not be accessible through
   GitHub UI
 - having package sets in `pkgs/by-name` may not fit the spirit of rfc 140
