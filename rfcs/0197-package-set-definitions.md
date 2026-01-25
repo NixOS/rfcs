@@ -39,6 +39,22 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538 
 - Versioned package sets like `python316Packages` are done in `all-packages.nix` by calling the
   `packageset.nix` again with different arguments.
 
+```
+pkgs
+├── by-name
+│   └── ...
+└── sets
+    ├── fishPlugins
+    │   ├── <no structure specified>
+    │   ...
+    │   └── packageset.nix <- entrypoint to package set
+    └── python3Packages
+    │   ├── <no structure specified>
+    │   ...
+    │   └── packageset.nix <- entrypoint to package set
+    ...
+```
+
 ## Advantages
 
 - flexibility
@@ -73,6 +89,28 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483432
 - To distinguish packages from packagesets we have to mark packagesets somehow, for example with a
   file `by-name/fi/fishPlugins/.packageset`, if that file exists, it's called as a packageset,
   if not the `package.nix` must exist and is called as a package.
+
+```
+pkgs
+└── by-name
+    ├── 0_
+    ...
+    ├── fi
+    │   ├── fiano
+    │   ├── fiche
+    │   ├── ...
+    │   ├── fishnet
+    │   ├── fishPlugins
+    │   │   ├── as
+    │   │   │   └── async-prompt
+    │   │   ├── au
+    │   │   ...
+    │   │   └── z_
+    │   │       └── z
+    │   ├── fishy
+    │   ...
+    ...
+```
 
 ## Advantages
 
@@ -109,6 +147,24 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483128
   `fishPlugins.puffer` would go in `by-name/fi/fishPlugins.puffer`.
 - The `top-level/by-name-overlay.nix` will call all folders in a `<shard>` that contain a dot as a
   package set.
+
+```
+pkgs
+└── by-name
+    ├── 0_
+    ...
+    ├── fi
+    │   ├── fiano
+    │   ├── fiche
+    │   ├── ...
+    │   ├── fishnet
+    │   ├── fishPlugins.async-prompt
+    │   ├── fishPlugins.autopair
+    │   ├── fishPlugins.z
+    │   ├── fishy
+    │   ...
+    ...
+```
 
 ## Advantages
 
