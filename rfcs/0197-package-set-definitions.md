@@ -90,6 +90,7 @@ pkgs
 - reuse of RFC 140 concepts
 - making maintainer merging work for this is probably relatively simple
   - implement tooling to work for a non-sharded by-name structure
+  - implement tooling to work for multiple directories https://github.com/NixOS/nixpkgs-vet/pull/180
   - enable tooling on all subdirectories of `pkgs/sets-by-name`
 
 ## Drawbacks
@@ -117,8 +118,8 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483432
 
 - Package sets are done in a nested `by-name` structure under `pkgs/by-name`, e.g.
   `fishPlugins.puffer` would be in `by-name/fi/fishPlugins/pu/puffer`.
-- To distinguish packages from packagesets we have to mark packagesets somehow, for example with a
-  file `by-name/fi/fishPlugins/.packageset`, if that file exists, it's called as a packageset,
+- To distinguish packages from package sets we have to mark package sets somehow, for example with a
+  file `by-name/fi/fishPlugins/.packageset`, if that file exists, it's called as a package set,
   if not the `package.nix` must exist and is called as a package.
 
 ```
