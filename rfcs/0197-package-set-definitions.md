@@ -27,9 +27,6 @@ This doesn't apply to package sets that are auto-generated like `haskellPackages
   - vetting
 - *your goal here*
 
-<details>
-<summary>
-
 # Detailed design
 [design]: #detailed-design
 
@@ -179,7 +176,7 @@ pkgs
 <details>
 <summary>
 
-## Idea 3: package sets in `pkgs/by-name` (scrapped)
+## Idea 3: package sets in `pkgs/by-name`
 
 </summary>
 
