@@ -101,6 +101,7 @@ pkgs
     │   ├── ...
     │   ├── fishnet
     │   ├── fishPlugins
+    │   │   ├── .packageset
     │   │   ├── as
     │   │   │   └── async-prompt
     │   │   ├── au
