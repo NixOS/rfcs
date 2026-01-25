@@ -57,7 +57,12 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538 
 
 </details>
 
+<details>
+<summary>
+
 # Idea 2: nested by-name structure
+
+</summary>
 
 Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483432
 
@@ -87,7 +92,14 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483432
 - How do we handle versioned package sets?
 - How do we move large package sets?
 
+</details>
+
+<details>
+<summary>
+
 # Idea 3: package sets in `pkgs/by-name` (probably worse than Idea 2 in every way)
+
+</summary>
 
 Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483128
 
@@ -118,6 +130,8 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483128
 - How do we handle aliases?
 - How do we handle versioned package sets?
 - How do we move large package sets?
+
+</details>
 
 # Detailed design
 [design]: #detailed-design
