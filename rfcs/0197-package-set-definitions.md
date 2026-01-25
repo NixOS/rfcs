@@ -164,10 +164,30 @@ pkgs
 
 </details>
 
+# Detailed design
+[design]: #detailed-design
+
+TODO: decide for one of the above ideas
+
+# Examples and Interactions
+[examples-and-interactions]: #examples-and-interactions
+
+TODO
+
+# Drawbacks
+[drawbacks]: #drawbacks
+
+TODO
+
+# Alternatives
+[alternatives]: #alternatives
+
+TODO: move other designs here once decided
+
 <details>
 <summary>
 
-# Idea 3: package sets in `pkgs/by-name` (probably worse than Idea 2 in every way)
+# Idea 3: package sets in `pkgs/by-name` (scrapped)
 
 </summary>
 
@@ -213,7 +233,7 @@ pkgs
     - specifically 12 more shards `em`, `gn`, `ha`, `ho`, `oc`, `pe`, `py`, `rp`, `sb`,
       `te`, `ty`, `vi` and `vi` (for `emacsPackages`, `gnomeExtensions`, `haskellPackages`,
       `home-assistant-component-tests`, `ocamlPackages`, `pearlPackages`, `python3Packages`,
-      `rPackages`, `sbclPackages`, `texlivePackages`, `typstPackages` and `vimPlugins`) will be
+      `rPackages`, `sbclPackages`, `texlivePackages`, `typstPackages` and `vimPlugins`) could become
       inaccessible.
 - some package sets like `lixPackages` (behind all `lib*` packages) will not be accessible through
   GitHub UI
@@ -230,26 +250,6 @@ pkgs
 - How do we move large package sets?
 
 </details>
-
-# Detailed design
-[design]: #detailed-design
-
-TODO: decide for one of the above ideas
-
-# Examples and Interactions
-[examples-and-interactions]: #examples-and-interactions
-
-TODO
-
-# Drawbacks
-[drawbacks]: #drawbacks
-
-TODO
-
-# Alternatives
-[alternatives]: #alternatives
-
-TODO: move other designs here once decided
 
 # Prior art
 [prior-art]: #prior-art
