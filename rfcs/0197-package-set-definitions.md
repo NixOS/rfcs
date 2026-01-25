@@ -240,6 +240,7 @@ TODO: move other designs here once decided
 # Prior art
 [prior-art]: #prior-art
 
+- `by-name` stucture for `python3Packages` https://github.com/NixOS/nixpkgs/pull/449896 https://github.com/NixOS/nixpkgs-vet/pull/180
 - https://github.com/NixOS/nixpkgs/issues/482537
 - https://github.com/NixOS/nixpkgs/issues/432625
 - `tclPackages` has their own `by-name` structure https://github.com/NixOS/nixpkgs/pull/344716
