@@ -218,6 +218,7 @@ pkgs
 - some package sets like `lixPackages` (behind all `lib*` packages) will not be accessible through
   GitHub UI
 - having package sets in `pkgs/by-name` may not fit the spirit of rfc 140
+- it's called pkgs/by-**name** and not pkgs/by-**attrpath**
 - directory names as attrpaths is sketchy
 - unresolved questions
 
