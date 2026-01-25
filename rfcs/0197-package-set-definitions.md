@@ -47,7 +47,7 @@ This doesn't apply to package sets that are auto-generated like `haskellPackages
   default version package set.
 - Versioned package sets without a default version will have to override the default version with
   an error.
-  - e.g. `nextcloud*Packages` are in `sets-by-name/nextcloundPackages` and thus autocalled by
+  - e.g. `nextcloud*Packages` are in `sets-by-name/nextcloudPackages` and thus autocalled by
     `top-level/package-sets-by-name.nix`, however we will have an alias in `top-level/aliases.nix`
     that says
     ```nix
