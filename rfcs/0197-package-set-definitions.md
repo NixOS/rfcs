@@ -149,6 +149,8 @@ pkgs
 ## Drawbacks
 
 - unresolved questions
+- some package sets like `lixPackages` (behind all `lib*` packages) will not be accessible through
+  GitHub UI
 - *your drawback here*
 
 ## Unresolved Questions
@@ -206,6 +208,8 @@ pkgs
   - currently only few shards like `li` are too large for GitHubs UI, but with this idea a lot of
     shards like `py` (`python3Packages`), `ha` (`haskellPackages`) or `vi` (`vimPlugins`) will be
     huge as well.
+- some package sets like `lixPackages` (behind all `lib*` packages) will not be accessible through
+  GitHub UI
 - directory names as attrpaths is sketchy
 - unresolved questions
 
