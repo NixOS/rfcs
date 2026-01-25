@@ -118,8 +118,7 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/483432
 
 - Package sets are done in a nested `by-name` structure under `pkgs/by-name`, e.g.
   `fishPlugins.puffer` would be in `by-name/fi/fishPlugins/pu/puffer`.
-- To distinguish packages from package sets we have to mark package sets somehow, for example with a
-  file `by-name/fi/fishPlugins/.packageset`, if that file exists, it's called as a package set,
+- A marker is required in order to distinguish package sets from simple packages, such as using a `.packageset` file (example: `by-name/fi/fishPlugins/.packageset`)
   if not the `package.nix` must exist and is called as a package.
 
 ```
