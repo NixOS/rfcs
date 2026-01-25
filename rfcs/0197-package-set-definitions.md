@@ -27,7 +27,7 @@ Different ideas on how to handle package sets in nixpkgs.
 <details>
 <summary>
 
-# Idea 1: new directory for package sets with by-name structure
+# Idea 1: `pkgs/sets-by-name`
 
 </summary>
 
@@ -37,50 +37,70 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538
 
 - Create a new directory under `pkgs/`, e.g. `pkgs/sets-by-name` that contains package sets.
   - For example `pkgs/sets-by-name/fishPlugins`, `pkgs/sets-by-name/python3Packages`.
-- Each packageset has a `packageset.nix`, that functions as an entrypoint to the package set.
-  - The `packageset.nix` has some code like `top-level/by-name-overlay.nix` that autocalls packages
-    in the folder.
-    - with sharding for large package sets like `python3Packages`
-    - without sharding for small package sets like `fishPlugins`
-    - threshold for sharding is to be discussed
-      - 1000 (including extra files like `README.md` and `packageset.nix`) should the the absolute
-        maximum because of GitHubs UI
-  - the `packageset.nix` can include aliases, functions like `fishPlugins.buildFishPlugin` and
-    overrides.
-- The `packageset.nix` files are autocalled by some `pkgs/top-level/by-name-overlay.nix` like file.
-- Versioned package sets like `python316Packages` are done in `all-packages.nix` by calling the
-  `packageset.nix` again with different arguments.
+- Each package set is sharded like `pkgs/by-name`.
+- The following additional have to exist for each package set.
+  - `functions.nix`: definitons of functions, like `buildFishPlugin`, `buildPythonPackage`.
+  - `overrides.nix`: overrides of packages, like `top-level/all-packages.nix` currently functions as
+    an overlay for `by-name` packages.
+    - This is something we try to keep empty. Most, maybe all, overrides can be inlined in the
+      package.
+  - `aliases.nix`: aliases for aliases in package sets behind `optionalAttrs config.allowAliases`
+    (like `top-level/aliases.nix`).
+- All package sets with their sharded packages, overlayed with their functions, overrides and
+  aliases are automatically called by `top-level/package-sets-by-name.nix`.
+- Versioned package sets like `python316Packages` are done in `all-packages.nix` by overriding the
+  default version package set.
+- Versioned package sets without a default version will have to override the default version with
+  an error.
+  - e.g. `nextcloud*Packages` are in `sets-by-name/nextcloundPackages` and thus autocalled by
+    `top-level/package-sets-by-name.nix`, however we will have an alias in `top-level/aliases.nix`
+    that says
+    ```nix
+    {
+      nextcloudPackages = throw "Please use nextcloudPackages for a specific nextcloud ersion e.g. nextcloud32Packages.";
+    }
+    ```
 
 ```
 pkgs
 ├── by-name
 │   └── ...
-└── sets-by-name
-    ├── fishPlugins <- small package set so no sharding
-    │   ├── async-prompt
-    │   │   └── package.nix
-    │   ├── autopair
-    │   │   └── package.nix
-    │   ...
-    │   ├── z
-    │   │   └── package.nix
-    │   └── packageset.nix <- entrypoint to package set
-    │
-    ├── python3Packages <- large package set with sharding
-    │   ├── a2
-    │   │   └── a2wsgi
-    │   │       └── package.nix
-    │   ├── aa
-    │   ...
-    │   ├── zx
-    │   │   ├── zxcvbn
-    │   │   │   └── package.nix
-    │   │   ├── zxcvbn-rs-py
-    │   │   │   └── package.nix
-    │   │   └── zxing-cpp
-    │   │       └── package.nix
-    │   └── packageset.nix <- entrypoint to package set
+├── sets-by-name
+│   ├── fishPlugins
+│   │   ├── as
+│   │   │   ├── async-prompt
+│   │   │   ... └── package.nix
+│   │   ├── au
+│   │   ...
+│   │   ├── z_
+│   │   │   └── z
+│   │   │       └── package.nix
+│   │   ├── aliases.nix
+│   │   ├── functions.nix
+│   │   └── overrides.nix
+│   │
+│   ├── python3Packages
+│   │   ├── a2
+│   │   │   └── a2wsgi
+│   │   │       └── package.nix
+│   │   ├── aa
+│   │   ...
+│   │   ├── zx
+│   │   │   ├── zxcvbn
+│   │   │   │   └── package.nix
+│   │   │   ├── zxcvbn-rs-py
+│   │   │   │   └── package.nix
+│   │   │   └── zxing-cpp
+│   │   │       └── package.nix
+│   │   ├── aliases.nix
+│   │   ├── functions.nix
+│   │   └── overrides.nix
+│   ...
+└── top-level
+    ├── all-packages.nix <- calls all versioned package sets
+    ├── by-name-overlay.nix <- used to autocall sharded packages (no change required)
     ...
+    └── package-sets-by-name.nix <- autocalls all sets by name
 ```
 
 ## Advantages
@@ -88,14 +108,12 @@ pkgs
 - accessibility through github ui navigation (better than idea 2 and 3)
 - clear package separation
 - reuse of RFC 140 concepts
-- making maintainer merging work for this is probably relatively simple
-  - implement tooling to work for a non-sharded by-name structure
+- making maintainer merging and nixpkgs-vet work for this is probably relatively simple
   - implement tooling to work for multiple directories https://github.com/NixOS/nixpkgs-vet/pull/180
   - enable tooling on all subdirectories of `pkgs/sets-by-name`
 
 ## Drawbacks
 
-- autocalling logic has to be duplicated for each package set
 - only allows top level package sets
 - *your drawback here*
 
