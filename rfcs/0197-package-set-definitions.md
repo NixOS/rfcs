@@ -21,7 +21,12 @@ Different ideas on how to handle package sets in nixpkgs.
   - auto updates with r-ryantm + merge bot maintainer merging
 - *your goal here*
 
+<details>
+<summary>
+
 # Idea 1: new directory for package sets
+
+</summary>
 
 Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538 and https://github.com/NixOS/nixpkgs/pull/482543
 
@@ -49,6 +54,8 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538 
 ## Unresolved Questions
 
 - *your question here*
+
+</details>
 
 # Idea 2: nested by-name structure
 
