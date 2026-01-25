@@ -24,7 +24,7 @@ Different ideas on how to handle package sets in nixpkgs.
 <details>
 <summary>
 
-# Idea 1: new directory for package sets
+# Idea 1: new directory for package sets with by-name structure
 
 </summary>
 
@@ -32,9 +32,18 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538 
 
 ## Detailed design
 
-- Create a new directory under `pkgs/`, e.g. `pkgs/sets` that contains package sets.
-  - For example `pkgs/sets/fishPlugins` `pkgs/sets/python3Packages`.
+- Create a new directory under `pkgs/`, e.g. `pkgs/sets-by-name` that contains package sets.
+  - For example `pkgs/sets-by-name/fishPlugins`, `pkgs/sets-by-name/python3Packages`.
 - Each packageset has a `packageset.nix`, that functions as an entrypoint to the package set.
+  - The `packageset.nix` has some code like `top-level/by-name-overlay.nix` that autocalls packages
+    in the folder.
+    - with sharding for large package sets like `python3Packages`
+    - without sharding for small package sets like `fishPlugins`
+    - threshold for sharding is to be discussed
+      - 1000 (including extra files like `README.md` and `packageset.nix`) should the the absolute
+        maximum because of GitHubs UI
+  - the `packageset.nix` can include aliases, functions like `fishPlugins.buildFishPlugin` and
+    overrides.
 - The `packageset.nix` files are autocalled by some `pkgs/top-level/by-name-overlay.nix` like file.
 - Versioned package sets like `python316Packages` are done in `all-packages.nix` by calling the
   `packageset.nix` again with different arguments.
@@ -43,28 +52,46 @@ Proof-Of-Concept implementation in https://github.com/NixOS/nixpkgs/pull/482538 
 pkgs
 ├── by-name
 │   └── ...
-└── sets
-    ├── fishPlugins
-    │   ├── <no structure specified>
+└── sets-by-name
+    ├── fishPlugins <- small package set so no sharding
+    │   ├── async-prompt
+    │   │   └── package.nix
+    │   ├── autopair
+    │   │   └── package.nix
     │   ...
+    │   ├── z
+    │   │   └── package.nix
     │   └── packageset.nix <- entrypoint to package set
-    └── python3Packages
-    │   ├── <no structure specified>
+    │
+    ├── python3Packages <- large package set with sharding
+    │   ├── a2
+    │   │   └── a2wsgi
+    │   │       └── package.nix
+    │   ├── aa
     │   ...
+    │   ├── zx
+    │   │   ├── zxcvbn
+    │   │   │   └── package.nix
+    │   │   ├── zxcvbn-rs-py
+    │   │   │   └── package.nix
+    │   │   └── zxing-cpp
+    │   │       └── package.nix
     │   └── packageset.nix <- entrypoint to package set
     ...
 ```
 
 ## Advantages
 
-- flexibility
-- easy transition
-  - for a lot of package sets just move the folder and rename the `default.nix` to `packageset.nix`
+- accessibility through github ui navigation (better than idea 2 and 3)
+- clear package separation
+- reuse of RFC 140 concepts
+- making maintainer merging work for this is probably relatively simple
+  - implement tooling to work for a non-sharded by-name structure
+  - enable tooling on all subdirectories of `pkgs/sets-by-name`
 
 ## Drawbacks
 
-- all packagesets have to handle their shit themselves, so no maintainer merging, by-name
-  autocalling and stuff without the additional work
+- autocalling logic has to be duplicated for each package set
 - *your drawback here*
 
 ## Unresolved Questions
