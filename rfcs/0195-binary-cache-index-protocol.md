@@ -118,90 +118,74 @@ for char in base32_string:
     result = (result << 5) | nix_base32_value(char)
 ```
 
-## 3. Layer 0: Manifest
+**Note on Nix32 Byte Order**: Nix's base32 encoding processes bytes in reverse order compared to RFC4648. This means prefix-based sharding on Nix32 strings corresponds to suffix-based sharding on native hash bytes. This is intentional—it preserves the intuitive correspondence between a hash's visible prefix (`b6gv...`) and its shard location (`b6/`). Implementers should use established Nix base32 libraries (such as `go-nix/pkg/nixbase32`) rather than adapting standard base32 implementations.
 
-The manifest is a JSON file that describes the index topology. Clients discover the manifest URL via the `index-url` field in the cache's `nix-cache-info` file.
+## 3. Layer 0: Manifest (via nix-cache-info)
 
-**Discovery**: Caches advertise their index by adding an `index-url` field to `nix-cache-info`:
+The index manifest is embedded directly in the cache's `nix-cache-info` file using `Index`-prefixed fields. This eliminates the need for a separate manifest file and allows clients to discover index capabilities with no additional HTTP requests.
+
+**Discovery**: Caches advertise their index by adding `Index*` fields to `nix-cache-info`:
+
 ```
 StoreDir: /nix/store
 WantMassQuery: 1
 Priority: 40
-index-url: https://cache.example.com/nix-cache-index/manifest.json
+IndexVersion: 1
+IndexFormat: hlssi
+IndexCreatedAt: 2026-01-13T12:00:00Z
+IndexItemCount: 1200000000
+IndexShardingDepth: 2
+IndexShardingAlphabet: 0123456789abcdfghijklmnpqrsvwxyz
+IndexEncodingType: golomb-rice
+IndexEncodingParameter: 8
+IndexHashBits: 160
+IndexPrefixBits: 10
+IndexJournalBase: https://cache.example.com/nix-cache-index/journal/
+IndexShardsBase: https://cache.example.com/nix-cache-index/shards/
+IndexDeltasBase: https://cache.example.com/nix-cache-index/deltas/
+IndexJournalCurrentSegment: 1705147200
+IndexJournalRetentionCount: 12
+IndexEpochCurrent: 42
+IndexEpochPrevious: 41
+IndexDeltasEnabled: true
+IndexDeltasOldestBase: 35
+IndexDeltasCompression: zstd
 ```
 
-Clients that understand this field fetch the manifest from the specified URL. Clients that don't recognize the field continue with standard HTTP probing. Caches without an index simply omit this field.
-
-**Example Manifest**:
-```json
-{
-  "version": 1,
-  "format": "hlssi",
-  "created_at": "2026-01-13T12:00:00Z",
-  "item_count": 1200000000,
-  "sharding": {
-    "depth": 2,
-    "alphabet": "0123456789abcdfghijklmnpqrsvwxyz"
-  },
-  "encoding": {
-    "type": "golomb-rice",
-    "parameter": 8,
-    "hash_bits": 160,
-    "prefix_bits": 10
-  },
-  "urls": {
-    "journal_base": "https://cache.example.com/nix-cache-index/journal/",
-    "shards_base": "https://cache.example.com/nix-cache-index/shards/",
-    "deltas_base": "https://cache.example.com/nix-cache-index/deltas/"
-  },
-  "journal": {
-    "current_segment": 1705147200,
-    "retention_count": 12
-  },
-  "epoch": {
-    "current": 42,
-    "previous": 41
-  },
-  "deltas": {
-    "enabled": true,
-    "oldest_base": 35,
-    "compression": "zstd"
-  }
-}
-```
+Clients that understand these fields use the index. Clients that don't recognize the fields continue with standard HTTP probing. Caches without an index simply omit these fields.
 
 **Field Definitions**:
 
-- `version`: Protocol version (currently 1). Clients MUST reject manifests with unsupported versions.
-- `format`: Index format identifier (`hlssi` for this RFC)
-- `created_at`: ISO 8601 timestamp of when this manifest was generated
-- `item_count`: Total number of store path hashes indexed across all shards. This is approximate and provided for client information and debugging purposes; it may drift slightly between compactions.
-- `sharding.depth`: Number of prefix characters used for partitioning (0–4)
-- `sharding.alphabet`: The base32 alphabet used for shard prefixes. MUST match Nix's alphabet: `0123456789abcdfghijklmnpqrsvwxyz`
-- `encoding.type`: Compression algorithm for shard files
-- `encoding.parameter`: Golomb-Rice divisor exponent (M = 2^parameter)
-- `encoding.hash_bits`: Total bits in a full store path hash (160 for Nix)
-- `encoding.prefix_bits`: Bits consumed by the shard prefix, used to compute suffix size. For depth=2, this is 10 bits (2 characters × 5 bits each).
-- `urls.journal_base`: Base URL for journal segment files
-- `urls.shards_base`: Base URL for shard files
-- `urls.deltas_base`: Base URL for delta files and checksums
-- `journal.current_segment`: Unix timestamp of the active journal segment
-- `journal.retention_count`: Number of journal segments retained before archival into shards
-- `epoch.current`: Current shard generation number
-- `epoch.previous`: Previous shard generation (for grace period support; see Section 9)
-- `deltas.enabled`: Whether differential updates are available (see Section 10)
-- `deltas.oldest_base`: Oldest epoch from which deltas can be applied. Clients with a local epoch older than this must perform a full download.
-- `deltas.compression`: Compression algorithm for delta files (`zstd`)
+- `IndexVersion`: Protocol version (currently 1). Clients MUST reject indexes with unsupported versions.
+- `IndexFormat`: Index format identifier (`hlssi` for this RFC)
+- `IndexCreatedAt`: ISO 8601 timestamp of when this index configuration was generated
+- `IndexItemCount`: Total number of store path hashes indexed across all shards. This is approximate and provided for client information and debugging purposes; it may drift slightly between compactions.
+- `IndexShardingDepth`: Number of prefix characters used for partitioning (0–4)
+- `IndexShardingAlphabet`: The base32 alphabet used for shard prefixes. MUST match Nix's alphabet: `0123456789abcdfghijklmnpqrsvwxyz`
+- `IndexEncodingType`: Compression algorithm for shard files
+- `IndexEncodingParameter`: Golomb-Rice divisor exponent (M = 2^parameter)
+- `IndexHashBits`: Total bits in a full store path hash (160 for Nix)
+- `IndexPrefixBits`: Bits consumed by the shard prefix, used to compute suffix size. For depth=2, this is 10 bits (2 characters × 5 bits each).
+- `IndexJournalBase`: Base URL for journal segment files
+- `IndexShardsBase`: Base URL for shard files
+- `IndexDeltasBase`: Base URL for delta files and checksums
+- `IndexJournalCurrentSegment`: Opaque monotonically increasing identifier for the active journal segment. Implementations commonly use Unix timestamps but MAY use any scheme that guarantees strictly increasing values.
+- `IndexJournalRetentionCount`: Number of journal segments retained before archival into shards
+- `IndexEpochCurrent`: Current shard generation number
+- `IndexEpochPrevious`: Previous shard generation (for grace period support; see Section 9)
+- `IndexDeltasEnabled`: Whether differential updates are available (see Section 10)
+- `IndexDeltasOldestBase`: Oldest epoch from which deltas can be applied. Clients with a local epoch older than this must perform a full download.
+- `IndexDeltasCompression`: Compression algorithm for delta files (`zstd`)
 
-**Caching**: Servers SHOULD use the `Cache-Control` HTTP header to specify the caching duration of the manifest. Clients SHOULD respect this header to allow the server to control how long the manifest is cached. Revalidation using `If-Modified-Since` or `ETag` SHOULD also be used.
+**Caching**: Servers SHOULD use the `Cache-Control` HTTP header to specify the caching duration of `nix-cache-info`. Clients SHOULD respect this header to allow the server to control how long the index metadata is cached. Revalidation using `If-Modified-Since` or `ETag` SHOULD also be used.
 
-**Integrity Verification**: Clients SHOULD verify manifest integrity using HTTP-level mechanisms (`ETag`, `Content-MD5`). Cryptographic signing of index files is deferred to future work (see Future Work: Index Signing and Trust).
+**Integrity Verification**: Clients SHOULD verify `nix-cache-info` integrity using HTTP-level mechanisms (`ETag`, `Content-MD5`). Cryptographic signing of index files is deferred to future work (see Future Work: Index Signing and Trust).
 
 ## 4. Layer 1: Journal (Hot Layer)
 
 The journal captures recent mutations.
 
-**URL Pattern**: `{urls.journal_base}<timestamp>.log`
+**URL Pattern**: `{IndexJournalBase}<segment_id>.log`
 
 **Format**: Line-delimited ASCII text, one operation per line:
 ```
@@ -219,7 +203,7 @@ The journal captures recent mutations.
 **Segment Lifecycle**:
 1. Writer appends to current segment file
 2. The segment is rotated at the discretion of the cache operator.
-3. Segments older than `retention_count` are archived into shards during compaction
+3. Segments older than `IndexJournalRetentionCount` are archived into shards during compaction
 4. Archived segments are deleted after successful compaction
 
 **Write Protocol** (for cache operators):
@@ -239,18 +223,18 @@ On garbage collection:
 
 Shards contain the bulk of membership data, compressed using Golomb-Rice coding.
 
-**URL Pattern**: `{urls.shards_base}<epoch>/<prefix>.idx.zst`
+**URL Pattern**: `{IndexShardsBase}<epoch>/<prefix>.idx.zst`
 
-For `sharding.depth = 2`:
+For `IndexShardingDepth = 2`:
 ```
-{shards_base}42/b6.idx.zst    # All hashes starting with "b6"
-{shards_base}42/a1.idx.zst    # All hashes starting with "a1"
+{IndexShardsBase}42/b6.idx.zst    # All hashes starting with "b6"
+{IndexShardsBase}42/a1.idx.zst    # All hashes starting with "a1"
 ...
 ```
 
-For `sharding.depth = 0` (small caches):
+For `IndexShardingDepth = 0` (small caches):
 ```
-{shards_base}42/root.idx.zst  # All hashes in single file
+{IndexShardsBase}42/root.idx.zst  # All hashes in single file
 ```
 
 **Compression**: Shard files MUST be compressed with zstd (indicated by `.zst` extension).
@@ -416,12 +400,12 @@ The number of partitions at depth `d` with Nix's 32-character base32 alphabet is
 ```
 FUNCTION query(target_hash: string) -> {DEFINITE_HIT, DEFINITE_MISS, PROBABLE_HIT}:
 
-    // Step 1: Fetch and parse manifest (cached)
-    manifest = fetch_cached(manifest_url)
+    // Step 1: Fetch and parse nix-cache-info (cached)
+    cache_info = fetch_cached(cache_url + "/nix-cache-info")
 
     // Step 2: Check journal for recent mutations
-    FOR segment IN manifest.journal.segments:
-        journal_url = manifest.urls.journal_base + segment + ".log"
+    FOR segment IN get_journal_segments(cache_info):
+        journal_url = cache_info.IndexJournalBase + segment + ".log"
         journal = fetch_cached(journal_url)
         IF "-" + target_hash IN journal:
             RETURN DEFINITE_MISS  // Recently deleted
@@ -429,13 +413,13 @@ FUNCTION query(target_hash: string) -> {DEFINITE_HIT, DEFINITE_MISS, PROBABLE_HI
             RETURN PROBABLE_HIT   // Recently added (see note below)
 
     // Step 3: Determine shard for this hash
-    prefix = target_hash[0:manifest.sharding.depth]
+    prefix = target_hash[0:cache_info.IndexShardingDepth]
     shard_url = format("{}{}/{}.idx.zst",
-                        manifest.urls.shards_base, manifest.epoch.current, prefix)
+                        cache_info.IndexShardsBase, cache_info.IndexEpochCurrent, prefix)
 
     // Step 4: Fetch and search shard (cached by epoch)
     shard = fetch_cached(shard_url)
-    suffix = parse_hash_suffix(target_hash, manifest.sharding.depth)
+    suffix = parse_hash_suffix(target_hash, cache_info.IndexShardingDepth)
 
     // Step 5: Binary search sparse index
     bracket = binary_search(shard.sparse_index, suffix)
@@ -467,14 +451,14 @@ Clients receiving `PROBABLE_HIT` SHOULD proceed to fetch the `.narinfo` file, tr
 Compaction merges journal entries into shards, producing a new epoch:
 
 ```
-FUNCTION compact(manifest, old_shards) -> new_shards:
+FUNCTION compact(cache_info, old_shards) -> new_shards:
 
     // Step 0: Rotate to a new journal segment
     // This ensures no writes occur to segments we're about to process
-    new_segment_timestamp = rotate_journal_segment()
+    new_segment_id = rotate_journal_segment()
 
     // Step 1: Identify segments to compact (all BEFORE the new segment)
-    segments_to_compact = get_segments_older_than(new_segment_timestamp)
+    segments_to_compact = get_segments_older_than(new_segment_id)
 
     // Step 2: Parse all journal mutations from those segments
     additions = {}  // prefix -> set of hashes
@@ -483,16 +467,16 @@ FUNCTION compact(manifest, old_shards) -> new_shards:
     FOR segment IN segments_to_compact:
         FOR line IN segment:
             hash = line[1:]
-            prefix = hash[0:manifest.sharding.depth]
+            prefix = hash[0:cache_info.IndexShardingDepth]
             IF line[0] == '+':
                 additions[prefix].add(hash)
             ELSE:
                 deletions[prefix].add(hash)
 
     // Step 3: Process each shard independently
-    new_epoch = manifest.epoch.current + 1
+    new_epoch = cache_info.IndexEpochCurrent + 1
 
-    FOR prefix IN all_prefixes(manifest.sharding.depth):
+    FOR prefix IN all_prefixes(cache_info.IndexShardingDepth):
         old_hashes = decode_shard(old_shards[prefix])
 
         // Streaming merge: old + additions - deletions
@@ -501,16 +485,16 @@ FUNCTION compact(manifest, old_shards) -> new_shards:
         )
 
         // Encode new shard
-        new_shards[prefix] = encode_shard(new_hashes, manifest.encoding)
+        new_shards[prefix] = encode_shard(new_hashes, cache_info)
 
     // Step 4: Generate deltas (see Section 10)
-    IF manifest.deltas.enabled:
-        generate_deltas(old_shards, new_shards, manifest)
+    IF cache_info.IndexDeltasEnabled:
+        generate_deltas(old_shards, new_shards, cache_info)
 
-    // Step 5: Update manifest (atomic swap)
-    manifest.epoch.previous = manifest.epoch.current
-    manifest.epoch.current = new_epoch
-    manifest.journal.current_segment = new_segment_timestamp
+    // Step 5: Update nix-cache-info (atomic swap)
+    cache_info.IndexEpochPrevious = cache_info.IndexEpochCurrent
+    cache_info.IndexEpochCurrent = new_epoch
+    cache_info.IndexJournalCurrentSegment = new_segment_id
 
     // Step 6: Delete compacted journal segments
     // Safe because nothing is writing to these anymore
@@ -539,56 +523,56 @@ To prevent race conditions during compaction, servers MUST maintain both the cur
 Without a grace period, the following race can occur:
 
 ```
-T+0ms:    Client fetches manifest.json, sees epoch: 41
+T+0ms:    Client fetches nix-cache-info, sees IndexEpochCurrent: 41
 T+100ms:  Server completes compaction to epoch 42
-T+101ms:  Server updates manifest.json to epoch: 42
+T+101ms:  Server updates nix-cache-info to IndexEpochCurrent: 42
 T+102ms:  Server deletes shards/41/ directory
 T+500ms:  Client requests shards/41/b6.idx.zst
 T+501ms:  Client receives 404 Not Found
 ```
 
-The client read a valid manifest but could not fetch the shards it referenced.
+The client read a valid index configuration but could not fetch the shards it referenced.
 
 ### 9.2 Grace Period Requirements
 
 **Server Requirements**:
 
-1. The manifest MUST include both `epoch.current` and `epoch.previous` fields.
-2. Shards for `epoch.previous` MUST remain available for a **minimum grace period** of:
+1. The `nix-cache-info` MUST include both `IndexEpochCurrent` and `IndexEpochPrevious` fields.
+2. Shards for `IndexEpochPrevious` MUST remain available for a **minimum grace period** of:
    ```
-   grace_period >= 2 × max_manifest_cache_duration + max_request_duration
+   grace_period >= 2 × max_cache_info_cache_duration + max_request_duration
    ```
-   Where `max_manifest_cache_duration` is the maximum value used in the `Cache-Control` header for the manifest. For typical values (max cache duration = 120s, max request = 30s):
+   Where `max_cache_info_cache_duration` is the maximum value used in the `Cache-Control` header for `nix-cache-info`. For typical values (max cache duration = 120s, max request = 30s):
    ```
    grace_period >= 2 × 120 + 30 = 270 seconds (4.5 minutes)
    ```
 3. Servers SHOULD retain previous epoch shards for at least **10 minutes** to provide margin.
-4. Shards for epochs older than `epoch.previous` MAY be deleted immediately.
+4. Shards for epochs older than `IndexEpochPrevious` MAY be deleted immediately.
 
 **Client Requirements**:
 
-1. Clients MUST first attempt to fetch shards from `epoch.current`.
-2. If a shard fetch returns 404 AND `epoch.previous` exists in manifest:
-   - Client SHOULD retry using `epoch.previous`
-   - Client SHOULD refresh the manifest before subsequent queries
-3. If both epochs return 404, client SHOULD refresh manifest and retry once.
-4. Persistent 404s after manifest refresh indicate a server-side issue or deleted content.
+1. Clients MUST first attempt to fetch shards from `IndexEpochCurrent`.
+2. If a shard fetch returns 404 AND `IndexEpochPrevious` exists:
+   - Client SHOULD retry using `IndexEpochPrevious`
+   - Client SHOULD refresh `nix-cache-info` before subsequent queries
+3. If both epochs return 404, client SHOULD refresh `nix-cache-info` and retry once.
+4. Persistent 404s after refresh indicate a server-side issue or deleted content.
 
 ### 9.3 Compaction Lifecycle
 
 ```
 Phase 1: Pre-Compaction
   shards/41/  (current)
-  manifest.json: { epoch: { current: 41, previous: 40 } }
+  nix-cache-info: IndexEpochCurrent: 41, IndexEpochPrevious: 40
 
 Phase 2: Write New Epoch
   shards/41/  (still current)
   shards/42/  (being written, not yet referenced)
 
-Phase 3: Atomic Manifest Update
+Phase 3: Atomic nix-cache-info Update
   shards/41/  (now previous)
   shards/42/  (now current)
-  manifest.json: { epoch: { current: 42, previous: 41 } }
+  nix-cache-info: IndexEpochCurrent: 42, IndexEpochPrevious: 41
 
 Phase 4: Cleanup (after grace period)
   shards/40/  (deleted, no longer referenced)
@@ -598,7 +582,7 @@ Phase 4: Cleanup (after grace period)
 
 ### 9.4 Structural Parameter Changes
 
-Structural parameters (`sharding.depth`, `encoding.parameter`) are expected to remain stable for the lifetime of a cache. However, if an operator needs to change these parameters (e.g., increasing depth as the cache grows), special handling is required.
+Structural parameters (`IndexShardingDepth`, `IndexEncodingParameter`) are expected to remain stable for the lifetime of a cache. However, if an operator needs to change these parameters (e.g., increasing depth as the cache grows), special handling is required.
 
 **The Problem**:
 
@@ -608,14 +592,14 @@ If structural parameters change between epochs, the grace period mechanism break
 Epoch 41 (depth=0): shards/41/root.idx.zst
 Epoch 42 (depth=2): shards/42/00.idx.zst, shards/42/01.idx.zst, ...
 
-Client with stale manifest tries: shards/41/b6.idx.zst → 404!
+Client with stale nix-cache-info tries: shards/41/b6.idx.zst → 404!
 ```
 
 **Requirements for Structural Changes**:
 
-1. Structural changes MUST reset `deltas.oldest_base` to the new epoch (deltas cannot span structural boundaries).
+1. Structural changes MUST reset `IndexDeltasOldestBase` to the new epoch (deltas cannot span structural boundaries).
 2. The previous epoch MUST be retained with its original structure for the grace period.
-3. Clients encountering a structure mismatch (e.g., expected shard file returns 404) SHOULD refresh the manifest and download the current epoch in full.
+3. Clients encountering a structure mismatch (e.g., expected shard file returns 404) SHOULD refresh `nix-cache-info` and download the current epoch in full.
 4. Operators SHOULD treat structural changes as major events requiring extended grace periods (RECOMMENDED: 1 hour minimum).
 
 ## 10. Differential Updates
@@ -633,7 +617,7 @@ Without differential updates, a client syncing daily downloads **~1.5 GB/day**. 
 
 ### 10.2 Delta File Format
 
-**URL Pattern**: `{urls.deltas_base}<from_epoch>-<to_epoch>/<prefix>.delta.zst`
+**URL Pattern**: `{IndexDeltasBase}<from_epoch>-<to_epoch>/<prefix>.delta.zst`
 
 Delta files use a simple line-oriented ASCII format listing the operations needed to transform the source epoch shard into the target epoch shard:
 
@@ -657,7 +641,7 @@ Delta files use a simple line-oriented ASCII format listing the operations neede
 
 To verify correct reconstruction, servers provide checksums for each epoch's shards:
 
-**URL**: `{urls.deltas_base}checksums/<epoch>.json`
+**URL**: `{IndexDeltasBase}checksums/<epoch>.json`
 
 ```json
 {
@@ -688,17 +672,17 @@ Clients MUST verify the checksum after reconstructing a shard from deltas. On mi
 ### 10.4 Client Update Algorithm
 
 ```
-FUNCTION update_local_index(local_epoch, manifest):
-    remote_epoch = manifest.epoch.current
+FUNCTION update_local_index(local_epoch, cache_info):
+    remote_epoch = cache_info.IndexEpochCurrent
 
     IF local_epoch == remote_epoch:
         RETURN  // Already current
 
-    IF NOT manifest.deltas.enabled:
+    IF NOT cache_info.IndexDeltasEnabled:
         download_full_epoch(remote_epoch)
         RETURN
 
-    IF local_epoch < manifest.deltas.oldest_base:
+    IF local_epoch < cache_info.IndexDeltasOldestBase:
         // Too far behind, deltas not available
         download_full_epoch(remote_epoch)
         RETURN
@@ -708,16 +692,16 @@ FUNCTION update_local_index(local_epoch, manifest):
     WHILE current < remote_epoch:
         next = current + 1
 
-        FOR prefix IN all_prefixes(manifest.sharding.depth):
+        FOR prefix IN all_prefixes(cache_info.IndexShardingDepth):
             delta_url = format("{}{}_{}/{}.delta.zst",
-                               manifest.urls.deltas_base, current, next, prefix)
+                               cache_info.IndexDeltasBase, current, next, prefix)
 
             delta = fetch(delta_url)  // May be 404 if no changes
             IF delta EXISTS:
                 apply_delta(local_shards[prefix], delta)
 
         // Verify reconstruction
-        checksums_url = format("{}checksums/{}.json", manifest.urls.deltas_base, next)
+        checksums_url = format("{}checksums/{}.json", cache_info.IndexDeltasBase, next)
         checksums = fetch(checksums_url)
         FOR prefix, expected IN checksums.shards:
             actual = xxh64(local_shards[prefix])
@@ -751,7 +735,7 @@ Client at epoch 38, current is 42:
 
 ### 10.6 Delta Retention Policy
 
-Delta retention is at the discretion of cache operators. The manifest field `deltas.oldest_base` advertises the oldest epoch from which deltas are available, allowing clients to determine whether differential updates are possible.
+Delta retention is at the discretion of cache operators. The `IndexDeltasOldestBase` field advertises the oldest epoch from which deltas are available, allowing clients to determine whether differential updates are possible.
 
 **Operator Guidance (Non-Normative)**:
 
@@ -778,11 +762,11 @@ For cache.nixos.org storing hundreds of terabytes of NARs, this overhead is negl
 During compaction, servers generate deltas by comparing old and new shards:
 
 ```
-FUNCTION generate_deltas(old_shards, new_shards, manifest):
-    old_epoch = manifest.epoch.current
+FUNCTION generate_deltas(old_shards, new_shards, cache_info):
+    old_epoch = cache_info.IndexEpochCurrent
     new_epoch = old_epoch + 1
 
-    FOR prefix IN all_prefixes(manifest.sharding.depth):
+    FOR prefix IN all_prefixes(cache_info.IndexShardingDepth):
         old_hashes = decode_shard(old_shards[prefix])
         new_hashes = decode_shard(new_shards[prefix])
 
@@ -795,7 +779,7 @@ FUNCTION generate_deltas(old_shards, new_shards, manifest):
 
     // Generate checksums for new epoch
     checksums = {}
-    FOR prefix IN all_prefixes(manifest.sharding.depth):
+    FOR prefix IN all_prefixes(cache_info.IndexShardingDepth):
         checksums[prefix] = {
             "checksum": xxh64(new_shards[prefix]),
             "item_count": count_items(new_shards[prefix]),
@@ -804,18 +788,18 @@ FUNCTION generate_deltas(old_shards, new_shards, manifest):
     write_json(format("deltas/checksums/{}.json", new_epoch), checksums)
 
     // Prune old deltas beyond retention window
-    oldest_to_keep = new_epoch - manifest.deltas.retention_epochs
+    oldest_to_keep = new_epoch - retention_epochs
     delete_deltas_older_than(oldest_to_keep)
-    manifest.deltas.oldest_base = max(manifest.deltas.oldest_base, oldest_to_keep)
+    cache_info.IndexDeltasOldestBase = max(cache_info.IndexDeltasOldestBase, oldest_to_keep)
 ```
 
 ## 11. File Layout Summary
 
-The following shows a typical file layout. Note that actual URLs are determined by the `urls.*` fields in the manifest and may differ:
+The following shows a typical file layout. Note that actual URLs are determined by the `Index*Base` fields in `nix-cache-info` and may differ:
 
 ```
+/nix-cache-info                    (contains Index* fields)
 /nix-cache-index/
-├── manifest.json
 ├── journal/
 │   ├── 1705147200.log
 │   ├── 1705147500.log
@@ -855,45 +839,36 @@ The following shows a typical file layout. Note that actual URLs are determined 
 
 ## Example 1: Small Homelab Cache (~500 items)
 
-**Manifest Configuration**:
-```json
-{
-  "version": 1,
-  "format": "hlssi",
-  "created_at": "2026-01-13T12:00:00Z",
-  "item_count": 487,
-  "sharding": {
-    "depth": 0,
-    "alphabet": "0123456789abcdfghijklmnpqrsvwxyz"
-  },
-  "encoding": {
-    "type": "golomb-rice",
-    "parameter": 6,
-    "hash_bits": 160,
-    "prefix_bits": 0
-  },
-  "urls": {
-    "journal_base": "https://homelab.local/nix-cache-index/journal/",
-    "shards_base": "https://homelab.local/nix-cache-index/shards/",
-    "deltas_base": "https://homelab.local/nix-cache-index/deltas/"
-  },
-  "journal": {
-    "current_segment": 1705147200,
-    "retention_count": 24
-  },
-  "epoch": { "current": 3, "previous": 2 },
-  "deltas": {
-    "enabled": true,
-    "oldest_base": 1,
-    "compression": "zstd"
-  }
-}
+**nix-cache-info**:
+```
+StoreDir: /nix/store
+WantMassQuery: 1
+Priority: 40
+IndexVersion: 1
+IndexFormat: hlssi
+IndexCreatedAt: 2026-01-13T12:00:00Z
+IndexItemCount: 487
+IndexShardingDepth: 0
+IndexShardingAlphabet: 0123456789abcdfghijklmnpqrsvwxyz
+IndexEncodingType: golomb-rice
+IndexEncodingParameter: 6
+IndexHashBits: 160
+IndexPrefixBits: 0
+IndexJournalBase: https://homelab.local/nix-cache-index/journal/
+IndexShardsBase: https://homelab.local/nix-cache-index/shards/
+IndexDeltasBase: https://homelab.local/nix-cache-index/deltas/
+IndexJournalCurrentSegment: 1705147200
+IndexJournalRetentionCount: 24
+IndexEpochCurrent: 3
+IndexEpochPrevious: 2
+IndexDeltasEnabled: true
+IndexDeltasOldestBase: 1
+IndexDeltasCompression: zstd
 ```
 
 **File Structure**:
 ```
 /nix-cache-index/
-├── manifest.json          (~500 bytes)
 ├── journal/
 │   └── 1705147200.log     (~50 bytes, 2 recent pushes)
 ├── shards/
@@ -914,7 +889,7 @@ The following shows a typical file layout. Note that actual URLs are determined 
 **Client Workflow**:
 ```
 1. Client wants to check: b6gvzjyb2pg0kjfwn6a6llj3k1bq6dwi
-2. Fetch manifest.json (500 bytes, cached 60s)
+2. Fetch nix-cache-info (500 bytes, cached 60s)
 3. Fetch journal/1705147200.log (50 bytes)
    - Hash not in journal
 4. Fetch shards/3/root.idx.zst (8 KB, cached until epoch changes)
@@ -927,39 +902,31 @@ Latency: 1 HTTP request (shard cached from previous query)
 
 ## Example 2: Large Public Cache (~100M items)
 
-**Manifest Configuration**:
-```json
-{
-  "version": 1,
-  "format": "hlssi",
-  "created_at": "2026-01-13T12:00:00Z",
-  "item_count": 98452103,
-  "sharding": {
-    "depth": 2,
-    "alphabet": "0123456789abcdfghijklmnpqrsvwxyz"
-  },
-  "encoding": {
-    "type": "golomb-rice",
-    "parameter": 8,
-    "hash_bits": 160,
-    "prefix_bits": 10
-  },
-  "urls": {
-    "journal_base": "https://cache.example.org/index/journal/",
-    "shards_base": "https://cdn.example.org/index/shards/",
-    "deltas_base": "https://cdn.example.org/index/deltas/"
-  },
-  "journal": {
-    "current_segment": 1705147200,
-    "retention_count": 12
-  },
-  "epoch": { "current": 156, "previous": 155 },
-  "deltas": {
-    "enabled": true,
-    "oldest_base": 66,
-    "compression": "zstd"
-  }
-}
+**nix-cache-info**:
+```
+StoreDir: /nix/store
+WantMassQuery: 1
+Priority: 40
+IndexVersion: 1
+IndexFormat: hlssi
+IndexCreatedAt: 2026-01-13T12:00:00Z
+IndexItemCount: 98452103
+IndexShardingDepth: 2
+IndexShardingAlphabet: 0123456789abcdfghijklmnpqrsvwxyz
+IndexEncodingType: golomb-rice
+IndexEncodingParameter: 8
+IndexHashBits: 160
+IndexPrefixBits: 10
+IndexJournalBase: https://cache.example.org/index/journal/
+IndexShardsBase: https://cdn.example.org/index/shards/
+IndexDeltasBase: https://cdn.example.org/index/deltas/
+IndexJournalCurrentSegment: 1705147200
+IndexJournalRetentionCount: 12
+IndexEpochCurrent: 156
+IndexEpochPrevious: 155
+IndexDeltasEnabled: true
+IndexDeltasOldestBase: 66
+IndexDeltasCompression: zstd
 ```
 
 **Shard Statistics**:
@@ -971,7 +938,7 @@ Latency: 1 HTTP request (shard cached from previous query)
 **Client Workflow**:
 ```
 1. Client wants to check: b6gvzjyb2pg0kjfwn6a6llj3k1bq6dwi
-2. Fetch manifest.json (600 bytes, cached 60s)
+2. Fetch nix-cache-info (600 bytes, cached 60s)
 3. Fetch recent journal segments (~200 KB total for 12 segments)
    - Hash not in journals
 4. Compute prefix: "b6"
@@ -1105,22 +1072,22 @@ Decoded entries: 3 (out of 256 in bracket)
 
 **Timeline**:
 ```
-T+0ms:    Client fetches manifest: { epoch: { current: 41, previous: 40 } }
+T+0ms:    Client fetches nix-cache-info: IndexEpochCurrent: 41, IndexEpochPrevious: 40
 T+50ms:   Server starts compaction to epoch 42
 T+100ms:  Server finishes writing shards/42/
-T+101ms:  Server updates manifest: { epoch: { current: 42, previous: 41 } }
-T+200ms:  Client requests shards/41/b6.idx.zst (based on stale manifest)
+T+101ms:  Server updates nix-cache-info: IndexEpochCurrent: 42, IndexEpochPrevious: 41
+T+200ms:  Client requests shards/41/b6.idx.zst (based on stale nix-cache-info)
 T+201ms:  Server returns 200 OK (epoch 41 retained as previous)
 T+300ms:  Client completes query successfully
 ```
 
 **Alternate Timeline** (without grace period, showing the problem):
 ```
-T+0ms:    Client fetches manifest: { epoch: { current: 41 } }
+T+0ms:    Client fetches nix-cache-info: IndexEpochCurrent: 41
 T+50ms:   Server completes compaction, deletes shards/41/
 T+200ms:  Client requests shards/41/b6.idx.zst
 T+201ms:  Server returns 404 Not Found
-T+202ms:  Client must refresh manifest and retry (wasted round-trip)
+T+202ms:  Client must refresh nix-cache-info and retry (wasted round-trip)
 ```
 
 ## Example 8: Differential Update for Weekly Sync
@@ -1130,14 +1097,14 @@ T+202ms:  Client must refresh manifest and retry (wasted round-trip)
 **Initial State**:
 ```
 Local epoch: 149
-Remote manifest: { epoch: { current: 156, previous: 155 },
-                   deltas: { oldest_base: 66 } }
+Remote nix-cache-info: IndexEpochCurrent: 156, IndexEpochPrevious: 155,
+                       IndexDeltasOldestBase: 66
 Epochs behind: 7
 ```
 
 **Update Process**:
 ```
-1. Check: 149 >= 66 (oldest_base)? Yes, deltas available
+1. Check: 149 >= 66 (IndexDeltasOldestBase)? Yes, deltas available
 
 2. For each epoch transition (149→150, 150→151, ..., 155→156):
    a. Fetch delta files for changed shards
@@ -1155,10 +1122,10 @@ Result: ~500x bandwidth reduction
 
 **Detailed Fetch Sequence**:
 ```
-GET {deltas_base}149-150/b6.delta.zst  (if changed)
-GET {deltas_base}149-150/a1.delta.zst  (if changed)
+GET {IndexDeltasBase}149-150/b6.delta.zst  (if changed)
+GET {IndexDeltasBase}149-150/a1.delta.zst  (if changed)
 ... (only shards that changed)
-GET {deltas_base}checksums/150.json
+GET {IndexDeltasBase}checksums/150.json
 (verify checksums)
 ... repeat for 150-151, 151-152, etc.
 ```
@@ -1170,12 +1137,12 @@ GET {deltas_base}checksums/150.json
 **State**:
 ```
 Local epoch: 20
-Remote manifest: { epoch: { current: 156 }, deltas: { oldest_base: 66 } }
+Remote nix-cache-info: IndexEpochCurrent: 156, IndexDeltasOldestBase: 66
 ```
 
 **Decision Process**:
 ```
-1. Check: 20 >= 66 (oldest_base)? No
+1. Check: 20 >= 66 (IndexDeltasOldestBase)? No
 2. Deltas not available for epoch 20
 3. Fall back to full shard download
 4. Download shards/156/*.idx.zst (~1.5 GB)
@@ -1209,13 +1176,7 @@ Unlike Bloom filters, the HLSSI format stores actual hashes, allowing enumeratio
 - The latency of a non-indexed binary cache may be acceptable.
 - Critical private caches should require authentication. Authorization may be simple, or rely on HMAC instead.
 
-## 4. Client Implementation Effort
-
-Existing Nix clients must be modified to benefit from this protocol.
-
-**Note**: The protocol is purely additive—index files don't interfere with existing cache access patterns. Old clients continue working unchanged; they simply don't benefit from the index optimization. New clients that implement the protocol gain the performance benefits while remaining fully compatible with non-indexed caches.
-
-## 5. Storage Overhead
+## 4. Storage Overhead
 
 The index adds ~10-15 bits per item of storage overhead.
 
@@ -1226,7 +1187,7 @@ Index overhead = 1,064,244,619 * 12 bits ≈ 1.5 GB
 
 For cache.nixos.org storing ~720 TiB of NARs, this overhead is negligible (~0.0002%).
 
-## 6. Initial Bootstrap Requirement
+## 5. Initial Bootstrap Requirement
 
 New caches adopting this protocol must enumerate existing items once to seed the index. For large existing caches without a separate metadata database, this requires an S3 LIST operation.
 
@@ -1234,7 +1195,7 @@ New caches adopting this protocol must enumerate existing items once to seed the
 
 **Note**: For cache.nixos.org specifically, the Hydra `buildstepoutputs` table already tracks ~99.5% of all narinfos in the bucket, potentially enabling bootstrap without a full S3 LIST operation. See the [garbage collection discussion](https://discourse.nixos.org/t/garbage-collecting-cache-nixos-org/74249) for details.
 
-## 7. Delta Storage Overhead
+## 6. Delta Storage Overhead
 
 Maintaining differential updates requires additional storage for delta files and checksums.
 
@@ -1450,7 +1411,7 @@ CDNs commonly use manifest files to describe available content:
 - Package managers (apt, yum) use compressed package lists
 - Container registries use manifest lists for multi-architecture images
 
-This RFC follows the same pattern: a manifest describing index topology with efficient lookup structures.
+This RFC follows the same pattern: index metadata in `nix-cache-info` with efficient lookup structures.
 
 ## Rsync and Binary Delta Algorithms
 
@@ -1507,7 +1468,7 @@ Remaining question: does a separate realisation index improve or degrade perform
 
 Extend the existing binary cache signing mechanism to cover index files, allowing clients to verify index authenticity before trusting membership results. This would include:
 - Defining a signature file format (e.g., `.sig` files)
-- Specifying which files are signed (manifest, shards, or both)
+- Specifying which files are signed (shards, or checksums)
 - Key distribution and trust model
 
 ## 2. Index Mirroring Protocol
@@ -1518,7 +1479,6 @@ Define a protocol for mirroring indices between caches, enabling CDN-style distr
 
 Specify standard paths for persistent client-side index caching:
 ```
-~/.cache/nix/indices/<cache-hash>/manifest.json
 ~/.cache/nix/indices/<cache-hash>/shards/...
 ```
 
@@ -1541,7 +1501,7 @@ Explore peer-to-peer distribution of index files and deltas, reducing load on ce
 
 For clients that sync at predictable intervals (e.g., weekly), servers could generate "skip deltas" that jump multiple epochs at once:
 ```
-{deltas_base}140-156/  # Skip delta covering 16 epochs
+{IndexDeltasBase}140-156/  # Skip delta covering 16 epochs
 ```
 
 This would reduce round-trips for clients with predictable sync patterns, at the cost of additional server-side storage and computation.
