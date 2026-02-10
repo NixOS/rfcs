@@ -157,9 +157,9 @@ These basic layering principles will be added to the [Nix architecture documenta
 
   Features should be in the lowest layer it makes sense to have them.
 
-## The general stabilization process --- audit, refine, and *then* stabilze
+## The general stabilization process --- audit, refine, and *then* stabilize
 
-See the [current documentation on experimental features and their lifecyle](https://nixos.org/manual/nix/stable/contributing/experimental-features.html).
+See the [current documentation on experimental features and their lifecycle](https://nixos.org/manual/nix/stable/contributing/experimental-features.html).
 
 Stabilization of any feature, not just the CLI or Flakes, is not a matter of just flipping a switch on an implementation that has accrued for a period of time.
 Because the moment before stabilization is our last chance to make major changes, it is crucial that we look over what is being stabilized.
@@ -181,7 +181,7 @@ To stabilize a piece of functionality (experimental -> stable in flowchart in li
    - **Whole feature flag, not part of a feature flag**
 
      It should be possible to enable just the experimental feature that is ready for stabilization *in isolation*, without also enabling other unstable functionality that is not ready for stabilization.
-     We are not allowed to propose to stabilize part of an experimenal feature and do so immediately.
+     We are not allowed to propose to stabilize part of an experimental feature and do so immediately.
      We have to first break out the candidate functionality to be stabilized so it is just guarded by one feature flag.
 
    - **Self-Containment**
@@ -297,7 +297,7 @@ Ramifications to the user experience from layering being public:
 
   - Both perspectives are equally valid, and neither is prioritized over the other
 
-  - While not going so far as to *insist* users are aware of layering and care about it, the layered archicture of Nix should be exposed to anyone that cares, and it shouldn't suddenly dissapear (as a mere implementation detail might).
+  - While not going so far as to *insist* users are aware of layering and care about it, the layered architecture of Nix should be exposed to anyone that cares, and it shouldn't suddenly disappear (as a mere implementation detail might).
 
 Some examples of ways the principles are upheld:
 

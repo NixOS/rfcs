@@ -1,5 +1,5 @@
 ---
-feature: Simple content-adressed store paths
+feature: Simple content-addressed store paths
 start-date: 2019-08-14
 author: Théophane Hufschmitt
 co-authors: (find a buddy later to help our with the RFC)
@@ -15,7 +15,7 @@ related-issues: (will contain links to implementation PRs)
 Add some experimental support for content-addressed store paths to Nix.
 
 We plan here to give the possibility to mark certain store paths as
-content-adressed (ca), while keeping the other input-adressed as they are
+content-addressed (ca), while keeping the other input-addressed as they are
 now (modulo some mandatory drv rewriting before the build, see below).
 
 By making this opt-in, we can impose arbitrary limitations to the paths that
@@ -37,7 +37,7 @@ the `ca-derivation` experimental flag.
 
 [motivation]: #motivation
 
-Having a content-adressed store with Nix (aka the "Intensional store") is a
+Having a content-addressed store with Nix (aka the "Intensional store") is a
 long-time dream of the community − a design for that was already taking a whole
 chapter in [Eelco's PHD thesis][nixphd].
 
@@ -45,9 +45,9 @@ This was never done because it represents quite a big change in Nix's model,
 with some non-trivial implications (regarding the trust model in
 particular).
 Even without going all the way down to a fully intensional model, we can
-make specific paths content-adressed, which can give some important benefits of
+make specific paths content-addressed, which can give some important benefits of
 the intensional store at a much lower price. In particular, setting some
-critical derivations as content-adressed can lead to some substantial build
+critical derivations as content-addressed can lead to some substantial build
 cutoffs.
 
 # Detailed design
@@ -87,7 +87,7 @@ these derivations).
 
 To fully support this content-addressed model, we need to extend the current
 build process, as well as the caching and remote building systems so that they
-are able to take into account the specificies of these new derivations.
+are able to take into account the specifics of these new derivations.
 
 Fully supporting content-addressed derivations requires some deep changes to the Nix model.
 For the sake of readability, we’ll first present a simplistic model that support them in a very basic way, and then extend this model in several different ways to improve the support.
@@ -119,7 +119,7 @@ the output paths of a derivation before building it.
 This means that the Nix evaluator doesn’t know the output paths of the
 dependencies it manipulates (it _could_ know them if they are already built, but
 that would be a blatant purity hole), so these derivations can’t neither embed
-their own output path, nor explicitely refer to their dependencies by their
+their own output path, nor explicitly refer to their dependencies by their
 output path.
 
 ### Output mappings
@@ -214,7 +214,7 @@ A store path `/nix/store/abc-foo` is said to be **self-referential** if the
 content of the path mentions the path `/nix/store/abc-foo` itself (and this
 mention of the store path is called a **self-reference**).
 
-A lot of store paths happen to be self-referential (for example a path that contains both an dynamic library and an executable using that library will likely have the `rpath` of the exectuable mention the absolute path to the library).
+A lot of store paths happen to be self-referential (for example a path that contains both an dynamic library and an executable using that library will likely have the `rpath` of the executable mention the absolute path to the library).
 
 It happens that these are problematic with content-addressed derivations, because
 
@@ -224,9 +224,9 @@ It happens that these are problematic with content-addressed derivations, becaus
 However, under the assumption that self-references only appear textually in the output (_i.e_ running strings on a file that contains self-references will print all the self-references out), we can:
 
 - Build the derivation on a temporary directory (`/nix/store/someArbitraryHash-foo`, the path provided by the function `assignScratchOutputPaths` above)
-- Replace all the occurences of `someArbitraryHash` by a fixed magic value
+- Replace all the occurrences of `someArbitraryHash` by a fixed magic value
 - Compute the hash of the resulting path to determine the final path
-- Replace the occurences of the magic value by the final path hash
+- Replace the occurrences of the magic value by the final path hash
 - Move the result to the final path.
 
 This is obviously a hack, however it seems to work very well in practice, due to the fact that:
@@ -311,7 +311,7 @@ work on store paths, but rather at the realisation level:
 
   If the store knows about the given derivation output, it will return the associated realisation, otherwise it will return `None`.
 
-- The substitution loop in Nix fist calls this method to ask the remote for the
+- The substitution loop in Nix first calls this method to ask the remote for the
   realisation of the current derivation output.
   If this first call succeeds, then it fetches the corresponding output path
   like before. Then, it registers the realisation in the database:
@@ -330,7 +330,7 @@ This folder contains a set of files of the form `{drvOutput}.doi`, each of them 
 
 #### The “two-glibc” issue
 
-As stated in [Eelco’s thesis][nixphd], remote caching of content-addressed derivations can be problematic in conjonction with non-determinism:
+As stated in [Eelco’s thesis][nixphd], remote caching of content-addressed derivations can be problematic in conjunction with non-determinism:
 
 A typical scenario where this can happen is:
 
@@ -431,8 +431,8 @@ We also update `registerRealisation` for the local store to check these signatur
 same end-goal. The big difference between these two is in the scope they cover:
 RFC 0017 is about fundamentally changing the base model of Nix, while this
 proposal suggests to make only the minimal amount of changes to the current
-model to allow the content-adressed model to live in parallel (which would open
-the way to a fully content-adressed store as RFC0017, but in a much more
+model to allow the content-addressed model to live in parallel (which would open
+the way to a fully content-addressed store as RFC0017, but in a much more
 incremental way).
 
 Eventually this RFC should be subsumed by RFC0017.
@@ -485,7 +485,7 @@ annoying since:
 - More annoyingly, these references become dangling and can cause runtime
   failures
 
-We however have a way to dectect these: If we have leaking self-references then
+We however have a way to detect these: If we have leaking self-references then
 the output will change if we artificially change its output path. This could be
 integrated in the `--check` option of `nix-store`.
 

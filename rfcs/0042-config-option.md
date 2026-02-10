@@ -192,7 +192,7 @@ The second part of this RFC aims to encourage people to write better NixOS modul
 
 This RFC has to be thought of as a basis for *new* modules first and foremost. By using this approach we can provide a good basis for new modules, with great flexibility for future changes.
 
-For existing modules, it is often not possible to use this `settings` style without breaking backwards compatibility. How this is handled is left up to the module authors. A workaround that could be employed is to define options `useLegacyConfig` or `declarative` which determin  the modules behavior in regards to old options.
+For existing modules, it is often not possible to use this `settings` style without breaking backwards compatibility. How this is handled is left up to the module authors. A workaround that could be employed is to define options `useLegacyConfig` or `declarative` which determine the modules behavior in regards to old options.
 
 # Drawbacks
 [drawbacks]: #drawbacks

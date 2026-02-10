@@ -57,7 +57,7 @@ as this will help define what breakages a pull request author should take owners
     - E.g. `nixos-test` `kvm` `big-parallel`
 
 Usage for mkDerivation's `checkPhase`:
-- Quick "cheap" tests, which run units tests and maybe some addtional scenarios.
+- Quick "cheap" tests, which run units tests and maybe some additional scenarios.
 - Since this contributes to the "build time" of a package, there should be some
 emphasis on ensuring this phase isn't bloated.
 

@@ -1,5 +1,5 @@
 ---
-feature: nixos-release-stablization
+feature: nixos-release-stabilization
 start-date: 2021-01-17
 author: Jonathan Ringer (@jonringer)
 co-authors:
@@ -13,7 +13,7 @@ related-issues: "[NixOS release schedule](https://github.com/NixOS/rfcs/pull/80)
 
 To bring more certainty to the release cycle, add short periods where
 breaking changes are partially restricted. A list of Release Critical
-Packages is defined. Also, move most release stablization work from
+Packages is defined. Also, move most release stabilization work from
 the `release` branch to the `master` branch to reduce backports.
 
 # Motivation

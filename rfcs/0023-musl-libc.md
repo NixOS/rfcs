@@ -66,7 +66,7 @@ most popular libc implementation on Linux, and is used
 by a number of important projects you may be familiar with
 large userbases, including:
 * Alpine Linux - [#70 on Distrowatch](https://distrowatch.com/table.php?distribution=alpine) but very popular amongst docker users for producing slim container images.
-* [OpenWRT/LEDE](https://openwrt.org/) - #1 open-source Linux router firmware project; foundation of most other projects targetting routers.
+* [OpenWRT/LEDE](https://openwrt.org/) - #1 open-source Linux router firmware project; foundation of most other projects targeting routers.
 More projects and details of how they use musl can be found here:
 
 https://wiki.musl-libc.org/projects-using-musl.html
@@ -86,7 +86,7 @@ The main arguments for inclusion are:
 * Software sometimes must be patched to compile or run with musl; in @dtzWill's experience,
   these changes are largely fixes improving compliance and correctness resulting in
   higher-quality programs.  Recent versions of glibc have started taking stronger stances
-  on enforcing compliance (look at patch fallout folllowing any glibc upgrade in last year or so)
+  on enforcing compliance (look at patch fallout following any glibc upgrade in last year or so)
   resulting in overlapping work from both sides.
   (NOTE: use of glibc extensions or reliance on non-standard behavior is still common and unlikely to go away soon)
 
@@ -107,7 +107,7 @@ do folks believe the costs are too high?
 * [projects using musl](https://wiki.musl-libc.org/projects-using-musl.html)
 * [Slides from a talk discussing various libcs, 2014](http://events17.linuxfoundation.org/sites/events/files/slides/libc-talk.pdf)
 
-## Related Isssues
+## Related Issues
 
 * [big musl PR](https://github.com/NixOS/nixpkgs/pull/34645)
 * [issues matching "musl", newest first](https://github.com/NixOS/nixpkgs/search?o=desc&q=musl&s=created&type=Issues&utf8=%E2%9C%93)
@@ -212,7 +212,7 @@ Unfortunately this is unrealistic due to capacity constraints and other reasons.
 
 ### Responsibility
 
-"musl team" is reponsible, initially consisting of
+"musl team" is responsible, initially consisting of
 
 * @dtzWill
 * @shlevy

@@ -76,7 +76,7 @@ Check the following using CI for each package directory:
 
 ## PR 2: Automated migration
 
-Automatically migrate to new directory structure for all _satisfiying definitions_ `pkgs.${name}`, meaning derivations defined as above using `callPackage`.
+Automatically migrate to new directory structure for all _satisfying definitions_ `pkgs.${name}`, meaning derivations defined as above using `callPackage`.
 
 However automatic migration is only possible if:
 - Files don't need to be changed, only moved, with the exception of `pkgs/top-level/all-packages.nix`
@@ -337,7 +337,7 @@ Context: It's possible to override the default `{ }` argument to `callPackage` b
 
 The alternative is to not allow that, requiring that `pkgs.${name}` corresponds directly to `callPackage pkgs/by-name/${shard}/${name}/package.nix { }`.
 - (-) It's harder to explain to beginners whether their package can use the new directory structure or not
-- (+) The direct correspondance ensures that the package directory contains all information about the package, which is very intuitive
+- (+) The direct correspondence ensures that the package directory contains all information about the package, which is very intuitive
   - (-) We're not at the point where we can have that though, custom arguments don't have a good replacement yet
 - (-) If a package previously didn't need custom arguments, it would be moved to the new directory structure. But when the need for a custom argument arises, it then requires moving it out from new directory structure and into the freeform structure of `pkgs/` again.
 - (+) It's easier to relax restrictions than to impose new ones

@@ -60,7 +60,7 @@ This team should be people who are very familiar with the main components
 touched by the RFC. The author cannot be part of the Shepherd Team. In addition,
 at most half of the Shepherd Team can be part of the RFC Steering Committee.
 
-The resposibility of the team is to guide the discussion as long as it is
+The responsibility of the team is to guide the discussion as long as it is
 constructive, new points are brought up and the RFC is iterated on and from time
 to time summarise the current state of discussion. If this is the case no longer,
 then the Shepherd Team shall step in with a motion for FCP.
@@ -68,7 +68,7 @@ then the Shepherd Team shall step in with a motion for FCP.
 ##### Shepherd Leader
 The person in charge of the RFC process for a specific RFC, and responsible for
 ensuring the process is followed in a timely fashion. The Shepherd Leader has no
-special resposibility with regard to moving an undecided Shepherd Team to a
+special responsibility with regard to moving an undecided Shepherd Team to a
 certain decision.
 
 ##### Final Comment Period (FCP)

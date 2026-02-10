@@ -49,7 +49,7 @@ However this system of categorization has serious problems:
    updated copy of the Nixpkgs tree.
 
 3. The creation of a new category - and more generally the manipulation of
-   categories - requires an unpleaseant task of renaming and eventually patching
+   categories - requires an unpleasant task of renaming and eventually patching
    many seemingly unrelated files.
 
    - Moving files around Nixpkgs codebase requires updating their forward and
@@ -318,7 +318,7 @@ There are remaining issues to be solved by the categorization team:
   - Documentation updates;
   - Category curation, integration and updates;
   - Continuous Integration updates and adaptations;
-  - Coordinaton of efforts to import, integrate and update categorization of
+  - Coordination of efforts to import, integrate and update categorization of
     packages;
   - Litigations and disputations:
     - Solve them, especially in corner cases;
