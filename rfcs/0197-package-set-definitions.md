@@ -200,10 +200,7 @@ lib.makeScope newScope (
       })
       [
         (import ../../top-level/by-name-overlay.nix ./by-name)
-        (lib.extends (
-          self: super:
-          lib.optionalAttrs config.allowAliases (import (../sets/${name}/aliases.nix) self super)
-        ))
+        (self: super: lib.optionalAttrs config.allowAliases (import (./aliases.nix) self super))
         (import ./functions.nix)
         (import ./manual-packages.nix)
         (import ./overrides.nix)
@@ -309,8 +306,8 @@ lib.pipe ../sets [
       (lib.extends (import ./by-name-overlay.nix ../sets/${name}/by-name))
       # overlay aliases
       (lib.extends (
-        self: super:
-        lib.optionalAttrs self.config.allowAliases (import (../sets/${name}/aliases.nix) self super)
+        setself: setsuper:
+        lib.optionalAttrs self.config.allowAliases (import (../sets/${name}/aliases.nix) setself setsuper)
       ))
       # overlay functions
       (lib.extends (import (../sets/${name}/functions.nix)))
@@ -328,7 +325,7 @@ lib.pipe ../sets [
 // {
   # python
   # we only recurse into the newest 2 python versions
-  python3PackagesFor = self.callPackage ../sets/python3Packages/packageset.nix {};
+  python3PackagesFor = self.callPackage ../sets/python3Packages/packageset.nix { };
   python311Packages = self.python3PackagesFor self.python311;
   python312Packages = self.python3PackagesFor self.python312;
   python313Packages = lib.recurseIntoAttrs (self.python3PackagesFor self.python313);
@@ -339,7 +336,7 @@ lib.pipe ../sets [
   pypy3Packages = pypy312Packages;
 
   # nextcloud
-  nextcloudPackagesFor = self.callPackage ../sets/nextcloudPackages/packageset.nix {};
+  nextcloudPackagesFor = self.callPackage ../sets/nextcloudPackages/packageset.nix { };
   nextcloud31Packages = self.nextcloudPackagesFor "31"; # idk if it works like this, this is an example
   nextcloud32Packages = self.nextcloudPackagesFor "32";
   nextcloud33Packages = self.nextcloudPackagesFor "33";
