@@ -202,6 +202,7 @@ lib.makeScope newScope (
         (import ./overrides.nix)
         (import ./functions.nix)
         (import ./aliases.nix)
+        (import ./manual-packages.nix)
       ]
   )
 )
@@ -247,6 +248,7 @@ pkgs
 │   │   │           └── package.nix
 │   │   ├── aliases.nix
 │   │   ├── functions.nix
+│   │   ├── manual-packages.nix
 │   │   ├── mkFishPlugin.nix (could also be inlined in functions.nix)
 │   │   └── overrides.nix
 │   │
@@ -269,11 +271,12 @@ pkgs
 │   │   │   └── buildPythonPackage.nix
 │   │   ├── aliases.nix
 │   │   ├── functions.nix
+│   │   ├── manual-packages.nix
 │   │   ├── overrides.nix
 │   │   └── packageset.nix ← entrypoint for versioned python3Packages
 │   ...
 └── top-level
-    ├── by-name-overlay.nix ← aliases for deprecated versions of package sets
+    ├── aliases.nix ← aliases for deprecated versions of package sets
     ├── by-name-overlay.nix ← used to autocall sharded packages (no change required)
     ...
     └── package-sets.nix ← calls all package sets in pkgs/sets
@@ -307,6 +310,8 @@ lib.pipe ../sets [
       ))
       # overlay functions
       (lib.extends (import (../sets/${name}/functions.nix)))
+      # overlay manual packages
+      (lib.extends (import (../sets/${name}/manual-packages.nix)))
       # overlay overrides
       (lib.extends (import (../sets/${name}/overrides.nix)))
       # make a new scope and recurse into it
