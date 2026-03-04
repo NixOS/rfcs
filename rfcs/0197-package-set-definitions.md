@@ -188,6 +188,7 @@ Example `packageset.nix` (I think this would work, but I haven't tested it):
 {
   lib,
   newScope,
+  config,
 }:
 python:
 lib.makeScope newScope (
@@ -199,10 +200,13 @@ lib.makeScope newScope (
       })
       [
         (import ../../top-level/by-name-overlay.nix ./by-name)
-        (import ./overrides.nix)
+        (lib.extends (
+          self: super:
+          lib.optionalAttrs config.allowAliases (import (../sets/${name}/aliases.nix) self super)
+        ))
         (import ./functions.nix)
-        (import ./aliases.nix)
         (import ./manual-packages.nix)
+        (import ./overrides.nix)
       ]
   )
 )
