@@ -24,7 +24,7 @@ Package sets (definition see [Detailed Design](#detailed-design) e.g.`fishPlugin
     that is checked in the CI with `nixpkgs-vet`
     - packages in this structure will get all the benefits of `pkgs/by-name`
   - they must have files `overrides.nix`, `aliases.nix`, `functions.nix` and `manual-packages.nix`
-    containing aliases, overrides, functions and packages outside of the `by-name` structure
+    containing aliases, overrides, functions and packages outside the `by-name` structure
   - are optionally are autocalled
     - this would be the case for manually defined package sets
       and auto generated package sets
@@ -32,12 +32,12 @@ Package sets (definition see [Detailed Design](#detailed-design) e.g.`fishPlugin
     they have to be manually called
     - this would be the case for versioned package sets
 - can be versioned for which they:
-  - are are called multiple times through `packageset.nix`
+  - are called multiple times through `packageset.nix`
     with the different interpreter/compiler/... versions
   - may have a top-level function `<setname>For` that allows convenient creation
     of new versions
   - may be in `passthru` of the package that they depend on
-    - this can be archived by using the `<setname>For` function
+    - this can be archieved by using the `<setname>For` function
 
 # Motivation
 [motivation]: #motivation
@@ -76,7 +76,7 @@ Package sets often depend on the version of a base program, such as an interpret
 Package sets are sometimes nested:
 - `emacsPackages.{melpa,elpa,nongnu}{,Devel}Packages`
 - `ocamlPackages.janeStreet`
-- `vscode-extensions.*` but thats a whole another mess
+- `vscode-extensions.*` but that's a whole another mess
 - `kdePackages.{gear,frameworks,plasma}`
 - ...
 
@@ -160,7 +160,7 @@ in
 ```
 
 Package sets in `pkgs/sets` _must_ have a file `pkgs/sets/<setname>/manual-packages.nix`
-that is an overlay containing derivations outside of the `by-name` structure
+that is an overlay containing derivations outside the `by-name` structure
 - **auto generated package sets** don't need to abuse the `overrides.nix`
 - the migration of (large) package sets can initially keep the `by-name` structure empty and
   only fill it gradually, simplifying the migration of large package sets
@@ -174,8 +174,8 @@ Since the `packageset.nix` is not automatically called
 there is no need to place any more restrictions on this file,
 which allows package sets to be flexible.
 Calling these package sets should be done in a file in `pkgs/top-level` e.g.
-- `top-level/package-sets.nix` -> have all package sets in one place
-- `top-level/all-packages.nix` -> only have autocalled packages in a separate file -> file is small
+- `top-level/package-sets.nix` → have all package sets in one place
+- `top-level/all-packages.nix` → only have autocalled packages in a separate file → file is small
 
 If a package set does not have a `packageset.nix`,
 it is autocalled by a file in `pkgs/top-level` (e.g. `top-level/package-sets.nix`).
@@ -183,7 +183,7 @@ it is autocalled by a file in `pkgs/top-level` (e.g. `top-level/package-sets.nix
 Versioned package sets
 like `python*Packages`, `nextcloud*Packages`
 will have to use the manual calling with `packageset.nix`
-Example `packageset.nix` (i think this would work but i haven't tested it):
+Example `packageset.nix` (I think this would work, but I haven't tested it):
 ```nix
 {
   lib,
@@ -270,13 +270,13 @@ pkgs
 │   │   ├── aliases.nix
 │   │   ├── functions.nix
 │   │   ├── overrides.nix
-│   │   └── packageset.nix <- entrypoint for versioned python3Packages
+│   │   └── packageset.nix ← entrypoint for versioned python3Packages
 │   ...
 └── top-level
-    ├── by-name-overlay.nix <- aliases for deprecated versions of package sets
-    ├── by-name-overlay.nix <- used to autocall sharded packages (no change required)
+    ├── by-name-overlay.nix ← aliases for deprecated versions of package sets
+    ├── by-name-overlay.nix ← used to autocall sharded packages (no change required)
     ...
-    └── package-sets.nix <- calls all package sets in pkgs/sets
+    └── package-sets.nix ← calls all package sets in pkgs/sets
 ```
 
 ## `pkgs/top-level/package-sets.nix` could look like
