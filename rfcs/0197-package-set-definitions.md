@@ -194,17 +194,13 @@ python:
 lib.makeScope newScope (
   self:
   lib.fix (
-    lib.extend
-      (x: {
-        inherit python;
-      })
-      [
-        (import ../../top-level/by-name-overlay.nix ./by-name)
-        (self: super: lib.optionalAttrs config.allowAliases (import (./aliases.nix) self super))
-        (import ./functions.nix)
-        (import ./manual-packages.nix)
-        (import ./overrides.nix)
-      ]
+    lib.pipe (x: { inherit python; }) [
+      (lib.extends (import ../../top-level/by-name-overlay.nix ./by-name))
+      (lib.extends (self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix self super)))
+      (lib.extends (import ./functions.nix))
+      (lib.extends (import ./manual-packages.nix))
+      (lib.extends (import ./overrides.nix))
+    ]
   )
 )
 ```
