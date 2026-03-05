@@ -23,7 +23,7 @@ Package sets (definition see [Detailed Design](#detailed-design) e.g.`fishPlugin
     with a sharded `by-name` like structure
     that is checked in the CI with `nixpkgs-vet`
     - packages in this structure will get all the benefits of `pkgs/by-name`
-  - they must have files `overrides.nix`, `aliases.nix`, `functions.nix` and `manual-packages.nix`
+  - they _must_ have files `overrides.nix`, `aliases.nix`, `functions.nix` and `manual-packages.nix`
     containing aliases, overrides, functions and packages outside the `by-name` structure
   - are optionally are autocalled
     - this would be the case for manually defined package sets
@@ -34,9 +34,9 @@ Package sets (definition see [Detailed Design](#detailed-design) e.g.`fishPlugin
 - can be versioned for which they:
   - are called multiple times through `packageset.nix`
     with the different interpreter/compiler/... versions
-  - may have a top-level function `<setname>For` that allows convenient creation
+  - _may_ have a top-level function `<setname>For` that allows convenient creation
     of new versions
-  - may be in `passthru` of the package that they depend on
+  - _may_ be in `passthru` of the package that they depend on
     - this can be archieved by using the `<setname>For` function
 
 # Motivation
@@ -178,9 +178,13 @@ which allows package sets to be flexible.
 Calling these package sets should be done in a file in `pkgs/top-level` e.g.
 - `top-level/package-sets.nix` → have all package sets in one place
 - `top-level/all-packages.nix` → only have autocalled packages in a separate file → file is small
+The `packageset.nix` is especially useful for versioned package set,
+but could also be used for other package sets that need special handling.
+
 
 If a package set does not have a `packageset.nix`,
 it is autocalled by a file in `pkgs/top-level` (e.g. `top-level/package-sets.nix`).
+This would be the case for most simple or auto generated package sets.
 
 Versioned package sets
 like `python*Packages`, `nextcloud*Packages`
@@ -212,14 +216,14 @@ lib.makeScope newScope (
 )
 ```
 
-Versioned package sets may define a top-level function wrapping this e.g.
+Versioned package sets _may_ define a top-level function wrapping this e.g.
 ```nix
 {
   pythonPackagesFor = callPackage ../sets/pythonPackages/packageset.nix {};
 }
 ```
 
-Versioned package sets may be in `passthru` of the package that they depend on e.g.
+Versioned package sets _may_ be in `passthru` of the package that they depend on e.g.
 ```nix
 {
   lib,
