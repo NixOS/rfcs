@@ -19,7 +19,7 @@ Package sets (definition see [Detailed Design](#detailed-design) e.g.`fishPlugin
   - variables like `version`, `withFoo`, ...
   - TBD: other package sets?
 - should move to `pkgs/sets/<setname>` where
-  - they must have a directory `pkgs/sets/<setname>/by-name`
+  - they _may_ have a directory `pkgs/sets/<setname>/by-name`
     with a sharded `by-name` like structure
     that is checked in the CI with `nixpkgs-vet`
     - packages in this structure will get all the benefits of `pkgs/by-name`
@@ -105,12 +105,14 @@ with a few exceptions for versioned package sets that don't have a default versi
 - e.g. `nextcloud*Packages` will be in `pkgs/sets/nextcloudPackages`,
   but there is no `pkgs.nextcloudPackages`
 
-Package sets in `pkgs/sets` _must_ have a directory `pkgs/sets/<setname>/by-name`
+Package sets in `pkgs/sets` _may_ have a directory `pkgs/sets/<setname>/by-name`
 which is a sharded directory structure for isolated package definitions as defined by RFC 140.
 This sharded structure is checked in the CI by `nixpkgs-vet`
 and will get the same benefits of `pkgs/by-name`
 like merge bot maintainer merging, scaleability, isolation and vetting.
-If there are no packages that fit into this structure, it may be empty.
+The directory `by-name` is not mandatory because not all package sets
+(e.g. completely generated package sets) have packages that fit into this structure.
+It is impossible to have empty folders in git.
 
 Package sets in `pkgs/sets` _must_ have a file `pkgs/sets/<setname>/overrides.nix`
 that is an overlay containing overrides for packages in the `by-name` structure
@@ -195,7 +197,12 @@ lib.makeScope newScope (
   self:
   lib.fix (
     lib.pipe (x: { inherit python; }) [
-      (lib.extends (import ../../top-level/by-name-overlay.nix ./by-name))
+      (lib.extends (
+        self: super:
+        lib.optionalAttrs (lib.pathExists ./by-name) (
+          import ../../top-level/by-name-overlay.nix ./by-name self super
+        )
+      ))
       (lib.extends (self: super: lib.optionalAttrs config.allowAliases (import ./aliases.nix self super)))
       (lib.extends (import ./functions.nix))
       (lib.extends (import ./manual-packages.nix))
@@ -299,7 +306,12 @@ lib.pipe ../sets [
     name: _:
     lib.pipe (self: { }) [
       # autocall all sharded by name packages
-      (lib.extends (import ./by-name-overlay.nix ../sets/${name}/by-name))
+      (lib.extends (
+        self: super:
+        optionalAttrs (lib.pathExists ../sets/${name}/by-name) (
+          import ./by-name-overlay.nix ../sets/${name}/by-name self super
+        )
+      ))
       # overlay aliases
       (lib.extends (
         setself: setsuper:
