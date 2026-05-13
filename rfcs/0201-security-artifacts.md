@@ -29,25 +29,28 @@ A unified interface will:
 This RFC proposes the `security.artifacts` module tree:
 
 1. **Option Declaration**:
-   `security.artifacts.secrets.<name>` accepts a submodule configuring the owner, group, mode, and target path of the secret.
+   `security.artifacts.secrets.<name>` accepts a submodule configuring the owner, group, mode, target path, and **optional per-secret provider**.
 
 2. **Providers**:
    The abstraction supports pluggable backends (`security.artifacts.provider`):
    - `sops-nix`
    - `agenix`
    - `systemd-creds`
+   - `external` (Assumes secret is provisioned outside of NixOS, e.g. cloud-init)
    - `dummy` (for CI/CD environments where secrets are mocked plaintext)
+
+   Users can set a global provider or override it per-secret, allowing for mixed configurations (e.g. TPM2-bound local secrets via `systemd-creds` alongside shared GitOps secrets via `sops-nix`).
 
 3. **Systemd Synchronization**:
    A global systemd target `nixos-artifacts-secrets.target` is introduced. All secrets must be provisioned before this target is reached. Downstream services that consume secrets simply need `Wants = [ "nixos-artifacts-secrets.target" ]` and `After = [ "nixos-artifacts-secrets.target" ]`.
 
 4. **Security Assertions**:
-   Evaluation-time assertions guarantee that the resolved paths of the secrets do not leak into `/nix/store`.
+   Evaluation-time assertions guarantee that the resolved paths of the secrets do not leak into `/nix/store` and that required source files are specified for providers that need them.
 
 # Examples and Interactions
 [examples-and-interactions]: #examples-and-interactions
 
-A user deploying a Postgres database password using `sops-nix`:
+### Basic Usage with `sops-nix`:
 
 ```nix
 security.artifacts.enable = true;
@@ -57,12 +60,31 @@ security.artifacts.secrets."postgres-pw" = {
   owner = "postgres";
   group = "postgres";
   mode = "0400";
+  source = ./secrets/postgres.yaml;
 };
 
 services.postgresql = {
   enable = true;
-  # ...
-  # The module can directly read the provisioned artifact or accept the path.
+  # Explicitly reference the artifact path
+  passwordFile = config.security.artifacts.secrets."postgres-pw".path;
+};
+```
+
+### Mixed Providers (TPM2 + GitOps):
+
+```nix
+security.artifacts.enable = true;
+security.artifacts.provider = "sops-nix"; # Global default
+
+security.artifacts.secrets = {
+  "shared-app-key" = {
+    source = ./secrets/app.yaml;
+  };
+  
+  "local-tpm-secret" = {
+    provider = "systemd-creds"; # Override global default
+    path = "/run/secrets/tpm-key";
+  };
 };
 ```
 
