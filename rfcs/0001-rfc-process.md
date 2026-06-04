@@ -23,7 +23,7 @@ because they introduce new concepts, big changes or are controversial enough
 that not everybody will agree on the direction to take.
 
 Therefore, the purpose of this RFC is to introduce a process that allows to
-bring the discussion upfront and avoid unnecesary implementations. It forces
+bring the discussion upfront and avoid unnecessary implementations. It forces
 developers to formulate their ideas without getting bogged down into
 implementation details. This RFC is used to bootstrap the process and further
 RFCs can be used to refine the process.
@@ -64,7 +64,7 @@ Pull requests that contain any of the afore mentioned 'substantial' changes may 
 ## Description of the process
 
 In short, to get a major feature added to the Nix ecosystem, one should first
-go through the RFC process in order to improve the likelyhood of inclusion.
+go through the RFC process in order to improve the likelihood of inclusion.
 Here are roughly the steps that one would take:
 
 * Fork the RFC repo https://github.com/NixOS/rfcs
@@ -79,12 +79,12 @@ that will help them bring the RFC to completion. The goal is to improve the
 chances that the RFC is both desired and likely to be implemented.
 
 Once the author is happy with the state of the RFC, they should seek for
-wider community review by stating the readyness of the work. Advertisement on
+wider community review by stating the readiness of the work. Advertisement on
 the mailing-list and IRC is an acceptable way of doing that.
 
 After a number of rounds of review the discussion should settle and a general
 consensus should emerge. This bit is left intentionally vague and should be
-refined in the future. We don't have a technical commitee so controversial
+refined in the future. We don't have a technical committee so controversial
 changes will be rejected by default.
 
 If a RFC is accepted then authors may implement it and submit the feature as a

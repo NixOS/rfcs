@@ -20,7 +20,7 @@ evolution of the Nix ecosystem and community. It was originally slated
 as a year-long experiment.
 
 It is now a little over a year since officially merging. In that time,
-the core team has not made signifcant progress on its initial goals.
+the core team has not made significant progress on its initial goals.
 We now have the RFC steering/shepherding process which serves similar
 goals (but for the whole ecosystem, not just Nix proper) and is
 operating well. The remaining functions of the core team *not* covered
@@ -46,7 +46,7 @@ announce on all relevant forums.
 
 * Keep the core team around in its current form and responsibilities.
   Would require a fresh attempt to follow through on the relevant
-  committments to be practical.
+  commitments to be practical.
 * Reform the core team based on what we've learned, including possibly
   narrowing the scope.
 

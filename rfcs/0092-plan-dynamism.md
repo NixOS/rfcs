@@ -69,7 +69,7 @@ It's very efficient, because it doesn't obligate the use of the Nix expression l
 
 It's also quite compatible with `--dry-run`.
 Because derivations don't get new dependencies *mid build*, we have no need to mess with individual steps to explore the plan.
-There still becomes multiple sorts of `--dry-run` policies, but all of them just have to do with building or not buidling derivations which *themselves* are unchanged.
+There still becomes multiple sorts of `--dry-run` policies, but all of them just have to do with building or not building derivations which *themselves* are unchanged.
 
 To make that more, clear, if you *do* want one big ("hundreds of thousands of nodes"-big), static graph, you can still have it!
 Build all the derivations that compute derivations, but not nothing else.
@@ -222,7 +222,7 @@ gives us the path to an output of it.
   still can not build derivations and then use them at evaluation
   time, meaning that you can't have an attribute set whose contents
   are determined by some build, and then access that attribute set
-  outside of build that dependens on that derivation.
+  outside of build that depends on that derivation.
 - We unfortunately expose the `text` `outputHashMode` to users.
   Preferably this should be removed entirely, in addition to `flat`,
   and everything should just use `recursive`.

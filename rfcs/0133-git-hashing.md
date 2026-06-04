@@ -64,7 +64,7 @@ This support entails two basic things:
 Git hashing would not (in this first proposed version) support references, since references in Nix's sense are not part of Git's data model.
 This is OK for now; encoding references is not needed for the intended initial use-case of exchanging source code.
 
-## Git file hashing for `buitins.fetch*`
+## Git file hashing for `builtins.fetch*`
 
 - **Purpose**: Source distribution and archival
 - **Depends on**: Git file hashing

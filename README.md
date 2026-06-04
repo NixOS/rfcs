@@ -101,7 +101,7 @@ graph TD
     NoShepherds[Closed - Lack of Interest]:::closed
     NoShepherds --> |Renewed Interest| Discuss
 
-    FCP[Final Coment Phase]
+    FCP[Final Comment Phase]
     FCP --> |FCP Canceled| Discuss
     FCP --> |Accept| Merged
     FCP --> |Reject| Rejected

@@ -147,7 +147,7 @@ When a package has a problem that `error`s, all packages that depend on it will 
 
 When the problem requires actions on dependents however, it does not sufficiently inform about all packages that need action. Multiple packages may be annotated with the same problem, in that case it should be given a name and the name should be the same across all instances. Other values like the message or the URL list do not need to be the same and may be adapted sensibly.
 
-### Backwards compatbility, Backporting and stable releases
+### Backwards compatibility, Backporting and stable releases
 
 New problems generally should not be added to stable branches if possible, and also not be backported to them, since it may break evaluation. The same rule applies to other changes to a package or its `meta` which may generate a problem and thus lead to evaluation failure too. Scenarios where evaluation failure is a desired goal, for example with unfixable security issues, are obviously exempt from this.
 
@@ -272,7 +272,7 @@ These have the advantage of enforcing the presence of a name if there are multip
 
 On the nixpkgs configuration side, the first iteration used a generic "predicate" system for ignoring packages, similar to `allowUnfreePredicate` and `allowInsecurePredicate`. This turned out to be both too flexible and not convenient enough to use, so this was complemented with a list of packages to ignore and "smart" default values generation.
 
-A second approach used a list type: `list of ("packageName.warningKind" or "packageName.*" or "*.warningKind" or "*.*")`. This was a binary choice (compared to the ternary value today), with an additional boolean `traceIgnoredWarnings` option. One downside is that it does not allow granular control over warnings, only evaluation failures. A bigger issue is that due to how the merge rules on lists work, it would have been difficult to provide good default values for the nixpkgs confinguration while keeping backwards compatibility.
+A second approach used a list type: `list of ("packageName.warningKind" or "packageName.*" or "*.warningKind" or "*.*")`. This was a binary choice (compared to the ternary value today), with an additional boolean `traceIgnoredWarnings` option. One downside is that it does not allow granular control over warnings, only evaluation failures. A bigger issue is that due to how the merge rules on lists work, it would have been difficult to provide good default values for the nixpkgs configuration while keeping backwards compatibility.
 
 A third approach used a two-level attribute set, similarly to the list above, but with the value setting the handler instead of it being a binary choice. `"*"."*" = "error";`, `myPackage."*" = "ignore";`, `"*".maintainerless = "ignore";`, etc. This provides better merging behavior than a list, while also being more granular. However, people voiced concerns about people accidentally wildcard-ignoring everything. Also, it is ambiguous on matching problem name vs problem kind, which mostly works fine but might lead to weird things happening in the case where new kinds are introduced.
 

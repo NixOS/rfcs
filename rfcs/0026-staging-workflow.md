@@ -9,7 +9,7 @@ related-issues:
 # Summary
 [summary]: #summary
 
-Define a new workflow for the `staging` branch that can better accomodate the
+Define a new workflow for the `staging` branch that can better accommodate the
 current and future influx of changes in order to deliver mass-rebuilds faster to
 master. As part of this new workflow an additional branch, `staging-next`, shall
 be introduced.
@@ -20,14 +20,14 @@ be introduced.
 
 The current workflow cannot handle the high amount of mass-rebuilds that are
 continuously delivered, resulting in long delays for these deliveries to reach
-`master`. When a certain delivery causes failures, attemps are typically made to
+`master`. When a certain delivery causes failures, attempts are typically made to
 fix these failures and stabilize `staging` so that the specific delivery can still
 reach `master`.
 
 Often it happens that during this period of stabilization other mass-rebuilds
 are submitted, and it is not uncommon that these also introduce failures, thus
 again increasing the time it takes for a delivery to reach `master`. This is
-especially worrysome in case of security fixes that need to be delivered as soon
+especially worrisome in case of security fixes that need to be delivered as soon
 as possible.
 
 # Detailed design

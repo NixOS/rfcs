@@ -47,7 +47,7 @@ graph TD
     NoShepherds[Closed - Lack of Interest]:::closed
     NoShepherds --> |Renewed Interest| Discuss
 
-    FCP[Final Coment Phase]
+    FCP[Final Comment Phase]
     FCP --> |FCP Canceled| Discuss
     FCP --> |Accept| Merged
     FCP --> |Reject| Rejected
@@ -144,4 +144,4 @@ None
 # Future work
 [future]: #future-work
 
-The ony work that needs to be done is updating documentation and informing the NixOS RFC Steering Committee.
+The only work that needs to be done is updating documentation and informing the NixOS RFC Steering Committee.

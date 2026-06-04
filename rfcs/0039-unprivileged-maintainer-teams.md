@@ -178,7 +178,7 @@ for requested reviews](https://github.com/pulls/review-requested).
    automation with credentials on an automated basis.
 
 # Future Potential RFCs
-The following topics are explictly _not_ part of this RFC.
+The following topics are explicitly _not_ part of this RFC.
 
  - Allowing maintainers to merge pull requests against their packages
    without having commit access.
