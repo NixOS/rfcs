@@ -135,11 +135,7 @@ IndexFormat: hlssi
 IndexCreatedAt: 2026-01-13T12:00:00Z
 IndexItemCount: 1200000000
 IndexShardingDepth: 2
-IndexShardingAlphabet: 0123456789abcdfghijklmnpqrsvwxyz
-IndexEncodingType: golomb-rice
 IndexEncodingParameter: 8
-IndexHashBits: 160
-IndexPrefixBits: 10
 IndexJournalBase: https://cache.example.com/nix-cache-index/journal/
 IndexShardsBase: https://cache.example.com/nix-cache-index/shards/
 IndexDeltasBase: https://cache.example.com/nix-cache-index/deltas/
@@ -161,11 +157,7 @@ Clients that understand these fields use the index. Clients that don't recognize
 - `IndexCreatedAt`: ISO 8601 timestamp of when this index configuration was generated
 - `IndexItemCount`: Total number of store path hashes indexed across all shards. This is approximate and provided for client information and debugging purposes; it may drift slightly between compactions.
 - `IndexShardingDepth`: Number of prefix characters used for partitioning (0–4)
-- `IndexShardingAlphabet`: The base32 alphabet used for shard prefixes. MUST match Nix's alphabet: `0123456789abcdfghijklmnpqrsvwxyz`
-- `IndexEncodingType`: Compression algorithm for shard files
 - `IndexEncodingParameter`: Golomb-Rice divisor exponent (M = 2^parameter)
-- `IndexHashBits`: Total bits in a full store path hash (160 for Nix)
-- `IndexPrefixBits`: Bits consumed by the shard prefix, used to compute suffix size. For depth=2, this is 10 bits (2 characters × 5 bits each).
 - `IndexJournalBase`: Base URL for journal segment files
 - `IndexShardsBase`: Base URL for shard files
 - `IndexDeltasBase`: Base URL for delta files and checksums
@@ -176,6 +168,10 @@ Clients that understand these fields use the index. Clients that don't recognize
 - `IndexDeltasEnabled`: Whether differential updates are available (see Section 10)
 - `IndexDeltasOldestBase`: Oldest epoch from which deltas can be applied. Clients with a local epoch older than this must perform a full download.
 - `IndexDeltasCompression`: Compression algorithm for delta files (`zstd`)
+
+**Format Invariants**: The `hlssi` format fixes several properties that are therefore not advertised as fields. The index is defined over Nix store-path digests, which are 160-bit hashes encoded in Nix's base32 alphabet (`0123456789abcdfghijklmnpqrsvwxyz`, 5 bits per character). The number of bits consumed by the shard prefix is therefore `IndexShardingDepth × 5`, and the per-shard suffix width is `160 − (IndexShardingDepth × 5)`; neither is advertised separately. Shard suffixes are Golomb-Rice coded (tuned by `IndexEncodingParameter`) and every shard file is zstd-compressed (see Section 5). Any change to these invariants would require a new `IndexFormat` (and, if not backward-compatible, a new `IndexVersion`).
+
+**Backward Compatibility**: These fields are purely additive. Nix's `nix-cache-info` parser reads line-oriented `key: value` pairs, recognizes only `StoreDir`, `WantMassQuery`, and `Priority`, and silently ignores every other key (`src/libstore/binary-cache-store.cc`). This behaviour is unchanged across all Nix 2.x releases (verified from 2.3 through the current development branch): unrecognized keys fall through the parser's `if`/`else if` chain with no error. Existing clients are therefore unaffected by the `Index*` fields: caches that advertise an index remain fully usable by clients that predate this RFC.
 
 **Caching**: Servers SHOULD use the `Cache-Control` HTTP header to specify the caching duration of `nix-cache-info`. Clients SHOULD respect this header to allow the server to control how long the index metadata is cached. Revalidation using `If-Modified-Since` or `ETag` SHOULD also be used.
 
@@ -197,8 +193,8 @@ The journal captures recent mutations.
 
 - Lines beginning with `+` indicate additions
 - Lines beginning with `-` indicate deletions (tombstones)
-- Hash is the 32-character store path hash (no `-name` suffix)
-- Encoding is ASCII (all characters are in the ASCII range: `+`, `-`, the 32 Nix base32 characters, and newline `\n`)
+- Hash is the 160 bit store path digest, nixbase32-encoded (32 characters, no `-name` suffix)
+- The whole file is ASCII (as `+`, `-`, the 32 Nix base32 characters, and newline `\n` are in the ASCII range)
 
 **Segment Lifecycle**:
 1. Writer appends to current segment file
@@ -209,13 +205,18 @@ The journal captures recent mutations.
 **Write Protocol** (for cache operators):
 ```
 On artifact push:
-  1. Upload .narinfo and .nar to storage
+  1. Upload the artifacts to storage: the .narinfo, the .nar (only if its
+     contents are not already present on the cache), and any additional
+     objects the configuration produces (e.g. build logs, debug symbols)
   2. Append "+<hash>\n" to current journal segment
 
 On garbage collection:
-  1. Delete .narinfo and .nar from storage
+  1. Delete the .narinfo from storage; delete the .nar only if it is no
+     longer referenced by any other .narinfo
   2. Append "-<hash>\n" to current journal segment
 ```
+
+**Concurrency**: Because the journal is an append-only log, all appends to a given segment MUST be serialized through a single logical writer per cache. This is a notable change from current practice: today multiple uncoordinated agents may upload `.narinfo`/`.nar` objects directly to raw object storage in parallel. Artifact uploads MAY remain concurrent, but recording those mutations in the journal requires a serialization point (a dedicated writer/coordinator, or a queue that batches appends). Caches that cannot provide a single writer can instead rebuild journal segments periodically by listing storage, at the cost of higher latency before new paths appear in the index.
 
 **Implementation Optimizations**: Servers MAY implement HTTP range requests to allow clients to efficiently catch up on journal segments. Servers with dynamic capabilities MAY implement long polling for near-real-time updates. These optimizations are not required by the protocol but can improve performance.
 
@@ -849,11 +850,7 @@ IndexFormat: hlssi
 IndexCreatedAt: 2026-01-13T12:00:00Z
 IndexItemCount: 487
 IndexShardingDepth: 0
-IndexShardingAlphabet: 0123456789abcdfghijklmnpqrsvwxyz
-IndexEncodingType: golomb-rice
 IndexEncodingParameter: 6
-IndexHashBits: 160
-IndexPrefixBits: 0
 IndexJournalBase: https://homelab.local/nix-cache-index/journal/
 IndexShardsBase: https://homelab.local/nix-cache-index/shards/
 IndexDeltasBase: https://homelab.local/nix-cache-index/deltas/
@@ -912,11 +909,7 @@ IndexFormat: hlssi
 IndexCreatedAt: 2026-01-13T12:00:00Z
 IndexItemCount: 98452103
 IndexShardingDepth: 2
-IndexShardingAlphabet: 0123456789abcdfghijklmnpqrsvwxyz
-IndexEncodingType: golomb-rice
 IndexEncodingParameter: 8
-IndexHashBits: 160
-IndexPrefixBits: 10
 IndexJournalBase: https://cache.example.org/index/journal/
 IndexShardsBase: https://cdn.example.org/index/shards/
 IndexDeltasBase: https://cdn.example.org/index/deltas/
