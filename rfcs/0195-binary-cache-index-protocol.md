@@ -216,6 +216,8 @@ On garbage collection:
   2. Append "-<hash>\n" to current journal segment
 ```
 
+The index tracks store-path membership only. Auxiliary objects such as build logs (keyed by derivation) and debug symbols (keyed by build-id) are not keyed by store-path digest and are therefore not reflected in the index; uploading or deleting them produces no journal entry. Each push or GC of a store path records exactly one line (`+<hash>` or `-<hash>`), regardless of how many auxiliary objects accompany it.
+
 **Concurrency**: Because the journal is an append-only log, all appends to a given segment MUST be serialized through a single logical writer per cache. This is a notable change from current practice: today multiple uncoordinated agents may upload `.narinfo`/`.nar` objects directly to raw object storage in parallel. Artifact uploads MAY remain concurrent, but recording those mutations in the journal requires a serialization point (a dedicated writer/coordinator, or a queue that batches appends). Caches that cannot provide a single writer can instead rebuild journal segments periodically by listing storage, at the cost of higher latency before new paths appear in the index.
 
 **Implementation Optimizations**: Servers MAY implement HTTP range requests to allow clients to efficiently catch up on journal segments. Servers with dynamic capabilities MAY implement long polling for near-real-time updates. These optimizations are not required by the protocol but can improve performance.
